@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}
+    LOGS
+{% endblock %}
+
+{% block page_header %}
+    LOGS
+{% endblock %}
+
+{% block stats %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="fa fa-files-o fa-fw"></i> Logs type
+            <div class="pull-right">
+                <div class="btn-group">
+                </div>
+            </div>
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+                <table>
+                    <tr>
+                        <td style="padding:0 15px 0 15px;">
+                           <a href="{{ url_for('export_file', type='all') }}"> <button type="button" class="btn btn-outline btn-warning btn-lg">ALL</button></a>
+                        </td>
+                        <td style="padding:0 15px 0 15px;">
+                            <a href="{{ url_for('export_file', type='users') }}"><button type="button" class="btn btn-outline btn-primary btn-lg">Users</button></a>
+
+                        </td>
+                        <td style="padding:0 15px 0 15px;">
+                             <a href="{{ url_for('export_file', type='mdx') }}"><button type="button" class="btn btn-outline btn-success btn-lg">MDX Quries</button></a>
+                        </td>
+                        <td style="padding:0 15px 0 15px;">
+                             <a href="{{ url_for('export_file', type='xmla') }}"><button type="button" class="btn btn-outline btn-info btn-lg">XMLA</button></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
+    <!-- /.panel -->
+{% endblock %}

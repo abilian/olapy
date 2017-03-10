@@ -1,0 +1,15 @@
+[TYPECHECK]
+# List of classes / modules names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set).
+ignored-classes=SQLAlchemy
+ignored-modules=lxml.etree
+
+
+[REPORTS]
+output-format=colorized
+
+# Include message's id in output
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+
+# Tells whether to display a full report or only the messages
+reports=no

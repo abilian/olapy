@@ -1,0 +1,68 @@
+(* The ebnf file is the translation and improvement of microsoft mdx's spec, from  https://msdn.microsoft.com/fr-fr/library/windows/desktop/ms717923%28v=vs.85%29.aspx *)
+(* The ebnf conversion was guided by http://stackoverflow.com/questions/14922242/how-to-convert-bnf-to-ebnf *)
+(* The generation of mdx_parser.py is as easy as: /path/to/grako bnf_mdx.ebnf -o mdx_parser.py *)
+
+
+MDX_statement =
+			select_statement;
+		
+select_statement::selectStatement = name:'SELECT' [axis_specification_columns:axis_specification]
+						[',' axis_specification_rows:axis_specification]
+						'FROM' cube_specification:cube_specification
+						['WHERE' condition_specification:condition_specification]$
+                        ;
+
+axis_specification = [left_accolade] [fetch_form] @:dim_props_place [right_accolade] 'ON' axis_name; 
+
+dim_props_place = [left_parentheses] @:dim_props_type [right_parentheses] ;
+
+dim_props_type = [left_accolade] [fetch_type] @:dim_props_op_l1 [right_accolade] [{@:operator dim_props_type}*]; 
+
+dim_props_op_l1 = [left_parentheses] @:dim_props_op [right_parentheses];
+
+dim_props_op = [left_accolade] @:dim_props_ligne [right_accolade] [{@:comma dim_props_op}*];
+
+dim_props_ligne = [left_parentheses] @:dimension_place [right_parentheses] [{ (@:comma | @:dpoint ) @:dim_props_ligne}*] ;
+
+dimension_place = [left_accolade] @:dim_props [ point @:laste_node] [ @:comma @:dim_props [ point @:laste_node ]] [@:dpoint @:dim_props [ point @:laste_node ]] [right_accolade] | @:dimension_shortcut;
+
+dim_props =  {[point] [left_bracket] @:dimension [right_bracket]}* ;
+
+laste_node = "members" | "children" | "Members" | 'ALLMEMBERS' ;
+
+dimension = @:/[a-zA-Z0-9'_'' '',']*/ ;
+
+axis_name = '0' | '1' |'COLUMNS' | 'ROWS' | '_ROWS';
+
+cube_specification = [left_bracket] dimension [right_bracket];
+
+condition_specification =  [left_parentheses] {[point] [left_bracket] @:dimension [right_bracket]}* [right_parentheses] ;
+
+digit = 
+"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+fetch_type = 'CROSSJOIN' | 'NONEMPTY' | 'union' | 'except' | 'extract' ;
+
+dimension_shortcut = 'all' | 'time' ;
+
+fetch_form = 'NONEMPTY' | 'non_empty' | 'non empty' ;
+	
+left_bracket = '[';
+
+right_bracket = ']';
+
+left_parentheses = '(';
+
+right_parentheses = ')';
+
+left_accolade = '{';
+
+right_accolade = '}';
+
+point = '.' ;
+
+dpoint = ':' ;
+
+comma = ',' ;
+
+operator = '+' | '-' | '/' | '*' ; 

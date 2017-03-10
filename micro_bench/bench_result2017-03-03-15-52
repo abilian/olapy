@@ -1,0 +1,210 @@
+Benchmarks are made with cpu :
+Intel(R) Core(TM) i7-2630QM CPU @ 2.00GHz
+
+Query 1 :
+
+            SELECT
+            FROM [temp_cube]
+            WHERE ([Measures].[Amount])
+            CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
+Query 2 :
+SELECT
+        NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
+        [table0].[table0].[All table0A].Members}}}, {
+        [table0].[table0].[table0A].[173]})))
+        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+        ON COLUMNS
+        FROM [temp_cube]
+        WHERE ([Measures].[Amount])
+        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+        
+----------------------------------------------------------
+
+Query 3 :
+
+        SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
+        [table0].[table0].[All table0A].Members}}}, {
+        [table0].[table0].[table0A].[497],
+[table0].[table0].[table0A].[173],
+[table0].[table0].[table0A].[211],
+[table0].[table0].[table0A].[95],
+[table0].[table0].[table0A].[811],
+[table0].[table0].[table0A].[538]
+        })))
+        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+        ON COLUMNS
+        FROM [temp_cube]
+        WHERE ([Measures].[Amount])
+        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+        
+----------------------------------------------------------
+
++---------+----------------------+
+|  Query  | olapy execution time |
++---------+----------------------+
+| Query 1 |   0.0900395646351    |
+| Query 2 |    1.41003381724     |
+| Query 3 |    1.52728830868     |
++---------+----------------------+
+
+******************************************************************************
+* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *
+* (olapy warehouse"s cube has more rows)                                     *
+******************************************************************************
+
+Query 1 :
+SELECT
+               NON EMPTY {[Measures].[Supply Time]}
+               DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON 0
+               FROM
+               [Warehouse]
+----------------------------------------------------------
+
+Query 2 :
+SELECT
+            NON EMPTY CrossJoin(Hierarchize({
+            [Product].[Brand Name].Members,
+            [Product].[Drink].[Alcoholic Beverages].[Beer and Wine].[Wine].[Pearl].Children}), {
+            [Measures].[Supply Time]})
+            DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON 0
+            FROM [Warehouse]
+----------------------------------------------------------
+
+Query 3 :
+SELECT
+            NON EMPTY CrossJoin(CrossJoin(Hierarchize({
+            [Product].[Brand Name].Members}),Hierarchize({
+            [Store Type].[All Store Types],
+            [Store Type].[All Store Types].Children})),
+            {[Measures].[Supply Time]})
+            DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON 0
+            FROM [Warehouse]
+----------------------------------------------------------
+
++---------+---------------+----------------+
+|  Query  |    mondrian   |     olapy      |
++---------+---------------+----------------+
+| Query 1 | 18.2991748387 | 0.295552442385 |
+| Query 2 | 5.94784549779 | 0.64196827645  |
+| Query 3 | 9.70531274535 |  1.7915328602  |
++---------+---------------+----------------+
+
+******************************************
+* iCcube v4.8.2 with "sales Excel" Cube  *
+******************************************
+
+Query 1 :
+SELECT
+          FROM [Sales]
+          WHERE ([Measures].[Amount])
+          CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
+Query 2 :
+SELECT
+                  NON EMPTY Hierarchize(AddCalculatedMembers({DrilldownLevel({
+                  [Geography].[Geo].[All Continent]})}))
+                  DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+                  ON COLUMNS
+                  FROM [Sales]
+                  WHERE ([Measures].[Amount])
+                  CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
+Query 3 :
+SELECT
+                  NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
+                  [Geography].[Geography].[All Continent].Members}}}, {
+                  [Geography].[Geography].[Continent].[America],
+                  [Geography].[Geography].[Continent].[Europe]})}}, {
+                  [Geography].[Geography].[Continent].[America].[United States],
+                  [Geography].[Geography].[Continent].[Europe].[France],
+                  [Geography].[Geography].[Continent].[Europe].[Spain]})))
+                  DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+                  ON COLUMNS
+                  FROM [sales]
+                  WHERE ([Measures].[Amount])
+                  CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
+Query 4 :
+SELECT
+                  NON EMPTY CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
+                  [Geography].[Geography].[All Continent].Members}}}, {
+                  [Geography].[Geography].[Continent].[America],
+                  [Geography].[Geography].[Continent].[Europe]})}}, {
+                  [Geography].[Geography].[Continent].[America].[United States],
+                  [Geography].[Geography].[Continent].[Europe].[France],
+                  [Geography].[Geography].[Continent].[Europe].[Spain]}))), Hierarchize(AddCalculatedMembers({
+                  [Product].[Product].[Company].Members})))
+                  DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+                  ON COLUMNS
+                  FROM [sales]
+                  WHERE ([Measures].[Amount])
+                  CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
+Query 5 :
+SELECT
+                  NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
+                  [Geography].[Geography].[All Continent].Members}}}, {
+                  [Geography].[Geography].[Continent].[America],
+                  [Geography].[Geography].[Continent].[Europe]})}}, {
+                  [Geography].[Geography].[Continent].[America].[United States],
+                  [Geography].[Geography].[Continent].[Europe].[France],
+                  [Geography].[Geography].[Continent].[Europe].[Spain]}))),
+                  Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{
+                  [Product].[Product].[Company].Members}}, {
+                  [Product].[Product].[Company].[Crazy Development]})}}, {
+                  [Product].[Product].[Company].[Crazy Development].[olapy]})))),
+                  Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownMember({{
+                  [Time].[Time].[Year].Members}}, {
+                  [Time].[Time].[Year].[2010]})}}, {
+                  [Time].[Time].[Year].[2010].[Q2 2010]})}}, {
+                  [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]}))))
+                  DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+                  ON COLUMNS
+                  FROM [sales]
+                  WHERE ([Measures].[Amount])
+                  CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+----------------------------------------------------------
+
++---------+----------------+-----------------+
+|  Query  |     olapy      |      icCube     |
++---------+----------------+-----------------+
+| Query 1 | 0.281230660283 |  0.621506021932 |
+| Query 2 | 0.059574795634 | 0.0932817094385 |
+| Query 3 |  0.1762889296  | 0.0877657527287 |
+| Query 4 | 0.146335781106 |  0.101121254574 |
+| Query 5 |  1.094864808   |  1.28551811198  |
++---------+----------------+-----------------+
+
+---------------- Profiling olapy Query 5 ------------------ 
+
+Fri Mar 03 15:53:38 2017    C:/Users/Mouadh/Google Drive/olapy-core/olapy-core/micro_bench/__init__.py.profile
+
+         101703 function calls (100437 primitive calls) in 0.337 seconds
+
+   Ordered by: internal time
+   List reduced from 658 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        3    0.129    0.043    0.129    0.043 {gc.collect}
+    19870    0.013    0.000    0.019    0.000 {isinstance}
+        1    0.010    0.010    0.068    0.068 xmla_execute_tools.py:53(generate_xs0)
+     2749    0.007    0.000    0.014    0.000 dtypes.py:74(is_dtype)
+        1    0.006    0.006    0.337    0.337 xmla.py:104(Execute)
+9403/8227    0.005    0.000    0.007    0.000 {len}
+     1580    0.004    0.000    0.008    0.000 common.py:357(_get_dtype_type)
+     1684    0.004    0.000    0.004    0.000 {method 'format' of 'str' objects}
+  170/122    0.004    0.000    0.017    0.000 base.py:142(__new__)
+      225    0.004    0.000    0.023    0.000 algorithms.py:1010(take_nd)
+       88    0.004    0.000    0.008    0.000 internals.py:2841(_rebuild_blknos_and_blklocs)
+     3671    0.003    0.000    0.003    0.000 {hasattr}
+2985/2975    0.003    0.000    0.003    0.000 {getattr}
+      485    0.003    0.000    0.003    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+1411/1390    0.003    0.000    0.003    0.000 {numpy.core.multiarray.array}
+
+

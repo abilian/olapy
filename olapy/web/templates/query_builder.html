@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Query Builder
+{% endblock %}
+
+{% block page_header %}
+    Query Builder
+{% endblock %}
+
+{% block stats %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="fa fa-wrench fa-fw"></i> Query Builder
+        </div>
+        <div class="panel-body">
+            <div class="row" style="height: 750px">
+                <iframe src="{{ url_for('qbuilder') }}" width="100%" height="100%" name="myFrame" id="myFrame"></iframe>
+            </div>
+        </div>
+    </div>
+{% endblock %}

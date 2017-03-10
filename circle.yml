@@ -1,0 +1,11 @@
+dependencies:
+  cache_directories:
+     - "~/.cache/"
+  override:
+    - pip install -U pip tox
+    # Just to fill up the cache (to speed up later builds)
+    - pip install -q -r requirements.txt
+
+test:
+  override:
+    - tox

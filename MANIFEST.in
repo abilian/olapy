@@ -1,0 +1,6 @@
+include *.rst *.txt *.ini *.py *.cfg *.yml
+recursive-include olapy *
+recursive-include cubes *
+prune tmp
+prune instance
+prune .git

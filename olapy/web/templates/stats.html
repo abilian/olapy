@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Statistics
+{% endblock %}
+
+{% block page_header %}
+    Statistics
+{% endblock %}
+
+{% block css_imp %}
+    <link href="{{ url_for('static',filename='vendor/bootstrap/css/dataTables.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block stats %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="fa fa-bar-chart-o fa-fw"></i> Statistics
+            <div class="pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                        Actions
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu pull-right" role="menu">
+                        <li>
+                            <a href="{{ url_for('export') }}">Export to Excel</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="row">
+
+
+{#                <select name="Time" class="form-control" style="width: 15%" onchange="change_p()">#}
+{#                    {{ dates_filter|safe }}#}
+{#                </select>#}
+                <br>
+                    <div class="table-responsive">
+                        {{ table_result|safe }}
+                    </div>
+            </div>
+            <!-- /.row -->
+        </div>
+
+        <div id="graph">
+
+        </div>
+
+        {% for id in ids %}
+            {#            <h3>{{ id }}</h3>#}
+            <div id="{{ id }}"></div>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
+
+{% block js_t %}
+
+    <script src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/d3.min') }}"></script>
+    <script src="{{ url_for('static',filename='js/plotly-basic.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable();
+        });
+    </script>
+
+
+        <script type="text/javascript">
+            var graphs = {{graphe['graphJSON'] | safe}};
+            var ids = {{graphe['ids'] | safe}};
+            for (var i in graphs) {
+                Plotly.plot(
+                        ids[i], // the ID of the div, created above
+                        graphs[i].data,
+                        graphs[i].layout || {});
+            }
+        </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable();
+        });
+
+    </script>
+{% endblock %}
