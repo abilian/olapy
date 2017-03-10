@@ -23,9 +23,9 @@ setup(
     include_package_data=False,
     classifiers=[
         "Programming Language :: Python",
-        "Development Status :: 2 - Alpha",
+        'Development Status :: 3 - Alpha',
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
-        "Topic :: Business intelligence",
+        # "Topic :: Business intelligence",
     ],)
