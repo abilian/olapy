@@ -84,4 +84,4 @@ or simply (on Unix-like systems)::
 Credits
 -------
 
-This project is developed by `Abilian SAS <https://www.abilian.com>`_ and partially funded by the French Government through the `Investissement d'avenir <http://www.gouvernement.fr/investissements-d-avenir-cgi>`_ programme.
+This project is developed by `Abilian SAS <https://www.abilian.com>`_ and partially funded by the French Government through the `Wendelin <http://www.wendelin.io/>`_ project and the `Investissement d'avenir <http://www.gouvernement.fr/investissements-d-avenir-cgi>`_ programme.
