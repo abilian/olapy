@@ -11,11 +11,12 @@ install_requires = [str(ir.req) for ir in _install_requires]
 
 setup(
     name='olapy',
-    version="0.2.1",
+    version="0.2.2",
     packages=find_packages(),
     author="Abilian SAS",
     author_email="contact@abilian.com",
     description="OLAP Engine",
+    url='https://github.com/abilian/olapy',
     # TODO fix tox problem with path
     long_description=open('README.rst').read(),
     install_requires=install_requires,
