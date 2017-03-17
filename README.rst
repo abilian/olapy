@@ -45,8 +45,6 @@ and use the url: http://127.0.0.1:8000/xmla in Excel
 
 *  Be sure to use ``Provider=MSOLAP.6`` in Excel (see https://blogs.technet.microsoft.com/excel_services__powerpivot_for_sharepoint_support_blog/2015/10/30/configuring-the-msolap-data-provider-version).
 
-* If you want to select many measures in Excel, select them before the dimensions and then drag and drop 'Values' attribute from COLUMNS to ROWS excel field.
-
 
 With the demo web app
 ~~~~~~~~~~~~~~~~~~~~~
