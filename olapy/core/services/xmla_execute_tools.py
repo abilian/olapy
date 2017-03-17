@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
-from collections import OrderedDict
-
 import itertools
+from collections import OrderedDict
 
 
 class XmlaExecuteTools():
@@ -523,12 +522,12 @@ class XmlaExecuteTools():
         tuple = ""
         # not used dimensions
         for dim_diff in list(
-                set(self.executer.get_all_tables_names(ignore_fact=True)) -
-                set([
-                    table_name
-                    for table_name in mdx_execution_result['columns_desc'][
-                        'all']
-                ])):
+                set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
+                    [
+                        table_name
+                        for table_name in mdx_execution_result['columns_desc'][
+                            'all']
+                    ])):
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>

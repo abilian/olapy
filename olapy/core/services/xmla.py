@@ -1,15 +1,16 @@
 from __future__ import absolute_import, division, print_function
 
-from lxml import etree
 from datetime import datetime
+
+from lxml import etree
 from spyne import AnyXml, Application, ServiceBase, rpc
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
-from .xmla_execute_xsds import execute_xsd
+from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
-from ..services.models import DiscoverRequest, ExecuteRequest, Session
+from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaProviderService(ServiceBase):
@@ -81,8 +82,7 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(
-                request)
+            return discover_tools.discover_mdschema_dimensions_response(request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -100,8 +100,7 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(
-                request)
+            return discover_tools.discover_mdschema_properties_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)

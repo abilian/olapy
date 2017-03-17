@@ -10,35 +10,29 @@
 # Any changes you make to it will be overwritten the next time
 # the file is generated.
 
-
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 from grako.buffering import Buffer
-from grako.parsing import graken, Parser
-from grako.util import re, RE_FLAGS, generic_main  # noqa
+from grako.parsing import Parser, graken
+from grako.util import RE_FLAGS, generic_main, re  # noqa
 
-
-__all__ = [
-    'MdxParserGen',
-    'UnknownSemantics',
-    'main'
-]
+__all__ = ['MdxParserGen', 'UnknownSemantics', 'main']
 
 KEYWORDS = {}
 
 
 class UnknownBuffer(Buffer):
-    def __init__(
-        self,
-        text,
-        whitespace=None,
-        nameguard=None,
-        comments_re=None,
-        eol_comments_re=None,
-        ignorecase=None,
-        namechars='',
-        **kwargs
-    ):
+
+    def __init__(self,
+                 text,
+                 whitespace=None,
+                 nameguard=None,
+                 comments_re=None,
+                 eol_comments_re=None,
+                 ignorecase=None,
+                 namechars='',
+                 **kwargs):
         super(UnknownBuffer, self).__init__(
             text,
             whitespace=whitespace,
@@ -47,25 +41,23 @@ class UnknownBuffer(Buffer):
             eol_comments_re=eol_comments_re,
             ignorecase=ignorecase,
             namechars=namechars,
-            **kwargs
-        )
+            **kwargs)
 
 
 class MdxParserGen(Parser):
-    def __init__(
-        self,
-        whitespace=None,
-        nameguard=None,
-        comments_re=None,
-        eol_comments_re=None,
-        ignorecase=None,
-        left_recursion=False,
-        parseinfo=True,
-        keywords=None,
-        namechars='',
-        buffer_class=UnknownBuffer,
-        **kwargs
-    ):
+
+    def __init__(self,
+                 whitespace=None,
+                 nameguard=None,
+                 comments_re=None,
+                 eol_comments_re=None,
+                 ignorecase=None,
+                 left_recursion=False,
+                 parseinfo=True,
+                 keywords=None,
+                 namechars='',
+                 buffer_class=UnknownBuffer,
+                 **kwargs):
         if keywords is None:
             keywords = KEYWORDS
         super(MdxParserGen, self).__init__(
@@ -79,8 +71,7 @@ class MdxParserGen(Parser):
             keywords=keywords,
             namechars=namechars,
             buffer_class=buffer_class,
-            **kwargs
-        )
+            **kwargs)
 
     @graken()
     def _MDX_statement_(self):
@@ -105,10 +96,10 @@ class MdxParserGen(Parser):
             self._condition_specification_()
             self.name_last_node('condition_specification')
         self._check_eof()
-        self.ast._define(
-            ['axis_specification_columns', 'axis_specification_rows', 'condition_specification', 'cube_specification', 'name'],
-            []
-        )
+        self.ast._define([
+            'axis_specification_columns', 'axis_specification_rows',
+            'condition_specification', 'cube_specification', 'name'
+        ], [])
 
     @graken()
     def _axis_specification_(self):
@@ -148,6 +139,7 @@ class MdxParserGen(Parser):
                 self._operator_()
                 self.name_last_node('@')
                 self._dim_props_type_()
+
             self._closure(block1)
 
     @graken()
@@ -173,6 +165,7 @@ class MdxParserGen(Parser):
                 self._comma_()
                 self.name_last_node('@')
                 self._dim_props_op_()
+
             self._closure(block1)
 
     @graken()
@@ -197,6 +190,7 @@ class MdxParserGen(Parser):
                         self._error('no available options')
                 self._dim_props_ligne_()
                 self.name_last_node('@')
+
             self._closure(block1)
 
     @graken()
@@ -248,6 +242,7 @@ class MdxParserGen(Parser):
             self.name_last_node('@')
             with self._optional():
                 self._right_bracket_()
+
         self._closure(block0)
 
     @graken()
@@ -305,6 +300,7 @@ class MdxParserGen(Parser):
             self.name_last_node('@')
             with self._optional():
                 self._right_bracket_()
+
         self._closure(block0)
         with self._optional():
             self._right_parentheses_()
@@ -347,7 +343,8 @@ class MdxParserGen(Parser):
                 self._token('except')
             with self._option():
                 self._token('extract')
-            self._error('expecting one of: CROSSJOIN NONEMPTY except extract union')
+            self._error(
+                'expecting one of: CROSSJOIN NONEMPTY except extract union')
 
     @graken()
     def _dimension_shortcut_(self):
@@ -420,6 +417,7 @@ class MdxParserGen(Parser):
 
 
 class UnknownSemantics(object):
+
     def MDX_statement(self, ast):
         return ast
 

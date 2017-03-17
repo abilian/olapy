@@ -213,13 +213,15 @@ def test_execution_query1():
 
 
 def test_execution_query3():
-    df = pd.DataFrame({'Continent': ['America', 'Europe'],
-                       'Amount': [768, 255]}
-                      ).groupby(['Continent']).sum()
+    df = pd.DataFrame({
+        'Continent': ['America', 'Europe'],
+        'Amount': [768, 255]
+    }).groupby(['Continent']).sum()
 
     executer.mdx_query = query12
     assert assert_frame_equal(df, executer.execute_mdx()['result']) is None
 
     executer.mdx_query = query11
 
-    assert list(executer.execute_mdx()['result']['Amount']) == [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    assert list(executer.execute_mdx()['result'][
+        'Amount']) == [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]

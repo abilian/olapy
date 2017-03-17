@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
+import itertools
 import os
 import re
 from collections import OrderedDict
-import itertools
 
 import numpy as np
 import pandas as pd
@@ -51,9 +51,8 @@ class MdxEngine:
 
         location = os.path.join(
             os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), "..", "..", "..", "..")),
-            MdxEngine.CUBE_FOLDER)
+                os.path.join(os.path.dirname(__file__), "..", "..", "..",
+                             "..")), MdxEngine.CUBE_FOLDER)
         return [
             file for file in os.listdir(location)
             if os.path.isdir(os.path.join(location, file))
@@ -68,9 +67,8 @@ class MdxEngine:
         '''
         return os.path.join(
             os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), '..', "..", '..', '..')),
-            self.cube_folder)
+                os.path.join(os.path.dirname(__file__), '..', "..", '..',
+                             '..')), self.cube_folder)
 
     def _load_tables(self):
         """
@@ -455,7 +453,9 @@ class MdxEngine:
         tables_n_columns = self.get_tables_and_columns(query_axes)
 
         columns_to_keep = OrderedDict(
-            (table, columns) for table, columns in tables_n_columns['all'].items() if table != self.facts)
+            (table, columns)
+            for table, columns in tables_n_columns['all'].items()
+            if table != self.facts)
 
         # if we have measures on axes we have to ignore them
         tuples_on_mdx_query = [
@@ -499,8 +499,7 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

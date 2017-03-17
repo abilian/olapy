@@ -92,7 +92,7 @@ class Propertielist(ComplexModel):
 
 
 class Command(ComplexModel):
-    _type_info = {'Statement': Unicode, }
+    _type_info = {'Statement': Unicode,}
 
 
 class ExecuteRequest(ComplexModel):

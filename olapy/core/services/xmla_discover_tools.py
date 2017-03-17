@@ -1,14 +1,23 @@
 from __future__ import absolute_import, division, print_function
 
-from .xmla_discover_xsds import discover_datasources_xsd, discover_preperties_xsd, discover_schema_rowsets_xsd, \
-    discover_literals_xsd, mdschema_sets_xsd, mdschema_kpis_xsd, dbschema_catalogs_xsd, mdschema_cubes_xsd, \
-    dbschema_tables_xsd, mdschema_measures_xsd, mdschema_dimensions_xsd, mdschema_hierarchies_xsd, mdschema_levels_xsd, \
-    mdschema_measuresgroups_xsd, mdschema_measuresgroups_dimensions_xsd, mdschema_properties_PROPERTIES_xsd, \
-    mdschema_members_xsd
+import uuid
 
 from lxml import etree
+
 from ..mdx.executor.execute import MdxEngine
-import uuid
+from .xmla_discover_xsds import (dbschema_catalogs_xsd, dbschema_tables_xsd,
+                                 discover_datasources_xsd,
+                                 discover_literals_xsd,
+                                 discover_preperties_xsd,
+                                 discover_schema_rowsets_xsd,
+                                 mdschema_cubes_xsd, mdschema_dimensions_xsd,
+                                 mdschema_hierarchies_xsd, mdschema_kpis_xsd,
+                                 mdschema_levels_xsd, mdschema_measures_xsd,
+                                 mdschema_measuresgroups_dimensions_xsd,
+                                 mdschema_measuresgroups_xsd,
+                                 mdschema_members_xsd,
+                                 mdschema_properties_PROPERTIES_xsd,
+                                 mdschema_sets_xsd)
 
 
 # TODO clean
@@ -67,6 +76,7 @@ class XmlaDiscoverTools():
         </return>""")
 
     def discover_properties_response(self, request):
+
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
             return etree.fromstring("""
@@ -108,15 +118,15 @@ class XmlaDiscoverTools():
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
+                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
+                                 '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
+                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
+                                 '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
@@ -2281,8 +2291,7 @@ class XmlaDiscoverTools():
                                 </row>
                             </root>
                         </return>
-                            """.format(self.selected_catalogue, separed_tuple[
-                        0], joined, request.Restrictions.RestrictionList.
-                                       MEMBER_UNIQUE_NAME, ''.join(
-                                           c for c in separed_tuple[-1]
-                                           if c not in '[]')))
+                            """.format(
+                        self.selected_catalogue, separed_tuple[0], joined,
+                        request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,
+                        ''.join(c for c in separed_tuple[-1] if c not in '[]')))

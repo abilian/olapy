@@ -1,11 +1,11 @@
 from __future__ import absolute_import, division, print_function
 
+import itertools
 import os
 from io import BytesIO
 from itertools import groupby
 from operator import itemgetter
 
-import itertools
 import pandas as pd
 from flask import flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required, login_user, logout_user
@@ -13,14 +13,14 @@ from pandas import DataFrame, Series
 from treelib import Tree
 from treelib.tree import DuplicatedNodeIdError
 
-from .forms import LoginForm, QueryForm
-from .models import User
 from olapy.web.pivottable import pivot_ui
-from ..core.mdx.executor.execute import MdxEngine
 
+from ..core.mdx.executor.execute import MdxEngine
 from ..web import app, login_manager
 from ..web.logger import Logs
 from ..web.stats_utils import graphs
+from .forms import LoginForm, QueryForm
+from .models import User
 
 # in pandas there is a problem with conversion multiindex dataframe to json
 # to solve the export to excel problem we used a global variable
@@ -35,6 +35,7 @@ log_mdx = Logs('mdx')
 
 
 class Nod:
+
     def __init__(self, text, id, parent):
         self.text = text
         self.id = id
@@ -63,7 +64,7 @@ def generate_tree_levels():
                 for k, v in groupby(
                         sorted((df.groupby(
                             list(df.columns.values[0:df.columns.get_loc(c) +
-                                1])).groups).keys()),
+                                                   1])).groups).keys()),
                         key=itemgetter(*range(0, df.columns.get_loc(c)))):
 
                     if type(k) not in [list, tuple]:
@@ -235,9 +236,10 @@ def stats():
     ex = MdxEngine(CUBE)
     graph = graphs()
 
-    columns = list(itertools.chain.from_iterable(
-        [[column for column in df.columns] for table_name, df in ex.tables_loaded.items() if
-         table_name != ex.facts]))
+    columns = list(
+        itertools.chain.from_iterable([[column for column in df.columns]
+                                       for table_name, df in ex.tables_loaded.
+                                       items() if table_name != ex.facts]))
     columns.append(ex.measures[0])
 
     temp_rslt = ex.load_star_schema_dataframe[columns].head(200)
@@ -249,9 +251,8 @@ def stats():
     return render_template(
         'stats.html',
         user=current_user,
-        table_result=temp_rslt.to_html(classes=[
-            'table table-bordered table-hover table-striped display'
-        ]),
+        table_result=temp_rslt.to_html(
+            classes=['table table-bordered table-hover table-striped display']),
         graphe=graph,
         ids=graph['ids'])
 

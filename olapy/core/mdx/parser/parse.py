@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 from grako.model import ModelBuilderSemantics
+
 from .gen_parser.mdxparser import MdxParserGen
 from .gen_parser.models import selectStatement
 

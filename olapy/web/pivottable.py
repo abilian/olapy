@@ -38,10 +38,8 @@ class IFrame(object):
             params = "?" + six.moves.urllib.parse.urlencode(self.params)
         else:
             params = ""
-        return self.iframe.format(src=self.src,
-                                  width=self.width,
-                                  height=self.height,
-                                  params=params)
+        return self.iframe.format(
+            src=self.src, width=self.width, height=self.height, params=params)
 
 
 template = """

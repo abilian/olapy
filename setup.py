@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, print_function
 import pip
 from setuptools import find_packages, setup
 
-
 session = pip.download.PipSession()
 _install_requires = pip.req.parse_requirements(
     'requirements.txt', session=session)
