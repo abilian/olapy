@@ -81,22 +81,27 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(request)
+            return discover_tools.discover_mdschema_dimensions_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
-            return discover_tools.discover_mdschema_hierarchies_response(request)
+            return discover_tools.discover_mdschema_hierarchies_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_LEVELS":
             return discover_tools.discover_mdschema_levels__response(request)
 
         elif request.RequestType == "MDSCHEMA_MEASUREGROUPS":
-            return discover_tools.discover_mdschema_measuresgroups_response(request)
+            return discover_tools.discover_mdschema_measuresgroups_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_MEASUREGROUP_DIMENSIONS":
-            return discover_tools.discover_mdschema_measuresgroups_dimensions_response(request)
+            return discover_tools.discover_mdschema_measuresgroups_dimensions_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(request)
+            return discover_tools.discover_mdschema_properties_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)
@@ -127,7 +132,8 @@ class XmlaProviderService(ServiceBase):
             </return>
             """)
         else:
-            XmlaProviderService.discover_tools.change_catalogue(request.Properties.PropertyList.Catalog)
+            XmlaProviderService.discover_tools.change_catalogue(
+                request.Properties.PropertyList.Catalog)
             executer = XmlaProviderService.discover_tools.executer
             executer.mdx_query = request.Command.Statement
             df = executer.execute_mdx()
@@ -143,33 +149,34 @@ class XmlaProviderService(ServiceBase):
                             <Cube>
                                 <CubeName>Sales</CubeName>
                                 <LastDataUpdate
-                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{6}</LastDataUpdate>
+                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{7}</LastDataUpdate>
                                 <LastSchemaUpdate
-                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{6}</LastSchemaUpdate>
+                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{7}</LastSchemaUpdate>
                             </Cube>
                         </CubeInfo>
                         <AxesInfo>
                             {1}
-                        </AxesInfo>
                             {2}
+                        </AxesInfo>
+                            {3}
                     </OlapInfo>
                     <Axes>
-                        {3}
                         {4}
+                        {5}
                     </Axes>
                     <CellData>
-                        {5}
+                        {6}
                     </CellData>
                 </root>
             </return>
             """.format(execute_xsd,
                        xmla_tools.generate_axes_info(df),
+                       xmla_tools.generate_axes_info_slicer(df),
                        xmla_tools.generate_cell_info(),
                        xmla_tools.generate_xs0(df),
                        xmla_tools.generate_slicer_axis(df),
                        xmla_tools.generate_cell_data(df),
-                       datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-                       ))
+                       datetime.now().strftime('%Y-%m-%dT%H:%M:%S')))
 
 
 application = Application(

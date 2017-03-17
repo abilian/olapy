@@ -16,13 +16,16 @@ class XmlaDiscoverTools():
     """
     XmlaDiscoverTools for generating xmla discover responses
     """
+
     def __init__(self):
         # right now the catalogue_name and cube name are the same
         self.catalogues = MdxEngine.get_cubes_names()
         self.selected_catalogue = self.catalogues[0]
         self.executer = MdxEngine(self.selected_catalogue)
-        self.star_schema_dataframe = self.executer.load_star_schema_dataframe[
-            [col for col in self.executer.load_star_schema_dataframe.columns if col[-3:] != "_id"]]
+        self.star_schema_dataframe = self.executer.load_star_schema_dataframe[[
+            col for col in self.executer.load_star_schema_dataframe.columns
+            if col[-3:] != "_id"
+        ]]
         self.SessionId = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
@@ -37,7 +40,11 @@ class XmlaDiscoverTools():
             self.selected_catalogue = new_catalogue
             self.executer = MdxEngine(new_catalogue)
             self.star_schema_dataframe = self.executer.load_star_schema_dataframe[
-                [col for col in self.executer.load_star_schema_dataframe.columns if col[-3:] != "_id"]]
+                [
+                    col
+                    for col in self.executer.load_star_schema_dataframe.columns
+                    if col[-3:] != "_id"
+                ]]
 
     def discover_datasources_response(self):
         return etree.fromstring("""
@@ -60,7 +67,8 @@ class XmlaDiscoverTools():
         </return>""")
 
     def discover_properties_response(self, request):
-        def get_props(xsd, PropertyName, PropertyDescription, PropertyType, PropertyAccessType, IsRequired, Value):
+        def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
+                      PropertyAccessType, IsRequired, Value):
             return etree.fromstring("""
             <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
@@ -77,7 +85,8 @@ class XmlaDiscoverTools():
                     </row>
                     </root>
             </return>
-            """.format(PropertyName, PropertyDescription, PropertyType, PropertyAccessType, IsRequired, Value))
+            """.format(PropertyName, PropertyDescription, PropertyType,
+                       PropertyAccessType, IsRequired, Value))
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -85,48 +94,53 @@ class XmlaDiscoverTools():
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"
-            return get_props(discover_preperties_xsd, 'Catalog', 'Catalog', 'string', 'ReadWrite', 'false', value)
+            return get_props(discover_preperties_xsd, 'Catalog', 'Catalog',
+                             'string', 'ReadWrite', 'false', value)
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ServerName':
-            return get_props(discover_preperties_xsd, 'ServerName', 'ServerName', 'string', 'Read', 'false', 'Mouadh')
+            return get_props(discover_preperties_xsd, 'ServerName',
+                             'ServerName', 'string', 'Read', 'false', 'Mouadh')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ProviderVersion':
-            return get_props(discover_preperties_xsd, 'ProviderVersion', 'ProviderVersion', 'string', 'Read', 'false',
+            return get_props(discover_preperties_xsd, 'ProviderVersion',
+                             'ProviderVersion', 'string', 'Read', 'false',
                              '0.02  08-Mar-2016 08:41:28 GMT')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries', 'MdpropMdxSubqueries', 'int', 'Read',
-                                 'false', '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries', 'MdpropMdxSubqueries', 'int', 'Read',
-                                 'false', '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxDrillFunctions', 'MdpropMdxDrillFunctions', 'int',
-                                 'Read',
-                                 'false', '3')
+                return get_props(
+                    discover_preperties_xsd, 'MdpropMdxDrillFunctions',
+                    'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxDrillFunctions', 'MdpropMdxDrillFunctions', 'int',
-                                 'Read',
-                                 'false', '3')
+                return get_props(
+                    discover_preperties_xsd, 'MdpropMdxDrillFunctions',
+                    'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxNamedSets':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets', 'MdpropMdxNamedSets', 'int',
-                                 'Read',
-                                 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
+                                 'MdpropMdxNamedSets', 'int', 'Read', 'false',
+                                 '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets', 'MdpropMdxNamedSets', 'int',
-                                 'Read',
-                                 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
+                                 'MdpropMdxNamedSets', 'int', 'Read', 'false',
+                                 '15')
 
         return etree.fromstring("""
         <return>
@@ -1693,7 +1707,8 @@ class XmlaDiscoverTools():
                         </row>
                     </root>
                   </return>
-                          """.format(self.selected_catalogue, self.selected_catalogue))
+                          """.format(self.selected_catalogue,
+                                     self.selected_catalogue))
                 return etree.fromstring("""
                 <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
@@ -1761,7 +1776,8 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
             if request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3:
                 if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(request.Properties.PropertyList.Catalog)
+                    self.change_catalogue(
+                        request.Properties.PropertyList.Catalog)
                     for mes in self.executer.measures:
                         measures += """
                         <row>
@@ -1796,10 +1812,12 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
             if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
                 if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(request.Properties.PropertyList.Catalog)
+                    self.change_catalogue(
+                        request.Properties.PropertyList.Catalog)
                     rows = ""
                     ord = 1
-                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                    for tables in self.executer.get_all_tables_names(
+                            ignore_fact=True):
                         rows += """
                         <row>
                             <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -1815,9 +1833,7 @@ class XmlaDiscoverTools():
                             <IS_READWRITE>false</IS_READWRITE>
                             <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
                             <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                        </row>""".format(self.selected_catalogue,
-                                         tables,
-                                         ord)
+                        </row>""".format(self.selected_catalogue, tables, ord)
                         ord += 1
 
                     rows += """
@@ -1880,9 +1896,8 @@ class XmlaDiscoverTools():
                             <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                             <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                         </row>
-                        """.format(
-                            self.selected_catalogue, table_name, df.columns[0],
-                            df.iloc[0][0])
+                        """.format(self.selected_catalogue, table_name,
+                                   df.columns[0], df.iloc[0][0])
                         # self.executer.get_attribute_column_rm_id(tables, column, 0))
 
                     rows += """
@@ -1907,7 +1922,8 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                    """.format(self.selected_catalogue, self.executer.measures[0])
+                    """.format(self.selected_catalogue,
+                               self.executer.measures[0])
 
                     return etree.fromstring("""
                 <return>
@@ -1946,10 +1962,8 @@ class XmlaDiscoverTools():
                             <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                             <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                         </row>
-                            """.format(self.selected_catalogue,
-                                       table_name,
-                                       df.columns[0],
-                                       df.iloc[0][0])
+                            """.format(self.selected_catalogue, table_name,
+                                       df.columns[0], df.iloc[0][0])
 
                     rows += """
                     <row>
@@ -1989,9 +2003,11 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
             if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
                 if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(request.Properties.PropertyList.Catalog)
+                    self.change_catalogue(
+                        request.Properties.PropertyList.Catalog)
                     rows = ""
-                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                    for tables in self.executer.get_all_tables_names(
+                            ignore_fact=True):
                         l_nb = 0
                         for col in self.executer.tables_loaded[tables].columns:
                             rows += """
@@ -2013,7 +2029,8 @@ class XmlaDiscoverTools():
                                 <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
                                 <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
                             </row>
-                            """.format(self.selected_catalogue, tables, col, l_nb)
+                            """.format(self.selected_catalogue, tables, col,
+                                       l_nb)
                             l_nb += 1
 
                     rows += """
@@ -2074,7 +2091,8 @@ class XmlaDiscoverTools():
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
                 rows = ""
-                for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                for tables in self.executer.get_all_tables_names(
+                        ignore_fact=True):
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -2210,7 +2228,8 @@ class XmlaDiscoverTools():
                     </row>
                     </root>
                   </return>
-                """.format(self.selected_catalogue, mdschema_properties_PROPERTIES_xsd))
+                """.format(self.selected_catalogue,
+                           mdschema_properties_PROPERTIES_xsd))
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             return etree.fromstring("""
               <return>
@@ -2228,7 +2247,8 @@ class XmlaDiscoverTools():
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
                 if request.Restrictions.RestrictionList.TREE_OP == 8:
-                    separed_tuple = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME.split(".")
+                    separed_tuple = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME.split(
+                        ".")
                     joined = ".".join(separed_tuple[:-1])
                     # exple
                     # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
@@ -2262,5 +2282,7 @@ class XmlaDiscoverTools():
                             </root>
                         </return>
                             """.format(self.selected_catalogue, separed_tuple[
-                        0], joined, request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME, ''.join(
-                        c for c in separed_tuple[-1] if c not in '[]')))
+                        0], joined, request.Restrictions.RestrictionList.
+                                       MEMBER_UNIQUE_NAME, ''.join(
+                                           c for c in separed_tuple[-1]
+                                           if c not in '[]')))

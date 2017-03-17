@@ -266,8 +266,6 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    print([Member(**dict(co)) for co in columns])
-    print(mems)
     assert [Member(**dict(co)) for co in columns] == mems
     assert values == [768, 768, 768, 255, 4, 3, 2, 1, 248]
 

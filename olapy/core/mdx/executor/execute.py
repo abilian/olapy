@@ -128,6 +128,23 @@ class MdxEngine:
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
+    def get_tuples(self, query, start=None, stop=None):
+        # TODO use grako instead and remove regex
+        regex = "(\[[\w\d ]+\](\.\[[\w\d\.\- ]+\])*\.?((Members)|(\[Q\d\]))?)"
+
+        if start is not None:
+            start = query.index(start)
+        if stop is not None:
+            stop = query.index(stop)
+
+        # clean the query (from All, Members...)
+        return [[
+            tup_att.replace('All ', '').replace('[', "").replace("]", "")
+            for tup_att in tup[0].replace('.Members', '').split('.')
+        ] for tup in re.compile(regex).findall(query[start:stop])
+                if len(tup[0].split('.')) > 1]
+
+    # TODO temporary function
     def decorticate_query(self, query):
         """
         get all tuples that exists in the MDX Query
@@ -135,16 +152,38 @@ class MdxEngine:
         :return: all tuples in the query
         """
 
-        # TODO use grako instead and remove regex
-        regex = "(\[[\w\d ]+\](\.\[[\w\d\.\- ]+\])*\.?((Members)|(\[Q\d\]))?)"
-        # clean the query
-        tuples_on_mdx_query = [[
-            tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').split('.')
-        ] for tup in re.compile(regex).findall(query)
-                               if len(tup[0].split('.')) > 1]
+        tuples_on_mdx_query = self.get_tuples(query)
 
-        return tuples_on_mdx_query
+        on_rows = []
+        on_columns = []
+        on_where = []
+
+        # ON ROWS
+        if 'ON ROWS' in query:
+            stop = 'ON ROWS'
+            if 'ON COLUMNS' in query:
+                start = 'ON COLUMNS'
+            else:
+                start = 'SELECT'
+            on_rows = self.get_tuples(query, start, stop)
+
+        # ON COLUMNS
+        if 'ON COLUMNS' in query:
+            start = 'SELECT'
+            stop = 'ON COLUMNS'
+            on_columns = self.get_tuples(query, start, stop)
+
+        # WHERE
+        if 'WHERE' in query:
+            start = 'FROM'
+            on_where = self.get_tuples(query, start)
+
+        return {
+            'all': tuples_on_mdx_query,
+            'columns': on_columns,
+            'rows': on_rows,
+            'where': on_where
+        }
 
     def change_measures(self, tuples_on_mdx):
         """
@@ -161,6 +200,7 @@ class MdxEngine:
         ]
 
     def get_tables_and_columns(self, tuple_as_list):
+        # TODO update docstring
         """
         get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation)
 
@@ -178,23 +218,31 @@ class MdxEngine:
         Facts :  ['Amount','Count']
         }
         """
-        tables_columns = OrderedDict()
+
+        axes = {}
         # TODO optimize
-        measures = []
-        for tupl in tuple_as_list:
+        for axis, tuples in tuple_as_list.items():
+            measures = []
+            tables_columns = OrderedDict()
             # if we have measures in columns or rows axes like :
             # SELECT {[Measures].[Amount],[Measures].[Count]} ON COLUMNS
             # we have to add measures directly to tables_columns
-            if tupl[0].upper() == 'MEASURES':
-                measures.append(tupl[-1])
-                tables_columns.update({self.facts: measures})
-            else:
-                tables_columns.update({
-                    tupl[0]:
-                    self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
-                })
+            for tupl in tuples:
+                if tupl[0].upper() == 'MEASURES':
+                    if tupl[-1] not in measures:
+                        measures.append(tupl[-1])
+                        tables_columns.update({self.facts: measures})
+                    else:
+                        continue
+                else:
+                    tables_columns.update({
+                        tupl[0]:
+                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                    })
 
-        return tables_columns
+            axes.update({axis: tables_columns})
+
+        return axes
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
         """
@@ -397,24 +445,21 @@ class MdxEngine:
         """
 
         # use measures that exists on where or insides axes
-        all_tuples = self.decorticate_query(self.mdx_query)
+        query_axes = self.decorticate_query(self.mdx_query)
 
-        if self.change_measures(all_tuples):
-            self.measures = self.change_measures(all_tuples)
+        if self.change_measures(query_axes['all']):
+            self.measures = self.change_measures(query_axes['all'])
 
         # get only used columns and dimensions for all query
         start_df = self.load_star_schema_dataframe
-        tables_n_columns = self.get_tables_and_columns(all_tuples)
+        tables_n_columns = self.get_tables_and_columns(query_axes)
 
-        columns_to_keep = {
-            table: columns
-            for table, columns in tables_n_columns.items()
-            if table != self.facts
-        }
+        columns_to_keep = OrderedDict(
+            (table, columns) for table, columns in tables_n_columns['all'].items() if table != self.facts)
 
         # if we have measures on axes we have to ignore them
         tuples_on_mdx_query = [
-            tup for tup in all_tuples if tup[0].upper() != 'MEASURES'
+            tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
@@ -469,6 +514,7 @@ class MdxEngine:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
             # TODO groupby in web demo (remove it for more performance)
+            # TODO margins=True for columns total !!!!!
             return {
                 'result':
                 df.drop_duplicates().replace(np.nan, -1).groupby(cols).sum(),
