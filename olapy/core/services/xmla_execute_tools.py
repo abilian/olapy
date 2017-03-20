@@ -102,42 +102,38 @@ class XmlaExecuteTools():
             else:
                 # ['Facts', 'Amount', 'Amount']
                 tuples = [[[[self.executer.facts] + [mes] + [mes]]]
-                          for mes in self.executer.measures]
+                          for mes in self.executer.selected_measures]
                 first_att = 3
 
         # query with on columns and on rows (without measure)
         elif mdx_execution_result['columns_desc'][
                 'columns'] and mdx_execution_result['columns_desc']['rows']:
-
             # ['Geography','America']
             tuples = [
-                zip(* [[[key] + list(row)
-                        for row in splited_df[key].itertuples(index=False)]
-                       for key in splited_df.keys()
-                       if key is not self.executer.facts])
+                zip(*[[[key] + list(row)
+                       for row in splited_df[key].itertuples(index=False)]
+                      for key in splited_df.keys()
+                      if key is not self.executer.facts])
             ]
 
             first_att = 2
 
         # query with on columns and on rows (many measures selected)
         else:
-
             # ['Geography','Amount','America']
             tuples = [
-                zip(* [[[key] + [mes] + list(row)
-                        for row in splited_df[key].itertuples(index=False)]
-                       for key in splited_df.keys()
-                       if key is not self.executer.facts])
-                for mes in self.executer.measures
+                zip(*[[[key] + [mes] + list(row)
+                       for row in splited_df[key].itertuples(index=False)]
+                      for key in splited_df.keys()
+                      if key is not self.executer.facts])
+                for mes in self.executer.selected_measures
             ]
             first_att = 3
 
         for tupls in itertools.chain(*tuples):
             axis0 += "<Tuple>\n"
-            # [u'Geography', u'Amount', 'America']
-            # tupls[0][1] --> Measure
             if tupls[0][1] in self.executer.measures and len(
-                    self.executer.measures) > 1:
+                    self.executer.selected_measures) > 1:
 
                 axis0 += """
                 <Member Hierarchy="[Measures]">
@@ -150,7 +146,7 @@ class XmlaExecuteTools():
                 </Member>
                 """.format(tupls[0][1])
 
-                if len(tupls) == 1:
+                if tupls[0][-1] in self.executer.measures:
                     axis0 += "</Tuple>\n"
                     continue
 
@@ -368,7 +364,9 @@ class XmlaExecuteTools():
             to_write = "[{0}].[{0}]".format(dim_diff)
             if dim_diff == 'Measures':
                 # if measures > 1 we don't have to write measure
-                if len(self.executer.measures) > 1:
+                if self.executer.facts in mdx_execution_result['columns_desc'][
+                        'all'] and len(mdx_execution_result['columns_desc'][
+                            'all'][self.executer.facts]) > 1:
                     continue
                 else:
                     to_write = "[Measures]"
@@ -425,31 +423,37 @@ class XmlaExecuteTools():
         :return:
         """
 
-        all_dimensions_names = self.executer.get_all_tables_names(
-            ignore_fact=True)
         hierarchy_info = ""
-        all_dimensions_names.append('Measures')
-        for table_name in mdx_execution_result['columns_desc'][mdx_query_axis]:
-            to_write = "[{0}].[{0}]".format(table_name)
-            # measures must be added to axis0 if measures selected > 1
-            if table_name == self.executer.facts and len(mdx_execution_result[
-                    'columns_desc'][mdx_query_axis][table_name]) > 1:
-                to_write = "[Measures]"
-                all_dimensions_names.remove('Measures')
-            elif table_name == self.executer.facts:
-                continue
-
+        # measure must be written at the top
+        if self.executer.facts in mdx_execution_result['columns_desc'][
+                mdx_query_axis].keys() and len(mdx_execution_result[
+                    'columns_desc'][mdx_query_axis][self.executer.facts]) > 1:
             hierarchy_info += """
-                <HierarchyInfo name="{0}">
-                    <UName name="{0}.[MEMBER_UNIQUE_NAME]" type="xs:string"/>
-                    <Caption name="{0}.[MEMBER_CAPTION]" type="xs:string"/>
-                    <LName name="{0}.[LEVEL_UNIQUE_NAME]" type="xs:string"/>
-                    <LNum name="{0}.[LEVEL_NUMBER]" type="xs:int"/>
-                    <DisplayInfo name="{0}.[DISPLAY_INFO]" type="xs:unsignedInt"/>
-                    <PARENT_UNIQUE_NAME name="{0}.[PARENT_UNIQUE_NAME]" type="xs:string"/>
-                    <HIERARCHY_UNIQUE_NAME name="{0}.[HIERARCHY_UNIQUE_NAME]" type="xs:string"/>
+            <HierarchyInfo name="{0}">
+                <UName name="{0}.[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                <Caption name="{0}.[MEMBER_CAPTION]" type="xs:string"/>
+                <LName name="{0}.[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                <LNum name="{0}.[LEVEL_NUMBER]" type="xs:int"/>
+                <DisplayInfo name="{0}.[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                <PARENT_UNIQUE_NAME name="{0}.[PARENT_UNIQUE_NAME]" type="xs:string"/>
+                <HIERARCHY_UNIQUE_NAME name="{0}.[HIERARCHY_UNIQUE_NAME]" type="xs:string"/>
                 </HierarchyInfo>
-            """.format(to_write)
+            """.format('[Measures]')
+
+        for table_name in mdx_execution_result['columns_desc'][mdx_query_axis]:
+            if table_name != self.executer.facts:
+                hierarchy_info += """
+                    <HierarchyInfo name="[{0}].[{0}]">
+                        <UName name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                        <Caption name="[{0}].[{0}].[MEMBER_CAPTION]" type="xs:string"/>
+                        <LName name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                        <LNum name="[{0}].[{0}].[LEVEL_NUMBER]" type="xs:int"/>
+                        <DisplayInfo name="[{0}].[{0}].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                        <PARENT_UNIQUE_NAME name="[{0}].[{0}].[PARENT_UNIQUE_NAME]" type="xs:string"/>
+                        <HIERARCHY_UNIQUE_NAME name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]" type="xs:string"/>
+                    </HierarchyInfo>
+                """.format(table_name)
+
         if hierarchy_info:
             hierarchy_info = """
             <AxisInfo name='{0}'>
@@ -522,12 +526,12 @@ class XmlaExecuteTools():
         tuple = ""
         # not used dimensions
         for dim_diff in list(
-                set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
-                    [
-                        table_name
-                        for table_name in mdx_execution_result['columns_desc'][
-                            'all']
-                    ])):
+                set(self.executer.get_all_tables_names(ignore_fact=True)) -
+                set([
+                    table_name
+                    for table_name in mdx_execution_result['columns_desc'][
+                        'all']
+                ])):
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>
@@ -541,7 +545,7 @@ class XmlaExecuteTools():
                        self.executer.tables_loaded[dim_diff].iloc[0][0])
 
         # if we have zero on one only measures used
-        if len(self.executer.measures) <= 1:
+        if len(self.executer.selected_measures) <= 1:
             tuple += """
             <Member Hierarchy="[Measures]">
                 <UName>[Measures].[{0}]</UName>

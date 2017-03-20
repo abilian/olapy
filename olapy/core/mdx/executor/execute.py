@@ -41,7 +41,10 @@ class MdxEngine:
             cube_name)
         self.tables_loaded = self._load_tables()
         self.tables_names = self._get_tables_name()
+        # all measures
         self.measures = self._get_measures()
+        # default measure is the first one
+        self.selected_measures = [self.measures[0]]
 
     @classmethod
     def get_cubes_names(self):
@@ -51,8 +54,9 @@ class MdxEngine:
 
         location = os.path.join(
             os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", "..",
-                             "..")), MdxEngine.CUBE_FOLDER)
+                os.path.join(
+                    os.path.dirname(__file__), "..", "..", "..", "..")),
+            MdxEngine.CUBE_FOLDER)
         return [
             file for file in os.listdir(location)
             if os.path.isdir(os.path.join(location, file))
@@ -67,8 +71,9 @@ class MdxEngine:
         '''
         return os.path.join(
             os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..', "..", '..',
-                             '..')), self.cube_folder)
+                os.path.join(
+                    os.path.dirname(__file__), '..', "..", '..', '..')),
+            self.cube_folder)
 
     def _load_tables(self):
         """
@@ -297,7 +302,7 @@ class MdxEngine:
                          == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
 
-        return df[cols + self.measures]
+        return df[cols + self.selected_measures]
 
     def add_missed_column(self, dataframe1, dataframe2):
         """
@@ -446,7 +451,7 @@ class MdxEngine:
         query_axes = self.decorticate_query(self.mdx_query)
 
         if self.change_measures(query_axes['all']):
-            self.measures = self.change_measures(query_axes['all'])
+            self.selected_measures = self.change_measures(query_axes['all'])
 
         # get only used columns and dimensions for all query
         start_df = self.load_star_schema_dataframe
@@ -499,7 +504,8 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
-            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(
+                itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)
@@ -522,6 +528,6 @@ class MdxEngine:
 
         else:
             return {
-                'result': start_df[self.measures].sum().to_frame().T,
+                'result': start_df[self.selected_measures].sum().to_frame().T,
                 'columns_desc': tables_n_columns
             }
