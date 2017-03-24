@@ -19,7 +19,6 @@ RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
 
 class Member(object):
-
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -44,7 +43,8 @@ class WSGIServer:
     Copy/pasted from pytest_localserver w/ slight changes.
     """
 
-    def __init__(self, host='127.0.0.1', port=8000, application=None, **kwargs):
+    def __init__(self, host='127.0.0.1', port=8000, application=None,
+                 **kwargs):
         self._server = make_server(host, port, application, **kwargs)
         self.server_address = self._server.server_address
 
@@ -424,6 +424,6 @@ def test_query4(conn):
         strr += str(item)
     assert strr == TEST_QUERY_AXIS0
     assert values == [
-        768, 255, 4, 3, 248, 768, 255, 4, 3, 248, 576, 1304, 2, 925, 377, 576,
-        1304, 2, 925, 377
+        768, 576, 255, 1304, 4, 2, 3, 925, 248, 377, 768, 576, 255, 1304, 4, 2,
+        3, 925, 248, 377
     ]
