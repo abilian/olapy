@@ -300,17 +300,35 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: CellData as string
         """
+        columns_loop = []
+        if mdx_execution_result['columns_desc']['columns'].keys(
+        ) and mdx_execution_result['columns_desc']['rows'].keys():
+            if self.executer.facts in mdx_execution_result['columns_desc'][
+                    'columns'].keys() + mdx_execution_result['columns_desc'][
+                        'rows'].keys():
+
+                # iterate DataFrame vertically
+                columns_loop = itertools.chain(* [
+                    tuple
+                    for tuple in mdx_execution_result['result'].itertuples(
+                        index=False)
+                ])
+        else:
+            # iterate DataFrame horizontally
+            columns_loop = itertools.chain(* [
+                mdx_execution_result['result'][measure]
+                for measure in mdx_execution_result['result'].columns
+            ])
+
         cell_data = ""
         index = 0
-        for tuple in mdx_execution_result['result'].itertuples(index=False):
-            for value in tuple:
-                cell_data += """
-                <Cell CellOrdinal="{0}">
-                    <Value xsi:type="xsi:long">{1}</Value>
-                </Cell>
-                """.format(index, value)
-                index += 1
-
+        for value in columns_loop:
+            cell_data += """
+            <Cell CellOrdinal="{0}">
+                <Value xsi:type="xsi:long">{1}</Value>
+            </Cell>
+            """.format(index, value)
+            index += 1
         return cell_data
 
     def generate_axes_info_slicer(self, mdx_execution_result):
