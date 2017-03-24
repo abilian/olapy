@@ -110,10 +110,10 @@ class XmlaExecuteTools():
                 'columns'] and mdx_execution_result['columns_desc']['rows']:
             # ['Geography','America']
             tuples = [
-                zip(*[[[key] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
-                      if key is not self.executer.facts])
+                zip(* [[[key] + list(row)
+                        for row in splited_df[key].itertuples(index=False)]
+                       for key in splited_df.keys()
+                       if key is not self.executer.facts])
             ]
 
             first_att = 2
@@ -122,10 +122,10 @@ class XmlaExecuteTools():
         else:
             # ['Geography','Amount','America']
             tuples = [
-                zip(*[[[key] + [mes] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
-                      if key is not self.executer.facts])
+                zip(* [[[key] + [mes] + list(row)
+                        for row in splited_df[key].itertuples(index=False)]
+                       for key in splited_df.keys()
+                       if key is not self.executer.facts])
                 for mes in self.executer.selected_measures
             ]
             first_att = 3
@@ -302,14 +302,15 @@ class XmlaExecuteTools():
         """
         cell_data = ""
         index = 0
-        for measure in mdx_execution_result['result'].columns.values:
-            for value in mdx_execution_result['result'][measure]:
+        for tuple in mdx_execution_result['result'].itertuples(index=False):
+            for value in tuple:
                 cell_data += """
                 <Cell CellOrdinal="{0}">
                     <Value xsi:type="xsi:long">{1}</Value>
                 </Cell>
                 """.format(index, value)
                 index += 1
+
         return cell_data
 
     def generate_axes_info_slicer(self, mdx_execution_result):
