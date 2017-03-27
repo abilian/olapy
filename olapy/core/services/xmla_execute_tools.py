@@ -301,23 +301,25 @@ class XmlaExecuteTools():
         :return: CellData as string
         """
         columns_loop = []
-        if mdx_execution_result['columns_desc']['columns'].keys(
-        ) and mdx_execution_result['columns_desc']['rows'].keys():
-            if self.executer.facts in mdx_execution_result['columns_desc'][
-                    'columns'].keys() + mdx_execution_result['columns_desc'][
-                        'rows'].keys():
 
-                # iterate DataFrame vertically
+        if (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0) ^ (
+                len(mdx_execution_result['columns_desc']['rows'].keys()) == 0):
+            if self.executer.facts in mdx_execution_result['columns_desc'][
+                    'all'].keys():
+
+                # iterate DataFrame horizontally
                 columns_loop = itertools.chain(* [
-                    tuple
-                    for tuple in mdx_execution_result['result'].itertuples(
-                        index=False)
+                    mdx_execution_result['result'][measure]
+                    for measure in mdx_execution_result['result'].columns
                 ])
+
         else:
-            # iterate DataFrame horizontally
+
+            # iterate DataFrame vertically
             columns_loop = itertools.chain(* [
-                mdx_execution_result['result'][measure]
-                for measure in mdx_execution_result['result'].columns
+                tuple
+                for tuple in mdx_execution_result['result'].itertuples(
+                    index=False)
             ])
 
         cell_data = ""
