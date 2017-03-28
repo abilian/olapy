@@ -20,8 +20,6 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     </xsd:simpleType>
     <xsd:complexType name="row">
         <xsd:sequence>
-            <xsd:element name="PropertyName" sql:field="PropertyName" type="string"/>
-            <xsd:element minOccurs="0" name="PropertyDescription" sql:field="PropertyDescription" type="string"/>
             <xsd:element name="DataSourceName" sql:field="DataSourceName" type="xs:string"/>
             <xsd:element minOccurs="0" name="DataSourceDescription" sql:field="DataSourceDescription" type="string"/>
             <xsd:element minOccurs="0" name="URL" sql:field="URL" type="string"/>
