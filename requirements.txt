@@ -37,6 +37,7 @@ pip-tools==1.8.0
 plotly==1.12.9
 pluggy==0.4.0             # via tox
 prettytable==0.7.2
+psycopg2==2.7.1
 py-cpuinfo==0.2.7
 py==1.4.33                # via pytest, tox
 pycodestyle==2.3.1        # via flake8
