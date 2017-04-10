@@ -1,3 +1,5 @@
+# -*- encoding: utf8 -*-
+
 from __future__ import absolute_import, division, print_function
 
 import uuid
@@ -5,19 +7,14 @@ import uuid
 from lxml import etree
 
 from ..mdx.executor.execute import MdxEngine
-from .xmla_discover_xsds import (dbschema_catalogs_xsd, dbschema_tables_xsd,
-                                 discover_datasources_xsd,
-                                 discover_literals_xsd,
-                                 discover_preperties_xsd,
-                                 discover_schema_rowsets_xsd,
-                                 mdschema_cubes_xsd, mdschema_dimensions_xsd,
-                                 mdschema_hierarchies_xsd, mdschema_kpis_xsd,
-                                 mdschema_levels_xsd, mdschema_measures_xsd,
-                                 mdschema_measuresgroups_dimensions_xsd,
-                                 mdschema_measuresgroups_xsd,
-                                 mdschema_members_xsd,
-                                 mdschema_properties_PROPERTIES_xsd,
-                                 mdschema_sets_xsd)
+from .xmla_discover_xsds import (
+    dbschema_catalogs_xsd, dbschema_tables_xsd, discover_datasources_xsd,
+    discover_literals_xsd, discover_preperties_xsd,
+    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd,
+    mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd,
+    mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd,
+    mdschema_measuresgroups_xsd, mdschema_members_xsd,
+    mdschema_properties_PROPERTIES_xsd, mdschema_sets_xsd)
 
 
 # TODO clean
@@ -76,7 +73,6 @@ class XmlaDiscoverTools():
         </return>""")
 
     def discover_properties_response(self, request):
-
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
             return etree.fromstring("""
@@ -118,15 +114,15 @@ class XmlaDiscoverTools():
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
-                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
-                                 '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
-                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
-                                 '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
@@ -1826,8 +1822,15 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog)
                     rows = ""
                     ord = 1
+
                     for tables in self.executer.get_all_tables_names(
                             ignore_fact=True):
+
+                        # TODO in another idea, change this
+                        # TO CHANGE NAME DISPLAY THAT EXISTS IN CONFIG FILE
+                        if MdxEngine.dimension_display_name != []:
+                            if tables in MdxEngine.dimension_display_name:
+                                continue
                         rows += """
                         <row>
                             <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -2264,34 +2267,38 @@ class XmlaDiscoverTools():
                     # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
                     # joined -> [Product].[Product].[Company]
 
+                    last_attribut = ''.join(att for att in separed_tuple[-1]
+                                            if att not in '[]').replace(
+                                                '&', '&amp;')
                     return etree.fromstring("""
-                        <return>
-                            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                            """ + mdschema_members_xsd + """
-                                <row>
-                                    <CATALOG_NAME>{0}</CATALOG_NAME>
-                                    <CUBE_NAME>{0}</CUBE_NAME>
-                                    <DIMENSION_UNIQUE_NAME>{1}</DIMENSION_UNIQUE_NAME>
-                                    <HIERARCHY_UNIQUE_NAME>{1}.{1}</HIERARCHY_UNIQUE_NAME>
-                                    <LEVEL_UNIQUE_NAME>{2}</LEVEL_UNIQUE_NAME>
-                                    <LEVEL_NUMBER>0</LEVEL_NUMBER>
-                                    <MEMBER_ORDINAL>0</MEMBER_ORDINAL>
-                                    <MEMBER_NAME>{4}</MEMBER_NAME>
-                                    <MEMBER_UNIQUE_NAME>{3}</MEMBER_UNIQUE_NAME>
-                                    <MEMBER_TYPE>1</MEMBER_TYPE>
-                                    <MEMBER_CAPTION>{4}</MEMBER_CAPTION>
-                                    <CHILDREN_CARDINALITY>1</CHILDREN_CARDINALITY>
-                                    <PARENT_LEVEL>0</PARENT_LEVEL>
-                                    <PARENT_COUNT>0</PARENT_COUNT>
-                                    <MEMBER_KEY>{4}</MEMBER_KEY>
-                                    <IS_PLACEHOLDERMEMBER>false</IS_PLACEHOLDERMEMBER>
-                                    <IS_DATAMEMBER>false</IS_DATAMEMBER>
-                                </row>
-                            </root>
-                        </return>
-                            """.format(
-                        self.selected_catalogue, separed_tuple[0], joined,
-                        request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,
-                        ''.join(c for c in separed_tuple[-1] if c not in '[]')))
+                <return>
+                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    """ + mdschema_members_xsd + """
+                        <row>
+                            <CATALOG_NAME>{0}</CATALOG_NAME>
+                            <CUBE_NAME>{0}</CUBE_NAME>
+                            <DIMENSION_UNIQUE_NAME>{1}</DIMENSION_UNIQUE_NAME>
+                            <HIERARCHY_UNIQUE_NAME>{1}.{1}</HIERARCHY_UNIQUE_NAME>
+                            <LEVEL_UNIQUE_NAME>{2}</LEVEL_UNIQUE_NAME>
+                            <LEVEL_NUMBER>0</LEVEL_NUMBER>
+                            <MEMBER_ORDINAL>0</MEMBER_ORDINAL>
+                            <MEMBER_NAME>""" + last_attribut +
+                                            """</MEMBER_NAME>
+                            <MEMBER_UNIQUE_NAME>{3}</MEMBER_UNIQUE_NAME>
+                            <MEMBER_TYPE>1</MEMBER_TYPE>
+                            <MEMBER_CAPTION>""" + last_attribut +
+                                            """</MEMBER_CAPTION>
+                            <CHILDREN_CARDINALITY>1</CHILDREN_CARDINALITY>
+                            <PARENT_LEVEL>0</PARENT_LEVEL>
+                            <PARENT_COUNT>0</PARENT_COUNT>
+                            <MEMBER_KEY>""" + last_attribut + """</MEMBER_KEY>
+                            <IS_PLACEHOLDERMEMBER>false</IS_PLACEHOLDERMEMBER>
+                            <IS_DATAMEMBER>false</IS_DATAMEMBER>
+                        </row>
+                    </root>
+                </return>
+                    """.format(self.selected_catalogue, separed_tuple[0],
+                               joined, request.Restrictions.RestrictionList.
+                               MEMBER_UNIQUE_NAME))
