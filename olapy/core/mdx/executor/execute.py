@@ -17,6 +17,7 @@ from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
+
 class MdxEngine:
     """
     The principal class for executing a query
@@ -75,14 +76,15 @@ class MdxEngine:
 
         # get csv files folders (cubes)
         if RUNNING_TOX:
-            location =  os.path.join(
+            location = os.path.join(
                 os.path.abspath(
                     os.path.join(
                         os.path.dirname(__file__), "..", "..", "..", "..")),
                 MdxEngine.CUBE_FOLDER)
         else:
             home_directory = expanduser("~")
-            location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
+            location = os.path.join(home_directory, 'olapy-data',
+                                    cls.CUBE_FOLDER)
 
         try:
             MdxEngine.csv_files_cubes = [
@@ -325,8 +327,8 @@ class MdxEngine:
             for cubes in config_file_parser.construct_cubes():
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(
-                        cube_name, cubes)
+                    fusion = self._construct_star_schema_config_file(cube_name,
+                                                                     cubes)
 
         elif cube_name in self.csv_files_cubes:
             fusion = self._construct_star_schema_csv_files(cube_name)
@@ -648,9 +650,8 @@ class MdxEngine:
         :return: updated columns_to_keep
         """
 
-        if len(
-                tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
+                tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -751,14 +752,8 @@ class MdxEngine:
             # TODO groupby in web demo (remove it for more performance)
             # TODO margins=True for columns total !!!!!
             return {
-                'result':
-                # df.drop_duplicates().replace(np.nan, -1).groupby(cols).sum(),
-                # TODO remove this (FIX V1)
-                # df.replace(np.nan, -1).groupby(cols).sum()[self.selected_measures],
-                # TODO chech this FIX
-                df.groupby(cols).sum()[self.selected_measures],
-                'columns_desc':
-                tables_n_columns
+                'result': df.groupby(cols).sum()[self.selected_measures],
+                'columns_desc': tables_n_columns
             }
 
         else:
