@@ -15,6 +15,10 @@ import pandas.io.sql as psql
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
 
+RUNNING_TOX = 'RUNTING_TOX' in os.environ
+print('running ??')
+print(RUNNING_TOX)
+
 
 class MdxEngine:
     """
@@ -73,8 +77,15 @@ class MdxEngine:
         '''
 
         # get csv files folders (cubes)
-        home_directory = expanduser("~")
-        location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
+        if RUNNING_TOX:
+            location =  os.path.join(
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__), "..", "..", "..", "..")),
+                MdxEngine.CUBE_FOLDER)
+        else:
+            home_directory = expanduser("~")
+            location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
 
         try:
             MdxEngine.csv_files_cubes = [
@@ -101,8 +112,16 @@ class MdxEngine:
         return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
 
     def _get_default_cube_directory(self):
-        home_directory = expanduser("~")
-        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
+
+        if RUNNING_TOX:
+            return os.path.join(
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__), "..", "..", "..", "..")),
+                MdxEngine.CUBE_FOLDER)
+        else:
+            home_directory = expanduser("~")
+            return os.path.join(home_directory, 'olapy-data', self.cube_folder)
 
     def _get_tables_name(self):
         return self.tables_loaded.keys()
@@ -736,6 +755,10 @@ class MdxEngine:
             # TODO margins=True for columns total !!!!!
             return {
                 'result':
+                # df.drop_duplicates().replace(np.nan, -1).groupby(cols).sum(),
+                # TODO remove this (FIX V1)
+                # df.replace(np.nan, -1).groupby(cols).sum()[self.selected_measures],
+                # TODO chech this FIX
                 df.groupby(cols).sum()[self.selected_measures],
                 'columns_desc':
                 tables_n_columns
