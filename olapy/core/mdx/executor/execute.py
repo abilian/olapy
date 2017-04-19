@@ -5,14 +5,15 @@ from __future__ import absolute_import, division, print_function
 import itertools
 import os
 import re
+from os.path import expanduser
 from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
 import pandas.io.sql as psql
 
-from ..utils.connection import MyDB
-from ..utils.config_file_parser import ConfigParser
+from ..tools.config_file_parser import ConfigParser
+from ..tools.connection import MyDB
 
 
 class MdxEngine:
@@ -31,6 +32,7 @@ class MdxEngine:
 
     def __init__(self,
                  cube_name,
+                 cubes_path=None,
                  mdx_query=None,
                  cube_folder=CUBE_FOLDER,
                  sep=';',
@@ -41,12 +43,18 @@ class MdxEngine:
         :param mdx_query: query to execute
         :param sep: separator in the csv files
         '''
-        self.cube = cube_name
+
         self.cube_folder = cube_folder
+        self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self.mdx_query = mdx_query
-        self.cube_path = self._get_cube_path()
+
+        if cubes_path is None:
+            self.cube_path = self._get_default_cube_directory()
+        else:
+            self.cube_path = cubes_path
+
         # to get cubes in db
         self._ = self.get_cubes_names()
         self.tables_loaded = self._load_tables()
@@ -59,18 +67,16 @@ class MdxEngine:
         self.selected_measures = [self.measures[0]]
 
     @classmethod
-    def get_cubes_names(self):
+    def get_cubes_names(cls):
         '''
         :return: list cubes name under cubes folder
         '''
 
         # get csv files folders (cubes)
+        home_directory = expanduser("~")
+        location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
+
         try:
-            location = os.path.join(
-                os.path.abspath(
-                    os.path.join(
-                        os.path.dirname(__file__), "..", "..", "..", "..")),
-                MdxEngine.CUBE_FOLDER)
             MdxEngine.csv_files_cubes = [
                 file for file in os.listdir(location)
                 if os.path.isdir(os.path.join(location, file))
@@ -93,6 +99,10 @@ class MdxEngine:
             pass
 
         return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
+
+    def _get_default_cube_directory(self):
+        home_directory = expanduser("~")
+        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
 
     def _get_tables_name(self):
         return self.tables_loaded.keys()
@@ -222,10 +232,7 @@ class MdxEngine:
                 db.connection)
 
             fusion = fusion.merge(
-                df,
-                left_on=fact_key,
-                right_on=dimension_and_key.split('.')[1],
-                how='outer')
+                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
             # TODO CHOSE BETWEEN THOSES DF
             # if separated dimensions
@@ -302,8 +309,8 @@ class MdxEngine:
             for cubes in config_file_parser.construct_cubes():
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(cube_name,
-                                                                     cubes)
+                    fusion = self._construct_star_schema_config_file(
+                        cube_name, cubes)
 
         elif cube_name in self.csv_files_cubes:
             fusion = self._construct_star_schema_csv_files(cube_name)
@@ -311,8 +318,9 @@ class MdxEngine:
         elif cube_name in self.postgres_db_cubes:
             fusion = self._construct_star_schema_db(cube_name)
 
-        return fusion[
-            [col for col in fusion.columns if col.lower()[-3:] != '_id']]
+        return fusion[[
+            col for col in fusion.columns if col.lower()[-3:] != '_id'
+        ]]
 
     def get_all_tables_names(self, ignore_fact=False):
         """
@@ -324,16 +332,6 @@ class MdxEngine:
         if ignore_fact:
             return [tab for tab in self.tables_names if self.facts not in tab]
         return self.tables_names
-
-    def _get_cube_path(self):
-        '''
-        :return: return local cube folder name with full path
-        '''
-        return os.path.join(
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), '..', "..", '..', '..')),
-            self.cube_folder)
 
     def get_cube(self):
         """
@@ -634,8 +632,9 @@ class MdxEngine:
         :return: updated columns_to_keep
         """
 
-        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
-                tuple_as_list[0]].columns:
+        if len(
+                tuple_as_list
+        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -737,7 +736,7 @@ class MdxEngine:
             # TODO margins=True for columns total !!!!!
             return {
                 'result':
-                df.drop_duplicates().replace(np.nan, -1).groupby(cols).sum(),
+                df.groupby(cols).sum()[self.selected_measures],
                 'columns_desc':
                 tables_n_columns
             }

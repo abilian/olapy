@@ -7,8 +7,12 @@ class MyDB(object):
             self.connection = pg.connect(
                 "user={0} password={1}".format(username, password))
         else:
-            self.connection = pg.connect("user={0} password={1} dbname='{2}'".
+            try:
+                self.connection = pg.connect("user={0} password={1} dbname='{2}'".
                                          format(username, password, db))
+            except:
+                print("can't connect")
 
     def __del__(self):
-        self.connection.close()
+        if hasattr(self, 'connection'):
+            self.connection.close()

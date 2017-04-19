@@ -2,7 +2,9 @@
 
 from __future__ import absolute_import, division, print_function
 
+import os
 from datetime import datetime
+from os.path import expanduser
 
 from lxml import etree
 from spyne import AnyXml, Application, ServiceBase, rpc
@@ -222,7 +224,12 @@ def start_server(write_on_file=False):
     # log to the file
     # TODO FIX it with os
     if write_on_file:
-        logging.basicConfig(level=logging.DEBUG, filename="C:\\logs\\xmla.log")
+        home_directory = expanduser("~")
+        if not os.path.isdir(os.path.join(home_directory, 'logs')):
+            os.makedirs(os.path.join(home_directory, 'logs'))
+        logging.basicConfig(
+            level=logging.DEBUG,
+            filename=os.path.join(home_directory, 'logs', 'xmla.log'))
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
