@@ -16,9 +16,6 @@ from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNTING_TOX' in os.environ
-print('running ??')
-print(RUNNING_TOX)
-
 
 class MdxEngine:
     """
