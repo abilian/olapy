@@ -109,6 +109,7 @@ class MdxEngine:
 
     def _get_default_cube_directory(self):
 
+        # toxworkdir does not expanduser properly
         if RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
