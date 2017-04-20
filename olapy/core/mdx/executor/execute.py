@@ -17,7 +17,6 @@ from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
-
 class MdxEngine:
     """
     The principal class for executing a query
@@ -75,16 +74,14 @@ class MdxEngine:
         '''
 
         # get csv files folders (cubes)
+        # toxworkdir does not expanduser properly
         if RUNNING_TOX:
-            location = os.path.join(
-                os.path.abspath(
-                    os.path.join(
-                        os.path.dirname(__file__), "..", "..", "..", "..")),
-                MdxEngine.CUBE_FOLDER)
+            home_directory = os.environ.get('HOME_DIR')
         else:
             home_directory = expanduser("~")
-            location = os.path.join(home_directory, 'olapy-data',
-                                    cls.CUBE_FOLDER)
+
+        location = os.path.join(home_directory, 'olapy-data',
+                                cls.CUBE_FOLDER)
 
         try:
             MdxEngine.csv_files_cubes = [
@@ -113,14 +110,11 @@ class MdxEngine:
     def _get_default_cube_directory(self):
 
         if RUNNING_TOX:
-            return os.path.join(
-                os.path.abspath(
-                    os.path.join(
-                        os.path.dirname(__file__), "..", "..", "..", "..")),
-                MdxEngine.CUBE_FOLDER)
+            home_directory = os.environ.get('HOME_DIR')
         else:
             home_directory = expanduser("~")
-            return os.path.join(home_directory, 'olapy-data', self.cube_folder)
+
+        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
 
     def _get_tables_name(self):
         return self.tables_loaded.keys()
