@@ -23,7 +23,8 @@ class ConfigParser:
             tree = etree.parse(config_file, parser)
 
             try:
-                return tree.xpath('/cubes/xmla_authentication')[0].text == 'True'
+                return tree.xpath('/cubes/xmla_authentication')[
+                    0].text == 'True'
             except:
                 return False
 
