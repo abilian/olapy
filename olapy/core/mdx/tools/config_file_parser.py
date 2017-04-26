@@ -15,6 +15,18 @@ class ConfigParser:
     def config_file_exist(self):
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
 
+    def xmla_authentication(self):
+
+        with open(os.path.join(self.cube_path, self.file_name)) as config_file:
+
+            parser = etree.XMLParser()
+            tree = etree.parse(config_file, parser)
+
+            try:
+                return tree.xpath('/cubes/xmla_authentication')[0].text == 'True'
+            except:
+                return False
+
     def get_cubes_names(self):
 
         with open(os.path.join(self.cube_path, self.file_name)) as config_file:
