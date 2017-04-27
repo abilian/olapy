@@ -104,8 +104,3 @@ class DiscoverRequest(ComplexModel):
     RequestType = Unicode
     Restrictions = Restrictionlist
     Properties = Propertielist
-
-
-class DiscoverResponse(ComplexModel):
-    __namespace__ = "urn:schemas-microsoft-com:xml-analysis:rowset"
-    root = String
