@@ -60,8 +60,15 @@ class XmlaProviderService(ServiceBase):
         if config_parser.xmla_authentication():
 
             # TODO call labster login or create login with token (according to labster db)
-            if ctx.transport.req_env['QUERY_STRING'] != 'mouadh':
-                return ''
+            if ctx.transport.req_env['QUERY_STRING'] != 'admin':
+                # TODO try to 'monkey-patch' spyne and change response function name so we can authentication error to user
+                return etree.fromstring("""
+                    <soap11env:Fault>
+                        <faultcode>soap11env:Server</faultcode>
+                        <faultstring>Authentication failed</faultstring>
+                        <faultactor></faultactor>
+                    </soap11env:Fault>
+                    """)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return discover_tools.discover_datasources_response()
