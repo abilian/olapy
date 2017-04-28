@@ -2,14 +2,14 @@ import psycopg2 as pg
 
 
 class MyDB(object):
-    def __init__(self, username='postgres', password='root', db=None):
+    def __init__(self, username='postgres', password='root', db=None,host='localhost'):
         if db is None:
             self.connection = pg.connect(
                 "user={0} password={1}".format(username, password))
         else:
             try:
-                self.connection = pg.connect("user={0} password={1} dbname='{2}'".
-                                         format(username, password, db))
+                self.connection = pg.connect("user={0} password={1} dbname='{2}' host='{3}'".
+                                         format(username, password, db,host))
             except:
                 print("can't connect")
 
