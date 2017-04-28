@@ -8,11 +8,12 @@ from os.path import expanduser
 
 from lxml import etree
 from spyne import AnyXml, Application, ServiceBase, rpc
+from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
-from ..services.models import DiscoverRequest, ExecuteRequest, Session
+from ..services.models import DiscoverRequest, ExecuteRequest, Session, AuthenticationError
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
@@ -36,10 +37,15 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     SessionId = discover_tools.SessionId
 
+
+
     @rpc(DiscoverRequest,
          _returns=AnyXml,
          _body_style="bare",
-         _out_header=Session)
+         _out_header=Session,
+         _throws=InvalidCredentialsError
+         # _throws=AuthenticationError
+         )
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -60,15 +66,12 @@ class XmlaProviderService(ServiceBase):
         if config_parser.xmla_authentication():
 
             # TODO call labster login or create login with token (according to labster db)
-            if ctx.transport.req_env['QUERY_STRING'] != 'admin':
-                # TODO try to 'monkey-patch' spyne and change response function name so we can authentication error to user
-                return etree.fromstring("""
-                    <soap11env:Fault>
-                        <faultcode>soap11env:Server</faultcode>
-                        <faultstring>Authentication failed</faultstring>
-                        <faultactor></faultactor>
-                    </soap11env:Fault>
-                    """)
+            if ctx.transport.req_env['QUERY_STRING'] != 'mouadh':
+
+                raise InvalidCredentialsError(fault_string='You do not have permission to access this resource',
+                                        fault_object=None)
+
+                # raise AuthenticationError()
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return discover_tools.discover_datasources_response()
@@ -198,7 +201,7 @@ class XmlaProviderService(ServiceBase):
                        xmla_tools.generate_slicer_axis(df),
                        xmla_tools.generate_cell_data(df),
                        datetime.now().strftime('%Y-%m-%dT%H:%M:%S')).replace(
-                           '&', '&amp;'))
+                '&', '&amp;'))
 
             # Problem:
             # An XML parser returns the error “xmlParseEntityRef: noname”
@@ -250,8 +253,8 @@ def start_server(write_on_file=False):
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
     logging.info("listening to http://127.0.0.1:8000/xmla")
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
-    # server = make_server('127.0.0.1', 8000, wsgi_application)
-    server = make_server('192.168.101.139', 8000, wsgi_application)
+    server = make_server('127.0.0.1', 8000, wsgi_application)
+    # server = make_server('192.168.101.139', 8000, wsgi_application)
     server.serve_forever()
 
 

@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
-from spyne import ComplexModel, Integer, String, Unicode, XmlAttribute
-
+from spyne import ComplexModel, Integer, Unicode, XmlAttribute
+from spyne.model.fault import Fault
 
 class Tuple(object):
 
@@ -104,3 +104,9 @@ class DiscoverRequest(ComplexModel):
     RequestType = Unicode
     Restrictions = Restrictionlist
     Properties = Propertielist
+
+
+class AuthenticationError(Fault):
+    __namespace__ = 'spyne.examples.authentication'
+    faultcode='Client.AuthenticationError',
+    faultstring='Invalid authentication request'
