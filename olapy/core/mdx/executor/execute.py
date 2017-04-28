@@ -17,6 +17,7 @@ from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
+
 class MdxEngine:
     """
     The principal class for executing a query
@@ -80,8 +81,7 @@ class MdxEngine:
         else:
             home_directory = expanduser("~")
 
-        location = os.path.join(home_directory, 'olapy-data',
-                                cls.CUBE_FOLDER)
+        location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
 
         try:
             MdxEngine.csv_files_cubes = [

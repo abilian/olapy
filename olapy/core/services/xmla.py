@@ -39,14 +39,13 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     SessionId = discover_tools.SessionId
 
-    @rpc(
-        DiscoverRequest,
-        _returns=AnyXml,
-        _body_style="bare",
-        _out_header=Session,
-        _throws=InvalidCredentialsError
-        # _throws=AuthenticationError
-    )
+    @rpc(DiscoverRequest,
+         _returns=AnyXml,
+         _body_style="bare",
+         _out_header=Session,
+         _throws=InvalidCredentialsError
+         # _throws=AuthenticationError
+         )
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -70,8 +69,7 @@ class XmlaProviderService(ServiceBase):
             if ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
                 raise InvalidCredentialsError(
-                    fault_string=
-                    'You do not have permission to access this resource',
+                    fault_string='You do not have permission to access this resource',
                     fault_object=None)
 
                 # raise AuthenticationError()
@@ -134,11 +132,10 @@ class XmlaProviderService(ServiceBase):
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
-    @rpc(
-        ExecuteRequest,
-        _returns=AnyXml,
-        _body_style="bare",
-        _out_header=Session)
+    @rpc(ExecuteRequest,
+         _returns=AnyXml,
+         _body_style="bare",
+         _out_header=Session)
     def Execute(ctx, request):
         """
         the second principle function of xmla protocol
