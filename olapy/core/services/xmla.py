@@ -66,8 +66,8 @@ class XmlaProviderService(ServiceBase):
         config_parser = ConfigParser(discover_tools.executer.cube_path)
         if config_parser.xmla_authentication():
 
-            # TODO call labster login or create login with token (according to labster db)
-            if ctx.transport.req_env['QUERY_STRING'] != 'mouadh':
+            # TODO call (labster) login function or create login with token (according to labster db)
+            if ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
                 raise InvalidCredentialsError(
                     fault_string=
