@@ -4,6 +4,9 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+
+# manually use : pip install git+https://github.com/abilian/olapy.git@12a213ccb198c6df591a2e348ec9067fc0ba8f87
+
 appdirs==1.4.3            # via setuptools
 astroid==1.5.2            # via pylint
 backports.functools-lru-cache==1.3  # via astroid, pylint
