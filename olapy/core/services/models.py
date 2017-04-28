@@ -105,8 +105,7 @@ class DiscoverRequest(ComplexModel):
     Restrictions = Restrictionlist
     Properties = Propertielist
 
-
-class AuthenticationError(Fault):
-    __namespace__ = 'spyne.examples.authentication'
-    faultcode='Client.AuthenticationError',
-    faultstring='Invalid authentication request'
+# class AuthenticationError(Fault):
+#     __namespace__ = 'spyne.examples.authentication'
+#     faultcode='Client.AuthenticationError',
+#     faultstring='Invalid authentication request'

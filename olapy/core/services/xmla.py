@@ -13,7 +13,8 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
-from ..services.models import DiscoverRequest, ExecuteRequest, Session, AuthenticationError
+from ..services.models import DiscoverRequest, ExecuteRequest, Session\
+    # , AuthenticationError
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
