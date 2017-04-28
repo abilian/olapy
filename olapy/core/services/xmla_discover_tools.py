@@ -34,7 +34,6 @@ class XmlaDiscoverTools():
         ]]
         self.SessionId = uuid.uuid1()
 
-
     def change_catalogue(self, new_catalogue):
         """
         if you change the catalogue(cube) in any request, we have to instantiate the MdxEngine with the new catalogue

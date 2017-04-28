@@ -15,6 +15,7 @@ from spyne.server.wsgi import WsgiApplication
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session\
     # , AuthenticationError
+
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
@@ -38,15 +39,14 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     SessionId = discover_tools.SessionId
 
-
-
-    @rpc(DiscoverRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session,
-         _throws=InvalidCredentialsError
-         # _throws=AuthenticationError
-         )
+    @rpc(
+        DiscoverRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session,
+        _throws=InvalidCredentialsError
+        # _throws=AuthenticationError
+    )
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -69,8 +69,10 @@ class XmlaProviderService(ServiceBase):
             # TODO call labster login or create login with token (according to labster db)
             if ctx.transport.req_env['QUERY_STRING'] != 'mouadh':
 
-                raise InvalidCredentialsError(fault_string='You do not have permission to access this resource',
-                                        fault_object=None)
+                raise InvalidCredentialsError(
+                    fault_string=
+                    'You do not have permission to access this resource',
+                    fault_object=None)
 
                 # raise AuthenticationError()
 
@@ -132,10 +134,11 @@ class XmlaProviderService(ServiceBase):
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
-    @rpc(ExecuteRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session)
+    @rpc(
+        ExecuteRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session)
     def Execute(ctx, request):
         """
         the second principle function of xmla protocol
@@ -202,7 +205,7 @@ class XmlaProviderService(ServiceBase):
                        xmla_tools.generate_slicer_axis(df),
                        xmla_tools.generate_cell_data(df),
                        datetime.now().strftime('%Y-%m-%dT%H:%M:%S')).replace(
-                '&', '&amp;'))
+                           '&', '&amp;'))
 
             # Problem:
             # An XML parser returns the error “xmlParseEntityRef: noname”
