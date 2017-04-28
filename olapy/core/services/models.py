@@ -1,10 +1,10 @@
 from __future__ import absolute_import, division, print_function
 
-from spyne import ComplexModel, Integer, String, Unicode, XmlAttribute
+from spyne import ComplexModel, Integer, Unicode, XmlAttribute
+from spyne.model.fault import Fault
 
 
 class Tuple(object):
-
     def __init__(self, Hierarchy, UName, Caption, LName, LNum, DisplayInfo,
                  PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME, Value):
         self.Hierarchy = Hierarchy
@@ -92,7 +92,9 @@ class Propertielist(ComplexModel):
 
 
 class Command(ComplexModel):
-    _type_info = {'Statement': Unicode,}
+    _type_info = {
+        'Statement': Unicode,
+    }
 
 
 class ExecuteRequest(ComplexModel):
@@ -106,6 +108,7 @@ class DiscoverRequest(ComplexModel):
     Properties = Propertielist
 
 
-class DiscoverResponse(ComplexModel):
-    __namespace__ = "urn:schemas-microsoft-com:xml-analysis:rowset"
-    root = String
+# class AuthenticationError(Fault):
+#     __namespace__ = 'spyne.examples.authentication'
+#     faultcode='Client.AuthenticationError',
+#     faultstring='Invalid authentication request'

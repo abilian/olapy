@@ -1,13 +1,21 @@
+# -*- encoding: utf8 -*-
+
 from __future__ import absolute_import, division, print_function
 
+import os
 from datetime import datetime
+from os.path import expanduser
 
 from lxml import etree
 from spyne import AnyXml, Application, ServiceBase, rpc
+from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
-from ..services.models import DiscoverRequest, ExecuteRequest, Session
+from ..mdx.tools.config_file_parser import ConfigParser
+from ..services.models import DiscoverRequest, ExecuteRequest, Session\
+    # , AuthenticationError
+
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
@@ -31,10 +39,14 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     SessionId = discover_tools.SessionId
 
-    @rpc(DiscoverRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session)
+    @rpc(
+        DiscoverRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session,
+        _throws=InvalidCredentialsError
+        # _throws=AuthenticationError
+    )
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -50,6 +62,19 @@ class XmlaProviderService(ServiceBase):
 
         discover_tools = XmlaProviderService.discover_tools
         ctx.out_header = Session(SessionId=str(XmlaProviderService.SessionId))
+
+        config_parser = ConfigParser(discover_tools.executer.cube_path)
+        if config_parser.xmla_authentication():
+
+            # TODO call (labster) login function or create login with token (according to labster db)
+            if ctx.transport.req_env['QUERY_STRING'] != 'admin':
+
+                raise InvalidCredentialsError(
+                    fault_string=
+                    'You do not have permission to access this resource',
+                    fault_object=None)
+
+                # raise AuthenticationError()
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return discover_tools.discover_datasources_response()
@@ -82,7 +107,8 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(request)
+            return discover_tools.discover_mdschema_dimensions_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -100,17 +126,19 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(request)
+            return discover_tools.discover_mdschema_properties_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
-    @rpc(ExecuteRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session)
+    @rpc(
+        ExecuteRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session)
     def Execute(ctx, request):
         """
         the second principle function of xmla protocol
@@ -137,6 +165,7 @@ class XmlaProviderService(ServiceBase):
             executer.mdx_query = request.Command.Statement
             df = executer.execute_mdx()
             xmla_tools = XmlaExecuteTools(executer)
+
             return etree.fromstring("""
             <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset"
@@ -175,7 +204,16 @@ class XmlaProviderService(ServiceBase):
                        xmla_tools.generate_xs0(df),
                        xmla_tools.generate_slicer_axis(df),
                        xmla_tools.generate_cell_data(df),
-                       datetime.now().strftime('%Y-%m-%dT%H:%M:%S')))
+                       datetime.now().strftime('%Y-%m-%dT%H:%M:%S')).replace(
+                           '&', '&amp;'))
+
+            # Problem:
+            # An XML parser returns the error “xmlParseEntityRef: noname”
+            #
+            # Cause:
+            # There is a stray ‘&’ (ampersand character) somewhere in the XML text eg. some text & some more text
+            # Solution
+            # .replace('&', '&amp;')
 
 
 application = Application(
@@ -208,13 +246,19 @@ def start_server(write_on_file=False):
     # log to the file
     # TODO FIX it with os
     if write_on_file:
-        logging.basicConfig(level=logging.DEBUG, filename="C:\\logs\\xmla.log")
+        home_directory = expanduser("~")
+        if not os.path.isdir(os.path.join(home_directory, 'logs')):
+            os.makedirs(os.path.join(home_directory, 'logs'))
+        logging.basicConfig(
+            level=logging.DEBUG,
+            filename=os.path.join(home_directory, 'logs', 'xmla.log'))
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
     logging.info("listening to http://127.0.0.1:8000/xmla")
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
     server = make_server('127.0.0.1', 8000, wsgi_application)
+    # server = make_server('192.168.101.139', 8000, wsgi_application)
     server.serve_forever()
 
 

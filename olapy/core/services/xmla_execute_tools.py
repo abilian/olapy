@@ -325,6 +325,8 @@ class XmlaExecuteTools():
         cell_data = ""
         index = 0
         for value in columns_loop:
+            if value == -1:
+                value = ''
             cell_data += """
             <Cell CellOrdinal="{0}">
                 <Value xsi:type="xsi:long">{1}</Value>

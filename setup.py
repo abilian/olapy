@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function
 
-import pip
+import os
+import zipfile
+
+from os.path import expanduser
+from pip.download import PipSession
+from pip.req import parse_requirements
 from setuptools import find_packages, setup
 
-session = pip.download.PipSession()
-_install_requires = pip.req.parse_requirements(
+RUNNING_TOX = 'RUNTING_TOX' in os.environ
+
+session = PipSession()
+_install_requires = parse_requirements(
     'requirements.txt', session=session)
 install_requires = [str(ir.req) for ir in _install_requires]
 
@@ -29,3 +36,18 @@ setup(
         "Programming Language :: Python :: 2.7",
         # "Topic :: Business intelligence",
     ],)
+
+# initiate cubes examples
+if RUNNING_TOX:
+    home_directory = os.environ.get('HOME_DIR')
+else:
+    home_directory = expanduser("~")
+
+if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
+    try:
+        os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
+        zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
+        zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
+        zip_ref.close()
+    except:
+        raise ('unable to create cubes directory !')

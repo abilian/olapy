@@ -1,13 +1,21 @@
+# -*- encoding: utf8 -*-
+
 from __future__ import absolute_import, division, print_function
 
 import itertools
 import os
 import re
+from os.path import expanduser
 from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
+import pandas.io.sql as psql
 
+from ..tools.config_file_parser import ConfigParser
+from ..tools.connection import MyDB
+
+RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
 class MdxEngine:
     """
@@ -17,77 +25,192 @@ class MdxEngine:
     :param mdx_query: query to execute
     """
     CUBE_FOLDER = "cubes"
-    FACTS_TABLE_NAME = "Facts"
+    # (before instantiate MdxEngine I need to access cubes information)
+    csv_files_cubes = []
+    postgres_db_cubes = []
+    # to show just config file's dimensions
+    dimension_display_name = []
 
     def __init__(self,
                  cube_name,
+                 cubes_path=None,
                  mdx_query=None,
                  cube_folder=CUBE_FOLDER,
                  sep=';',
-                 fact_table_name=FACTS_TABLE_NAME):
+                 fact_table_name="Facts"):
         '''
 
         :param cube_folder: parent cube folder name
         :param mdx_query: query to execute
         :param sep: separator in the csv files
         '''
-        self.cube = cube_name
+
         self.cube_folder = cube_folder
+        self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self.mdx_query = mdx_query
-        self.cube_path = self._get_cube_path()
-        self.load_star_schema_dataframe = self._get_star_schema_dataframe(
-            cube_name)
+
+        if cubes_path is None:
+            self.cube_path = self._get_default_cube_directory()
+        else:
+            self.cube_path = cubes_path
+
+        # to get cubes in db
+        self._ = self.get_cubes_names()
         self.tables_loaded = self._load_tables()
-        self.tables_names = self._get_tables_name()
         # all measures
         self.measures = self._get_measures()
+        self.load_star_schema_dataframe = self._get_star_schema_dataframe(
+            cube_name)
+        self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
 
     @classmethod
-    def get_cubes_names(self):
+    def get_cubes_names(cls):
         '''
         :return: list cubes name under cubes folder
         '''
 
-        location = os.path.join(
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), "..", "..", "..", "..")),
-            MdxEngine.CUBE_FOLDER)
-        return [
-            file for file in os.listdir(location)
-            if os.path.isdir(os.path.join(location, file))
-        ]
+        # get csv files folders (cubes)
+        # toxworkdir does not expanduser properly
+        if RUNNING_TOX:
+            home_directory = os.environ.get('HOME_DIR')
+        else:
+            home_directory = expanduser("~")
+
+        location = os.path.join(home_directory, 'olapy-data',
+                                cls.CUBE_FOLDER)
+
+        try:
+            MdxEngine.csv_files_cubes = [
+                file for file in os.listdir(location)
+                if os.path.isdir(os.path.join(location, file))
+            ]
+
+        except:
+            pass
+
+        # get postgres databases
+        try:
+            db = MyDB()
+            cursor = db.connection.cursor()
+            cursor.execute("""SELECT datname FROM pg_database
+            WHERE datistemplate = false;""")
+
+            MdxEngine.postgres_db_cubes = [
+                database[0] for database in cursor.fetchall()
+            ]
+        except:
+            pass
+
+        return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
+
+    def _get_default_cube_directory(self):
+
+        # toxworkdir does not expanduser properly
+        if RUNNING_TOX:
+            home_directory = os.environ.get('HOME_DIR')
+        else:
+            home_directory = expanduser("~")
+
+        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
 
     def _get_tables_name(self):
         return self.tables_loaded.keys()
 
-    def _get_cube_path(self):
-        '''
-        :return: return local cube folder name with full path
-        '''
-        return os.path.join(
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), '..', "..", '..', '..')),
-            self.cube_folder)
+    def _load_table_config_file(self, cube_obj):
+        """
+        load tables from config file
+        :param cube_obj: cubes object
+        :return: tables dict with table name as key and dataframe as value
+        """
+
+        tables = {}
+        # just one facts table right now
+        self.facts = cube_obj.facts[0].table_name
+
+        db = MyDB(db=self.cube)
+
+        for table in cube_obj.dimensions:
+            value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
+                                        db.connection)
+
+            tables[table.name] = value[[
+                col for col in value.columns if col.lower()[-3:] != '_id'
+            ]]
+
+        # update table display name
+        for dimension in cube_obj.dimensions:
+            if dimension.displayName and dimension.name and dimension.displayName != dimension.name:
+                tables[dimension.displayName] = tables[dimension.name][
+                    dimension.columns]
+                MdxEngine.dimension_display_name.append(dimension.name)
+
+        return tables
+
+    def _load_tables_csv_files(self):
+        """
+        load tables from csv files
+        :return: tables dict with table name as key and dataframe as value
+        """
+
+        tables = {}
+        cube = self.get_cube()
+        for file in os.listdir(cube):
+            # to remove file extension ".csv"
+            table_name = os.path.splitext(file)[0]
+            value = pd.read_csv(os.path.join(cube, file), sep=self.sep)
+            tables[table_name] = value[[
+                col for col in value.columns if col.lower()[-3:] != '_id'
+            ]]
+
+        return tables
+
+    def _load_tables_db(self):
+        """
+        load tables from database
+        :return: tables dict with table name as key and dataframe as value
+        """
+
+        tables = {}
+        db = MyDB(db=self.cube)
+        cursor = db.connection.cursor()
+        cursor.execute("""SELECT table_name FROM information_schema.tables
+                          WHERE table_schema = 'public'""")
+
+        for table_name in cursor.fetchall():
+            value = psql.read_sql_query(
+                'SELECT * FROM "{0}" '.format(table_name[0]), db.connection)
+
+            tables[table_name[0]] = value[[
+                col for col in value.columns if col.lower()[-3:] != '_id'
+            ]]
+        return tables
 
     def _load_tables(self):
         """
         load all tables
         :return: dict with key as table name and DataFrame as value
         """
-        cube = self.get_cube()
+
+        config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        for file in os.listdir(cube):
-            # to remove file extension ".csv"
-            table_name = os.path.splitext(file)[0]
-            value = pd.read_csv(os.path.join(cube, file), sep=self.sep)
-            tables[table_name] = value[
-                [col for col in value.columns if col.lower()[-3:] != '_id']]
+        if config_file_parser.config_file_exist(
+        ) and self.cube in config_file_parser.get_cubes_names():
+            for cubes in config_file_parser.construct_cubes():
+
+                # TODO cubes.source == 'csv'
+                if cubes.source == 'postgres':
+                    tables = self._load_table_config_file(cubes)
+
+        elif self.cube in self.csv_files_cubes:
+            tables = self._load_tables_csv_files()
+
+        elif self.cube in self.postgres_db_cubes:
+            tables = self._load_tables_db()
+
         return tables
 
     def _get_measures(self):
@@ -95,21 +218,122 @@ class MdxEngine:
 
         :return: all numerical columns in facts table
         """
-        return list(self.tables_loaded[self.facts].select_dtypes(
-            include=[np.number]).columns)
+        # col.lower()[-2:] != 'id' to ignore any id column
+        return [
+            col
+            for col in self.tables_loaded[self.facts].select_dtypes(
+                include=[np.number]).columns if col.lower()[-2:] != 'id'
+        ]
 
-    def _get_star_schema_dataframe(self, cube):
+    def _construct_star_schema_config_file(self, cube_name, cubes_obj):
+        """
+        Construct star schema Dataframe from configuration file
+        :param cube_name:  cube name (or database name)
+        :param cubes_obj: cubes object
+        :return: star schema Dataframe
+        """
+
+        self.facts = cubes_obj.facts[0].table_name
+        db = MyDB(db=cube_name)
+        # load facts table
+        fusion = psql.read_sql_query("SELECT * FROM {0}".format(self.facts),
+                                     db.connection)
+
+        for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
+            df = psql.read_sql_query(
+                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+                db.connection)
+
+            fusion = fusion.merge(
+                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+
+            # TODO CHOSE BETWEEN THOSES DF
+            # if separated dimensions
+            # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
+
+        # TODO CHOSE BETWEEN THOSES DF
+        # if facts contains all dimensions
+        # fusion = facts
+
+        # measures in config-file only
+        if cubes_obj.facts[0].measures:
+            self.measures = cubes_obj.facts[0].measures
+
+        return fusion
+
+    def _construct_star_schema_csv_files(self, cube_name):
+        """
+        Construct star schema Dataframe from csv files
+        :param cube_name:  cube name (folder name)
+        :return: star schema Dataframe
+        """
+
+        cube = self.get_cube()
+        # loading facts table
+        fusion = pd.read_csv(
+            os.path.join(cube, self.facts + '.csv'), sep=self.sep)
+        for file_name in os.listdir(cube):
+            try:
+                fusion = fusion.merge(
+                    pd.read_csv(os.path.join(cube, file_name), sep=self.sep))
+            except:
+                print('No common column')
+                pass
+
+        return fusion
+
+    def _construct_star_schema_db(self, cube_name):
+        """
+        Construct star schema Dataframe from database
+        :param cube_name:  cube name (database name)
+        :return: star schema Dataframe
+        """
+
+        db = MyDB(db=cube_name)
+
+        # load facts table
+        fusion = psql.read_sql_query('SELECT * FROM "{0}" '.format(self.facts),
+                                     db.connection)
+
+        cursor = db.connection.cursor()
+        cursor.execute("""SELECT table_name FROM information_schema.tables
+                              WHERE table_schema = 'public'""")
+        for db_table_name in cursor.fetchall():
+            try:
+                fusion = fusion.merge(
+                    psql.read_sql_query("SELECT * FROM {0}".format(
+                        db_table_name[0]), db.connection))
+            except:
+                print('No common column')
+                pass
+
+        return fusion
+
+    def _get_star_schema_dataframe(self, cube_name):
         '''
         :return: all DataFrames merged as star schema
         '''
-        # star schema = (http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html)
-        cube = self.get_cube()
-        # loading facts table
-        df = pd.read_csv(os.path.join(cube, self.facts + '.csv'), sep=self.sep)
-        for f in os.listdir(cube):
-            df = df.merge(pd.read_csv(os.path.join(cube, f), sep=self.sep))
-        # TODO check this
-        return df[[col for col in df.columns if col.lower()[-3:] != '_id']]
+
+        fusion = None
+
+        config_file_parser = ConfigParser(self.cube_path)
+        if config_file_parser.config_file_exist(
+        ) and cube_name in config_file_parser.get_cubes_names():
+            for cubes in config_file_parser.construct_cubes():
+                # TODO cubes.source == 'csv'
+                if cubes.source == 'postgres':
+                    fusion = self._construct_star_schema_config_file(cube_name,
+                                                                     cubes)
+
+        elif cube_name in self.csv_files_cubes:
+            fusion = self._construct_star_schema_csv_files(cube_name)
+
+        elif cube_name in self.postgres_db_cubes:
+            fusion = self._construct_star_schema_db(cube_name)
+
+        return fusion[[
+            col for col in fusion.columns if col.lower()[-3:] != '_id'
+        ]]
 
     def get_all_tables_names(self, ignore_fact=False):
         """
@@ -125,15 +349,17 @@ class MdxEngine:
     def get_cube(self):
         """
         get path to the cube (example /home/your_user_name/olapy-core/cubes)
-
         :return: path to the cube
         """
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
     def get_tuples(self, query, start=None, stop=None):
-        # TODO use grako instead and remove regex
-        regex = "(\[[\w\d ]+\](\.\[[\w\d\.\- ]+\])*\.?((Members)|(\[Q\d\]))?)"
+
+        # french characters
+        # or use new regex 2017.02.08
+        regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
+                "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
         if start is not None:
             start = query.index(start)
@@ -144,7 +370,9 @@ class MdxEngine:
         return [[
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.')
-        ] for tup in re.compile(regex).findall(query[start:stop])
+        ]
+                for tup in re.compile(regex).findall(
+                    query.encode("utf-8")[start:stop])
                 if len(tup[0].split('.')) > 1]
 
     # TODO temporary function
@@ -156,7 +384,6 @@ class MdxEngine:
         """
 
         tuples_on_mdx_query = self.get_tuples(query)
-
         on_rows = []
         on_columns = []
         on_where = []
@@ -449,7 +676,6 @@ class MdxEngine:
 
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
-
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -521,8 +747,7 @@ class MdxEngine:
             # TODO groupby in web demo (remove it for more performance)
             # TODO margins=True for columns total !!!!!
             return {
-                'result':
-                df.drop_duplicates().replace(np.nan, -1).groupby(cols).sum(),
+                'result': df.groupby(cols).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
             }
 
