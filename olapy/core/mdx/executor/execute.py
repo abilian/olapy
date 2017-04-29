@@ -5,8 +5,8 @@ from __future__ import absolute_import, division, print_function
 import itertools
 import os
 import re
-from os.path import expanduser
 from collections import OrderedDict
+from os.path import expanduser
 
 import numpy as np
 import pandas as pd
@@ -730,8 +730,7 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

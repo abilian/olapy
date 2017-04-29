@@ -5,6 +5,7 @@ from spyne.model.fault import Fault
 
 
 class Tuple(object):
+
     def __init__(self, Hierarchy, UName, Caption, LName, LNum, DisplayInfo,
                  PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME, Value):
         self.Hierarchy = Hierarchy
@@ -92,9 +93,7 @@ class Propertielist(ComplexModel):
 
 
 class Command(ComplexModel):
-    _type_info = {
-        'Statement': Unicode,
-    }
+    _type_info = {'Statement': Unicode,}
 
 
 class ExecuteRequest(ComplexModel):

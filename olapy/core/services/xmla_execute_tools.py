@@ -302,8 +302,8 @@ class XmlaExecuteTools():
         """
         columns_loop = []
 
-        if (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0) ^ (
-                len(mdx_execution_result['columns_desc']['rows'].keys()) == 0):
+        if (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0
+           ) ^ (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0):
             if self.executer.facts in mdx_execution_result['columns_desc'][
                     'all'].keys():
 
@@ -549,12 +549,12 @@ class XmlaExecuteTools():
         tuple = ""
         # not used dimensions
         for dim_diff in list(
-                set(self.executer.get_all_tables_names(ignore_fact=True)) -
-                set([
-                    table_name
-                    for table_name in mdx_execution_result['columns_desc'][
-                        'all']
-                ])):
+                set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
+                    [
+                        table_name
+                        for table_name in mdx_execution_result['columns_desc'][
+                            'all']
+                    ])):
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>

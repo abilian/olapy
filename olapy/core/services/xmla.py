@@ -13,9 +13,8 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
-from ..services.models import DiscoverRequest, ExecuteRequest, Session\
-    # , AuthenticationError
-
+from ..services.models import DiscoverRequest  # , AuthenticationError
+from ..services.models import ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
@@ -45,7 +44,7 @@ class XmlaProviderService(ServiceBase):
          _out_header=Session,
          _throws=InvalidCredentialsError
          # _throws=AuthenticationError
-         )
+        )
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -105,8 +104,7 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(
-                request)
+            return discover_tools.discover_mdschema_dimensions_response(request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -124,8 +122,7 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(
-                request)
+            return discover_tools.discover_mdschema_properties_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)

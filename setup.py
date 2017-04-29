@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function
 
 import os
 import zipfile
-
 from os.path import expanduser
+
 from pip.download import PipSession
 from pip.req import parse_requirements
 from setuptools import find_packages, setup
@@ -12,8 +12,7 @@ from setuptools import find_packages, setup
 RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
 session = PipSession()
-_install_requires = parse_requirements(
-    'requirements.txt', session=session)
+_install_requires = parse_requirements('requirements.txt', session=session)
 install_requires = [str(ir.req) for ir in _install_requires]
 
 setup(

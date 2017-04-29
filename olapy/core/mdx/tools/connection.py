@@ -2,6 +2,7 @@ import psycopg2 as pg
 
 
 class MyDB(object):
+
     def __init__(self,
                  username='postgres',
                  password='root',

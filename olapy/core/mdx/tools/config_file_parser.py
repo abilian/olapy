@@ -4,10 +4,11 @@ import os
 
 from lxml import etree
 
-from .models import Cube, Facts, Dimension
+from .models import Cube, Dimension, Facts
 
 
 class ConfigParser:
+
     def __init__(self, cube_path, file_name='cubes-config.xml'):
         self.cube_path = cube_path
         self.file_name = file_name
@@ -57,8 +58,7 @@ class ConfigParser:
                             table_name=xml_facts.find('table_name').text,
                             keys={
                                 key.text: key.attrib['ref']
-                                for key in xml_facts.findall(
-                                    'keys/column_name')
+                                for key in xml_facts.findall('keys/column_name')
                             },
                             measures=[
                                 mes.text
