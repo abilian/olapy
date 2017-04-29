@@ -69,3 +69,14 @@ update-deps:
 	pip-compile -U > /dev/null
 	pip-compile > /dev/null
 	git --no-pager diff requirements.txt
+
+sync-deps:
+	pip install -r requirements.txt -r dev-requirements.txt -e .
+
+release:
+	git push --tags
+	rm -rf /tmp/olapy
+	git clone . /tmp/olapy
+	cd /tmp/olapy ; python setup.py sdist
+	cd /tmp/olapy ; python setup.py sdist upload
+
