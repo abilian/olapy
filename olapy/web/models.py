@@ -28,4 +28,4 @@ class User(db.Model, UserMixin):
         return User.query.filter_by(username=username).first()
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User {}>'.format(self.username)

@@ -65,7 +65,7 @@ class WSGIServer:
     def url(self):
         host, port = self.server_address
         proto = 'http' if self._server.ssl_context is None else 'https'
-        return '%s://%s:%i' % (proto, host, port)
+        return '{0}://{1}:{2}'.format(proto, host, port)
 
 
 @pytest.fixture(scope="function")
