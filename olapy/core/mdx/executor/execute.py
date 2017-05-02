@@ -88,7 +88,8 @@ class MdxEngine:
                 if os.path.isdir(os.path.join(location, file))
             ]
 
-        except:
+        except Exception:
+            print('no csv folders')
             pass
 
         # get postgres databases
@@ -101,7 +102,8 @@ class MdxEngine:
             MdxEngine.postgres_db_cubes = [
                 database[0] for database in cursor.fetchall()
             ]
-        except:
+        except Exception:
+            print('no database connexion')
             pass
 
         return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
