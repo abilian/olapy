@@ -1,0 +1,144 @@
+    SELECT
+        {
+        [Measures].[Amount]
+        } ON COLUMNS (or ROWS)
+
+        FROM [Sales]
+
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+        OR
+        WHERE [Product].[Product].[Company].[Crazy Development].[olapy].[Personal]
+        OR
+        WHERE [Time].[Time].[Year].[2010]
+        OR
+        WHERE [Time].[Time].[Year].[2010], [Measures].[Count]
+
+//////////////////////
+
+    SELECT
+        {
+        [Geography].[Geo].[Continent]} ON COLUMNS
+
+        FROM [Sales]
+
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+        OR
+        WHERE [Product].[Product].[Company].[Crazy Development].[olapy].[Personal]
+        OR
+        WHERE [Time].[Calendar].[Year].[2010]
+        OR
+        [Measures].[Count]
+        OR
+        WHERE [Time].[Calendar].[Year].[2010],[Measures].[Count]
+
+//////////////////////
+
+    SELECT
+        {
+        [Measures].[Amount]} ON COLUMNS,
+
+        non empty {[Geography].[Geo].[Continent].Members} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+        OR
+        WHERE [Product].[Product].[Company].[Crazy Development].[olapy].[Personal]
+        OR
+        WHERE [Time].[Calendar].[Year].[2010]
+
+
+//////////////////
+
+    SELECT
+
+		{[Product].[Prod].[Company]} ON COLUMNS,
+
+        non empty {[Geography].[Geo].[Continent].Members} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+        OR
+        WHERE [Time].[Calendar].[Year].[2010]
+        OR
+        WHERE [Measures].[Count]
+
+//////////////////
+
+    SELECT
+
+		{[Geography].[Geo].[Continent]} ON COLUMNS,  OR {[Geography].[Geo].[Continent].[America]} ON COLUMNS,
+
+        {[Product].[Prod].[Company]} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+        OR
+        WHERE [Product].[Product].[Company].[Crazy Development].[olapy].[Personal] not working well and is correct //hierarchy '[Product].[Prod]' Can not be used both in the 'slicer' and on an axis
+        OR
+        WHERE [Time].[Calendar].[Year].[2010]
+        OR
+        WHERE [Measures].[Count]
+
+
+////////////////////////////
+
+    SELECT
+
+		{
+		[Geography].[Geo].[Continent].[America],
+		[Geography].[Geo].[Continent].[Europe]} ON COLUMNS,
+
+        {
+        [Product].[Prod].[Company].[Crazy Development],
+        [Product].[Prod].[Company].[Company_test],
+        [Product].[Prod].[Company].[test_Development]} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Measures].[Count]
+        OR
+        WHERE [Time].[Calendar].[Year].[2010]
+        OR
+        WHERE [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]
+
+
+////////////////////////////////////////////
+
+    SELECT
+		{
+		[Geography].[Geo].[Continent].[America],
+		[Geography].[Geo].[Continent].[Europe]} ON COLUMNS
+
+        FROM [Sales]
+
+        WHERE [Time].[Calendar].[Year].[2010]
+
+////////////////////////////////////////////
+
+    SELECT
+        {
+        [Geography].[Geo].[Continent].[Europe].[France],
+        [Geography].[Geo].[Continent].[Europe].[Spain]} ON COLUMNS,
+
+        non empty {[Measures].[Amount]} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Time].[Calendar].[Year].[2010]
+
+////////////////////////////////////////////
+
+    SELECT
+
+		{
+		[Geography].[Geo].[Continent].[Europe].[France]} ON COLUMNS,
+
+        {
+        [Product].[Prod].[Company].[Crazy Development]} ON ROWS
+
+        FROM [Sales]
+
+        WHERE [Time].[Calendar].[Year].[2010]
