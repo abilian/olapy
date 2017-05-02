@@ -77,7 +77,7 @@ class MdxParserGen(Parser):
     def _MDX_statement_(self):
         self._select_statement_()
 
-    @graken('selectStatement')
+    @graken('SelectStatement')
     def _select_statement_(self):
         self._token('SELECT')
         self.name_last_node('name')

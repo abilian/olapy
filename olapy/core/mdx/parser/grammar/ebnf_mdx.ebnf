@@ -6,7 +6,7 @@
 MDX_statement =
 			select_statement;
 		
-select_statement::selectStatement = name:'SELECT' [axis_specification_columns:axis_specification]
+select_statement::SelectStatement = name:'SELECT' [axis_specification_columns:axis_specification]
 						[',' axis_specification_rows:axis_specification]
 						'FROM' cube_specification:cube_specification
 						['WHERE' condition_specification:condition_specification]$

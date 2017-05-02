@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 
-class selectStatement():
+class SelectStatement:
 
     def __init__(self, select_statement):
         self.select_statement = select_statement

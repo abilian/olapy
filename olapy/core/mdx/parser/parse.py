@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 from grako.model import ModelBuilderSemantics
 
 from .gen_parser.mdxparser import MdxParserGen
-from .gen_parser.models import selectStatement
+from .gen_parser.models import SelectStatement
 
 
 class MdxParser:
@@ -48,7 +48,7 @@ class MdxParser:
         :return: Tuples in the axis, from the MDX query
         '''
         model = MdxParserGen(semantics=ModelBuilderSemantics(
-            types=[selectStatement]))
+            types=[SelectStatement]))
         ast = model.parse(query, rule_name=MdxParser.START, ignorecase=True)
         if axis == "column":
             if ast.select_statement.axis_specification_columns is not None:
