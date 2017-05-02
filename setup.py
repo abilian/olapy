@@ -36,6 +36,9 @@ setup(
         # "Topic :: Business intelligence",
     ],)
 
+# generate and set secret key
+os.environ["SECRET_KEY"] = os.urandom(24).encode('hex')
+
 # initiate cubes examples
 if RUNNING_TOX:
     home_directory = os.environ.get('HOME_DIR')
