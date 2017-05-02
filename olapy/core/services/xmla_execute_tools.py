@@ -372,10 +372,10 @@ class XmlaExecuteTools():
         hierarchy_info_slicer = ""
 
         slicer_list = list(
-            set(all_dimensions_names) - set([
+            set(all_dimensions_names) - set(
                 table_name
                 for table_name in mdx_execution_result['columns_desc']['all']
-            ]))
+            ))
 
         # we have to write measures after dimensions !
         if 'Measures' in slicer_list:
@@ -550,11 +550,10 @@ class XmlaExecuteTools():
         # not used dimensions
         for dim_diff in list(
                 set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
-                    [
                         table_name
                         for table_name in mdx_execution_result['columns_desc'][
                             'all']
-                    ])):
+                    )):
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>
