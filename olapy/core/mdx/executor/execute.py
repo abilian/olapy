@@ -22,8 +22,7 @@ class MdxEngine:
     """
     The principal class for executing a query
 
-    :param cube_name: Cube name , it must be under cube_folder (example : olapy/cubes/sales)
-    :param mdx_query: query to execute
+    :param cube_name: Cube name , it must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
     """
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
@@ -71,11 +70,11 @@ class MdxEngine:
     @classmethod
     def get_cubes_names(cls):
         '''
-        :return: list cubes name under cubes folder
+        :return: list cubes name that exists in cubes folder and postgres database
         '''
 
         # get csv files folders (cubes)
-        # toxworkdir does not expanduser properly
+        # toxworkdir does not expanduser properly under tox
         if RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
@@ -109,7 +108,7 @@ class MdxEngine:
 
     def _get_default_cube_directory(self):
 
-        # toxworkdir does not expanduser properly
+        # toxworkdir does not expanduser properly under tox
         if RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
@@ -118,13 +117,18 @@ class MdxEngine:
         return os.path.join(home_directory, 'olapy-data', self.cube_folder)
 
     def _get_tables_name(self):
+        """
+        get all tables names
+        
+        :return: list tables names
+        """
         return self.tables_loaded.keys()
 
     def _load_table_config_file(self, cube_obj):
         """
         load tables from config file
         :param cube_obj: cubes object
-        :return: tables dict with table name as key and dataframe as value
+        :return: tables dict with table name as key and DataFrame as value
         """
 
         tables = {}
@@ -191,7 +195,7 @@ class MdxEngine:
 
     def _load_tables(self):
         """
-        load all tables
+        load all tables (DataFrames)
         :return: dict with key as table name and DataFrame as value
         """
 
@@ -201,7 +205,7 @@ class MdxEngine:
         ) and self.cube in config_file_parser.get_cubes_names():
             for cubes in config_file_parser.construct_cubes():
 
-                # TODO cubes.source == 'csv'
+                # TODO working with cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     tables = self._load_table_config_file(cubes)
 
@@ -227,10 +231,10 @@ class MdxEngine:
 
     def _construct_star_schema_config_file(self, cube_name, cubes_obj):
         """
-        Construct star schema Dataframe from configuration file
+        Construct star schema DataFrame from configuration file
         :param cube_name:  cube name (or database name)
         :param cubes_obj: cubes object
-        :return: star schema Dataframe
+        :return: star schema DataFrame
         """
 
         self.facts = cubes_obj.facts[0].table_name
@@ -263,9 +267,9 @@ class MdxEngine:
 
     def _construct_star_schema_csv_files(self, cube_name):
         """
-        Construct star schema Dataframe from csv files
+        Construct star schema DataFrame from csv files
         :param cube_name:  cube name (folder name)
-        :return: star schema Dataframe
+        :return: star schema DataFrame
         """
 
         cube = self.get_cube()
@@ -284,9 +288,9 @@ class MdxEngine:
 
     def _construct_star_schema_db(self, cube_name):
         """
-        Construct star schema Dataframe from database
+        Construct star schema DataFrame from database
         :param cube_name:  cube name (database name)
-        :return: star schema Dataframe
+        :return: star schema DataFrame
         """
 
         db = MyDB(db=cube_name)
@@ -310,9 +314,12 @@ class MdxEngine:
         return fusion
 
     def _get_star_schema_dataframe(self, cube_name):
-        '''
-        :return: all DataFrames merged as star schema
-        '''
+        """
+        merge all DataFrames as star schema
+        
+        :param cube_name: cube name with which we want to generate a star schema model
+        :return: star schema DataFrame
+        """
 
         fusion = None
 
@@ -348,13 +355,42 @@ class MdxEngine:
 
     def get_cube(self):
         """
-        get path to the cube (example /home/your_user_name/olapy-core/cubes)
+        get path to the cube (example /home_directory/your_user_name/olapy-data/cubes)
+        
         :return: path to the cube
         """
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
     def get_tuples(self, query, start=None, stop=None):
+        """
+        get all tuples in the mdx query
+        
+        example:
+        
+        
+            SELECT {[Geography].[Geography].[All Continent].Members,
+                    [Geography].[Geography].[Continent].[Europe]
+     
+            } ON COLUMNS,
+            
+                   {[Product].[Product].[Company]
+                    
+            } ON ROWS
+            
+            FROM {sales}
+            
+        It returns [ ['Geography','Geography','Continent'],
+                    ['Geography','Geography','Continent','Europe'],
+                    ['Product','Product','Company']
+                ]
+                    
+            
+        :param query: mdx query
+        :param start: key-word in the query where we start (examples start = SELECT)
+        :param stop:  key-word in the query where we stop (examples start = ON ROWS)
+        :return:  nested list of tuples (see the example)
+        """
 
         # french characters
         # or use new regex 2017.02.08
@@ -366,7 +402,7 @@ class MdxEngine:
         if stop is not None:
             stop = query.index(stop)
 
-        # clean the query (from All, Members...)
+        # clean the query (remove All, Members...)
         return [[
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.')
@@ -378,9 +414,10 @@ class MdxEngine:
     # TODO temporary function
     def decorticate_query(self, query):
         """
-        get all tuples that exists in the MDX Query
+        get all tuples that exists in the MDX Query by axes
+        
         :param query: MDX Query
-        :return: all tuples in the query
+        :return: dict of axis as key and tuples as value
         """
 
         tuples_on_mdx_query = self.get_tuples(query)
@@ -388,25 +425,30 @@ class MdxEngine:
         on_columns = []
         on_where = []
 
-        # ON ROWS
-        if 'ON ROWS' in query:
-            stop = 'ON ROWS'
+        try:
+
+            # ON ROWS
+            if 'ON ROWS' in query:
+                stop = 'ON ROWS'
+                if 'ON COLUMNS' in query:
+                    start = 'ON COLUMNS'
+                else:
+                    start = 'SELECT'
+                on_rows = self.get_tuples(query, start, stop)
+
+            # ON COLUMNS
             if 'ON COLUMNS' in query:
-                start = 'ON COLUMNS'
-            else:
                 start = 'SELECT'
-            on_rows = self.get_tuples(query, start, stop)
+                stop = 'ON COLUMNS'
+                on_columns = self.get_tuples(query, start, stop)
 
-        # ON COLUMNS
-        if 'ON COLUMNS' in query:
-            start = 'SELECT'
-            stop = 'ON COLUMNS'
-            on_columns = self.get_tuples(query, start, stop)
+            # WHERE
+            if 'WHERE' in query:
+                start = 'FROM'
+                on_where = self.get_tuples(query, start)
 
-        # WHERE
-        if 'WHERE' in query:
-            start = 'FROM'
-            on_where = self.get_tuples(query, start)
+        except:
+            raise SyntaxError('Please check your MDX Query')
 
         return {
             'all': tuples_on_mdx_query,
@@ -480,7 +522,7 @@ class MdxEngine:
 
         Example :
 
-        tuple = ['Geograpy','Geograpy','Continent','Europe','France','olapy']
+        tuple = ['Geography','Geography','Continent','Europe','France','olapy']
 
         Dataframe_in in =
 
@@ -510,12 +552,12 @@ class MdxEngine:
         :return: Filtered DataFrame
         """
         df = Dataframe_in
-        #  tuple_as_list like ['Geograpy','Geograpy','Continent']
+        #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
         if len(tuple_as_list) == 3:
             df = df[(df[tuple_as_list[-1]].notnull())]
 
-        # tuple_as_list like['Geograpy', 'Geograpy', 'Continent' , 'America','US']
+        # tuple_as_list like['Geography', 'Geography', 'Continent' , 'America','US']
         # execute : df[(df['Continent'] == 'America')] and
         #           df[(df['Country'] == 'US')]
         elif len(tuple_as_list) > 3:
@@ -687,7 +729,6 @@ class MdxEngine:
             (table, columns)
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
-
         # if we have measures on axes we have to ignore them
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'

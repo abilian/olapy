@@ -8,7 +8,7 @@ from .gen_parser.models import selectStatement
 
 class MdxParser:
     """
-    this class parse the mdx query and split it into well-defined parts
+    parse the mdx query and split it into well-defined parts
     """
     START = 'MDX_statement'
 

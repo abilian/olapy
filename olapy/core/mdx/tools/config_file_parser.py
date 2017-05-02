@@ -8,15 +8,31 @@ from .models import Cube, Dimension, Facts
 
 
 class ConfigParser:
+    """
+    Parse olapy config files
+    """
 
     def __init__(self, cube_path, file_name='cubes-config.xml'):
+        """
+        
+        :param cube_path: path to cube (csv folders)
+        :param file_name: config file name (DEFAULT = cubes-config.xml)
+        """
         self.cube_path = cube_path
         self.file_name = file_name
 
     def config_file_exist(self):
+        """
+        check whether the config file exists or not 
+        :return: True | False
+        """
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
 
     def xmla_authentication(self):
+        """
+        check if excel need authentication to access cubes or not. (xmla_authentication tag in the config file)
+        :return: True | False
+        """
 
         with open(os.path.join(self.cube_path, self.file_name)) as config_file:
 
@@ -30,6 +46,11 @@ class ConfigParser:
                 return False
 
     def get_cubes_names(self):
+        """
+        get all cubes names in the config file
+        
+        :return: dict of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
+        """
 
         with open(os.path.join(self.cube_path, self.file_name)) as config_file:
 
@@ -45,6 +66,11 @@ class ConfigParser:
                 raise ('missed name or source tags')
 
     def construct_cubes(self):
+        """
+        construct cube (with it dimensions) and facts from  the config file
+        :return: list of Cubes instance
+        """
+
         if self.config_file_exist():
             try:
                 with open(os.path.join(self.cube_path,
