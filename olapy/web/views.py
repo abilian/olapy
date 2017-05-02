@@ -18,7 +18,7 @@ from olapy.web.pivottable import pivot_ui
 from ..core.mdx.executor.execute import MdxEngine
 from ..web import app, login_manager
 from ..web.logger import Logs
-from ..web.stats_utils import graphs
+from ..web.stats_utils import Graphs
 from .forms import LoginForm, QueryForm
 from .models import User
 
@@ -234,7 +234,7 @@ def export_file(type):
 @login_required
 def stats():
     ex = MdxEngine(CUBE)
-    graph = graphs()
+    graph = Graphs()
 
     columns = list(
         itertools.chain.from_iterable([[column for column in df.columns]

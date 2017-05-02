@@ -7,7 +7,7 @@ import plotly
 import plotly.graph_objs as go
 
 
-class graphs:
+class Graphs:
     """
     Manage graphs for the web clients
     """
