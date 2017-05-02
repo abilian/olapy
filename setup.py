@@ -36,8 +36,8 @@ setup(
         # "Topic :: Business intelligence",
     ],)
 
-# generate and set secret key
-os.environ["SECRET_KEY"] = os.urandom(24).encode('hex')
+# # generate and set secret key
+# os.environ["SECRET_KEY"]
 
 # initiate cubes examples
 if RUNNING_TOX:
