@@ -12,7 +12,7 @@ class XmlaExecuteTools():
     def __init__(self, executer):
         self.executer = executer
 
-    def split_dataFrame(self, mdx_execution_result):
+    def split_dataframe(self, mdx_execution_result):
         """
         Split DataFrame into multiple ones by dimension
         example:
@@ -248,7 +248,7 @@ class XmlaExecuteTools():
         """
         # TODO must be OPTIMIZED every time!!!!!
 
-        dfs = self.split_dataFrame(mdx_execution_result)
+        dfs = self.split_dataframe(mdx_execution_result)
         if mdx_execution_result['columns_desc'][
                 'rows'] and mdx_execution_result['columns_desc']['columns']:
 
