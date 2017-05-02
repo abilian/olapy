@@ -302,10 +302,10 @@ class XmlaExecuteTools():
         """
         columns_loop = []
 
-        if (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0
-           ) ^ (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0):
-            if self.executer.facts in mdx_execution_result['columns_desc'][
-                    'all'].keys():
+        if (
+                (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0
+                ) ^ (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0)
+            ) and self.executer.facts in mdx_execution_result['columns_desc']['all'].keys():
 
                 # iterate DataFrame horizontally
                 columns_loop = itertools.chain(* [

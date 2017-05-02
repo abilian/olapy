@@ -165,8 +165,8 @@ class XmlaDiscoverTools():
         """)
 
     def discover_schema_rowsets_response(self, request):
-        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES":
-            if request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
+                        request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
                 return etree.fromstring("""
                 <return>
@@ -218,8 +218,8 @@ class XmlaDiscoverTools():
                     </root>
                 </return>
             """)
-        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES':
-            if request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and \
+                        request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
                 return etree.fromstring("""
                 <return>

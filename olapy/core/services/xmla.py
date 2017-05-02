@@ -61,16 +61,12 @@ class XmlaProviderService(ServiceBase):
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
         config_parser = ConfigParser(discover_tools.executer.cube_path)
-        if config_parser.xmla_authentication():
+        if config_parser.xmla_authentication() and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
+            raise InvalidCredentialsError(
+                fault_string='You do not have permission to access this resource',
+                fault_object=None)
             # TODO call (labster) login function or create login with token (according to labster db)
-            if ctx.transport.req_env['QUERY_STRING'] != 'admin':
-
-                raise InvalidCredentialsError(
-                    fault_string='You do not have permission to access this resource',
-                    fault_object=None)
-
-                # raise AuthenticationError()
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return discover_tools.discover_datasources_response()
