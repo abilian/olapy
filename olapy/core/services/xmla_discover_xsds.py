@@ -623,7 +623,7 @@ xmlns:sql="urn:schemas-microsoft-com:xml-sql">
 </xsd:schema>
 """
 
-mdschema_properties_PROPERTIES_xsd = """
+mdschema_properties_properties_xsd = """
 <xsd:schema elementFormDefault="qualified"
 targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
 xmlns:sql="urn:schemas-microsoft-com:xml-sql">

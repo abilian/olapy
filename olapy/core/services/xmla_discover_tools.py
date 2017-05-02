@@ -18,7 +18,7 @@ from .xmla_discover_xsds import (dbschema_catalogs_xsd, dbschema_tables_xsd,
                                  mdschema_measuresgroups_dimensions_xsd,
                                  mdschema_measuresgroups_xsd,
                                  mdschema_members_xsd,
-                                 mdschema_properties_PROPERTIES_xsd,
+                                 mdschema_properties_properties_xsd,
                                  mdschema_sets_xsd)
 
 
@@ -37,7 +37,7 @@ class XmlaDiscoverTools():
             col for col in self.executer.load_star_schema_dataframe.columns
             if col[-3:] != "_id"
         ]]
-        self.SessionId = uuid.uuid1()
+        self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
         """
@@ -2248,7 +2248,7 @@ class XmlaDiscoverTools():
                     </root>
                   </return>
                 """.format(self.selected_catalogue,
-                           mdschema_properties_PROPERTIES_xsd))
+                           mdschema_properties_properties_xsd))
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             return etree.fromstring("""
               <return>
@@ -2258,7 +2258,7 @@ class XmlaDiscoverTools():
                  {0}
                 </root>
               </return>
-            """.format(mdschema_properties_PROPERTIES_xsd))
+            """.format(mdschema_properties_properties_xsd))
 
     def discover_mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions

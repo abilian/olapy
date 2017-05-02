@@ -1,22 +1,20 @@
 from __future__ import absolute_import, division, print_function
 
 from spyne import ComplexModel, Integer, Unicode, XmlAttribute
-from spyne.model.fault import Fault
-
 
 class Tuple(object):
 
     def __init__(self, Hierarchy, UName, Caption, LName, LNum, DisplayInfo,
                  PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME, Value):
-        self.Hierarchy = Hierarchy
-        self.UName = UName
-        self.Caption = Caption
-        self.LName = LName
-        self.LNum = LNum
-        self.DisplayInfo = DisplayInfo
-        self.PARENT_UNIQUE_NAME = PARENT_UNIQUE_NAME
-        self.HIERARCHY_UNIQUE_NAME = HIERARCHY_UNIQUE_NAME
-        self.Value = Value
+        self.hierarchy = Hierarchy
+        self.uname = UName
+        self.caption = Caption
+        self.lname = LName
+        self.lnum = LNum
+        self.display_info = DisplayInfo
+        self.parent_unique_name = PARENT_UNIQUE_NAME
+        self.hierarchy_unique_name = HIERARCHY_UNIQUE_NAME
+        self.value = Value
 
     def __str__(self):
         return """
@@ -29,9 +27,9 @@ class Tuple(object):
         PARENT_UNIQUE_NAME : {6}
         HIERARCHY_UNIQUE_NAME : {7}
         Value : {8}
-        """.format(self.Hierarchy, self.UName, self.Caption, self.LName,
-                   self.LNum, self.DisplayInfo, self.PARENT_UNIQUE_NAME,
-                   self.HIERARCHY_UNIQUE_NAME, self.Value)
+        """.format(self.hierarchy, self.uname, self.caption, self.lname,
+                   self.lnum, self.display_info, self.parent_unique_name,
+                   self.hierarchy_unique_name, self.value)
 
 
 class Property(ComplexModel):
@@ -105,9 +103,3 @@ class DiscoverRequest(ComplexModel):
     RequestType = Unicode
     Restrictions = Restrictionlist
     Properties = Propertielist
-
-
-# class AuthenticationError(Fault):
-#     __namespace__ = 'spyne.examples.authentication'
-#     faultcode='Client.AuthenticationError',
-#     faultstring='Invalid authentication request'

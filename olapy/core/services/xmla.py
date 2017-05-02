@@ -36,14 +36,13 @@ class XmlaProviderService(ServiceBase):
     # this problem is related with Spyne architecture, NO CHOICE
 
     discover_tools = XmlaDiscoverTools()
-    SessionId = discover_tools.SessionId
+    sessio_id = discover_tools.session_id
 
     @rpc(DiscoverRequest,
          _returns=AnyXml,
          _body_style="bare",
          _out_header=Session,
          _throws=InvalidCredentialsError
-         # _throws=AuthenticationError
         )
     def Discover(ctx, request):
         """
@@ -59,7 +58,7 @@ class XmlaProviderService(ServiceBase):
         # (which cause problems when we want to access xmla_provider instantiation variables)
 
         discover_tools = XmlaProviderService.discover_tools
-        ctx.out_header = Session(SessionId=str(XmlaProviderService.SessionId))
+        ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
         config_parser = ConfigParser(discover_tools.executer.cube_path)
         if config_parser.xmla_authentication():
@@ -143,7 +142,7 @@ class XmlaProviderService(ServiceBase):
         :return: Execute response in xml format
         """
 
-        ctx.out_header = Session(SessionId=str(XmlaProviderService.SessionId))
+        ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
         if request.Command.Statement == '':
             # check if command contains a query

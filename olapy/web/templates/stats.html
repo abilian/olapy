@@ -73,7 +73,7 @@
 
 
         <script type="text/javascript">
-            var graphs = {{graphe['graphJSON'] | safe}};
+            var graphs = {{graphe['graph_json'] | safe}};
             var ids = {{graphe['ids'] | safe}};
             for (var i in graphs) {
                 Plotly.plot(
