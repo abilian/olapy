@@ -12,7 +12,8 @@ class MdxParser:
     """
     START = 'MDX_statement'
 
-    def parsing_mdx_query(self, axis, query):
+    @staticmethod
+    def parsing_mdx_query(axis, query):
         '''
         Split the query into axis
 

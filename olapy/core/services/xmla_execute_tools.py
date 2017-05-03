@@ -12,7 +12,8 @@ class XmlaExecuteTools():
     def __init__(self, executer):
         self.executer = executer
 
-    def split_dataframe(self, mdx_execution_result):
+    @staticmethod
+    def split_dataframe(mdx_execution_result):
         """
         Split DataFrame into multiple ones by dimension
         example:
@@ -57,7 +58,8 @@ class XmlaExecuteTools():
             for key, value in mdx_execution_result['columns_desc']['all']
             .items())
 
-    def get_tuple_without_nan(self, tuple):
+    @staticmethod
+    def get_tuple_without_nan(tuple):
         """
         remove nan from tuple.
         example
@@ -505,7 +507,8 @@ class XmlaExecuteTools():
 
         return self.generate_one_axis_info(mdx_execution_result)
 
-    def generate_cell_info(self):
+    @staticmethod
+    def generate_cell_info():
         return """
         <CellInfo>
             <Value name="VALUE"/>

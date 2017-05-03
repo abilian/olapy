@@ -575,7 +575,8 @@ class MdxEngine:
 
         return df[cols + self.selected_measures]
 
-    def add_missed_column(self, dataframe1, dataframe2):
+    @staticmethod
+    def add_missed_column(dataframe1, dataframe2):
         """
         solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
 

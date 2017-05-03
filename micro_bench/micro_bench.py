@@ -10,7 +10,8 @@ class MicBench:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
-    def bench(self, connection, query, cube=CUBE_NAME, number=1):
+    @staticmethod
+    def bench(connection, query, cube=CUBE_NAME, number=1):
         """
          To be precise, this executes the query statement once, and
         then returns the time it takes to execute

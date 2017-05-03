@@ -15,7 +15,8 @@ class Logs:
         self.file_name = file_name + ".log"
         self.root_path = self._create_log_file()
 
-    def _create_log_file(self):
+    @staticmethod
+    def _create_log_file():
         home_directory = expanduser("~")
         location = os.path.join(home_directory, 'olapy-data', 'logs')
 

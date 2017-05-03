@@ -52,7 +52,8 @@ class XmlaDiscoverTools():
                     if col[-3:] != "_id"
                 ]]
 
-    def discover_datasources_response(self):
+    @staticmethod
+    def discover_datasources_response():
         return etree.fromstring("""
         <return>
             <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
@@ -1513,7 +1514,8 @@ class XmlaDiscoverTools():
         </return>
             """)
 
-    def discover_literals_response(self, request):
+    @staticmethod
+    def discover_literals_response(request):
         if request.Properties.PropertyList.Content == 'SchemaData' \
                 and request.Properties.PropertyList.Format == 'Tabular':
 

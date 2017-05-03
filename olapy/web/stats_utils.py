@@ -13,7 +13,8 @@ class Graphs:
     """
 
     # TODO remove this , ( right know this is just a demo with sales cube )
-    def generate_graphes(self, dataframe):
+    @staticmethod
+    def generate_graphes(dataframe):
         """
         Generate graphs for a pandas DataFrame, if you want to add graphs, you have to do it in this function
 
