@@ -74,10 +74,9 @@ class XmlaExecuteTools():
         :return: tuple as list without -1
 
         """
-
-        for index, att in enumerate(tuple[::-1]):
+        for att in tuple[::-1]:
             if att != -1:
-                return tuple[:len(tuple) - index]
+                return tuple[:tuple.index(att)+1]
 
         return tuple
 
