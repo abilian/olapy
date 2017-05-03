@@ -364,7 +364,8 @@ class MdxEngine:
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
-    def get_tuples(self, query, start=None, stop=None):
+    @staticmethod
+    def get_tuples(query, start=None, stop=None):
         """
         get all tuples in the mdx query
 

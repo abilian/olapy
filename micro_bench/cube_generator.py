@@ -49,7 +49,8 @@ class CubeGen:
         tables['Facts'] = facts
         return tables
 
-    def generate_csv(self, tables):
+    @staticmethod
+    def generate_csv(tables):
         """
         generate csv files for the generated DataFrames
         :param tables: dict of DataFrames
