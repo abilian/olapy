@@ -52,28 +52,28 @@ class MdxParser:
             types=[SelectStatement]))
         ast = model.parse(query, rule_name=MdxParser.START, ignorecase=True)
         if axis == "column":
-            if ast.select_statement.axis_specification_columns is not None:
-                if u'' in ast.select_statement.axis_specification_columns:
-                    ast.select_statement.axis_specification_columns.remove(u'')
+            if ast.select_statement.axis_specification_columns is not None and \
+                    u'' in ast.select_statement.axis_specification_columns:
+                ast.select_statement.axis_specification_columns.remove(u'')
             return ast.select_statement.axis_specification_columns
         elif axis == "row":
-            if ast.select_statement.axis_specification_rows is not None:
-                if u'' in ast.select_statement.axis_specification_rows:
-                    ast.select_statement.axis_specification_rows.remove(u'')
+            if ast.select_statement.axis_specification_rows is not None and \
+                    u'' in ast.select_statement.axis_specification_rows:
+                ast.select_statement.axis_specification_rows.remove(u'')
             return ast.select_statement.axis_specification_rows
         elif axis == "cube":
-            if ast.select_statement.cube_specification is not None:
-                if u'' in ast.select_statement.cube_specification:
-                    ast.select_statement.cube_specification.remove(u'')
+            if ast.select_statement.cube_specification is not None and \
+                    u'' in ast.select_statement.cube_specification:
+                ast.select_statement.cube_specification.remove(u'')
             return ast.select_statement.cube_specification[1] if \
                 isinstance(ast.select_statement.cube_specification, list) \
                 else ast.select_statement.cube_specification
         elif axis == "condition":
-            if ast.select_statement.condition_specification is not None:
-                if type(ast.select_statement.condition_specification) not in (
-                        unicode, str):
-                    if u'' in ast.select_statement.condition_specification:
-                        ast.select_statement.condition_specification.remove(u'')
+            if ast.select_statement.condition_specification is not None and \
+                    type(ast.select_statement.condition_specification) not in (
+                    unicode, str) and \
+                    u'' in ast.select_statement.condition_specification:
+                ast.select_statement.condition_specification.remove(u'')
             return ast.select_statement.condition_specification
         elif axis == "all":
 
