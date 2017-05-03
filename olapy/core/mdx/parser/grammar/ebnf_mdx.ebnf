@@ -3,7 +3,7 @@
 (* The generation of mdx_parser.py is as easy as: /path/to/grako bnf_mdx.ebnf -o mdx_parser.py *)
 
 
-MDX_statement =
+mdx_statement =
 			select_statement;
 		
 select_statement::SelectStatement = name:'SELECT' [axis_specification_columns:axis_specification]

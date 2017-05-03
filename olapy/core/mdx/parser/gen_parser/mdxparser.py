@@ -418,7 +418,7 @@ class MdxParserGen(Parser):
 
 class UnknownSemantics(object):
 
-    def MDX_statement(self, ast):
+    def mdx_statement(self, ast):
         return ast
 
     def select_statement(self, ast):
