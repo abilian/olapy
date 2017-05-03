@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+from os.path import expanduser
 
 
 class Logs:
@@ -12,15 +13,13 @@ class Logs:
         self.root_path = self._create_log_file()
 
     def _create_log_file(self):
-        path = os.path.abspath(__file__)
-        path = path.lstrip(os.sep)
-        root = path[:path.index(os.sep)]
-        # TODO Fix this prob with c: (
-        # http://stackoverflow.com/questions/2422798/python-os-path-join-on-windows)
-        if not os.path.exists(os.path.join(root + '\\', 'logs')):
-            os.makedirs(os.path.join(root + '\\', 'logs'))
-        root = os.path.join(root + '\\', 'logs')
-        return root
+        home_directory = expanduser("~")
+        location = os.path.join(home_directory, 'olapy-data', 'logs')
+
+        if not os.path.exists(location):
+            os.makedirs(location)
+
+        return location
 
     def write_log(self, msg):
         # Creation of the logger object that will serve us to write in the logs

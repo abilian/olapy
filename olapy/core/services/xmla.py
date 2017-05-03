@@ -236,11 +236,11 @@ def start_server(write_on_file=False):
     # TODO FIX it with os
     if write_on_file:
         home_directory = expanduser("~")
-        if not os.path.isdir(os.path.join(home_directory, 'logs')):
-            os.makedirs(os.path.join(home_directory, 'logs'))
+        if not os.path.isdir(os.path.join(home_directory,'olapy-data', 'logs')):
+            os.makedirs(os.path.join(home_directory,'olapy-data', 'logs'))
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=os.path.join(home_directory, 'logs', 'xmla.log'))
+            filename=os.path.join(home_directory,'olapy-data', 'logs', 'xmla.log'))
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
