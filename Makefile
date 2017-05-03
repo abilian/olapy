@@ -23,7 +23,7 @@ develop:
 	@echo "--> Installing / updating python dependencies for development"
 	pip install -q pip-tools
 	pip-sync requirements.txt
-	pip install -q -r requirements.txt
+	pip install -q -r requirements.txt -r dev-requirements.txt
 	pip install -e .
 	@echo ""
 
