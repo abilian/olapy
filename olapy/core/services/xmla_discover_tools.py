@@ -7,19 +7,14 @@ import uuid
 from lxml import etree
 
 from ..mdx.executor.execute import MdxEngine
-from .xmla_discover_xsds import (dbschema_catalogs_xsd, dbschema_tables_xsd,
-                                 discover_datasources_xsd,
-                                 discover_literals_xsd,
-                                 discover_preperties_xsd,
-                                 discover_schema_rowsets_xsd,
-                                 mdschema_cubes_xsd, mdschema_dimensions_xsd,
-                                 mdschema_hierarchies_xsd, mdschema_kpis_xsd,
-                                 mdschema_levels_xsd, mdschema_measures_xsd,
-                                 mdschema_measuresgroups_dimensions_xsd,
-                                 mdschema_measuresgroups_xsd,
-                                 mdschema_members_xsd,
-                                 mdschema_properties_properties_xsd,
-                                 mdschema_sets_xsd)
+from .xmla_discover_xsds import (
+    dbschema_catalogs_xsd, dbschema_tables_xsd, discover_datasources_xsd,
+    discover_literals_xsd, discover_preperties_xsd,
+    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd,
+    mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd,
+    mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd,
+    mdschema_measuresgroups_xsd, mdschema_members_xsd,
+    mdschema_properties_properties_xsd, mdschema_sets_xsd)
 
 
 # TODO clean
@@ -78,7 +73,6 @@ class XmlaDiscoverTools():
         </return>""")
 
     def discover_properties_response(self, request):
-
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
             return etree.fromstring("""
@@ -120,15 +114,15 @@ class XmlaDiscoverTools():
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
-                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
-                                 '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
-                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
-                                 '15')
+                return get_props(discover_preperties_xsd,
+                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                 'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
@@ -167,8 +161,8 @@ class XmlaDiscoverTools():
     def discover_schema_rowsets_response(self, request):
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
                         request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
                 <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -220,8 +214,8 @@ class XmlaDiscoverTools():
             """)
         if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and \
                         request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
                 <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -1810,8 +1804,8 @@ class XmlaDiscoverTools():
                     <MEASURE_UNQUALIFIED_CAPTION>{2}</MEASURE_UNQUALIFIED_CAPTION>
                     <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
                 </row>
-                """.format(self.selected_catalogue,
-                                   self.selected_catalogue, mes)
+                """.format(self.selected_catalogue, self.selected_catalogue,
+                           mes)
 
             return etree.fromstring("""
             <return>
@@ -1918,7 +1912,7 @@ class XmlaDiscoverTools():
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
                     """.format(self.selected_catalogue, table_name,
-                                df.columns[0], df.iloc[0][0])
+                               df.columns[0], df.iloc[0][0])
 
                 rows += """
                 <row>
@@ -1942,8 +1936,7 @@ class XmlaDiscoverTools():
                     <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                     <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                 </row>
-                """.format(self.selected_catalogue,
-                            self.executer.measures[0])
+                """.format(self.selected_catalogue, self.executer.measures[0])
 
                 return etree.fromstring("""
             <return>
@@ -1984,7 +1977,7 @@ class XmlaDiscoverTools():
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
                         """.format(self.selected_catalogue, table_name,
-                                    df.columns[0], df.iloc[0][0])
+                                   df.columns[0], df.iloc[0][0])
 
                 rows += """
                 <row>
@@ -2008,7 +2001,7 @@ class XmlaDiscoverTools():
                     <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                     <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                 </row>""".format(self.selected_catalogue,
-                                     self.executer.measures[0])
+                                 self.executer.measures[0])
                 return etree.fromstring("""
                 <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
@@ -2027,8 +2020,7 @@ class XmlaDiscoverTools():
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             rows = ""
-            for tables in self.executer.get_all_tables_names(
-                    ignore_fact=True):
+            for tables in self.executer.get_all_tables_names(ignore_fact=True):
                 l_nb = 0
                 for col in self.executer.tables_loaded[tables].columns:
                     rows += """
@@ -2050,8 +2042,7 @@ class XmlaDiscoverTools():
                         <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
                         <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
                     </row>
-                    """.format(self.selected_catalogue, tables, col,
-                                l_nb)
+                    """.format(self.selected_catalogue, tables, col, l_nb)
                     l_nb += 1
 
             rows += """
@@ -2114,8 +2105,7 @@ class XmlaDiscoverTools():
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             rows = ""
-            for tables in self.executer.get_all_tables_names(
-                    ignore_fact=True):
+            for tables in self.executer.get_all_tables_names(ignore_fact=True):
                 rows += """
                 <row>
                     <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -2254,7 +2244,7 @@ class XmlaDiscoverTools():
                     </root>
                   </return>
             """.format(self.selected_catalogue,
-                         mdschema_properties_properties_xsd))
+                       mdschema_properties_properties_xsd))
 
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             return etree.fromstring("""
@@ -2282,8 +2272,7 @@ class XmlaDiscoverTools():
             # joined -> [Product].[Product].[Company]
 
             last_attribut = ''.join(att for att in separed_tuple[-1]
-                                    if att not in '[]').replace('&',
-                                                                '&amp;')
+                                    if att not in '[]').replace('&', '&amp;')
             return etree.fromstring("""
         <return>
             <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
@@ -2311,6 +2300,6 @@ class XmlaDiscoverTools():
                 </row>
             </root>
         </return>
-            """.format(self.selected_catalogue, separed_tuple[
-                                        0], joined, request.
-                        Restrictions.RestrictionList.MEMBER_UNIQUE_NAME))
+            """.format(
+                self.selected_catalogue, separed_tuple[0], joined,
+                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME))
