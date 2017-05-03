@@ -38,12 +38,12 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     sessio_id = discover_tools.session_id
 
-    @rpc(DiscoverRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session,
-         _throws=InvalidCredentialsError
-        )
+    @rpc(
+        DiscoverRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session,
+        _throws=InvalidCredentialsError)
     def Discover(ctx, request):
         """
         the first principle function of xmla protocol
@@ -61,10 +61,12 @@ class XmlaProviderService(ServiceBase):
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
         config_parser = ConfigParser(discover_tools.executer.cube_path)
-        if config_parser.xmla_authentication() and ctx.transport.req_env['QUERY_STRING'] != 'admin':
+        if config_parser.xmla_authentication(
+        ) and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
             raise InvalidCredentialsError(
-                fault_string='You do not have permission to access this resource',
+                fault_string=
+                'You do not have permission to access this resource',
                 fault_object=None)
             # TODO call (labster) login function or create login with token (according to labster db)
 
@@ -99,7 +101,8 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(request)
+            return discover_tools.discover_mdschema_dimensions_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -117,17 +120,19 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(request)
+            return discover_tools.discover_mdschema_properties_response(
+                request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
-    @rpc(ExecuteRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session)
+    @rpc(
+        ExecuteRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session)
     def Execute(ctx, request):
         """
         the second principle function of xmla protocol
@@ -236,11 +241,13 @@ def start_server(write_on_file=False):
     # TODO FIX it with os
     if write_on_file:
         home_directory = expanduser("~")
-        if not os.path.isdir(os.path.join(home_directory,'olapy-data', 'logs')):
-            os.makedirs(os.path.join(home_directory,'olapy-data', 'logs'))
+        if not os.path.isdir(
+                os.path.join(home_directory, 'olapy-data', 'logs')):
+            os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=os.path.join(home_directory,'olapy-data', 'logs', 'xmla.log'))
+            filename=os.path.join(home_directory, 'olapy-data', 'logs',
+                                  'xmla.log'))
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)

@@ -331,8 +331,8 @@ class MdxEngine:
             for cubes in config_file_parser.construct_cubes():
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(cube_name,
-                                                                     cubes)
+                    fusion = self._construct_star_schema_config_file(
+                        cube_name, cubes)
 
         elif cube_name in self.csv_files_cubes:
             fusion = self._construct_star_schema_csv_files(cube_name)
@@ -690,8 +690,9 @@ class MdxEngine:
         :return: updated columns_to_keep
         """
 
-        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
-                tuple_as_list[0]].columns:
+        if len(
+                tuple_as_list
+        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -774,7 +775,8 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
-            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(
+                itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

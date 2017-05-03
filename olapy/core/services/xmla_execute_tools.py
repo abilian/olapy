@@ -78,7 +78,7 @@ class XmlaExecuteTools():
         """
         for att in tuple[::-1]:
             if att != -1:
-                return tuple[:tuple.index(att)+1]
+                return tuple[:tuple.index(att) + 1]
 
         return tuple
 
@@ -94,8 +94,9 @@ class XmlaExecuteTools():
         """
         axis0 = ""
         # only measure selected
-        if mdx_execution_result['columns_desc'][
-                mdx_query_axis].keys() == [self.executer.facts]:
+        if mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
+                self.executer.facts
+        ]:
             if len(mdx_execution_result['columns_desc'][mdx_query_axis][
                     self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
@@ -107,14 +108,14 @@ class XmlaExecuteTools():
                 first_att = 3
 
         # query with on columns and on rows (without measure)
-        elif mdx_execution_result['columns_desc'][
-                'columns'] and mdx_execution_result['columns_desc']['rows']:
+        elif mdx_execution_result['columns_desc']['columns'] and mdx_execution_result['columns_desc']['rows']:
             # ['Geography','America']
             tuples = [
-                zip(* [[[key] + list(row)
-                        for row in splited_df[key].itertuples(index=False)]
-                       for key in splited_df.keys()
-                       if key is not self.executer.facts])
+                zip(
+                    *[[[key] + list(row)
+                       for row in splited_df[key].itertuples(index=False)]
+                      for key in splited_df.keys()
+                      if key is not self.executer.facts])
             ]
 
             first_att = 2
@@ -123,10 +124,11 @@ class XmlaExecuteTools():
         else:
             # ['Geography','Amount','America']
             tuples = [
-                zip(* [[[key] + [mes] + list(row)
-                        for row in splited_df[key].itertuples(index=False)]
-                       for key in splited_df.keys()
-                       if key is not self.executer.facts])
+                zip(
+                    *[[[key] + [mes] + list(row)
+                       for row in splited_df[key].itertuples(index=False)]
+                      for key in splited_df.keys()
+                      if key is not self.executer.facts])
                 for mes in self.executer.selected_measures
             ]
             first_att = 3
@@ -250,8 +252,7 @@ class XmlaExecuteTools():
         # TODO must be OPTIMIZED every time!!!!!
 
         dfs = self.split_dataframe(mdx_execution_result)
-        if mdx_execution_result['columns_desc'][
-                'rows'] and mdx_execution_result['columns_desc']['columns']:
+        if mdx_execution_result['columns_desc']['rows'] and mdx_execution_result['columns_desc']['columns']:
 
             return """
             {0}
@@ -304,24 +305,27 @@ class XmlaExecuteTools():
         columns_loop = []
 
         if (
-                (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0
-                ) ^ (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0)
-            ) and self.executer.facts in mdx_execution_result['columns_desc']['all'].keys():
+            (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0)
+                ^
+            (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0)
+        ) and self.executer.facts in mdx_execution_result['columns_desc']['all'].keys(
+        ):
 
-                # iterate DataFrame horizontally
-                columns_loop = itertools.chain(* [
-                    mdx_execution_result['result'][measure]
-                    for measure in mdx_execution_result['result'].columns
-                ])
+            # iterate DataFrame horizontally
+            columns_loop = itertools.chain(*[
+                mdx_execution_result['result'][measure]
+                for measure in mdx_execution_result['result'].columns
+            ])
 
         else:
 
             # iterate DataFrame vertically
-            columns_loop = itertools.chain(* [
-                tuple
-                for tuple in mdx_execution_result['result'].itertuples(
-                    index=False)
-            ])
+            columns_loop = itertools.chain(
+                *[
+                    tuple
+                    for tuple in mdx_execution_result['result'].itertuples(
+                        index=False)
+                ])
 
         cell_data = ""
         index = 0
@@ -375,8 +379,7 @@ class XmlaExecuteTools():
         slicer_list = list(
             set(all_dimensions_names) - set(
                 table_name
-                for table_name in mdx_execution_result['columns_desc']['all']
-            ))
+                for table_name in mdx_execution_result['columns_desc']['all']))
 
         # we have to write measures after dimensions !
         if 'Measures' in slicer_list:
@@ -388,9 +391,9 @@ class XmlaExecuteTools():
             to_write = "[{0}].[{0}]".format(dim_diff)
             if dim_diff == 'Measures':
                 # if measures > 1 we don't have to write measure
-                if self.executer.facts in mdx_execution_result['columns_desc'][
-                        'all'] and len(mdx_execution_result['columns_desc'][
-                            'all'][self.executer.facts]) > 1:
+                if self.executer.facts in mdx_execution_result['columns_desc']['all'] and len(
+                        mdx_execution_result['columns_desc']['all']
+                    [self.executer.facts]) > 1:
                     continue
                 else:
                     to_write = "[Measures]"
@@ -449,9 +452,9 @@ class XmlaExecuteTools():
 
         hierarchy_info = ""
         # measure must be written at the top
-        if self.executer.facts in mdx_execution_result['columns_desc'][
-                mdx_query_axis].keys() and len(mdx_execution_result[
-                    'columns_desc'][mdx_query_axis][self.executer.facts]) > 1:
+        if self.executer.facts in mdx_execution_result['columns_desc'][mdx_query_axis].keys(
+        ) and len(mdx_execution_result['columns_desc'][mdx_query_axis]
+                  [self.executer.facts]) > 1:
             hierarchy_info += """
             <HierarchyInfo name="{0}">
                 <UName name="{0}.[MEMBER_UNIQUE_NAME]" type="xs:string"/>
@@ -551,11 +554,10 @@ class XmlaExecuteTools():
         tuple = ""
         # not used dimensions
         for dim_diff in list(
-                set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
-                        table_name
-                        for table_name in mdx_execution_result['columns_desc'][
-                            'all']
-                    )):
+                set(self.executer.get_all_tables_names(ignore_fact=True)) -
+                set(table_name
+                    for table_name in mdx_execution_result['columns_desc']
+                    ['all'])):
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>
