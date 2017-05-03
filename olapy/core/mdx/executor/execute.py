@@ -15,7 +15,7 @@ import pandas.io.sql as psql
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
 
-RUNNING_TOX = 'RUNTING_TOX' in os.environ
+RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
 class MdxEngine:
@@ -121,7 +121,7 @@ class MdxEngine:
     def _get_tables_name(self):
         """
         get all tables names
-        
+
         :return: list tables names
         """
         return self.tables_loaded.keys()
@@ -318,7 +318,7 @@ class MdxEngine:
     def _get_star_schema_dataframe(self, cube_name):
         """
         merge all DataFrames as star schema
-        
+
         :param cube_name: cube name with which we want to generate a star schema model
         :return: star schema DataFrame
         """
@@ -358,7 +358,7 @@ class MdxEngine:
     def get_cube(self):
         """
         get path to the cube (example /home_directory/your_user_name/olapy-data/cubes)
-        
+
         :return: path to the cube
         """
         return os.path.join(self.cube_path, self.cube)
@@ -367,27 +367,27 @@ class MdxEngine:
     def get_tuples(self, query, start=None, stop=None):
         """
         get all tuples in the mdx query
-        
+
         example:
-        
-        
+
+
             SELECT {[Geography].[Geography].[All Continent].Members,
                     [Geography].[Geography].[Continent].[Europe]
-     
+
             } ON COLUMNS,
-            
+
                    {[Product].[Product].[Company]
-                    
+
             } ON ROWS
-            
+
             FROM {sales}
-            
+
         It returns [ ['Geography','Geography','Continent'],
                     ['Geography','Geography','Continent','Europe'],
                     ['Product','Product','Company']
                 ]
-                    
-            
+
+
         :param query: mdx query
         :param start: key-word in the query where we start (examples start = SELECT)
         :param stop:  key-word in the query where we stop (examples start = ON ROWS)
@@ -417,7 +417,7 @@ class MdxEngine:
     def decorticate_query(self, query):
         """
         get all tuples that exists in the MDX Query by axes
-        
+
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
         """

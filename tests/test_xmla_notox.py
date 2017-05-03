@@ -15,7 +15,7 @@ from tests.xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230
-RUNNING_TOX = 'RUNTING_TOX' in os.environ
+RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
 class Member(object):

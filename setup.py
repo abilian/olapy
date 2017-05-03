@@ -9,7 +9,7 @@ from pip.download import PipSession
 from pip.req import parse_requirements
 from setuptools import find_packages, setup
 
-RUNNING_TOX = 'RUNTING_TOX' in os.environ
+RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 session = PipSession()
 _install_requires = parse_requirements('requirements.txt', session=session)
