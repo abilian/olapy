@@ -1520,149 +1520,152 @@ class XmlaDiscoverTools():
             """)
 
     def discover_literals_response(self, request):
-        if request.Properties.PropertyList.Content == 'SchemaData':
-            if request.Properties.PropertyList.Format == 'Tabular':
-                return etree.fromstring("""
-                <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + discover_literals_xsd + """
-              <row>
-                <LiteralName>DBLITERAL_CATALOG_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>24</LiteralMaxLength>
-                <LiteralNameEnumValue>2</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_CATALOG_SEPARATOR</LiteralName>
-                <LiteralValue>.</LiteralValue>
-                <LiteralMaxLength>0</LiteralMaxLength>
-                <LiteralNameEnumValue>3</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_COLUMN_ALIAS</LiteralName>
-                <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>5</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_COLUMN_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>6</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_CORRELATION_NAME</LiteralName>
-                <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>7</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_CUBE_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>21</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_DIMENSION_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>22</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_HIERARCHY_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>23</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_LEVEL_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>24</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_MEMBER_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>25</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_PROCEDURE_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>14</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_PROPERTY_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>26</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_QUOTE_PREFIX</LiteralName>
-                <LiteralValue>[</LiteralValue>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>15</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_QUOTE_SUFFIX</LiteralName>
-                <LiteralValue>]</LiteralValue>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>28</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_TABLE_NAME</LiteralName>
-                <LiteralInvalidChars>.</LiteralInvalidChars>
-                <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>17</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_TEXT_COMMAND</LiteralName>
-                <LiteralMaxLength>-1</LiteralMaxLength>
-                <LiteralNameEnumValue>18</LiteralNameEnumValue>
-              </row>
-              <row>
-                <LiteralName>DBLITERAL_USER_NAME</LiteralName>
-                <LiteralMaxLength>0</LiteralMaxLength>
-                <LiteralNameEnumValue>19</LiteralNameEnumValue>
-              </row>
-            </root>
-          </return>
+        if request.Properties.PropertyList.Content == 'SchemaData' \
+                and request.Properties.PropertyList.Format == 'Tabular':
+
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    """ + discover_literals_xsd + """
+                  <row>
+                    <LiteralName>DBLITERAL_CATALOG_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>24</LiteralMaxLength>
+                    <LiteralNameEnumValue>2</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_CATALOG_SEPARATOR</LiteralName>
+                    <LiteralValue>.</LiteralValue>
+                    <LiteralMaxLength>0</LiteralMaxLength>
+                    <LiteralNameEnumValue>3</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_COLUMN_ALIAS</LiteralName>
+                    <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>5</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_COLUMN_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>6</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_CORRELATION_NAME</LiteralName>
+                    <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>7</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_CUBE_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>21</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_DIMENSION_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>22</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_HIERARCHY_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>23</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_LEVEL_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>24</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_MEMBER_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>25</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_PROCEDURE_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>14</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_PROPERTY_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>26</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_QUOTE_PREFIX</LiteralName>
+                    <LiteralValue>[</LiteralValue>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>15</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_QUOTE_SUFFIX</LiteralName>
+                    <LiteralValue>]</LiteralValue>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>28</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_TABLE_NAME</LiteralName>
+                    <LiteralInvalidChars>.</LiteralInvalidChars>
+                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>17</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_TEXT_COMMAND</LiteralName>
+                    <LiteralMaxLength>-1</LiteralMaxLength>
+                    <LiteralNameEnumValue>18</LiteralNameEnumValue>
+                  </row>
+                  <row>
+                    <LiteralName>DBLITERAL_USER_NAME</LiteralName>
+                    <LiteralMaxLength>0</LiteralMaxLength>
+                    <LiteralNameEnumValue>19</LiteralNameEnumValue>
+                  </row>
+                </root>
+            </return>
                 """)
 
     def discover_mdschema_sets_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_sets_xsd + """
-                    </root>
-                  </return>
-                """)
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
+                and request.Properties.PropertyList.Catalog is not None:
+
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_sets_xsd + """
+                </root>
+            </return>
+            """)
 
     def discover_mdschema_kpis_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
+                and request.Properties.PropertyList.Catalog is not None:
+
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
             <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -1693,12 +1696,12 @@ class XmlaDiscoverTools():
         """.format(_catalogues))
 
     def discover_mdschema_cubes_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                    return etree.fromstring("""
-                    <return>
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
+                and request.Properties.PropertyList.Catalog is not None:
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
+                return etree.fromstring("""
+                <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -1721,28 +1724,28 @@ class XmlaDiscoverTools():
                   </return>
                           """.format(self.selected_catalogue,
                                      self.selected_catalogue))
-                return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_cubes_xsd + """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <CUBE_TYPE>CUBE</CUBE_TYPE>
-                            <LAST_SCHEMA_UPDATE>2016-07-25T15:18:20</LAST_SCHEMA_UPDATE>
-                            <LAST_DATA_UPDATE>2016-07-25T15:18:20</LAST_DATA_UPDATE>
-                            <DESCRIPTION>A demo. cube</DESCRIPTION>
-                            <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
-                            <IS_LINKABLE>false</IS_LINKABLE>
-                            <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
-                            <IS_SQL_ENABLED>false</IS_SQL_ENABLED>
-                            <CUBE_CAPTION>{0}</CUBE_CAPTION>
-                            <CUBE_SOURCE>1</CUBE_SOURCE>
-                        </row>
-                    </root>
-                  </return>""".format(self.selected_catalogue))
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_cubes_xsd + """
+                    <row>
+                        <CATALOG_NAME>{0}</CATALOG_NAME>
+                        <CUBE_NAME>{0}</CUBE_NAME>
+                        <CUBE_TYPE>CUBE</CUBE_TYPE>
+                        <LAST_SCHEMA_UPDATE>2016-07-25T15:18:20</LAST_SCHEMA_UPDATE>
+                        <LAST_DATA_UPDATE>2016-07-25T15:18:20</LAST_DATA_UPDATE>
+                        <DESCRIPTION>A demo. cube</DESCRIPTION>
+                        <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
+                        <IS_LINKABLE>false</IS_LINKABLE>
+                        <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
+                        <IS_SQL_ENABLED>false</IS_SQL_ENABLED>
+                        <CUBE_CAPTION>{0}</CUBE_CAPTION>
+                        <CUBE_SOURCE>1</CUBE_SOURCE>
+                    </row>
+                </root>
+            </return>""".format(self.selected_catalogue))
 
         if request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -1785,94 +1788,93 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_measures__response(self, request):
         measures = ""
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3:
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(
-                        request.Properties.PropertyList.Catalog)
-                    for mes in self.executer.measures:
-                        measures += """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{1}</CUBE_NAME>
-                            <MEASURE_NAME>{2}</MEASURE_NAME>
-                            <MEASURE_UNIQUE_NAME>[Measures].[{2}]</MEASURE_UNIQUE_NAME>
-                            <MEASURE_CAPTION>{2}</MEASURE_CAPTION>
-                            <MEASURE_AGGREGATOR>1</MEASURE_AGGREGATOR>
-                            <DATA_TYPE>5</DATA_TYPE>
-                            <NUMERIC_PRECISION>16</NUMERIC_PRECISION>
-                            <NUMERIC_SCALE>-1</NUMERIC_SCALE>
-                            <MEASURE_IS_VISIBLE>true</MEASURE_IS_VISIBLE>
-                            <MEASURE_NAME_SQL_COLUMN_NAME>{2}</MEASURE_NAME_SQL_COLUMN_NAME>
-                            <MEASURE_UNQUALIFIED_CAPTION>{2}</MEASURE_UNQUALIFIED_CAPTION>
-                            <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
-                        </row>
-                        """.format(self.selected_catalogue,
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                        request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3 and\
+                        request.Properties.PropertyList.Catalog is not None:
+
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            for mes in self.executer.measures:
+                measures += """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{1}</CUBE_NAME>
+                    <MEASURE_NAME>{2}</MEASURE_NAME>
+                    <MEASURE_UNIQUE_NAME>[Measures].[{2}]</MEASURE_UNIQUE_NAME>
+                    <MEASURE_CAPTION>{2}</MEASURE_CAPTION>
+                    <MEASURE_AGGREGATOR>1</MEASURE_AGGREGATOR>
+                    <DATA_TYPE>5</DATA_TYPE>
+                    <NUMERIC_PRECISION>16</NUMERIC_PRECISION>
+                    <NUMERIC_SCALE>-1</NUMERIC_SCALE>
+                    <MEASURE_IS_VISIBLE>true</MEASURE_IS_VISIBLE>
+                    <MEASURE_NAME_SQL_COLUMN_NAME>{2}</MEASURE_NAME_SQL_COLUMN_NAME>
+                    <MEASURE_UNQUALIFIED_CAPTION>{2}</MEASURE_UNQUALIFIED_CAPTION>
+                    <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
+                </row>
+                """.format(self.selected_catalogue,
                                    self.selected_catalogue, mes)
-                    return etree.fromstring("""
-                    <return>
-                        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                        """ + mdschema_measures_xsd + """
-                        {0}
-                        </root>
-                    </return>
-                    """.format(measures))
+
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_measures_xsd + """
+                {0}
+                </root>
+            </return>
+            """.format(measures))
 
     def discover_mdschema_dimensions_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(
-                        request.Properties.PropertyList.Catalog)
-                    rows = ""
-                    ord = 1
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and\
+                        request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
+                        request.Properties.PropertyList.Catalog is not None:
 
-                    for tables in self.executer.get_all_tables_names(
-                            ignore_fact=True):
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            rows = ""
+            ord = 1
 
-                        # TODO in another idea, change this
-                        # TO CHANGE NAME DISPLAY THAT EXISTS IN CONFIG FILE
-                        if MdxEngine.dimension_display_name != []:
-                            if tables in MdxEngine.dimension_display_name:
-                                continue
-                        rows += """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <DIMENSION_NAME>{1}</DIMENSION_NAME>
-                            <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                            <DIMENSION_CAPTION>{1}</DIMENSION_CAPTION>
-                            <DIMENSION_ORDINAL>{2}</DIMENSION_ORDINAL>
-                            <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                            <DIMENSION_CARDINALITY>23</DIMENSION_CARDINALITY>
-                            <DEFAULT_HIERARCHY>[{1}].[{1}]</DEFAULT_HIERARCHY>
-                            <IS_VIRTUAL>false</IS_VIRTUAL>
-                            <IS_READWRITE>false</IS_READWRITE>
-                            <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                            <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                        </row>""".format(self.selected_catalogue, tables, ord)
-                        ord += 1
+            for tables in self.executer.get_all_tables_names(ignore_fact=True):
 
-                    rows += """
-                    <row>
-                        <CATALOG_NAME>{0}</CATALOG_NAME>
-                        <CUBE_NAME>{0}</CUBE_NAME>
-                        <DIMENSION_NAME>Measures</DIMENSION_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                        <DIMENSION_CAPTION>Measures</DIMENSION_CAPTION>
-                        <DIMENSION_ORDINAL>{1}</DIMENSION_ORDINAL>
-                        <DIMENSION_TYPE>2</DIMENSION_TYPE>
-                        <DIMENSION_CARDINALITY>0</DIMENSION_CARDINALITY>
-                        <DEFAULT_HIERARCHY>[Measures]</DEFAULT_HIERARCHY>
-                        <IS_VIRTUAL>false</IS_VIRTUAL>
-                        <IS_READWRITE>false</IS_READWRITE>
-                        <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                        <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                    </row>""".format(self.selected_catalogue, ord)
+                # TODO in another idea, change this
+                # TO CHANGE NAME DISPLAY THAT EXISTS IN CONFIG FILE
+                if MdxEngine.dimension_display_name != [] and tables in MdxEngine.dimension_display_name:
+                    continue
+                rows += """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{0}</CUBE_NAME>
+                    <DIMENSION_NAME>{1}</DIMENSION_NAME>
+                    <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+                    <DIMENSION_CAPTION>{1}</DIMENSION_CAPTION>
+                    <DIMENSION_ORDINAL>{2}</DIMENSION_ORDINAL>
+                    <DIMENSION_TYPE>3</DIMENSION_TYPE>
+                    <DIMENSION_CARDINALITY>23</DIMENSION_CARDINALITY>
+                    <DEFAULT_HIERARCHY>[{1}].[{1}]</DEFAULT_HIERARCHY>
+                    <IS_VIRTUAL>false</IS_VIRTUAL>
+                    <IS_READWRITE>false</IS_READWRITE>
+                    <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+                </row>""".format(self.selected_catalogue, tables, ord)
+                ord += 1
 
-                    return etree.fromstring("""
+            rows += """
+            <row>
+                <CATALOG_NAME>{0}</CATALOG_NAME>
+                <CUBE_NAME>{0}</CUBE_NAME>
+                <DIMENSION_NAME>Measures</DIMENSION_NAME>
+                <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
+                <DIMENSION_CAPTION>Measures</DIMENSION_CAPTION>
+                <DIMENSION_ORDINAL>{1}</DIMENSION_ORDINAL>
+                <DIMENSION_TYPE>2</DIMENSION_TYPE>
+                <DIMENSION_CARDINALITY>0</DIMENSION_CARDINALITY>
+                <DEFAULT_HIERARCHY>[Measures]</DEFAULT_HIERARCHY>
+                <IS_VIRTUAL>false</IS_VIRTUAL>
+                <IS_READWRITE>false</IS_READWRITE>
+                <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+                <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            </row>""".format(self.selected_catalogue, ord)
+
+            return etree.fromstring("""
                 <return>
                     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                       """ + mdschema_dimensions_xsd + """
@@ -1884,52 +1886,26 @@ class XmlaDiscoverTools():
     def discover_mdschema_hierarchies_response(self, request):
 
         # Enumeration of hierarchies in all dimensions
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3:
-                    rows = ""
-                    for table_name, df in self.executer.tables_loaded.items():
-                        # column = XmlaProvider.executer.get_columns_to_index(tables, 1, 0)[0]
-                        if table_name == self.executer.facts:
-                            continue
-                        rows += """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                            <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
-                            <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
-                            <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
-                            <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                            <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
-                            <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
-                            <STRUCTURE>0</STRUCTURE>
-                            <IS_VIRTUAL>false</IS_VIRTUAL>
-                            <IS_READWRITE>false</IS_READWRITE>
-                            <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                            <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                            <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
-                            <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
-                            <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
-                            <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
-                            <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
-                        </row>
-                        """.format(self.selected_catalogue, table_name,
-                                   df.columns[0], df.iloc[0][0])
-                        # self.executer.get_attribute_column_rm_id(tables, column, 0))
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                        request.Properties.PropertyList.Catalog is not None:
 
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3:
+                rows = ""
+                for table_name, df in self.executer.tables_loaded.items():
+                    if table_name == self.executer.facts:
+                        continue
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
                         <CUBE_NAME>{0}</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
-                        <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
-                        <DIMENSION_TYPE>2</DIMENSION_TYPE>
-                        <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
-                        <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
+                        <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+                        <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
+                        <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
+                        <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
+                        <DIMENSION_TYPE>3</DIMENSION_TYPE>
+                        <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
+                        <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
                         <STRUCTURE>0</STRUCTURE>
                         <IS_VIRTUAL>false</IS_VIRTUAL>
                         <IS_READWRITE>false</IS_READWRITE>
@@ -1941,60 +1917,61 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                    """.format(self.selected_catalogue,
-                               self.executer.measures[0])
+                    """.format(self.selected_catalogue, table_name,
+                                df.columns[0], df.iloc[0][0])
 
-                    return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_hierarchies_xsd + """
-                        {0}
-                    </root>
-                </return>
-                    """.format(rows))
-                if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                    rows = ""
-                    for table_name, df in self.executer.tables_loaded.items():
-                        if table_name == self.executer.facts:
-                            continue
-                        rows += """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                            <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
-                            <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
-                            <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
-                            <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                            <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
-                            <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
-                            <STRUCTURE>0</STRUCTURE>
-                            <IS_VIRTUAL>false</IS_VIRTUAL>
-                            <IS_READWRITE>false</IS_READWRITE>
-                            <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                            <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                            <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
-                            <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
-                            <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
-                            <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
-                            <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
-                        </row>
-                            """.format(self.selected_catalogue, table_name,
-                                       df.columns[0], df.iloc[0][0])
+                rows += """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{0}</CUBE_NAME>
+                    <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
+                    <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
+                    <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
+                    <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
+                    <DIMENSION_TYPE>2</DIMENSION_TYPE>
+                    <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
+                    <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
+                    <STRUCTURE>0</STRUCTURE>
+                    <IS_VIRTUAL>false</IS_VIRTUAL>
+                    <IS_READWRITE>false</IS_READWRITE>
+                    <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+                    <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
+                    <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+                    <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
+                    <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
+                    <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
+                </row>
+                """.format(self.selected_catalogue,
+                            self.executer.measures[0])
 
+                return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_hierarchies_xsd + """
+                    {0}
+                </root>
+            </return>
+            """.format(rows))
+
+            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
+                rows = ""
+                for table_name, df in self.executer.tables_loaded.items():
+                    if table_name == self.executer.facts:
+                        continue
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
                         <CUBE_NAME>{0}</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
-                        <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
-                        <DIMENSION_TYPE>2</DIMENSION_TYPE>
-                        <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
-                        <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
+                        <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+                        <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
+                        <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
+                        <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
+                        <DIMENSION_TYPE>3</DIMENSION_TYPE>
+                        <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
+                        <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
                         <STRUCTURE>0</STRUCTURE>
                         <IS_VIRTUAL>false</IS_VIRTUAL>
                         <IS_READWRITE>false</IS_READWRITE>
@@ -2005,64 +1982,66 @@ class XmlaDiscoverTools():
                         <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
-                    </row>""".format(self.selected_catalogue,
+                    </row>
+                        """.format(self.selected_catalogue, table_name,
+                                    df.columns[0], df.iloc[0][0])
+
+                rows += """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{0}</CUBE_NAME>
+                    <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
+                    <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
+                    <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
+                    <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
+                    <DIMENSION_TYPE>2</DIMENSION_TYPE>
+                    <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
+                    <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
+                    <STRUCTURE>0</STRUCTURE>
+                    <IS_VIRTUAL>false</IS_VIRTUAL>
+                    <IS_READWRITE>false</IS_READWRITE>
+                    <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+                    <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
+                    <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+                    <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
+                    <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
+                    <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
+                </row>""".format(self.selected_catalogue,
                                      self.executer.measures[0])
-                    return etree.fromstring("""
-                    <return>
-                        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                        """ + mdschema_hierarchies_xsd + """
-                            {0}
-                        </root>
-                    </return>""".format(rows))
+                return etree.fromstring("""
+                <return>
+                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    """ + mdschema_hierarchies_xsd + """
+                        {0}
+                    </root>
+                 </return>""".format(rows))
 
     def discover_mdschema_levels__response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_catalogue(
-                        request.Properties.PropertyList.Catalog)
-                    rows = ""
-                    for tables in self.executer.get_all_tables_names(
-                            ignore_fact=True):
-                        l_nb = 0
-                        for col in self.executer.tables_loaded[tables].columns:
-                            rows += """
-                            <row>
-                                <CATALOG_NAME>{0}</CATALOG_NAME>
-                                <CUBE_NAME>{0}</CUBE_NAME>
-                                <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                                <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
-                                <LEVEL_NAME>{2}</LEVEL_NAME>
-                                <LEVEL_UNIQUE_NAME>[{1}].[{1}].[{2}]</LEVEL_UNIQUE_NAME>
-                                <LEVEL_CAPTION>{2}</LEVEL_CAPTION>
-                                <LEVEL_NUMBER>{3}</LEVEL_NUMBER>
-                                <LEVEL_CARDINALITY>1</LEVEL_CARDINALITY>
-                                <LEVEL_TYPE>0</LEVEL_TYPE>
-                                <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
-                                <LEVEL_UNIQUE_SETTINGS>0</LEVEL_UNIQUE_SETTINGS>
-                                <LEVEL_IS_VISIBLE>true</LEVEL_IS_VISIBLE>
-                                <LEVEL_DBTYPE>130</LEVEL_DBTYPE>
-                                <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
-                                <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
-                            </row>
-                            """.format(self.selected_catalogue, tables, col,
-                                       l_nb)
-                            l_nb += 1
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
+                request.Properties.PropertyList.Catalog is not None:
 
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            rows = ""
+            for tables in self.executer.get_all_tables_names(
+                    ignore_fact=True):
+                l_nb = 0
+                for col in self.executer.tables_loaded[tables].columns:
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
                         <CUBE_NAME>{0}</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
-                        <LEVEL_NAME>MeasuresLevel</LEVEL_NAME>
-                        <LEVEL_UNIQUE_NAME>[Measures]</LEVEL_UNIQUE_NAME>
-                        <LEVEL_CAPTION>MeasuresLevel</LEVEL_CAPTION>
-                        <LEVEL_NUMBER>0</LEVEL_NUMBER>
-                        <LEVEL_CARDINALITY>0</LEVEL_CARDINALITY>
+                        <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+                        <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
+                        <LEVEL_NAME>{2}</LEVEL_NAME>
+                        <LEVEL_UNIQUE_NAME>[{1}].[{1}].[{2}]</LEVEL_UNIQUE_NAME>
+                        <LEVEL_CAPTION>{2}</LEVEL_CAPTION>
+                        <LEVEL_NUMBER>{3}</LEVEL_NUMBER>
+                        <LEVEL_CARDINALITY>1</LEVEL_CARDINALITY>
                         <LEVEL_TYPE>0</LEVEL_TYPE>
                         <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
                         <LEVEL_UNIQUE_SETTINGS>0</LEVEL_UNIQUE_SETTINGS>
@@ -2071,82 +2050,109 @@ class XmlaDiscoverTools():
                         <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
                         <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
                     </row>
-                    """.format(self.selected_catalogue)
+                    """.format(self.selected_catalogue, tables, col,
+                                l_nb)
+                    l_nb += 1
 
-                    return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                      """ + mdschema_levels_xsd + """
-                      {0}
-                    </root>
-                </return>""".format(rows))
+            rows += """
+            <row>
+                <CATALOG_NAME>{0}</CATALOG_NAME>
+                <CUBE_NAME>{0}</CUBE_NAME>
+                <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
+                <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
+                <LEVEL_NAME>MeasuresLevel</LEVEL_NAME>
+                <LEVEL_UNIQUE_NAME>[Measures]</LEVEL_UNIQUE_NAME>
+                <LEVEL_CAPTION>MeasuresLevel</LEVEL_CAPTION>
+                <LEVEL_NUMBER>0</LEVEL_NUMBER>
+                <LEVEL_CARDINALITY>0</LEVEL_CARDINALITY>
+                <LEVEL_TYPE>0</LEVEL_TYPE>
+                <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
+                <LEVEL_UNIQUE_SETTINGS>0</LEVEL_UNIQUE_SETTINGS>
+                <LEVEL_IS_VISIBLE>true</LEVEL_IS_VISIBLE>
+                <LEVEL_DBTYPE>130</LEVEL_DBTYPE>
+                <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
+                <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
+            </row>
+            """.format(self.selected_catalogue)
+
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_levels_xsd + """
+                {0}
+                </root>
+            </return>""".format(rows))
 
     def discover_mdschema_measuresgroups_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                        """ + mdschema_measuresgroups_xsd + """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
-                            <DESCRIPTION>-</DESCRIPTION>
-                            <IS_WRITE_ENABLED>true</IS_WRITE_ENABLED>
-                            <MEASUREGROUP_CAPTION>default</MEASUREGROUP_CAPTION>
-                        </row>
-                    </root>
-                </return>
-                """.format(self.selected_catalogue))
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                request.Properties.PropertyList.Catalog is not None:
 
-    def discover_mdschema_measuresgroups_dimensions_response(self, request):
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                rows = ""
-                for tables in self.executer.get_all_tables_names(
-                        ignore_fact=True):
-                    rows += """
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + mdschema_measuresgroups_xsd + """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
                         <CUBE_NAME>{0}</CUBE_NAME>
                         <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
-                        <MEASUREGROUP_CARDINALITY>ONE</MEASUREGROUP_CARDINALITY>
-                        <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                        <DIMENSION_CARDINALITY>MANY</DIMENSION_CARDINALITY>
-                        <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                        <DIMENSION_IS_FACT_DIMENSION>false</DIMENSION_IS_FACT_DIMENSION>
-                        <DIMENSION_GRANULARITY>[{1}].[{1}]</DIMENSION_GRANULARITY>
+                        <DESCRIPTION>-</DESCRIPTION>
+                        <IS_WRITE_ENABLED>true</IS_WRITE_ENABLED>
+                        <MEASUREGROUP_CAPTION>default</MEASUREGROUP_CAPTION>
                     </row>
-                    """.format(self.selected_catalogue, tables)
+                </root>
+            </return>
+            """.format(self.selected_catalogue))
 
-                return etree.fromstring("""
-                <return>
+    def discover_mdschema_measuresgroups_dimensions_response(self, request):
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                request.Properties.PropertyList.Catalog is not None:
+
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            rows = ""
+            for tables in self.executer.get_all_tables_names(
+                    ignore_fact=True):
+                rows += """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{0}</CUBE_NAME>
+                    <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
+                    <MEASUREGROUP_CARDINALITY>ONE</MEASUREGROUP_CARDINALITY>
+                    <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+                    <DIMENSION_CARDINALITY>MANY</DIMENSION_CARDINALITY>
+                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+                    <DIMENSION_IS_FACT_DIMENSION>false</DIMENSION_IS_FACT_DIMENSION>
+                    <DIMENSION_GRANULARITY>[{1}].[{1}]</DIMENSION_GRANULARITY>
+                </row>
+                """.format(self.selected_catalogue, tables)
+
+            return etree.fromstring("""
+            <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                   """ + mdschema_measuresgroups_dimensions_xsd + """
-                  {0}
-                  </root>
-              </return>
-         """.format(rows))
+                {0}
+              </root>
+            </return>
+            """.format(rows))
 
     def discover_mdschema_properties_response(self, request):
-        if request.Restrictions.RestrictionList.PROPERTY_TYPE == 2:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return etree.fromstring("""
-                  <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                      {1}
+
+        if request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and \
+            request.Properties.PropertyList.Catalog is not None:
+
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                {1}
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
                         <PROPERTY_TYPE>2</PROPERTY_TYPE>
@@ -2247,8 +2253,9 @@ class XmlaDiscoverTools():
                     </row>
                     </root>
                   </return>
-                """.format(self.selected_catalogue,
-                           mdschema_properties_properties_xsd))
+            """.format(self.selected_catalogue,
+                         mdschema_properties_properties_xsd))
+
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             return etree.fromstring("""
               <return>
@@ -2262,48 +2269,48 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue:
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                if request.Restrictions.RestrictionList.TREE_OP == 8:
-                    separed_tuple = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME.split(
-                        ".")
-                    joined = ".".join(separed_tuple[:-1])
-                    # exple
-                    # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
-                    # joined -> [Product].[Product].[Company]
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
+                request.Properties.PropertyList.Catalog is not None and \
+                request.Restrictions.RestrictionList.TREE_OP == 8:
 
-                    last_attribut = ''.join(att for att in separed_tuple[-1]
-                                            if att not in '[]').replace('&',
-                                                                        '&amp;')
-                    return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_members_xsd + """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{0}</CUBE_NAME>
-                            <DIMENSION_UNIQUE_NAME>{1}</DIMENSION_UNIQUE_NAME>
-                            <HIERARCHY_UNIQUE_NAME>{1}.{1}</HIERARCHY_UNIQUE_NAME>
-                            <LEVEL_UNIQUE_NAME>{2}</LEVEL_UNIQUE_NAME>
-                            <LEVEL_NUMBER>0</LEVEL_NUMBER>
-                            <MEMBER_ORDINAL>0</MEMBER_ORDINAL>
-                            <MEMBER_NAME>""" + last_attribut + """</MEMBER_NAME>
-                            <MEMBER_UNIQUE_NAME>{3}</MEMBER_UNIQUE_NAME>
-                            <MEMBER_TYPE>1</MEMBER_TYPE>
-                            <MEMBER_CAPTION>""" + last_attribut +
-                                            """</MEMBER_CAPTION>
-                            <CHILDREN_CARDINALITY>1</CHILDREN_CARDINALITY>
-                            <PARENT_LEVEL>0</PARENT_LEVEL>
-                            <PARENT_COUNT>0</PARENT_COUNT>
-                            <MEMBER_KEY>""" + last_attribut + """</MEMBER_KEY>
-                            <IS_PLACEHOLDERMEMBER>false</IS_PLACEHOLDERMEMBER>
-                            <IS_DATAMEMBER>false</IS_DATAMEMBER>
-                        </row>
-                    </root>
-                </return>
-                    """.format(self.selected_catalogue, separed_tuple[
-                                                0], joined, request.
-                               Restrictions.RestrictionList.MEMBER_UNIQUE_NAME))
+            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            separed_tuple = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME.split(
+                ".")
+            joined = ".".join(separed_tuple[:-1])
+            # exple
+            # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
+            # joined -> [Product].[Product].[Company]
+
+            last_attribut = ''.join(att for att in separed_tuple[-1]
+                                    if att not in '[]').replace('&',
+                                                                '&amp;')
+            return etree.fromstring("""
+        <return>
+            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            """ + mdschema_members_xsd + """
+                <row>
+                    <CATALOG_NAME>{0}</CATALOG_NAME>
+                    <CUBE_NAME>{0}</CUBE_NAME>
+                    <DIMENSION_UNIQUE_NAME>{1}</DIMENSION_UNIQUE_NAME>
+                    <HIERARCHY_UNIQUE_NAME>{1}.{1}</HIERARCHY_UNIQUE_NAME>
+                    <LEVEL_UNIQUE_NAME>{2}</LEVEL_UNIQUE_NAME>
+                    <LEVEL_NUMBER>0</LEVEL_NUMBER>
+                    <MEMBER_ORDINAL>0</MEMBER_ORDINAL>
+                    <MEMBER_NAME>""" + last_attribut + """</MEMBER_NAME>
+                    <MEMBER_UNIQUE_NAME>{3}</MEMBER_UNIQUE_NAME>
+                    <MEMBER_TYPE>1</MEMBER_TYPE>
+                    <MEMBER_CAPTION>""" + last_attribut + """</MEMBER_CAPTION>
+                    <CHILDREN_CARDINALITY>1</CHILDREN_CARDINALITY>
+                    <PARENT_LEVEL>0</PARENT_LEVEL>
+                    <PARENT_COUNT>0</PARENT_COUNT>
+                    <MEMBER_KEY>""" + last_attribut + """</MEMBER_KEY>
+                    <IS_PLACEHOLDERMEMBER>false</IS_PLACEHOLDERMEMBER>
+                    <IS_DATAMEMBER>false</IS_DATAMEMBER>
+                </row>
+            </root>
+        </return>
+            """.format(self.selected_catalogue, separed_tuple[
+                                        0], joined, request.
+                        Restrictions.RestrictionList.MEMBER_UNIQUE_NAME))
