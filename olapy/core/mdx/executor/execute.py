@@ -460,7 +460,8 @@ class MdxEngine:
             'where': on_where
         }
 
-    def change_measures(self, tuples_on_mdx):
+    @staticmethod
+    def change_measures(tuples_on_mdx):
         """
         set measures to which exists in the query
 

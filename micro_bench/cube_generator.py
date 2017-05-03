@@ -65,7 +65,8 @@ class CubeGen:
         for (table_name, table_value) in tables.items():
             table_value.to_csv(os.path.join(os.path.join(cube_path, table_name + '.csv')), sep=";", index=False)
 
-    def remove_temp_cube(self):
+    @staticmethod
+    def remove_temp_cube():
         """
         remove the temporary cube
         """
