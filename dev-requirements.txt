@@ -1,0 +1,16 @@
+# Tools / dev / testing
+tox
+pytest
+pytest-cov
+xmla
+pip-tools
+flake8
+flake8-tidy-imports
+mccabe
+isort
+yapf
+pylint
+PrettyTable
+py-cpuinfo
+gprof2dot
+
