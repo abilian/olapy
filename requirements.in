@@ -19,18 +19,3 @@ Flask-WTF==0.12
 plotly==1.12.9
 XlsxWriter==0.9.3
 
-# Tools / dev / testing
-tox<3
-pytest<4
-pytest-cov
-xmla
-pip-tools
-flake8
-flake8-tidy-imports
-mccabe
-isort
-yapf
-pylint
-PrettyTable
-py-cpuinfo
-gprof2dot
