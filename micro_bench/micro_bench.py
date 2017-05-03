@@ -4,6 +4,9 @@ from cube_generator import CUBE_NAME
 
 
 class MicBench:
+    """
+    Micro Benchmark for an mdx query
+    """
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 

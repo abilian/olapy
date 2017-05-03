@@ -7,6 +7,9 @@ from os.path import expanduser
 
 
 class Logs:
+    """
+    class responsible of managing logs (users , mdx and xmla logs) 
+    """
 
     def __init__(self, file_name):
         self.file_name = file_name + ".log"

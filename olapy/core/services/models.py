@@ -3,6 +3,9 @@ from __future__ import absolute_import, division, print_function
 from spyne import ComplexModel, Integer, Unicode, XmlAttribute
 
 class Tuple(object):
+    """
+    Tuple description (used by spyne)
+    """
 
     def __init__(self, Hierarchy, UName, Caption, LName, LNum, DisplayInfo,
                  PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME, Value):
@@ -33,6 +36,9 @@ class Tuple(object):
 
 
 class Property(ComplexModel):
+    """
+    Property description (used by spyne)
+    """
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     _type_info = {
         'LocaleIdentifier': Unicode,
@@ -55,6 +61,9 @@ class Property(ComplexModel):
 
 
 class Restriction(ComplexModel):
+    """
+    Restriction description (used by spyne)
+    """
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     _type_info = {
         'CATALOG_NAME': Unicode,
@@ -74,32 +83,50 @@ class Restriction(ComplexModel):
 
 
 class Session(ComplexModel):
+    """
+        Session description (used by spyne)
+    """
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     SessionId = XmlAttribute(Unicode)
 
 
 class Restrictionlist(ComplexModel):
+    """
+        Restriction description (used by spyne)
+    """
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     __type_name__ = "Restrictions"
     RestrictionList = Restriction
 
 
 class Propertielist(ComplexModel):
+    """
+        Properties description (used by spyne)
+    """
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     __type_name__ = "Properties"
     PropertyList = Property
 
 
 class Command(ComplexModel):
+    """
+        Command description (used by spyne)
+    """
     _type_info = {'Statement': Unicode,}
 
 
 class ExecuteRequest(ComplexModel):
+    """
+        Execute description (used by spyne)
+    """
     Command = Command
     Properties = Propertielist
 
 
 class DiscoverRequest(ComplexModel):
+    """
+        Discover description (used by spyne)
+    """
     RequestType = Unicode
     Restrictions = Restrictionlist
     Properties = Propertielist

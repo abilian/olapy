@@ -35,6 +35,9 @@ log_mdx = Logs('mdx')
 
 
 class Nod:
+    """
+    class for maintaining dimensions hierarchies 
+    """
 
     def __init__(self, text, id, parent):
         self.text = text

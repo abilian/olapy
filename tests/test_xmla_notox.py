@@ -19,8 +19,14 @@ RUNNING_TOX = 'RUNTING_TOX' in os.environ
 
 
 class Member(object):
+    """
+    encapsulating xs0 response attributes 
+    """
 
     def __init__(self, **kwargs):
+        """
+        :param kwargs: [_Hierarchy,UName,Caption,LName,LNum,DisplayInfo,PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME]
+        """
         self.__dict__.update(kwargs)
 
     def __eq__(self, other):

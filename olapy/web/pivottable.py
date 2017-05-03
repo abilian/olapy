@@ -4,6 +4,9 @@ import six
 
 
 class IFrame(object):
+    """
+    Frame in which we can drag and drop our columns 
+    """
 
     iframe = """
         <iframe
