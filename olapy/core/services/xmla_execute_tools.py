@@ -17,34 +17,34 @@ class XmlaExecuteTools():
         """
         Split DataFrame into multiple ones by dimension
         
-        example:
+        example::
 
-        in :
-
-        +-------------+----------+----------+---------+---------+
-        | Continent   | Country  | Company  |Article  | Amount  |
-        +=============+==========+==========+=========+=========+
-        | America     | US       | MS       |Crazy De | 35150   |
-        +-------------+----------+----------+---------+---------+
-
-        out :
-
-        'Geography':
-
-            +-------------+----------+---------+
-            | Continent   | Country  | Amount  |
-            +=============+==========+=========+
-            | America     | US       | 35150   |
-            +-------------+----------+---------+
-
-
-        'Product':
-
-            +----------+---------+---------+
-            | Company  |Article  | Amount  |
-            +==========+=========+=========+
-            | MS       |Crazy De | 35150   |
-            +----------+---------+---------+
+            in :
+    
+            +-------------+----------+----------+---------+---------+
+            | Continent   | Country  | Company  |Article  | Amount  |
+            +=============+==========+==========+=========+=========+
+            | America     | US       | MS       |Crazy De | 35150   |
+            +-------------+----------+----------+---------+---------+
+    
+            out :
+    
+            'Geography':
+    
+                +-------------+----------+---------+
+                | Continent   | Country  | Amount  |
+                +=============+==========+=========+
+                | America     | US       | 35150   |
+                +-------------+----------+---------+
+    
+    
+            'Product':
+    
+                +----------+---------+---------+
+                | Company  |Article  | Amount  |
+                +==========+=========+=========+
+                | MS       |Crazy De | 35150   |
+                +----------+---------+---------+
 
 
         :param mdx_execution_result: MdxEngine.execute_mdx() result
@@ -61,15 +61,12 @@ class XmlaExecuteTools():
     def get_tuple_without_nan(tuple):
         """
         remove nan from tuple.
-        example
 
-        in :
+        example:
 
-        ['Geography','Continent','-1']
-
-        out :
-
-        ['Geography','Continent']
+            in  : ['Geography','Continent','-1']
+    
+            out : ['Geography','Continent']
 
         :param tuple: tuple as list
         :return: tuple as list without -1

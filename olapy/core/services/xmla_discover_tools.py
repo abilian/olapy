@@ -36,7 +36,7 @@ class XmlaDiscoverTools():
 
     def change_catalogue(self, new_catalogue):
         """
-        if you change the catalogue(cube) in any request, we have to instantiate the MdxEngine with the new catalogue
+        if you change the catalogue (cube) in any request, we have to instantiate the MdxEngine with the new catalogue
 
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables

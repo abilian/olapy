@@ -231,9 +231,9 @@ def start_server(write_on_file=False):
     """
     start the xmla server
 
-    :param write_on_file = :
+    :param write_on_file:
      - False -> server logs will be displayed on console
-     - True  -> server logs will be saved in file
+     - True  -> server logs will be saved in file (~/olapy-data/logs)
 
     :return: server instance
     """

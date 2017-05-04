@@ -3,34 +3,35 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to olapy's documentation!
+Welcome to OlaPy's documentation!
 =================================
-**olapy** is an OLAP engine with MDX support, web interface (slice & dice) and XMLA support for excel client.
+**OlaPy** is an OLAP engine with MDX support, web interface (slice & dice) and XMLA support for excel client.
 it can be found at
-`olapy <https://github.com/abilian/olapy-core>`_.
+`OlaPy <https://github.com/abilian/olapy>`_.
 
 
 Simple use
 ----------
 
-For the impatient: here's a quick overview of how to use this project. Normally,
-all you have to do is install the application first, like this::
+For the impatient: here's a quick overview of how to use this project.
+
+All you have to do is install the application first, like this::
 
     python setup.py install
 
 
-and then, it is already done, from the root directory *(which is olapy-core)* you can
+and then, it is already done, you can
 
-**Starting XMLA Server** by using::
+**Start XMLA Server** by using::
 
     python olapy ( -c | --console , if you want to print logs only in the console)
 
 
-and use the url :http://127.0.0.1:8000/xmla in excel the see your :ref:`cubes`.
+and use the url :http://127.0.0.1:8000/ in excel the see your :ref:`cubes <cubes>`.
 
 - Be sure to use `Provider=MSOLAP.6 <https://blogs.technet.microsoft.com/excel_services__powerpivot_for_sharepoint_support_blog/2015/10/30/configuring-the-msolap-data-provider-version/>`_ in excel
 
-- If you want to select many measures in excel, select them before the dimensions and then drag and drop 'Values' attribute from COLUMNS to ROWS excel field
+you can also :ref:`customize <customize>` your cubes
 
 **Starting Web DEMO** by using::
 
@@ -50,11 +51,15 @@ and use the url :http://127.0.0.1:8000/xmla in excel the see your :ref:`cubes`.
     python manage.py dropdb
 
 Tests
-^^^^^
+-----
 
-to run tests (make sure that the server is started) ::
+To run tests, run::
 
-    python -m pytest tests
+    pytest tests
+
+or simply (on Unix-like systems)::
+
+    make test
 
 
 For more information about how to use this library, see the :ref:`api`.
@@ -72,6 +77,7 @@ Contents:
    :maxdepth: 2
 
    cubes
+   customize
    api
    web
 

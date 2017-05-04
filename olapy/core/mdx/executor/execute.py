@@ -22,7 +22,8 @@ class MdxEngine:
     """
     The principal class for executing a query
 
-    :param cube_name: Cube name , it must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
+
+    :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
     """
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
@@ -198,6 +199,7 @@ class MdxEngine:
     def load_tables(self):
         """
         load all tables { Table name : DataFrame } of the current cube instance
+        
         :return: dict with key as table name and DataFrame as value
         """
 
@@ -369,21 +371,27 @@ class MdxEngine:
         """
         get all tuples in the mdx query
 
-        example:
+        example::
 
 
-            SELECT  {[Geography].[Geography].[All Continent].Members,
-                     [Geography].[Geography].[Continent].[Europe]} ON COLUMNS,
+            SELECT  {
+                    [Geography].[Geography].[All Continent].Members,
+                    [Geography].[Geography].[Continent].[Europe]
+                    } ON COLUMNS,
 
-                    {[Product].[Product].[Company]} ON ROWS
+                    {
+                    [Product].[Product].[Company]
+                    } ON ROWS
 
                     FROM {sales}
 
             it returns :
             
-                [['Geography','Geography','Continent'],
-                 ['Geography','Geography','Continent','Europe'],
-                 ['Product','Product','Company']]
+                [
+                ['Geography','Geography','Continent'],
+                ['Geography','Geography','Continent','Europe'],
+                ['Product','Product','Company']
+                ]
 
 
         :param query: mdx query
@@ -461,13 +469,16 @@ class MdxEngine:
     def change_measures(tuples_on_mdx):
         """
         set measures to which exists in the query
-
-        :param tuples_on_where: list of tuples
-
-        example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-
-        :return: measures columns names
+        
+        :param tuples_on_mdx: list of tuples:
+            
+            
+            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
+            
+            
+        :return: measures column's names
         """
+
         return [
             tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
         ]
@@ -480,17 +491,17 @@ class MdxEngine:
 
         :param tuple_as_list: list of tuples
 
-        example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
+            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
 
         :return: dimension and columns dict
 
-        example :
-        {
-        Geography : ['Continent','Country'],
-        Product : ['Company']
-        Facts :  ['Amount','Count']
-        }
-        """
+            example :
+            {
+            Geography : ['Continent','Country'],
+            Product : ['Company']
+            Facts :  ['Amount','Count']
+            }
+            """
 
         axes = {}
         # TODO optimize
@@ -665,13 +676,14 @@ class MdxEngine:
             columns_to_keep :
     
                 Geo  -> Continent,Country
+                
                 Prod -> Company
+                
                 Time -> Year,Month,Day
                   
 
-        we have to use only dimension's columns of current dimension that exist in tuple_as_list a keep other dimensions
-        columns
-
+        we have to use only dimension's columns of current dimension that exist in tuple_as_list and keep other dimensions columns
+        
         so if tuple_as_list = ['Geography','Geography','Continent']
 
         columns_to_keep will be:
@@ -679,30 +691,29 @@ class MdxEngine:
             columns_to_keep :
     
                 Geo  -> Continent
+                
                 Prod -> Company
+                
                 Time -> Year,Month,Day
                 
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
-        :param tuple_as_list: 
-            example :
-                ['Geography','Geography','Continent']
+        :param tuple_as_list:  example : ['Geography','Geography','Continent']
         :param columns_to_keep:  
             
-        example :
-             
-            {
-            
-            'Geography':
-             
-                ['Continent','Country'],
+            example :
+                 
+                {
                 
-            'Time': 
-            
-            ['Year','Month','Day']
-            
-            }
+                'Geography':
+                 
+                    ['Continent','Country'],
+                    
+                'Time': 
+                
+                    ['Year','Month','Day']
+                }
                 
         :return: updated columns_to_keep
         """
@@ -720,7 +731,7 @@ class MdxEngine:
 
     def execute_mdx(self):
         """
-        execute and MDX Query
+        execute an MDX Query
 
         usage ::
 
@@ -730,10 +741,10 @@ class MdxEngine:
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
 
-        {
-        'result' : DataFrame result
-        'columns_desc' : dict of dimension and columns used
-        }
+            {
+            'result' : DataFrame result
+            'columns_desc' : dict of dimension and columns used
+            }
 
         """
 

@@ -12,7 +12,9 @@ class ConfigParser:
     Parse olapy config files
     
     Config file used if you want to show only some measures, dimensions, columns... in excel
+    
     Config file should be under 'home-directory/olapy-data/cubes/cubes-config.xml'
+    
     Config file Structure::
             
             
@@ -22,6 +24,8 @@ class ConfigParser:
                     
                     <!-- if you want to set an authentication mechanism in excel so to access cube, 
                         user must set a token with login url like 'http://127.0.0.1/admin  -->
+                        
+                    <!-- default password = admin -->
                         
                     <xmla_authentication>False</xmla_authentication>
                 
@@ -123,6 +127,7 @@ class ConfigParser:
     def config_file_exist(self):
         """
         check whether the config file exists or not 
+        
         :return: True | False
         """
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
@@ -130,6 +135,7 @@ class ConfigParser:
     def xmla_authentication(self):
         """
         check if excel need authentication to access cubes or not. (xmla_authentication tag in the config file)
+        
         :return: True | False
         """
 
@@ -167,6 +173,7 @@ class ConfigParser:
     def construct_cubes(self):
         """
         construct cube (with it dimensions) and facts from  the config file
+        
         :return: list of Cubes instance
         """
 
