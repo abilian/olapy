@@ -16,6 +16,7 @@ class XmlaExecuteTools():
     def split_dataframe(mdx_execution_result):
         """
         Split DataFrame into multiple ones by dimension
+        
         example:
 
         in :
@@ -28,24 +29,22 @@ class XmlaExecuteTools():
 
         out :
 
-        { 'Geography':
+        'Geography':
 
-        +-------------+----------+---------+
-        | Continent   | Country  | Amount  |
-        +=============+==========+=========+
-        | America     | US       | 35150   |
-        +-------------+----------+---------+
-        ,
+            +-------------+----------+---------+
+            | Continent   | Country  | Amount  |
+            +=============+==========+=========+
+            | America     | US       | 35150   |
+            +-------------+----------+---------+
+
 
         'Product':
 
-        +----------+---------+---------+
-        | Company  |Article  | Amount  |
-        +==========+=========+=========+
-        | MS       |Crazy De | 35150   |
-        +----------+---------+---------+
-
-        }
+            +----------+---------+---------+
+            | Company  |Article  | Amount  |
+            +==========+=========+=========+
+            | MS       |Crazy De | 35150   |
+            +----------+---------+---------+
 
 
         :param mdx_execution_result: MdxEngine.execute_mdx() result

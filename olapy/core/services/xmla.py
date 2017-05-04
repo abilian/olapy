@@ -55,7 +55,7 @@ class XmlaProviderService(ServiceBase):
         the first principle function of xmla protocol
 
         :param request: Discover function must take 3 argument ( JUST 3 ! ) RequestType,
-        Restrictions and Properties , we encapsulate them in DiscoverRequest object
+            Restrictions and Properties , we encapsulate them in DiscoverRequest object
 
         :return: Discover response in xmla format
 
@@ -144,7 +144,7 @@ class XmlaProviderService(ServiceBase):
         the second principle function of xmla protocol
 
         :param request: Execute function must take 2 argument ( JUST 2 ! ) Command and Properties,
-        we encapsulate them in ExecuteRequest object
+            we encapsulate them in ExecuteRequest object
 
         :return: Execute response in xml format
         """

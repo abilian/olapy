@@ -32,18 +32,19 @@ to import the package use::
     .. autoclass:: MdxEngine
         :members:
             get_cubes_names,
-            get_cube,
+            load_tables,
+            get_measures,
+            get_star_schema_dataframe,
             get_all_tables_names,
             get_cube,
-            get_measures,
-            load_tables,
+            get_tuples,
+            decorticate_query,
             change_measures,
             get_tables_and_columns,
             execute_one_tuple,
             add_missed_column,
+            update_columns_to_keep,
             execute_mdx
-
-        **MdxEngine.load_star_schema_dataframe** contains a DataFrame of all dimension merged in one (the star schema in one table)
 
 Package ``olapy.core.services.xmla``
 ------------------------------------
@@ -57,7 +58,6 @@ to import the package use::
 
     .. autoclass:: XmlaProviderService
         :members:
-            change_catalogue,
             Discover,
             Execute
 
@@ -74,18 +74,10 @@ to import the package use::
 
     .. autoclass:: XmlaExecuteTools
         :members:
-            split_DataFrame,
+            split_dataframe,
             get_tuple_without_nan,
-            check_measures_only_selected,
-            generate_xs0_measures_only,
             generate_xs0,
+            generate_cell_info,
             generate_cell_data,
             generate_axes_info,
             generate_slicer_axis
-
-
-.. automodule:: olapy.core.services.logger
-
-    .. autoclass:: Logs
-        :members:
-            write_log

@@ -58,10 +58,10 @@ class MdxEngine:
 
         # to get cubes in db
         self._ = self.get_cubes_names()
-        self.tables_loaded = self._load_tables()
+        self.tables_loaded = self.load_tables()
         # all measures
-        self.measures = self._get_measures()
-        self.load_star_schema_dataframe = self._get_star_schema_dataframe(
+        self.measures = self.get_measures()
+        self.load_star_schema_dataframe = self.get_star_schema_dataframe(
             cube_name)
         self.tables_names = self._get_tables_name()
         # default measure is the first one
@@ -70,7 +70,7 @@ class MdxEngine:
     @classmethod
     def get_cubes_names(cls):
         '''
-        :return: list cubes name that exists in cubes folder and postgres database
+        :return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)
         '''
 
         # get csv files folders (cubes)
@@ -195,9 +195,9 @@ class MdxEngine:
             ]]
         return tables
 
-    def _load_tables(self):
+    def load_tables(self):
         """
-        load all tables (DataFrames)
+        load all tables { Table name : DataFrame } of the current cube instance
         :return: dict with key as table name and DataFrame as value
         """
 
@@ -219,7 +219,7 @@ class MdxEngine:
 
         return tables
 
-    def _get_measures(self):
+    def get_measures(self):
         """
 
         :return: all numerical columns in facts table
@@ -315,7 +315,7 @@ class MdxEngine:
 
         return fusion
 
-    def _get_star_schema_dataframe(self, cube_name):
+    def get_star_schema_dataframe(self, cube_name):
         """
         merge all DataFrames as star schema
 
@@ -357,7 +357,7 @@ class MdxEngine:
 
     def get_cube(self):
         """
-        get path to the cube (example /home_directory/your_user_name/olapy-data/cubes)
+        get path to the cube (example /home_directory/olapy-data/cubes)
 
         :return: path to the cube
         """
@@ -372,21 +372,18 @@ class MdxEngine:
         example:
 
 
-            SELECT {[Geography].[Geography].[All Continent].Members,
-                    [Geography].[Geography].[Continent].[Europe]
+            SELECT  {[Geography].[Geography].[All Continent].Members,
+                     [Geography].[Geography].[Continent].[Europe]} ON COLUMNS,
 
-            } ON COLUMNS,
+                    {[Product].[Product].[Company]} ON ROWS
 
-                   {[Product].[Product].[Company]
+                    FROM {sales}
 
-            } ON ROWS
-
-            FROM {sales}
-
-        It returns [ ['Geography','Geography','Continent'],
-                    ['Geography','Geography','Continent','Europe'],
-                    ['Product','Product','Company']
-                ]
+            it returns :
+            
+                [['Geography','Geography','Continent'],
+                 ['Geography','Geography','Continent','Europe'],
+                 ['Product','Product','Company']]
 
 
         :param query: mdx query
@@ -522,37 +519,40 @@ class MdxEngine:
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
         """
+        
         filter a DataFrame (Dataframe_in) with one tuple
+        
 
-        Example :
-
-        tuple = ['Geography','Geography','Continent','Europe','France','olapy']
-
-        Dataframe_in in =
-
-        +-------------+----------+---------+---------+---------+
-        | Continent   | Country  | Company | Article | Amount  |
-        +=============+==========+=========+=========+=========+
-        | America     | US       | MS      | SSAS    | 35150   |
-        +-------------+----------+---------+---------+---------+
-        | Europe      |  France  | AB      | olapy   | 41239   |
-        +-------------+----------+---------+---------+---------+
-        |  .....      |  .....   | ......  | .....   | .....   |
-        +-------------+----------+---------+---------+---------+
-
-        out :
-
-        +-------------+----------+---------+---------+---------+
-        | Continent   | Country  | Company | Article | Amount  |
-        +=============+==========+=========+=========+=========+
-        | Europe      |  France  | AB      | olapy   | 41239   |
-        +-------------+----------+---------+---------+---------+
+            Example ::
+            
+    
+                tuple = ['Geography','Geography','Continent','Europe','France','olapy']
+        
+                Dataframe_in in :
+        
+                +-------------+----------+---------+---------+---------+
+                | Continent   | Country  | Company | Article | Amount  |
+                +=============+==========+=========+=========+=========+
+                | America     | US       | MS      | SSAS    | 35150   |
+                +-------------+----------+---------+---------+---------+
+                | Europe      |  France  | AB      | olapy   | 41239   |
+                +-------------+----------+---------+---------+---------+
+                |  .....      |  .....   | ......  | .....   | .....   |
+                +-------------+----------+---------+---------+---------+
+        
+                out :
+        
+                +-------------+----------+---------+---------+---------+
+                | Continent   | Country  | Company | Article | Amount  |
+                +=============+==========+=========+=========+=========+
+                | Europe      |  France  | AB      | olapy   | 41239   |
+                +-------------+----------+---------+---------+---------+
 
 
         :param tuple_as_list: tuple as list
         :param Dataframe_in: DataFrame in with you want to execute tuple
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
-        other columns to keep in the execution except the current tuple
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx) 
+            other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
         df = Dataframe_in
@@ -660,35 +660,50 @@ class MdxEngine:
 
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
         """
-        If we have multiple dimensions, with many columns like
+        if we have multiple dimensions, with many columns like:
 
-        columns_to_keep =>
-
-        ( Geo  -> Continent,Country
-          Prod -> Company
-          Time -> Year,Month,Day
-        )
+            columns_to_keep :
+    
+                Geo  -> Continent,Country
+                Prod -> Company
+                Time -> Year,Month,Day
+                  
 
         we have to use only dimension's columns of current dimension that exist in tuple_as_list a keep other dimensions
         columns
 
         so if tuple_as_list = ['Geography','Geography','Continent']
 
-        columns_to_keep will be
+        columns_to_keep will be:
 
-        columns_to_keep =>
+            columns_to_keep :
+    
+                Geo  -> Continent
+                Prod -> Company
+                Time -> Year,Month,Day
+                
 
-        ( Geo  -> Continent
-          Prod -> Company
-          Time -> Year,Month,Day
-        )
+        we need columns_to_keep for grouping our columns in the DataFrame
 
-        (we need columns_to_keep for grouping our columns in the DataFrame)
-
-        :param tuple_as_list: example -> ['Geography','Geography','Continent']
-        :param columns_to_keep:  example -> { 'Geography' : ['Continent','Country'],
-                                              'Time'      : ['Year','Month','Day']
-                                            }
+        :param tuple_as_list: 
+            example :
+                ['Geography','Geography','Continent']
+        :param columns_to_keep:  
+            
+        example :
+             
+            {
+            
+            'Geography':
+             
+                ['Continent','Country'],
+                
+            'Time': 
+            
+            ['Year','Month','Day']
+            
+            }
+                
         :return: updated columns_to_keep
         """
 
