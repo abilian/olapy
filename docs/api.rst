@@ -46,6 +46,24 @@ to import the package use::
             update_columns_to_keep,
             execute_mdx
 
+
+Package ``olapy.core.mdx.tools``
+--------------------------------
+
+to import the package use::
+
+    import olapy.core.mdx.tools.config_file_parser
+
+
+.. automodule:: olapy.core.mdx.tools.config_file_parser
+
+    .. autoclass:: ConfigParser
+        :members:
+            config_file_exist,
+            xmla_authentication,
+            get_cubes_names,
+            construct_cubes
+
 Package ``olapy.core.services.xmla``
 ------------------------------------
 
