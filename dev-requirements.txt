@@ -1,16 +1,18 @@
 # Tools / dev / testing
-tox
-pytest
-pytest-cov
-xmla
-pip-tools
+PrettyTable
 flake8
 flake8-tidy-imports
-mccabe
-isort
-yapf
-pylint
-PrettyTable
-py-cpuinfo
 gprof2dot
+isort
+mccabe
+pip-tools
+py-cpuinfo
+pylint
+pytest
+pytest-cov
+tox
+xmla
+
+# 0.16 doesn't give as good looking output as this version
+yapf==0.15.2
 
