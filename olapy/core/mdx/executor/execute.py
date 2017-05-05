@@ -20,11 +20,14 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 class MdxEngine:
     """
-    The principal class for executing a query
-
+    The principal class for executing a query.
 
     :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
+    :param cube_folder: parent cube folder name
+    :param mdx_query: query to execute
+    :param sep: separator in the csv files
     """
+
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
@@ -39,13 +42,6 @@ class MdxEngine:
                  cube_folder=CUBE_FOLDER,
                  sep=';',
                  fact_table_name="Facts"):
-        '''
-
-        :param cube_folder: parent cube folder name
-        :param mdx_query: query to execute
-        :param sep: separator in the csv files
-        '''
-
         self.cube_folder = cube_folder
         self.cube = cube_name
         self.sep = sep
@@ -70,10 +66,7 @@ class MdxEngine:
 
     @classmethod
     def get_cubes_names(cls):
-        '''
-        :return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)
-        '''
-
+        """:return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)."""
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
         if RUNNING_TOX:
@@ -121,7 +114,7 @@ class MdxEngine:
 
     def _get_tables_name(self):
         """
-        get all tables names
+        Get all tables names.
 
         :return: list tables names
         """
@@ -129,11 +122,11 @@ class MdxEngine:
 
     def _load_table_config_file(self, cube_obj):
         """
-        load tables from config file
+        Load tables from config file.
+        
         :param cube_obj: cubes object
         :return: tables dict with table name as key and DataFrame as value
         """
-
         tables = {}
         # just one facts table right now
         self.facts = cube_obj.facts[0].table_name
@@ -159,10 +152,10 @@ class MdxEngine:
 
     def _load_tables_csv_files(self):
         """
-        load tables from csv files
+        Load tables from csv files.
+        
         :return: tables dict with table name as key and dataframe as value
         """
-
         tables = {}
         cube = self.get_cube()
         for file in os.listdir(cube):
@@ -177,10 +170,10 @@ class MdxEngine:
 
     def _load_tables_db(self):
         """
-        load tables from database
+        Load tables from database.
+        
         :return: tables dict with table name as key and dataframe as value
         """
-
         tables = {}
         db = MyDB(db=self.cube)
         cursor = db.connection.cursor()
@@ -198,11 +191,10 @@ class MdxEngine:
 
     def load_tables(self):
         """
-        load all tables { Table name : DataFrame } of the current cube instance
+        Load all tables { Table name : DataFrame } of the current cube instance.
         
         :return: dict with key as table name and DataFrame as value
         """
-
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
         if config_file_parser.config_file_exist(
@@ -222,10 +214,7 @@ class MdxEngine:
         return tables
 
     def get_measures(self):
-        """
-
-        :return: all numerical columns in facts table
-        """
+        """:return: all numerical columns in facts table."""
         # col.lower()[-2:] != 'id' to ignore any id column
         return [
             col
@@ -235,12 +224,12 @@ class MdxEngine:
 
     def _construct_star_schema_config_file(self, cube_name, cubes_obj):
         """
-        Construct star schema DataFrame from configuration file
+        Construct star schema DataFrame from configuration file.
+        
         :param cube_name:  cube name (or database name)
         :param cubes_obj: cubes object
         :return: star schema DataFrame
         """
-
         self.facts = cubes_obj.facts[0].table_name
         db = MyDB(db=cube_name)
         # load facts table
@@ -271,11 +260,11 @@ class MdxEngine:
 
     def _construct_star_schema_csv_files(self, cube_name):
         """
-        Construct star schema DataFrame from csv files
+        Construct star schema DataFrame from csv files.
+        
         :param cube_name:  cube name (folder name)
         :return: star schema DataFrame
         """
-
         cube = self.get_cube()
         # loading facts table
         fusion = pd.read_csv(
@@ -292,11 +281,11 @@ class MdxEngine:
 
     def _construct_star_schema_db(self, cube_name):
         """
-        Construct star schema DataFrame from database
+        Construct star schema DataFrame from database.
+        
         :param cube_name:  cube name (database name)
         :return: star schema DataFrame
         """
-
         db = MyDB(db=cube_name)
 
         # load facts table
@@ -319,12 +308,11 @@ class MdxEngine:
 
     def get_star_schema_dataframe(self, cube_name):
         """
-        merge all DataFrames as star schema
+        Merge all DataFrames as star schema.
 
         :param cube_name: cube name with which we want to generate a star schema model
         :return: star schema DataFrame
         """
-
         fusion = None
 
         config_file_parser = ConfigParser(self.cube_path)
@@ -348,7 +336,7 @@ class MdxEngine:
 
     def get_all_tables_names(self, ignore_fact=False):
         """
-        get list of tables names of the cube
+        Get list of tables names of the cube.
 
         :param ignore_fact: return all table name with facts table name
         :return: all tables names
@@ -359,7 +347,7 @@ class MdxEngine:
 
     def get_cube(self):
         """
-        get path to the cube (example /home_directory/olapy-data/cubes)
+        Get path to the cube (example /home_directory/olapy-data/cubes).
 
         :return: path to the cube
         """
@@ -369,7 +357,7 @@ class MdxEngine:
     @staticmethod
     def get_tuples(query, start=None, stop=None):
         """
-        get all tuples in the mdx query
+        Get all tuples in the mdx query.
 
         example::
 
@@ -399,7 +387,6 @@ class MdxEngine:
         :param stop:  key-word in the query where we stop (examples start = ON ROWS)
         :return:  nested list of tuples (see the example)
         """
-
         # french characters
         # or use new regex 2017.02.08
         regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
@@ -422,12 +409,11 @@ class MdxEngine:
     # TODO temporary function
     def decorticate_query(self, query):
         """
-        get all tuples that exists in the MDX Query by axes
+        Get all tuples that exists in the MDX Query by axes.
 
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
         """
-
         tuples_on_mdx_query = self.get_tuples(query)
         on_rows = []
         on_columns = []
@@ -468,7 +454,7 @@ class MdxEngine:
     @staticmethod
     def change_measures(tuples_on_mdx):
         """
-        set measures to which exists in the query
+        Set measures to which exists in the query.
         
         :param tuples_on_mdx: list of tuples:
             
@@ -478,7 +464,6 @@ class MdxEngine:
             
         :return: measures column's names
         """
-
         return [
             tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
         ]
@@ -486,8 +471,7 @@ class MdxEngine:
     def get_tables_and_columns(self, tuple_as_list):
         # TODO update docstring
         """
-        get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation)
-
+        Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
 
         :param tuple_as_list: list of tuples
 
@@ -501,8 +485,7 @@ class MdxEngine:
             Product : ['Company']
             Facts :  ['Amount','Count']
             }
-            """
-
+        """
         axes = {}
         # TODO optimize
         for axis, tuples in tuple_as_list.items():
@@ -530,9 +513,7 @@ class MdxEngine:
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
         """
-        
-        filter a DataFrame (Dataframe_in) with one tuple
-        
+        Filter a DataFrame (Dataframe_in) with one tuple.   
 
             Example ::
             
@@ -591,7 +572,7 @@ class MdxEngine:
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
         """
-        solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
+        Solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
 
         if you want to concat two dataframes with different columns like :
 
@@ -671,7 +652,7 @@ class MdxEngine:
 
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
         """
-        if we have multiple dimensions, with many columns like:
+        If we have multiple dimensions, with many columns like:
 
             columns_to_keep :
     
@@ -717,7 +698,6 @@ class MdxEngine:
                 
         :return: updated columns_to_keep
         """
-
         if len(
                 tuple_as_list
         ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
@@ -731,7 +711,7 @@ class MdxEngine:
 
     def execute_mdx(self):
         """
-        execute an MDX Query
+        Execute an MDX Query.
 
         usage ::
 
@@ -747,7 +727,6 @@ class MdxEngine:
             }
 
         """
-
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
         if self.change_measures(query_axes['all']):

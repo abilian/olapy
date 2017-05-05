@@ -5,9 +5,7 @@ from collections import OrderedDict
 
 
 class XmlaExecuteTools():
-    """
-    XmlaExecuteTools for generating xmla execute responses
-    """
+    """XmlaExecuteTools for generating xmla execute responses."""
 
     def __init__(self, executer):
         self.executer = executer
@@ -15,7 +13,7 @@ class XmlaExecuteTools():
     @staticmethod
     def split_dataframe(mdx_execution_result):
         """
-        Split DataFrame into multiple ones by dimension
+        Split DataFrame into multiple ones by dimension.
         
         example::
 
@@ -50,7 +48,6 @@ class XmlaExecuteTools():
         :param mdx_execution_result: MdxEngine.execute_mdx() result
         :return: dict with multiple DataFrame
         """
-
         # TODO new version with facts as splited df maybe
         return OrderedDict(
             (key, mdx_execution_result['result'].reset_index()[list(value)])
@@ -60,7 +57,7 @@ class XmlaExecuteTools():
     @staticmethod
     def get_tuple_without_nan(tuple):
         """
-        remove nan from tuple.
+        Remove nan from tuple.
 
         example:
 
@@ -84,6 +81,7 @@ class XmlaExecuteTools():
                               mdx_query_axis='all',
                               axis="Axis0"):
         """
+        
         :param mdx_execution_result:
         :param splited_df:
         :return:
@@ -285,7 +283,7 @@ class XmlaExecuteTools():
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self, mdx_execution_result):
         """
-        examle of CellData::
+        Examle of CellData::
 
             <Cell CellOrdinal="0">
                 <Value xsi:type="xsi:long">768</Value>
@@ -338,7 +336,7 @@ class XmlaExecuteTools():
 
     def generate_axes_info_slicer(self, mdx_execution_result):
         """
-        Not used dimensions
+        Not used dimensions.
 
         example AxisInfo::
 
@@ -365,7 +363,6 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
-
         all_dimensions_names = self.executer.get_all_tables_names(
             ignore_fact=True)
         all_dimensions_names.append('Measures')
@@ -413,7 +410,7 @@ class XmlaExecuteTools():
                                mdx_query_axis='columns',
                                Axis='Axis0'):
         """
-        example AxisInfo::
+        Example AxisInfo::
 
 
             <AxesInfo>
@@ -445,7 +442,6 @@ class XmlaExecuteTools():
         :param Axis: Axis0 or Axis1 (Axis0 by default)
         :return:
         """
-
         hierarchy_info = ""
         # measure must be written at the top
         if self.executer.facts in mdx_execution_result['columns_desc'][mdx_query_axis].keys(
@@ -488,10 +484,10 @@ class XmlaExecuteTools():
 
     def generate_axes_info(self, mdx_execution_result):
         """
+        
         :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
-
         if mdx_execution_result['columns_desc']['rows']:
             return """
             {0}
@@ -520,7 +516,7 @@ class XmlaExecuteTools():
 
     def generate_slicer_axis(self, mdx_execution_result):
         """
-        example SlicerAxis::
+        Example SlicerAxis::
 
 
             <Axis name="SlicerAxis">

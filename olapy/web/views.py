@@ -35,9 +35,7 @@ log_mdx = Logs('mdx')
 
 
 class Nod:
-    """
-    class for maintaining dimensions hierarchies 
-    """
+    """Class for maintaining dimensions hierarchies."""
 
     def __init__(self, text, id, parent):
         self.text = text
@@ -52,7 +50,7 @@ class Nod:
 
 def generate_tree_levels():
     """
-    build table's levels to use them in the page's TreeView
+    Build table's levels to use them in the page's TreeView.
 
     :return: dict of levels
     """
@@ -92,7 +90,7 @@ def generate_tree_levels():
 @login_manager.user_loader
 def load_user(userid):
     """
-    load user with specific id
+    Load user with specific id.
 
     :param userid: user id
     :return: user

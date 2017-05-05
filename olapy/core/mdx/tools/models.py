@@ -1,7 +1,5 @@
 class Facts:
-    """
-    Facts class used to encapsulate config file attributes
-    """
+    """Facts class used to encapsulate config file attributes."""
 
     def __init__(self, **kwargs):
         """
@@ -23,31 +21,24 @@ class Facts:
 
 
 class Dimension:
-    """
-    Dimension class used to encapsulate config file attributes
-    """
+    """Dimension class used to encapsulate config file attributes."""
 
     def __init__(self, **kwargs):
         """
-        
         :param kwargs: {
                         name : 'something',
                         displayName : 'something',
                         columns : 
                             { name : 'something' }
-                        }
-                        
+                        }     
         """
         self.__dict__.update(kwargs)
 
     def __str__(self):
         return str(self.__dict__)
 
-
 class Cube:
-    """
-    Cube class used to encapsulate config file attributes
-    """
+    """Cube class used to encapsulate config file attributes."""
 
     def __init__(self, **kwargs):
         """   

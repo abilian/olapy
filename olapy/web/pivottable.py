@@ -4,9 +4,7 @@ import six
 
 
 class IFrame(object):
-    """
-    Frame in which we can drag and drop our columns 
-    """
+    """Frame in which we can drag and drop our columns."""
 
     iframe = """
         <iframe
@@ -20,7 +18,7 @@ class IFrame(object):
 
     def __init__(self, src, width, height, **kwargs):
         """
-        IFrame
+        Iframe
         :param src:
         :param width:
         :param height:
@@ -32,7 +30,7 @@ class IFrame(object):
         self.params = kwargs
 
     def _repr_html_(self):
-        """return the embed iframe"""
+        """return the embed iframe."""
         if self.params:
             # try:
             #     from urllib.parse import urlencode  # Py 3
@@ -112,7 +110,7 @@ template = """
 
 def pivot_ui(df, outfile_path="pivottablejs.html", width="100%", height="500"):
     """
-    Create pivot table html page relative to DataFrame
+    Create pivot table html page relative to DataFrame.
 
     :param df: the DataFrame
     :param outfile_path: html page name (can be the path also)

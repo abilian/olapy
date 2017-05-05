@@ -4,17 +4,15 @@ from cube_generator import CUBE_NAME
 
 
 class MicBench:
-    """
-    Micro Benchmark for an mdx query
-    """
+    """Micro Benchmark for an mdx query."""
+
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
     @staticmethod
     def bench(connection, query, cube=CUBE_NAME, number=1):
         """
-         To be precise, this executes the query statement once, and
-        then returns the time it takes to execute
+        To be precise, this executes the query statement once, and then returns the time it takes to execute.
 
         :param connection: connection object
         :param query: MDX query

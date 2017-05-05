@@ -7,15 +7,12 @@ from .gen_parser.models import SelectStatement
 
 
 class MdxParser:
-    """
-    parse the mdx query and split it into well-defined parts
-    """
+    """Parse the mdx query and split it into well-defined parts."""
     START = 'MDX_statement'
 
     @staticmethod
     def parsing_mdx_query(axis, query):
-        '''
-        Split the query into axis
+        """Split the query into axis.
 
         **Example**::
 
@@ -47,7 +44,7 @@ class MdxParser:
         :param query: MDX Query
         :param axis: column | row | cube | condition | all
         :return: Tuples in the axis, from the MDX query
-        '''
+        """
         model = MdxParserGen(semantics=ModelBuilderSemantics(
             types=[SelectStatement]))
         ast = model.parse(query, rule_name=MdxParser.START, ignorecase=True)

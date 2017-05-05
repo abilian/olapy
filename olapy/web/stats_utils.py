@@ -8,20 +8,17 @@ import plotly.graph_objs as go
 
 
 class Graphs:
-    """
-    Manage graphs for the web clients
-    """
+    """Manage graphs for the web clients."""
 
     # TODO remove this , ( right know this is just a demo with sales cube )
     @staticmethod
     def generate_graphes(dataframe):
         """
-        Generate graphs for a pandas DataFrame, if you want to add graphs, you have to do it in this function
+        Generate graphs for a pandas DataFrame, if you want to add graphs, you have to do it in this function.
 
         :param dataframe: the DataFrame
         :return: dict of ids as keys and json graphs as values
         """
-
         x = []
         x_pie = []
         y = []

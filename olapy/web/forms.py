@@ -9,19 +9,17 @@ from ..core.mdx.parser.parse import MdxParser
 
 
 class QueryForm(Form):
-    """
-    Query Form
-    """
+    """Query Form."""
+
     mdx = TextAreaField(
         "MDX Query",
         validators=[DataRequired(message="Please enter the MDX Query")])
 
     def validate(self):
-        """
-        Valide
+        """Valide.
+        
         :return:
         """
-
         parser = MdxParser()
         if self.mdx.data:
             try:
@@ -39,9 +37,8 @@ class QueryForm(Form):
 
 
 class LoginForm(Form):
-    """
-    Loging Form
-    """
+    """Loging Form."""
+
     username = StringField(
         'Your username:',
         validators=[DataRequired(message="Please enter the Username")])

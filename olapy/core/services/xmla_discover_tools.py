@@ -19,9 +19,7 @@ from .xmla_discover_xsds import (
 
 # TODO clean
 class XmlaDiscoverTools():
-    """
-    XmlaDiscoverTools for generating xmla discover responses
-    """
+    """XmlaDiscoverTools for generating xmla discover responses."""
 
     def __init__(self):
         # right now the catalogue_name and cube name are the same
@@ -36,12 +34,11 @@ class XmlaDiscoverTools():
 
     def change_catalogue(self, new_catalogue):
         """
-        if you change the catalogue (cube) in any request, we have to instantiate the MdxEngine with the new catalogue
+        If you change the catalogue (cube) in any request, we have to instantiate the MdxEngine with the new catalogue.
 
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
-        #
         if self.selected_catalogue != new_catalogue:
             self.selected_catalogue = new_catalogue
             self.executer = MdxEngine(new_catalogue)

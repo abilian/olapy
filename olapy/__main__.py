@@ -6,11 +6,12 @@ from core.services.xmla import start_server
 
 
 def main(arg):
-    '''
-    Execute xmla provider
+    """
+    Execute xmla provider.
+    
     :param arg: -c | --console :  show logs in server console
     :return:
-    '''
+    """
     if len(arg) > 1:
         if arg[1] in ("-c", "--console"):
             start_server(write_on_file=False)

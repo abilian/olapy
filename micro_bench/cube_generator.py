@@ -11,8 +11,8 @@ CUBE_NAME ="temp_cube"
 
 class CubeGen:
     """
-    Benchmark olapy query execution
-
+    Benchmark olapy query execution.
+    
     :param number_dimensions: number of dimensions to generate (not including fact)
     :param rows_length: number of line in each dimension
     :param columns_length: cumber of columns in each dimension
@@ -28,7 +28,7 @@ class CubeGen:
 
     def generate_cube(self, min_val=5, max_val=100):
         """
-        Generate dimension and fact that follows star schema
+        Generate dimension and fact that follows star schema.
 
         :param min_val: minimal value in every dimension
         :param max_val: maximal value in every dimension
@@ -52,10 +52,10 @@ class CubeGen:
     @staticmethod
     def generate_csv(tables):
         """
-        generate csv files for the generated DataFrames
+        Generate csv files for the generated DataFrames.
+        
         :param tables: dict of DataFrames
         """
-
         cube_path = os.path.join(
             os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "..")), MdxEngine.CUBE_FOLDER)
@@ -67,9 +67,7 @@ class CubeGen:
 
     @staticmethod
     def remove_temp_cube():
-        """
-        remove the temporary cube
-        """
+        """Remove the temporary cube."""
         cube_path = os.path.join(
             os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "..")), MdxEngine.CUBE_FOLDER)

@@ -2,10 +2,7 @@ import psycopg2 as pg
 
 
 class MyDB(object):
-    """
-    Connect to sql database (postgres only right now)
-    """
-
+    """Connect to sql database (postgres only right now)."""
     def __init__(self,
                  username='postgres',
                  password='root',
