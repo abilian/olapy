@@ -22,20 +22,21 @@ from ..web.stats_utils import Graphs
 from .forms import LoginForm, QueryForm
 from .models import User
 
-# in pandas there is a problem with conversion multiindex dataframe to json
-# to solve the export to excel problem we used a global variable
-# TODO remove this , ( right know this is just a demo with sales cube )
-CUBE = 'sales'
-frame = pd.DataFrame()
-ex = MdxEngine(CUBE)
-
-log = Logs('all')
-log_users = Logs('users')
-log_mdx = Logs('mdx')
-
 
 class Nod:
     """Class for maintaining dimensions hierarchies."""
+
+    # in pandas there is a problem with conversion multiindex dataframe to json
+    # to solve the export to excel problem we used a global variable
+    # TODO remove this , ( right know this is just a demo with sales cube )
+    CUBE = 'sales'
+    frame = pd.DataFrame()
+    ex = MdxEngine(CUBE)
+
+    log = Logs('all')
+    log_users = Logs('users')
+    log_mdx = Logs('mdx')
+
 
     def __init__(self, text, id, parent):
         self.text = text
@@ -55,9 +56,9 @@ def generate_tree_levels():
     :return: dict of levels
     """
     levels = {}
-    for t in ex.tables_names:
-        if t != ex.facts:
-            df = ex.tables_loaded[t]
+    for t in Nod.ex.tables_names:
+        if t != Nod.ex.facts:
+            df = Nod.ex.tables_loaded[t]
             tree = Tree()
             tree.create_node(t, t, data=t)
 
@@ -115,8 +116,8 @@ def login():
         if user is not None and user.check_password(form.password.data):
             login_user(user, form.remember_me.data)
             # next to hold the the page that the user tries to visite
-            log.write_log('connected as ' + str(current_user.username))
-            log_users.write_log('connected as ' + str(current_user.username))
+            Nod.log.write_log('connected as ' + str(current_user.username))
+            Nod.log_users.write_log('connected as ' + str(current_user.username))
             return redirect(
                 request.args.get('next') or url_for(
                     'execute', user=current_user))
@@ -126,8 +127,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    log.write_log('logout as ' + str(current_user.username))
-    log_users.write_log('logout as ' + str(current_user.username))
+    Nod.log.write_log('logout as ' + str(current_user.username))
+    Nod.log_users.write_log('logout as ' + str(current_user.username))
     logout_user()
     return redirect(url_for('login'))
 
@@ -140,8 +141,8 @@ def execute():
     # if we have a slow page load we have to com the line below
     lvls = generate_tree_levels()
     nods = {}
-    for t in ex.tables_names:
-        if t != ex.facts:
+    for t in Nod.ex.tables_names:
+        if t != Nod.ex.facts:
             l_nods = []
             for node in lvls[t].expand_tree(mode=Tree.DEPTH):
                 if lvls[t][node].fpointer:
@@ -156,18 +157,17 @@ def execute():
 
     if form.validate_on_submit():
         query = form.mdx.data
-        log.write_log('Query : ' + str(query))
-        log_mdx.write_log('Query : ' + str(query))
-        ex.mdx_query = query
-        rslt = ex.execute_mdx()['result']
-        log.write_log('Query result :  ' + str(rslt))
-        log_mdx.write_log('Query result :  ' + str(rslt))
+        Nod.log.write_log('Query : ' + str(query))
+        Nod.log_mdx.write_log('Query : ' + str(query))
+        Nod.ex.mdx_query = query
+        rslt = Nod.ex.execute_mdx()['result']
+        Nod.log.write_log('Query result :  ' + str(rslt))
+        Nod.log_mdx.write_log('Query result :  ' + str(rslt))
 
         # we used a global variable which will contain the dataframe execution result
         # because pandas current version has problem converting multiindex
         # dataframe to json format
-        global frame
-        frame = rslt
+        Nod.frame = rslt
 
         if isinstance(rslt, DataFrame):
             t_rslt = rslt.to_html(
@@ -181,28 +181,28 @@ def execute():
             user=current_user,
             form=form,
             t_result=t_rslt,
-            tables=ex.tables_loaded,
-            cube=CUBE,
-            measures=ex.measures,
+            tables=Nod.ex.tables_loaded,
+            cube=Nod.CUBE,
+            measures=Nod.ex.measures,
             hierarchies=nods)
 
     return render_template(
         'execute_query.html',
         user=current_user,
         form=form,
-        tables=ex.tables_loaded,
-        cube=CUBE,
-        measures=ex.measures,
+        tables=Nod.ex.tables_loaded,
+        cube=Nod.CUBE,
+        measures=Nod.ex.measures,
         hierarchies=nods)
 
 
 @app.route('/export', methods=['GET', 'POST'])
 @login_required
 def export():
-    if not frame.empty:
-        df = pd.DataFrame(frame)
-        log.write_log('Export :  ' + str(df))
-        log_mdx.write_log('Export :  ' + str(df))
+    if not Nod.frame.empty:
+        df = pd.DataFrame(Nod.frame)
+        Nod.log.write_log('Export :  ' + str(df))
+        Nod.log_mdx.write_log('Export :  ' + str(df))
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')
         df.to_excel(writer, sheet_name='Sheet1')
@@ -225,16 +225,16 @@ def export():
 @app.route('/export/<type>', methods=['GET', 'POST'])
 @login_required
 def export_file(type):
-    if log.root_path:
+    if Nod.log.root_path:
         return send_file(
-            os.path.join(log.root_path, type + '.log'), as_attachment=True)
+            os.path.join(Nod.log.root_path, type + '.log'), as_attachment=True)
     return redirect('/execute')
 
 
 @app.route('/stats', methods=['GET', 'POST'])
 @login_required
 def stats():
-    ex = MdxEngine(CUBE)
+    ex = MdxEngine(Nod.CUBE)
     graph = Graphs()
 
     columns = list(
@@ -245,8 +245,7 @@ def stats():
 
     temp_rslt = ex.load_star_schema_dataframe[columns].head(200)
     # so we can export it to excel
-    global frame
-    frame = ex.load_star_schema_dataframe[columns]
+    Nod.frame = ex.load_star_schema_dataframe[columns]
     graph = graph.generate_graphes(temp_rslt)
 
     return render_template(
@@ -267,7 +266,7 @@ def logs():
 @app.route('/query_builder', methods=['GET', 'POST'])
 @login_required
 def query_builder():
-    df = ex.load_star_schema_dataframe
+    df = Nod.ex.load_star_schema_dataframe
     if not df.empty:
         pivot_ui(
             df,
