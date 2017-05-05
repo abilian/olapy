@@ -51,8 +51,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OlaPy'
-copyright = u'2017, Mouadh Kaabachi'
-author = u'Mouadh Kaabachi'
+copyright = u'2017, Abilian SAS'
+author = u'Abilian SAS'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
