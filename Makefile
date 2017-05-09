@@ -7,6 +7,9 @@ PKG=$(SRC)
 default: test
 
 
+run:
+	python manage.py runserver
+
 #
 # testing
 #
@@ -79,4 +82,3 @@ release:
 	git clone . /tmp/olapy
 	cd /tmp/olapy ; python setup.py sdist
 	cd /tmp/olapy ; python setup.py sdist upload
-
