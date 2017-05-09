@@ -4,6 +4,7 @@ flake8
 flake8-tidy-imports
 gprof2dot
 isort
+ipdb
 mccabe
 pip-tools
 py-cpuinfo
@@ -15,4 +16,3 @@ xmla
 
 # 0.16 doesn't give as good looking output as this version
 yapf==0.15.2
-
