@@ -18,7 +18,7 @@ class OlapyService(ServiceBase):
     def get_star_schema(ctx):
         return OlapyService.executer.load_star_schema_dataframe.to_json()
 
-    # curl "http://localhost:8000/get_cubes_names"
+    # curl "http://localhost:8000/get_all_tables"
     @rpc(_returns=Unicode)
     def get_all_tables(ctx):
         return {
