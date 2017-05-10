@@ -12,22 +12,27 @@ class OlapyService(ServiceBase):
 
     executer = MdxEngine('sales')
 
+    # curl "http://localhost:8000/get_cubes_names"
     @rpc(_returns=Iterable(Unicode))
     def get_cubes_names(ctx):
         return MdxEngine.get_cubes_names()
 
+    # curl "http://localhost:8000/get_star_schema"
     @rpc(_returns=Unicode)
     def get_star_schema(ctx):
         return OlapyService.executer.load_star_schema_dataframe.to_json()
 
+
+    # curl "http://localhost:8000/get_cubes_names"
     @rpc(_returns=Unicode)
-    def get_tables(ctx):
+    def get_cubes_names(ctx):
         return {
             table_name: table_dataframe.to_json()
             for table_name, table_dataframe in
             OlapyService.executer.tables_loaded.items()
         }
 
+    # curl "http://localhost:8000/get_measures"
     @rpc(_returns=Iterable(Unicode))
     def get_measures(ctx):
         return OlapyService.executer.measures
