@@ -22,20 +22,22 @@ class OlapyService(ServiceBase):
 
     @rpc(_returns=Unicode)
     def get_tables(ctx):
-        return {table_name: table_dataframe.to_json() for table_name, table_dataframe in
-                OlapyService.executer.tables_loaded.items()}
+        return {
+            table_name: table_dataframe.to_json()
+            for table_name, table_dataframe in
+            OlapyService.executer.tables_loaded.items()
+        }
 
     @rpc(_returns=Iterable(Unicode))
     def get_measures(ctx):
         return OlapyService.executer.measures
 
-application = Application([OlapyService],
-                          tns='spyne.olapy.services',
-                          in_protocol=HttpRpc(validator='soft'),
-                          out_protocol=JsonDocument()
-                          )
 
-
+application = Application(
+    [OlapyService],
+    tns='spyne.olapy.services',
+    in_protocol=HttpRpc(validator='soft'),
+    out_protocol=JsonDocument())
 
 if __name__ == '__main__':
     # You can use any Wsgi server. Here, we chose
