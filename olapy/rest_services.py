@@ -5,7 +5,7 @@ from spyne.protocol.json import JsonDocument
 from spyne.server.wsgi import WsgiApplication
 from spyne.service import ServiceBase
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from core.mdx.executor.execute import MdxEngine
 
 
 class OlapyService(ServiceBase):
