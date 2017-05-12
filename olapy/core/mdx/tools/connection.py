@@ -14,7 +14,7 @@ class MyDB(object):
                  host=HOST):
         if db is None:
             self.connection = pg.connect(
-                "user={0} password={1}".format(username, password))
+                "user={0} password={1} host='{2}'".format(username, password,host))
         else:
             try:
                 self.connection = pg.connect(
