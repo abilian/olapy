@@ -37,7 +37,6 @@ class Nod:
     log_users = Logs('users')
     log_mdx = Logs('mdx')
 
-
     def __init__(self, text, id, parent):
         self.text = text
         self.id = id
@@ -65,8 +64,8 @@ def generate_tree_levels():
             for c in df.columns[1:]:
                 for k, v in groupby(
                         sorted((df.groupby(
-                            list(df.columns.values[0:df.columns.get_loc(c) +
-                                                   1])).groups).keys()),
+                            list(df.columns.values[
+                                0:df.columns.get_loc(c) + 1])).groups).keys()),
                         key=itemgetter(*range(0, df.columns.get_loc(c)))):
 
                     if type(k) not in [list, tuple]:
@@ -117,10 +116,11 @@ def login():
             login_user(user, form.remember_me.data)
             # next to hold the the page that the user tries to visite
             Nod.log.write_log('connected as ' + str(current_user.username))
-            Nod.log_users.write_log('connected as ' + str(current_user.username))
+            Nod.log_users.write_log('connected as ' +
+                                    str(current_user.username))
             return redirect(
-                request.args.get('next') or url_for(
-                    'execute', user=current_user))
+                request.args.get('next') or
+                url_for('execute', user=current_user))
         flash('incorrect username or password')
     return render_template('login.html', form=form, user=current_user)
 
@@ -251,8 +251,9 @@ def stats():
     return render_template(
         'stats.html',
         user=current_user,
-        table_result=temp_rslt.to_html(
-            classes=['table table-bordered table-hover table-striped display']),
+        table_result=temp_rslt.to_html(classes=[
+            'table table-bordered table-hover table-striped display'
+        ]),
         graphe=graph,
         ids=graph['ids'])
 
@@ -266,12 +267,18 @@ def logs():
 @app.route('/query_builder', methods=['GET', 'POST'])
 @login_required
 def query_builder():
-    df = Nod.ex.load_star_schema_dataframe
+    # df = Nod.ex.load_star_schema_dataframe
+    # if not df.empty:
+
+    executer = MdxEngine('mpr')
+    df = executer.get_star_schema_dataframe(client_type='web')
+
     if not df.empty:
         pivot_ui(
             df,
             outfile_path="olapy/web/templates/pivottablejs.html",
             height="100%")
+
     return render_template('query_builder.html', user=current_user)
 
 

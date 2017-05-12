@@ -58,8 +58,7 @@ class MdxEngine:
         self.tables_loaded = self.load_tables()
         # all measures
         self.measures = self.get_measures()
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe(
-            cube_name)
+        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
@@ -369,7 +368,7 @@ class MdxEngine:
 
         return fusion
 
-    def get_star_schema_dataframe(self, cube_name, client_type='excel'):
+    def get_star_schema_dataframe(self, client_type='excel'):
         """
         Merge all DataFrames as star schema.
 
@@ -381,23 +380,23 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 client_type
-        ) and cube_name in config_file_parser.get_cubes_names():
+        ) and self.cube in config_file_parser.get_cubes_names():
             for cubes in config_file_parser.construct_cubes(client_type):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     # TODO one config file (I will try to merge dimensions between them in web part)
                     if client_type == 'web':
                         fusion = self._construct_web_star_schema_config_file(
-                            cube_name, cubes)
+                            self.cube, cubes)
                     else:
                         fusion = self._construct_star_schema_config_file(
-                            cube_name, cubes)
+                            self.cube, cubes)
 
-        elif cube_name in self.csv_files_cubes:
-            fusion = self._construct_star_schema_csv_files(cube_name)
+        elif self.cube in self.csv_files_cubes:
+            fusion = self._construct_star_schema_csv_files(self.cube)
 
-        elif cube_name in self.postgres_db_cubes:
-            fusion = self._construct_star_schema_db(cube_name)
+        elif self.cube in self.postgres_db_cubes:
+            fusion = self._construct_star_schema_db(self.cube)
 
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
