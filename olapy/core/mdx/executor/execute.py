@@ -96,6 +96,7 @@ class MdxEngine:
             MdxEngine.postgres_db_cubes = [
                 database[0] for database in cursor.fetchall()
             ]
+
         except Exception:
             print('no database connexion')
             pass
@@ -258,6 +259,68 @@ class MdxEngine:
 
         return fusion
 
+    def _construct_web_star_schema_config_file(self, cube_name, cubes_obj):
+        """
+        Construct star schema DataFrame from configuration file.
+
+        :param cube_name:  cube name (or database name)
+        :param cubes_obj: cubes object
+        :return: star schema DataFrame
+        """
+        all_columns = []
+
+        self.facts = cubes_obj.facts[0].table_name
+        db = MyDB(db=cube_name)
+        # load facts table
+
+        # measures in config-file only
+        if cubes_obj.facts[0].measures:
+            self.measures = cubes_obj.facts[0].measures
+            all_columns += cubes_obj.facts[0].measures
+
+        fusion = psql.read_sql_query("SELECT * FROM {0}".format(self.facts),
+                                     db.connection)
+
+        tables = {}
+        for table in cubes_obj.tables:
+
+            tab = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
+                                      db.connection)
+
+            try:
+                if table.columns:
+                    tab = tab[table.columns]
+
+            except:
+                print("table columns doesn't exist")
+                print('pass with all columns')
+
+            try:
+                if table.new_names:
+                    tab = tab.rename(columns=table.new_names)
+
+            except:
+                print("verify your old and new columns names")
+                print('pass with no change')
+
+            all_columns += list(tab.columns)
+            tables.update({table.name: tab})
+
+        for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
+            dimension_name = dimension_and_key.split('.')[0]
+            if dimension_name in tables.keys():
+                df = tables[dimension_name]
+            else:
+                df = psql.read_sql_query(
+                    "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+                    db.connection)
+
+            fusion = fusion.merge(
+                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+
+        return fusion[[column for column in all_columns if 'id' != column[-2:]]]
+
+
     def _construct_star_schema_csv_files(self, cube_name):
         """
         Construct star schema DataFrame from csv files.
@@ -306,7 +369,7 @@ class MdxEngine:
 
         return fusion
 
-    def get_star_schema_dataframe(self, cube_name):
+    def get_star_schema_dataframe(self, cube_name, client_type='excel'):
         """
         Merge all DataFrames as star schema.
 
@@ -316,13 +379,18 @@ class MdxEngine:
         fusion = None
 
         config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(
+        if config_file_parser.config_file_exist(client_type
         ) and cube_name in config_file_parser.get_cubes_names():
-            for cubes in config_file_parser.construct_cubes():
+            for cubes in config_file_parser.construct_cubes(client_type):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(
-                        cube_name, cubes)
+                    # TODO one config file (I will try to merge dimensions between them in web part)
+                    if client_type == 'web':
+                        fusion = self._construct_web_star_schema_config_file(
+                            cube_name, cubes)
+                    else:
+                        fusion = self._construct_star_schema_config_file(
+                            cube_name, cubes)
 
         elif cube_name in self.csv_files_cubes:
             fusion = self._construct_star_schema_csv_files(cube_name)

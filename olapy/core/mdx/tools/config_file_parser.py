@@ -4,7 +4,7 @@ import os
 
 from lxml import etree
 
-from .models import Cube, Dimension, Facts
+from .models import Cube, Dimension, Facts, Table
 
 
 class ConfigParser:
@@ -15,7 +15,7 @@ class ConfigParser:
     
     Config file should be under 'home-directory/olapy-data/cubes/cubes-config.xml'
     
-    Config file Structure::
+    Excel Config file Structure::
             
             
             <?xml version="1.0" encoding="UTF-8"?>
@@ -112,9 +112,110 @@ class ConfigParser:
                     </cube>
                 
                 </cubes>
+        
+                
+    WEB Config file Structure::
+    
+            
+            <?xml version="1.0" encoding="UTF-8"?>
+
+                <cubes>
+                
+                    <cube>
+                        <!-- cube name => db name -->
+                        <name>mpr</name>
+                        <!-- source : postgres | csv -->
+                        <source>postgres</source>
+                
+                        <!--
+                        star building customized star schema
+                        -->
+                        <facts>
+                            <!-- facts table name -->
+                            <table_name>projet</table_name>
+                            <keys>
+                                <!-- ref = table_name.column  -->
+                                <column_name ref="vocabulary_crm_status.id">status_id</column_name>
+                                <column_name ref="vocabulary_crm_pole_leader.id">pole_leader_id</column_name>
+                                <column_name ref="contact.id">contact_id</column_name>
+                                <column_name ref="compte.id">compte_porteur_id</column_name>
+                                <column_name ref="vocabulary_crm_aap_type.id">aap_name_id</column_name>
+                            </keys>
+                
+                            <!-- specify measures explicitly -->
+                            <measures>
+                                <!-- by default, all number type columns in facts table, or you can specify them here -->
+                                <name>budget_total</name>
+                                <name>subvention_totale</name>
+                                <name>duree_projet</name>
+                            </measures>
+                
+                        </facts>
+                
+                        <!--
+                        end building customized star schema
+                        -->
+                
+                        <!-- --------------------------------------------------------  -->
+                
+                        <!-- FOR WEB -->
+                
+                        <tables>
+                            <!-- Table name --> 
+                            <table name="vocabulary_crm_status">
+                
+                                <!-- Columns to keep (exclude id)-->
+                                <!-- They must be seperated with comma ',' -->
+                                <columns>label,active</columns>
+                
+                                <!-- Change insignificant table columns names -->
+                                <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+                                <new_name old_column_name="label">status_label</new_name>
+                
+                            </table>
+                
+                            <!-- ***********************  -->
+                
+                            <!-- Table name --> 
+                            <table name="vocabulary_crm_pole_leader">
+                
+                                <!-- Columns to keep (exclude id)-->
+                                <!-- They must be seperated with comma ',' -->
+                                <columns>label</columns>
+                
+                                <!-- Change insignificant table columns names -->
+                                <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+                                <new_name old_column_name="label">pole_leader_label</new_name>
+                
+                            </table>
+                
+                
+                            <!-- ***********************  -->
+                
+                            <!-- Table name --> 
+                            <table name="contact">
+                
+                                <!-- Columns to keep (exclude id)-->
+                                <!-- They must be seperated with comma ',' -->
+                                <columns>nom,prenom,fonction</columns>
+                
+                            </table>
+                
+                        </tables>    
+                
+                        <!-- END FOR WEB -->
+                
+                        <!-- --------------------------------------------------------  -->
+                
+                    </cube>
+                
+                </cubes>
+
       
     """
-    def __init__(self, cube_path, file_name='cubes-config.xml'):
+
+    # TODO one config file (I will try to merge dimensions between them in web part)
+    def __init__(self, cube_path, file_name='cubes-config.xml', web_config_file_name='web_cube_config.xml'):
         """
         
         :param cube_path: path to cube (csv folders)
@@ -122,13 +223,16 @@ class ConfigParser:
         """
         self.cube_path = cube_path
         self.file_name = file_name
+        self.web_config_file_name = web_config_file_name
 
-    def config_file_exist(self):
+    def config_file_exist(self,client_type='excel'):
         """
         Check whether the config file exists or not.
         
         :return: True | False
         """
+        if client_type == 'web':
+            return os.path.isfile(os.path.join(self.cube_path, self.web_config_file_name))
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
 
     def xmla_authentication(self):
@@ -167,56 +271,114 @@ class ConfigParser:
             except:
                 raise ('missed name or source tags')
 
-    def construct_cubes(self):
+    def _construct_cubes_excel(self):
+        try:
+            with open(os.path.join(self.cube_path,
+                                   self.file_name)) as config_file:
+
+                parser = etree.XMLParser()
+                tree = etree.parse(config_file, parser)
+
+                facts = [
+                    Facts(
+                        table_name=xml_facts.find('table_name').text,
+                        keys={
+                            key.text: key.attrib['ref']
+                            for key in xml_facts.findall(
+                            'keys/column_name')
+                        },
+                        measures=[
+                            mes.text
+                            for mes in xml_facts.findall('measures/name')
+                        ]) for xml_facts in tree.xpath('/cubes/cube/facts')
+                ]
+
+                dimensions = [
+                    Dimension(
+                        name=xml_dimension.find('name').text,
+                        displayName=xml_dimension.find('displayName').text,
+                        columns=[
+                            column_name.text
+                            for column_name in xml_dimension.findall(
+                                'columns/name')
+                        ])
+                    for xml_dimension in tree.xpath(
+                        '/cubes/cube/dimensions/dimension')
+                ]
+
+            return [
+                Cube(
+                    name=xml_cube.find('name').text,
+                    source=xml_cube.find('source').text,
+                    facts=facts,
+                    dimensions=dimensions)
+                for xml_cube in tree.xpath('/cubes/cube')
+            ]
+        except:
+            raise ('Bad configuration in the configuration file')
+
+    def _construct_cubes_web(self):
+
+        # try:
+        with open(os.path.join(self.cube_path,
+                               self.web_config_file_name)) as config_file:
+
+            parser = etree.XMLParser()
+            tree = etree.parse(config_file, parser)
+
+            facts = [
+                Facts(
+                    table_name=xml_facts.find('table_name').text,
+                    keys={
+                        key.text: key.attrib['ref']
+                        for key in xml_facts.findall(
+                        'keys/column_name')
+                    },
+                    measures=[
+                        mes.text
+                        for mes in xml_facts.findall('measures/name')
+                    ]) for xml_facts in tree.xpath('/cubes/cube/facts')
+            ]
+
+            tables = [
+                Table(
+                    name=xml_column.attrib['name'],
+                    columns = xml_column.find('columns').text.split(','),
+                    new_names={
+                        new_col.attrib['old_column_name'] : new_col.text
+                        for new_col in xml_column.findall('new_name')
+                    }
+                )
+                for xml_column in tree.xpath(
+                    '/cubes/cube/tables/table')
+
+            ]
+
+        return [
+            Cube(
+                name=xml_cube.find('name').text,
+                source=xml_cube.find('source').text,
+                facts=facts,
+                tables = tables
+            )
+            for xml_cube in tree.xpath('/cubes/cube')
+        ]
+        # except:
+        #     raise ('Bad configuration in the configuration file')
+
+
+    def construct_cubes(self,client_type='excel'):
         """
         Construct cube (with it dimensions) and facts from  the config file.
-        
+        :param client_type: excel | web
         :return: list of Cubes instance
         """
-        if self.config_file_exist():
-            try:
-                with open(os.path.join(self.cube_path,
-                                       self.file_name)) as config_file:
 
-                    parser = etree.XMLParser()
-                    tree = etree.parse(config_file, parser)
+        if self.config_file_exist(client_type):
+            if client_type == 'excel':
+                return self._construct_cubes_excel()
+            elif client_type == 'web':
+                return self._construct_cubes_web()
 
-                    facts = [
-                        Facts(
-                            table_name=xml_facts.find('table_name').text,
-                            keys={
-                                key.text: key.attrib['ref']
-                                for key in xml_facts.findall(
-                                    'keys/column_name')
-                            },
-                            measures=[
-                                mes.text
-                                for mes in xml_facts.findall('measures/name')
-                            ]) for xml_facts in tree.xpath('/cubes/cube/facts')
-                    ]
-
-                    dimensions = [
-                        Dimension(
-                            name=xml_dimension.find('name').text,
-                            displayName=xml_dimension.find('displayName').text,
-                            columns=[
-                                column_name.text
-                                for column_name in xml_dimension.findall(
-                                    'columns/name')
-                            ])
-                        for xml_dimension in tree.xpath(
-                            '/cubes/cube/dimensions/dimension')
-                    ]
-
-                return [
-                    Cube(
-                        name=xml_cube.find('name').text,
-                        source=xml_cube.find('source').text,
-                        facts=facts,
-                        dimensions=dimensions)
-                    for xml_cube in tree.xpath('/cubes/cube')
-                ]
-            except:
-                raise ('Bad configuration in the configuration file')
         else:
             raise ("Config file don't exist")
