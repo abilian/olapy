@@ -5,16 +5,18 @@ USERNAME = 'postgres'
 PASSWORD = 'root'
 HOST = 'localhost'
 
+
 class MyDB(object):
     """Connect to sql database (postgres only right now)."""
+
     def __init__(self,
                  username=USERNAME,
                  password=PASSWORD,
                  db=None,
                  host=HOST):
         if db is None:
-            self.connection = pg.connect(
-                "user={0} password={1} host='{2}'".format(username, password,host))
+            self.connection = pg.connect("user={0} password={1} host='{2}'".
+                                         format(username, password, host))
         else:
             try:
                 self.connection = pg.connect(

@@ -215,7 +215,10 @@ class ConfigParser:
     """
 
     # TODO one config file (I will try to merge dimensions between them in web part)
-    def __init__(self, cube_path, file_name='cubes-config.xml', web_config_file_name='web_cube_config.xml'):
+    def __init__(self,
+                 cube_path,
+                 file_name='cubes-config.xml',
+                 web_config_file_name='web_cube_config.xml'):
         """
         
         :param cube_path: path to cube (csv folders)
@@ -225,14 +228,15 @@ class ConfigParser:
         self.file_name = file_name
         self.web_config_file_name = web_config_file_name
 
-    def config_file_exist(self,client_type='excel'):
+    def config_file_exist(self, client_type='excel'):
         """
         Check whether the config file exists or not.
         
         :return: True | False
         """
         if client_type == 'web':
-            return os.path.isfile(os.path.join(self.cube_path, self.web_config_file_name))
+            return os.path.isfile(
+                os.path.join(self.cube_path, self.web_config_file_name))
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
 
     def xmla_authentication(self):
@@ -284,8 +288,7 @@ class ConfigParser:
                         table_name=xml_facts.find('table_name').text,
                         keys={
                             key.text: key.attrib['ref']
-                            for key in xml_facts.findall(
-                            'keys/column_name')
+                            for key in xml_facts.findall('keys/column_name')
                         },
                         measures=[
                             mes.text
@@ -331,27 +334,21 @@ class ConfigParser:
                     table_name=xml_facts.find('table_name').text,
                     keys={
                         key.text: key.attrib['ref']
-                        for key in xml_facts.findall(
-                        'keys/column_name')
+                        for key in xml_facts.findall('keys/column_name')
                     },
                     measures=[
-                        mes.text
-                        for mes in xml_facts.findall('measures/name')
+                        mes.text for mes in xml_facts.findall('measures/name')
                     ]) for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
             tables = [
                 Table(
                     name=xml_column.attrib['name'],
-                    columns = xml_column.find('columns').text.split(','),
+                    columns=xml_column.find('columns').text.split(','),
                     new_names={
-                        new_col.attrib['old_column_name'] : new_col.text
+                        new_col.attrib['old_column_name']: new_col.text
                         for new_col in xml_column.findall('new_name')
-                    }
-                )
-                for xml_column in tree.xpath(
-                    '/cubes/cube/tables/table')
-
+                    }) for xml_column in tree.xpath('/cubes/cube/tables/table')
             ]
 
         return [
@@ -359,15 +356,12 @@ class ConfigParser:
                 name=xml_cube.find('name').text,
                 source=xml_cube.find('source').text,
                 facts=facts,
-                tables = tables
-            )
-            for xml_cube in tree.xpath('/cubes/cube')
+                tables=tables) for xml_cube in tree.xpath('/cubes/cube')
         ]
         # except:
         #     raise ('Bad configuration in the configuration file')
 
-
-    def construct_cubes(self,client_type='excel'):
+    def construct_cubes(self, client_type='excel'):
         """
         Construct cube (with it dimensions) and facts from  the config file.
         :param client_type: excel | web

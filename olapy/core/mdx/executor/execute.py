@@ -311,15 +311,15 @@ class MdxEngine:
             if dimension_name in tables.keys():
                 df = tables[dimension_name]
             else:
-                df = psql.read_sql_query(
-                    "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                    db.connection)
+                df = psql.read_sql_query("SELECT * FROM {0}".format(
+                    dimension_and_key.split('.')[0]), db.connection)
 
             fusion = fusion.merge(
                 df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
-        return fusion[[column for column in all_columns if 'id' != column[-2:]]]
-
+        return fusion[[
+            column for column in all_columns if 'id' != column[-2:]
+        ]]
 
     def _construct_star_schema_csv_files(self, cube_name):
         """
@@ -379,7 +379,8 @@ class MdxEngine:
         fusion = None
 
         config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(client_type
+        if config_file_parser.config_file_exist(
+                client_type
         ) and cube_name in config_file_parser.get_cubes_names():
             for cubes in config_file_parser.construct_cubes(client_type):
                 # TODO cubes.source == 'csv'
