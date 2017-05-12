@@ -13,8 +13,9 @@ import pandas as pd
 
 from .execute_csv_files import _load_tables_csv_files, _construct_star_schema_csv_files
 from .execute_db import _load_tables_db, _construct_star_schema_db
-from .execute_config_file import _load_table_config_file
-from .execute_config_file import _construct_web_star_schema_config_file, _construct_star_schema_config_file
+from .execute_config_file import (_load_table_config_file,
+                                  _construct_web_star_schema_config_file,
+                                  _construct_star_schema_config_file)
 
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
@@ -167,7 +168,8 @@ class MdxEngine:
         fusion = None
 
         config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(client_type
+        if config_file_parser.config_file_exist(
+                client_type
         ) and self.cube in config_file_parser.get_cubes_names():
             for cubes in config_file_parser.construct_cubes(client_type):
                 # TODO cubes.source == 'csv'
