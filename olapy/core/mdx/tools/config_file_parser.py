@@ -116,102 +116,76 @@ class ConfigParser:
                 
     WEB Config file Structure::
     
-            
-            <?xml version="1.0" encoding="UTF-8"?>
+                    
+        <cubes>
+        
+           <cube>
+           
+              <!-- cube name => db name -->
+              <name>mpr</name>
+              
+              <!-- source : postgres | csv -->
+              <source>postgres</source>
+              
+              <!-- star building customized star schema -->
+              <facts>
+              
+                 <!-- facts table name -->
+                 <table_name>projet</table_name>
+                 
+                 <keys>
+                 
+                    <!-- ref = table_name.column  -->
+                    <column_name ref="vocabulary_crm_status.id">status_id</column_name>
+                    <column_name ref="vocabulary_crm_pole_leader.id">pole_leader_id</column_name>
+                    <column_name ref="contact.id">contact_id</column_name>
+                    <column_name ref="compte.id">compte_porteur_id</column_name>
+                    <column_name ref="vocabulary_crm_aap_type.id">aap_name_id</column_name>
+                    
+                 </keys>
+                 
+                 <!-- specify measures explicitly -->
+                 
+                 <measures>
+                    <!-- by default, all number type columns in facts table, or you can specify them here -->
+                    <name>budget_total</name>
+                    <name>subvention_totale</name>
+                    <name>duree_projet</name>
+                 </measures>
+                 
+              </facts>
+              
+              <!-- end building customized star schema -->
 
-                <cubes>
-                
-                    <cube>
-                        <!-- cube name => db name -->
-                        <name>mpr</name>
-                        <!-- source : postgres | csv -->
-                        <source>postgres</source>
-                
-                        <!--
-                        star building customized star schema
-                        -->
-                        <facts>
-                            <!-- facts table name -->
-                            <table_name>projet</table_name>
-                            <keys>
-                                <!-- ref = table_name.column  -->
-                                <column_name ref="vocabulary_crm_status.id">status_id</column_name>
-                                <column_name ref="vocabulary_crm_pole_leader.id">pole_leader_id</column_name>
-                                <column_name ref="contact.id">contact_id</column_name>
-                                <column_name ref="compte.id">compte_porteur_id</column_name>
-                                <column_name ref="vocabulary_crm_aap_type.id">aap_name_id</column_name>
-                            </keys>
-                
-                            <!-- specify measures explicitly -->
-                            <measures>
-                                <!-- by default, all number type columns in facts table, or you can specify them here -->
-                                <name>budget_total</name>
-                                <name>subvention_totale</name>
-                                <name>duree_projet</name>
-                            </measures>
-                
-                        </facts>
-                
-                        <!--
-                        end building customized star schema
-                        -->
-                
-                        <!-- --------------------------------------------------------  -->
-                
-                        <!-- FOR WEB -->
-                
-                        <tables>
-                            <!-- Table name --> 
-                            <table name="vocabulary_crm_status">
-                
-                                <!-- Columns to keep (exclude id)-->
-                                <!-- They must be seperated with comma ',' -->
-                                <columns>label,active</columns>
-                
-                                <!-- Change insignificant table columns names -->
-                                <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
-                                <new_name old_column_name="label">status_label</new_name>
-                
-                            </table>
-                
-                            <!-- ***********************  -->
-                
-                            <!-- Table name --> 
-                            <table name="vocabulary_crm_pole_leader">
-                
-                                <!-- Columns to keep (exclude id)-->
-                                <!-- They must be seperated with comma ',' -->
-                                <columns>label</columns>
-                
-                                <!-- Change insignificant table columns names -->
-                                <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
-                                <new_name old_column_name="label">pole_leader_label</new_name>
-                
-                            </table>
-                
-                
-                            <!-- ***********************  -->
-                
-                            <!-- Table name --> 
-                            <table name="contact">
-                
-                                <!-- Columns to keep (exclude id)-->
-                                <!-- They must be seperated with comma ',' -->
-                                <columns>nom,prenom,fonction</columns>
-                
-                            </table>
-                
-                        </tables>    
-                
-                        <!-- END FOR WEB -->
-                
-                        <!-- --------------------------------------------------------  -->
-                
-                    </cube>
-                
-                </cubes>
+                  <tables>
+                  
+                     <!-- Table name -->
+                     <table name="vocabulary_crm_status">
+                     
+                        <!-- Columns to keep (INCLUDING id)-->
+                        <!-- They must be seperated with comma ',' -->
+                        <columns>id,label</columns>
+                        
+                        <!-- Change insignificant table columns names -->
+                        <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+                        <new_name old_column_name="label">Status</new_name>
+                        
+                     </table>
+                    
+                    
+                     <table name="contact">
+                     
+                        <columns>id,nom,prenom,fonction</columns>
+                        
+                     </table>
+                     
+                     
+                  </tables>
 
-      
+           </cube>
+           
+        </cubes>
+
     """
 
     # TODO one config file (I will try to merge dimensions between them in web part)
