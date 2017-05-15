@@ -131,7 +131,11 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
                 db.connection)
 
+        # TODO check merge (how)
         fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left')
+
+        # fusion = fusion.merge(
+        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]
