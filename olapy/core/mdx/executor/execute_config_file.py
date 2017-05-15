@@ -91,6 +91,9 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         executer_instance.measures = cubes_obj.facts[0].measures
         all_columns += cubes_obj.facts[0].measures
 
+    if cubes_obj.facts[0].columns:
+        all_columns += cubes_obj.facts[0].columns
+
     fusion = psql.read_sql_query(
         "SELECT * FROM {0}".format(executer_instance.facts), db.connection)
 

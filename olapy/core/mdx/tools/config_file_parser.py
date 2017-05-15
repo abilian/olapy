@@ -312,7 +312,10 @@ class ConfigParser:
                     },
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
-                    ]) for xml_facts in tree.xpath('/cubes/cube/facts')
+                    ],
+                    columns=xml_facts.find('columns').text.split(',')
+
+                ) for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
             tables = [
