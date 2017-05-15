@@ -6,6 +6,9 @@ spyne<3
 treelib<2
 psycopg2
 
+# Test
+werkzeug
+
 # Web
 #Flask
 #SQLAlchemy<1.1
