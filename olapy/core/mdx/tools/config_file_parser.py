@@ -4,7 +4,7 @@ import os
 
 from lxml import etree
 
-from .models import Cube, Dimension, Facts, Table
+from .models import Cube, Dimension, Facts, Table, Dashboard
 
 
 class ConfigParser:
@@ -294,6 +294,24 @@ class ConfigParser:
         except:
             raise ('Bad configuration in the configuration file')
 
+
+    def construct_cubes(self, client_type='excel'):
+        """
+        Construct cube (with it dimensions) and facts from  the config file.
+        :param client_type: excel | web
+        :return: list of Cubes instance
+        """
+
+        if self.config_file_exist(client_type):
+            if client_type == 'excel':
+                return self._construct_cubes_excel()
+            elif client_type == 'web':
+                return self._construct_cubes_web()
+
+        else:
+            raise ("Config file don't exist")
+
+
     def _construct_cubes_web(self):
 
         # try:
@@ -338,18 +356,22 @@ class ConfigParser:
         # except:
         #     raise ('Bad configuration in the configuration file')
 
-    def construct_cubes(self, client_type='excel'):
-        """
-        Construct cube (with it dimensions) and facts from  the config file.
-        :param client_type: excel | web
-        :return: list of Cubes instance
-        """
+    def construct_web_dashboard(self):
 
-        if self.config_file_exist(client_type):
-            if client_type == 'excel':
-                return self._construct_cubes_excel()
-            elif client_type == 'web':
-                return self._construct_cubes_web()
+        # try:
+        with open(os.path.join(self.cube_path,
+                               self.web_config_file_name)) as config_file:
 
-        else:
-            raise ("Config file don't exist")
+            parser = etree.XMLParser()
+            tree = etree.parse(config_file, parser)
+
+        return [
+            Dashboard(
+
+                pie_charts=dashboard.find('PieCharts').text.split(','),
+                bar_chats=dashboard.find('BarCharts').text.split(',')
+
+            ) for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
+        ]
+        # except:
+        #     raise ('Bad configuration in the configuration file')
