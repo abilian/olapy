@@ -366,7 +366,7 @@ class ConfigParser:
             Dashboard(
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_chats=dashboard.find('BarCharts').text.split(','),
-                line_chart={
+                line_charts={
                     table.find('name').text:
                     (table.find('columns').text.split(',')
                      if table.find('columns') is not None else 'ALL')
