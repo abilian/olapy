@@ -364,6 +364,11 @@ class ConfigParser:
 
         return [
             Dashboard(
+                global_table={
+                    'columns':
+                        dashboard.find('Global_table/columns').text.split(','),
+                    'rows': dashboard.find('Global_table/rows').text.split(',')
+                },
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_chats=dashboard.find('BarCharts').text.split(','),
                 line_charts={
