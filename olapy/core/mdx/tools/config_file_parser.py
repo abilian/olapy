@@ -294,7 +294,6 @@ class ConfigParser:
         except:
             raise ('Bad configuration in the configuration file')
 
-
     def construct_cubes(self, client_type='excel'):
         """
         Construct cube (with it dimensions) and facts from  the config file.
@@ -310,7 +309,6 @@ class ConfigParser:
 
         else:
             raise ("Config file don't exist")
-
 
     def _construct_cubes_web(self):
 
@@ -331,9 +329,8 @@ class ConfigParser:
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
                     ],
-                    columns=xml_facts.find('columns').text.split(',')
-
-                ) for xml_facts in tree.xpath('/cubes/cube/facts')
+                    columns=xml_facts.find('columns').text.split(','))
+                for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
             tables = [
@@ -370,12 +367,12 @@ class ConfigParser:
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_chats=dashboard.find('BarCharts').text.split(','),
                 line_chart={
-                    table.find('name').text: (
-                    table.find('columns').text.split(',') if table.find('columns') is not None else 'ALL') for table in
-                    dashboard.findall('LineCharts/table')
-                }
-
-            ) for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
+                    table.find('name').text:
+                    (table.find('columns').text.split(',')
+                     if table.find('columns') is not None else 'ALL')
+                    for table in dashboard.findall('LineCharts/table')
+                })
+            for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
         ]
         # except:
         #     raise ('Bad configuration in the configuration file')
