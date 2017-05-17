@@ -367,9 +367,13 @@ class ConfigParser:
 
         return [
             Dashboard(
-
                 pie_charts=dashboard.find('PieCharts').text.split(','),
-                bar_chats=dashboard.find('BarCharts').text.split(',')
+                bar_chats=dashboard.find('BarCharts').text.split(','),
+                line_chart={
+                    table.find('name').text: (
+                    table.find('columns').text.split(',') if table.find('columns') is not None else 'ALL') for table in
+                    dashboard.findall('LineCharts/table')
+                }
 
             ) for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
         ]
