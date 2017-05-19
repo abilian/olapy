@@ -220,14 +220,15 @@ class ConfigParser:
         :return: True | False
         """
         if self.config_file_exist():
-            with open(os.path.join(self.cube_path, self.file_name)) as config_file:
+            with open(os.path.join(self.cube_path,
+                                   self.file_name)) as config_file:
 
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
 
                 try:
                     return tree.xpath('/cubes/xmla_authentication')[
-                               0].text == 'True'
+                        0].text == 'True'
                 except:
                     return False
         else:
@@ -372,15 +373,16 @@ class ConfigParser:
             Dashboard(
                 global_table={
                     'columns':
-                        dashboard.find('Global_table/columns').text.split(','),
-                    'rows': dashboard.find('Global_table/rows').text.split(',')
+                    dashboard.find('Global_table/columns').text.split(','),
+                    'rows':
+                    dashboard.find('Global_table/rows').text.split(',')
                 },
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_charts=dashboard.find('BarCharts').text.split(','),
                 line_charts={
                     table.find('name').text:
-                        (table.find('columns').text.split(',')
-                         if table.find('columns') is not None else 'ALL')
+                    (table.find('columns').text.split(',')
+                     if table.find('columns') is not None else 'ALL')
                     for table in dashboard.findall('LineCharts/table')
                 })
             for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')

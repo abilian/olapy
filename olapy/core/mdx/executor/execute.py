@@ -136,7 +136,8 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
         if config_file_parser.config_file_exist(
-        ) and self.cube in config_file_parser.get_cubes_names() and self.client != 'web':
+        ) and self.cube in config_file_parser.get_cubes_names(
+        ) and self.client != 'web':
             for cubes in config_file_parser.construct_cubes():
 
                 # TODO working with cubes.source == 'csv'
@@ -172,7 +173,8 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 self.client
-        ) and self.cube in config_file_parser.get_cubes_names(client_type='web'):
+        ) and self.cube in config_file_parser.get_cubes_names(
+                client_type='web'):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
@@ -262,9 +264,9 @@ class MdxEngine:
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.')
         ]
-            for tup in re.compile(regex).findall(
-                query.encode("utf-8")[start:stop])
-            if len(tup[0].split('.')) > 1]
+                for tup in re.compile(regex).findall(
+                    query.encode("utf-8")[start:stop])
+                if len(tup[0].split('.')) > 1]
 
     # TODO temporary function
     def decorticate_query(self, query):
@@ -364,7 +366,7 @@ class MdxEngine:
                 else:
                     tables_columns.update({
                         tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
                     })
 
             axes.update({axis: tables_columns})
