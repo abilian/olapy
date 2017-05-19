@@ -42,17 +42,18 @@ class MdxEngine:
 
     def __init__(self,
                  cube_name,
+                 client_type='excel',
                  cubes_path=None,
                  mdx_query=None,
                  cube_folder=CUBE_FOLDER,
                  sep=';',
                  fact_table_name="Facts"):
+
         self.cube_folder = cube_folder
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self.mdx_query = mdx_query
-
         if cubes_path is None:
             self.cube_path = self._get_default_cube_directory()
         else:
@@ -60,10 +61,11 @@ class MdxEngine:
 
         # to get cubes in db
         self._ = self.get_cubes_names()
+        self.client = client_type
         self.tables_loaded = self.load_tables()
         # all measures
-        self.measures = self.get_measures()
         self.load_star_schema_dataframe = self.get_star_schema_dataframe()
+        self.measures = self.get_measures()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
@@ -128,13 +130,13 @@ class MdxEngine:
     def load_tables(self):
         """
         Load all tables { Table name : DataFrame } of the current cube instance.
-        
+
         :return: dict with key as table name and DataFrame as value
         """
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
         if config_file_parser.config_file_exist(
-        ) and self.cube in config_file_parser.get_cubes_names():
+        ) and self.cube in config_file_parser.get_cubes_names() and self.client != 'web':
             for cubes in config_file_parser.construct_cubes():
 
                 # TODO working with cubes.source == 'csv'
@@ -158,7 +160,7 @@ class MdxEngine:
                 include=[np.number]).columns if col.lower()[-2:] != 'id'
         ]
 
-    def get_star_schema_dataframe(self, client_type='excel'):
+    def get_star_schema_dataframe(self):
         """
         Merge all DataFrames as star schema.
 
@@ -169,13 +171,13 @@ class MdxEngine:
 
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
-                client_type
-        ) and self.cube in config_file_parser.get_cubes_names():
-            for cubes in config_file_parser.construct_cubes(client_type):
+                self.client
+        ) and self.cube in config_file_parser.get_cubes_names(client_type='web'):
+            for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     # TODO one config file (I will try to merge dimensions between them in web part)
-                    if client_type == 'web':
+                    if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(
                             self, cubes)
                     else:
@@ -232,7 +234,7 @@ class MdxEngine:
                     FROM {sales}
 
             it returns :
-            
+
                 [
                 ['Geography','Geography','Continent'],
                 ['Geography','Geography','Continent','Europe'],
@@ -260,9 +262,9 @@ class MdxEngine:
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.')
         ]
-                for tup in re.compile(regex).findall(
-                    query.encode("utf-8")[start:stop])
-                if len(tup[0].split('.')) > 1]
+            for tup in re.compile(regex).findall(
+                query.encode("utf-8")[start:stop])
+            if len(tup[0].split('.')) > 1]
 
     # TODO temporary function
     def decorticate_query(self, query):
@@ -313,13 +315,13 @@ class MdxEngine:
     def change_measures(tuples_on_mdx):
         """
         Set measures to which exists in the query.
-        
+
         :param tuples_on_mdx: list of tuples:
-            
-            
+
+
             example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-            
-            
+
+
         :return: measures column's names
         """
         return [
@@ -362,7 +364,7 @@ class MdxEngine:
                 else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
                     })
 
             axes.update({axis: tables_columns})
@@ -374,12 +376,12 @@ class MdxEngine:
         Filter a DataFrame (Dataframe_in) with one tuple.   
 
             Example ::
-            
-    
+
+
                 tuple = ['Geography','Geography','Continent','Europe','France','olapy']
-        
+
                 Dataframe_in in :
-        
+
                 +-------------+----------+---------+---------+---------+
                 | Continent   | Country  | Company | Article | Amount  |
                 +=============+==========+=========+=========+=========+
@@ -389,9 +391,9 @@ class MdxEngine:
                 +-------------+----------+---------+---------+---------+
                 |  .....      |  .....   | ......  | .....   | .....   |
                 +-------------+----------+---------+---------+---------+
-        
+
                 out :
-        
+
                 +-------------+----------+---------+---------+---------+
                 | Continent   | Country  | Company | Article | Amount  |
                 +=============+==========+=========+=========+=========+
@@ -513,47 +515,47 @@ class MdxEngine:
         If we have multiple dimensions, with many columns like:
 
             columns_to_keep :
-    
+
                 Geo  -> Continent,Country
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                  
+
 
         we have to use only dimension's columns of current dimension that exist in tuple_as_list and keep other dimensions columns
-        
+
         so if tuple_as_list = ['Geography','Geography','Continent']
 
         columns_to_keep will be:
 
             columns_to_keep :
-    
+
                 Geo  -> Continent
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                
+
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
         :param tuple_as_list:  example : ['Geography','Geography','Continent']
         :param columns_to_keep:  
-            
+
             example :
-                 
+
                 {
-                
+
                 'Geography':
-                 
+
                     ['Continent','Country'],
-                    
+
                 'Time': 
-                
+
                     ['Year','Month','Day']
                 }
-                
+
         :return: updated columns_to_keep
         """
         if len(
