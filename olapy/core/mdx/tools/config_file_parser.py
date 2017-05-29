@@ -190,7 +190,7 @@ class ConfigParser:
 
     # TODO one config file (I will try to merge dimensions between them in web part)
     def __init__(self,
-                 cube_path,
+                 cube_path = None,
                  file_name='cubes-config.xml',
                  web_config_file_name='web_cube_config.xml'):
         """
@@ -198,7 +198,17 @@ class ConfigParser:
         :param cube_path: path to cube (csv folders)
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         """
-        self.cube_path = cube_path
+        if cube_path == None:
+            # for later tests with config file
+            from tests.test_xmla_notox import RUNNING_TOX
+            if RUNNING_TOX:
+                home_directory = os.environ.get('HOME_DIR')
+            else:
+                from os.path import expanduser
+                home_directory = expanduser("~")
+            self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
+        else:
+            self.cube_path = cube_path
         self.file_name = file_name
         self.web_config_file_name = web_config_file_name
 
