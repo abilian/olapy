@@ -199,13 +199,8 @@ class ConfigParser:
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         """
         if cube_path is None:
-            # for later tests with config file
-            from tests.test_xmla_notox import RUNNING_TOX
-            if RUNNING_TOX:
-                home_directory = os.environ.get('HOME_DIR')
-            else:
-                from os.path import expanduser
-                home_directory = expanduser("~")
+            from os.path import expanduser
+            home_directory = expanduser("~")
             self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
         else:
             self.cube_path = cube_path
