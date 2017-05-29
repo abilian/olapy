@@ -86,11 +86,6 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     db = MyDB(db=executer_instance.cube)
     # load facts table
 
-    # measures in config-file only
-    if cubes_obj.facts[0].measures:
-        executer_instance.measures = cubes_obj.facts[0].measures
-        all_columns += cubes_obj.facts[0].measures
-
     if cubes_obj.facts[0].columns:
         all_columns += cubes_obj.facts[0].columns
 
@@ -121,6 +116,11 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
 
         all_columns += list(tab.columns)
         tables.update({table.name: tab})
+
+    # measures in config-file only
+    if cubes_obj.facts[0].measures:
+        executer_instance.measures = cubes_obj.facts[0].measures
+        all_columns += cubes_obj.facts[0].measures
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
         dimension_name = dimension_and_key.split('.')[0]
