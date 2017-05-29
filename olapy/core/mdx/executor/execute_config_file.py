@@ -133,9 +133,9 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
 
         # TODO check merge (how)
         fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left')
-
-        # fusion = fusion.merge(
-        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
+              # remove suffixe from dimension and keep the same column name for facts
+              suffixes=('', '_y'))
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]
+
