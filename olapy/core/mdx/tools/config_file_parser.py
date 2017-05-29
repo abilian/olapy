@@ -198,7 +198,7 @@ class ConfigParser:
         :param cube_path: path to cube (csv folders)
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         """
-        if cube_path == None:
+        if cube_path is None:
             # for later tests with config file
             from tests.test_xmla_notox import RUNNING_TOX
             if RUNNING_TOX:
