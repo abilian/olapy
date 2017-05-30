@@ -1,6 +1,7 @@
 include *.rst *.txt *.ini *.py *.cfg *.yml
 recursive-include olapy *
 recursive-include cubes_templates *
+recursive-include olapy/config *
 prune tmp
 prune instance
 prune .git

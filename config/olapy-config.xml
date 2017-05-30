@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<olapy>
+
+    <database>
+        
+        <!--<sgbd>postgres</sgbd>-->
+        <user_name>postgres</user_name>
+        <passowrd>root</passowrd>
+        <host>localhost</host>
+
+    </database>
+
+
+</olapy>
