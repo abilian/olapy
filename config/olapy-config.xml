@@ -6,7 +6,7 @@
         
         <!--<sgbd>postgres</sgbd>-->
         <user_name>postgres</user_name>
-        <passowrd>root</passowrd>
+        <password>root</password>
         <host>localhost</host>
 
     </database>

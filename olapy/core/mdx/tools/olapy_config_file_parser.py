@@ -45,9 +45,10 @@ class DbConfigParser:
 
             try:
                 return [
-                    {'sgbd': db.find('sgbd').text,
+                    {
+                        # 'sgbd': db.find('sgbd').text,
                      'user_name': db.find('user_name').text,
-                     'passowrd': db.find('passowrd').text,
+                     'password': db.find('password').text,
                      'host': db.find('host').text,
                      }
                     for db in tree.xpath('/olapy/database')
