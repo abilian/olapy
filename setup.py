@@ -52,4 +52,4 @@ if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
         zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
         zip_ref.close()
     except:
-        raise ('unable to create cubes directory !')
+        raise Exception('unable to create cubes directory !')
