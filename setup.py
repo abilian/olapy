@@ -12,45 +12,6 @@ from setuptools import find_packages, setup
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
-# from setuptools.command.install import install
-
-
-# class PostDevelopCommand(develop):
-#     """Post-installation for development mode."""
-#     def run(self):
-#         # PUT YOUR PRE-INSTALL SCRIPT HERE or CALL A FUNCTION
-#         print('111111111111111111111111')
-#         develop.run(self)
-#
-#         basedir = expanduser('~')
-#         if not os.path.isfile(os.path.join(basedir, 'olapy-data', 'olapy.db')):
-#             # try:
-#             from manage import initdb
-#             initdb()
-#         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-# class PostInstallCommand(install):
-#     """Post-installation for installation mode."""
-#     def run(self):
-#         # PUT YOUR PRE-INSTALL SCRIPT HERE or CALL A FUNCTION
-#
-#         install.run(self)
-#         # initiate cubes examples
-#         if RUNNING_TOX:
-#             home_directory = os.environ.get('HOME_DIR')
-#         else:
-#             home_directory = expanduser("~")
-#
-#         if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
-#             try:
-#                 os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
-#                 zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
-#                 zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
-#                 zip_ref.close()
-#             except:
-#                 raise Exception('unable to create cubes directory !')
-
-
 session = PipSession()
 _install_requires = parse_requirements('requirements.txt', session=session)
 install_requires = [str(ir.req) for ir in _install_requires]
@@ -80,8 +41,6 @@ setup(
         # "Topic :: Business intelligence",
     ],)
 
-# # generate and set secret key
-# os.environ["SECRET_KEY"]
 
 if RUNNING_TOX:
     home_directory = os.environ.get('HOME_DIR')
