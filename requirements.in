@@ -4,7 +4,8 @@ pandas<1
 lxml==3.6.0  #lxml 3.7 causes problems in windows
 spyne<3
 treelib<2
-psycopg2
+SQLAlchemy
+#psycopg2
 
 # Test
 werkzeug
