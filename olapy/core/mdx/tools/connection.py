@@ -1,4 +1,4 @@
-import psycopg2 as pg
+# import psycopg2 as pg
 from sqlalchemy import create_engine
 
 # postgres connection
@@ -29,8 +29,8 @@ class MyDB(object):
 
         if db is None:
             # first i want to show all databases to user (in excel)
-            self.engine = pg.connect("user={0} password={1} host='{2}'".
-                                         format(username, password, host))
+            # self.engine = pg.connect("user={0} password={1} host='{2}'".
+            #                              format(username, password, host))
             self.engine = create_engine('postgresql+psycopg2://{0}:{1}@{3}:{4}/{2}'.format(
                 username, password, 'postgres', host, port))
 
