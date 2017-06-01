@@ -90,13 +90,13 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         all_columns += cubes_obj.facts[0].columns
 
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.connection)
+        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
 
     tables = {}
     for table in cubes_obj.tables:
 
         tab = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                  db.connection)
+                                  db.engine)
 
         try:
             if table.columns:

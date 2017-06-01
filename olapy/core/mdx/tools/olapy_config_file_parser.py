@@ -43,15 +43,13 @@ class DbConfigParser:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
-            try:
-                return [
-                    {
-                        # 'sgbd': db.find('sgbd').text,
-                     'user_name': db.find('user_name').text,
-                     'password': db.find('password').text,
-                     'host': db.find('host').text,
-                     }
-                    for db in tree.xpath('/olapy/database')
-                ]
-            except:
-                raise ('missed name or source tags')
+            return [
+                {
+                    # 'sgbd': db.find('sgbd').text,
+                 'user_name': db.find('user_name').text,
+                 'password': db.find('password').text,
+                 'host': db.find('host').text,
+                 'port': db.find('port').text,
+                 }
+                for db in tree.xpath('/olapy/database')
+            ]

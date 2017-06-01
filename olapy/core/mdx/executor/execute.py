@@ -95,12 +95,15 @@ class MdxEngine:
         # get postgres databases
         try:
             db = MyDB()
-            cursor = db.connection.cursor()
-            cursor.execute("""SELECT datname FROM pg_database
-            WHERE datistemplate = false;""")
+            connection = db.engine
+            # TODO this work only with postgres
+            result = connection.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
+            available_tables = result.fetchall()
+            # cursor.execute("""SELECT datname FROM pg_database
+            # WHERE datistemplate = false;""")
 
             MdxEngine.postgres_db_cubes = [
-                database[0] for database in cursor.fetchall()
+                database[0] for database in available_tables
             ]
 
         except Exception:

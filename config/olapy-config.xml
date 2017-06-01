@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- this config file will be deleted ASAP -->
 <olapy>
 
     <database>
@@ -8,6 +8,7 @@
         <user_name>postgres</user_name>
         <password>root</password>
         <host>localhost</host>
+        <port>5432</port>
 
     </database>
 
