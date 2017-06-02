@@ -198,12 +198,18 @@ class ConfigParser:
         :param cube_path: path to cube (csv folders)
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         """
-        if cube_path is None:
+        # home_directory = home_directory
+        if 'OLAPY_PATH' in os.environ:
+            home_directory = os.environ['OLAPY_PATH']
+        else:
             from os.path import expanduser
             home_directory = expanduser("~")
+
+        if cube_path is None:
             self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
         else:
             self.cube_path = cube_path
+
         self.file_name = file_name
         self.web_config_file_name = web_config_file_name
 

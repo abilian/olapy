@@ -29,7 +29,7 @@ setup(
     install_requires=install_requires,
     include_package_data=False,
     # cmdclass={
-    #     # 'develop': PostDevelopCommand,
+    #     'develop': PostDevelopCommand,
     #     'install': PostInstallCommand,
     # },
     classifiers=[
@@ -42,7 +42,13 @@ setup(
     ],)
 
 
-if RUNNING_TOX:
+# if RUNNING_TOX:
+#     home_directory = os.environ.get('HOME_DIR')
+# else:
+#     home_directory = expanduser("~")
+if 'OLAPY_PATH' in os.environ:
+    home_directory = os.environ['OLAPY_PATH']
+elif RUNNING_TOX:
     home_directory = os.environ.get('HOME_DIR')
 else:
     home_directory = expanduser("~")
@@ -55,5 +61,3 @@ if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
 
 if not os.path.isfile(os.path.join(home_directory, 'olapy-data','olapy-config.xml')):
     copyfile('config/olapy-config.xml', os.path.join(home_directory, 'olapy-data','olapy-config.xml'))
-
-
