@@ -84,7 +84,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     all_columns = []
 
     executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db=executer_instance.cube,db_config_file_path=os.path.join(executer_instance.cube_path,".."))
+    db = MyDB(db=executer_instance.cube,db_config_file_path=os.path.dirname(executer_instance.cube_path))
     # load facts table
 
     if cubes_obj.facts[0].columns:
