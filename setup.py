@@ -41,11 +41,6 @@ setup(
         # "Topic :: Business intelligence",
     ],)
 
-
-# if RUNNING_TOX:
-#     home_directory = os.environ.get('HOME_DIR')
-# else:
-#     home_directory = expanduser("~")
 if 'OLAPY_PATH' in os.environ:
     home_directory = os.environ['OLAPY_PATH']
 elif RUNNING_TOX:
