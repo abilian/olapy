@@ -17,10 +17,10 @@ class MyDB(object):
     #         raise Exception('Missing database config file')
 
 
-    def __init__(self,db=None):
+    def __init__(self,db_config_file_path=None,db=None):
 
         # TODO temporary
-        db_config = DbConfigParser()
+        db_config = DbConfigParser(config_path=db_config_file_path)
         db_credentials = db_config.get_db_credentials()[0]
         username = db_credentials['user_name']
         password = db_credentials['password']

@@ -33,6 +33,9 @@ class MdxEngine:
     :param sep: separator in the csv files
     """
 
+    # DATA_FOLDER useful for olapy web (falsk instance_path)
+    # get olapy-data path with instance_path instead of 'expanduser'
+    DATA_FOLDER = None
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
@@ -75,7 +78,12 @@ class MdxEngine:
         """:return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)."""
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
-        if RUNNING_TOX:
+
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
+        if cls.DATA_FOLDER is not None:
+            home_directory = cls.DATA_FOLDER
+        elif RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
             home_directory = expanduser("~")
@@ -94,7 +102,7 @@ class MdxEngine:
 
         # get postgres databases
         try:
-            db = MyDB()
+            db = MyDB(db_config_file_path=cls.DATA_FOLDER)
             connection = db.engine
             # TODO this work only with postgres
             result = connection.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
@@ -174,7 +182,6 @@ class MdxEngine:
         :return: star schema DataFrame
         """
         fusion = None
-
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 self.client

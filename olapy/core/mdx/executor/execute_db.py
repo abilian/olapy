@@ -13,7 +13,7 @@ def _load_tables_db(executer_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    db = MyDB(db=executer_instance.cube)
+    db = MyDB(db_config_file_path=executer_instance.DATA_FOLDER,db=executer_instance.cube)
     inspector = inspect(db.engine)
 
     for table_name in inspector.get_table_names():
