@@ -225,6 +225,8 @@ class MdxEngine:
 
         :return: path to the cube
         """
+        if MdxEngine.DATA_FOLDER is not None:
+            return os.path.join(MdxEngine.DATA_FOLDER,'olapy-data', MdxEngine.CUBE_FOLDER, self.cube)
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
