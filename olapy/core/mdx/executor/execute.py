@@ -125,6 +125,8 @@ class MdxEngine:
         # toxworkdir does not expanduser properly under tox
         if 'OLAPY_PATH' in os.environ:
             home_directory = os.environ.get('OLAPY_PATH')
+        elif MdxEngine.DATA_FOLDER is not None:
+            home_directory = MdxEngine.DATA_FOLDER
         elif RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
@@ -148,6 +150,7 @@ class MdxEngine:
         """
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
+
         if config_file_parser.config_file_exist(
         ) and self.cube in config_file_parser.get_cubes_names(
         ) and self.client != 'web':
