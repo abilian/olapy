@@ -7,6 +7,64 @@ from ..tools.connection import MyDB
 import pandas.io.sql as psql
 
 
+class StringFolder(object):
+    """
+    Class that will fold strings. See 'fold_string'.
+    This object may be safely deleted or go out of scope when
+    strings have been folded.
+    """
+    def __init__(self):
+        self.unicode_map = {}
+
+    def fold_string(self, s):
+        """
+        Given a string (or unicode) parameter s, return a string object
+        that has the same value as s (and may be s). For all objects
+        with a given value, the same object will be returned. For unicode
+        objects that can be coerced to a string with the same value, a
+        string object will be returned.
+        If s is not a string or unicode object, it is returned unchanged.
+        :param s: a string or unicode object.
+        :return: a string or unicode object.
+        """
+        # If s is not a string or unicode object, return it unchanged
+        if not isinstance(s, basestring):
+            return s
+
+        # If s is already a string, then str() has no effect.
+        # If s is Unicode, try and encode as a string and use intern.
+        # If s is Unicode and can't be encoded as a string, this try
+        # will raise a UnicodeEncodeError.
+        try:
+            return intern(str(s))
+        except UnicodeEncodeError:
+            # Fall through and handle s as Unicode
+            pass
+
+        # Look up the unicode value in the map and return
+        # the object from the map. If there is no matching entry,
+        # store this unicode object in the map and return it.
+        t = self.unicode_map.get(s, None)
+        if t is None:
+            # Put s in the map
+            t = self.unicode_map[s] = s
+        return t
+
+def string_folding_wrapper(results):
+    """
+    This generator yields rows from the results as tuples,
+    with all string values folded.
+    """
+    # Get the list of keys so that we build tuples with all
+    # the values in key order.
+    keys = results.keys()
+    folder = StringFolder()
+    for row in results:
+        yield tuple(
+            folder.fold_string(row[key])
+            for key in keys
+        )
+
 def _load_tables_db(executer_instance):
     """
     Load tables from database.
@@ -28,11 +86,8 @@ def _load_tables_db(executer_instance):
                    .execution_options(stream_results=True)
                    .execute('SELECT * FROM "{0}"'.format(table_name)))
         # Fetch all the results of the query
-        # fetchall = results.fetchall()
-        # # fetchall = results.fetchone()
-        # value = pd.DataFrame(fetchall,columns=results.keys())
-        value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
-
+        # value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
+        value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
