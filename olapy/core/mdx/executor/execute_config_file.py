@@ -20,7 +20,7 @@ def _load_table_config_file(executer_instance, cube_obj):
 
     for table in cube_obj.dimensions:
         value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                    db.connection)
+                                    db.engine)
 
         tables[table.name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
@@ -48,7 +48,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     db = MyDB(db=executer_instance.cube)
     # load facts table
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.connection)
+        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
         df = psql.read_sql_query(
@@ -130,7 +130,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         else:
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.connection)
+                db.engine)
 
         # TODO check merge (how)
         fusion = fusion.merge(
