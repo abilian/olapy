@@ -28,9 +28,10 @@ def _load_tables_db(executer_instance):
                    .execution_options(stream_results=True)
                    .execute('SELECT * FROM "{0}"'.format(table_name)))
         # Fetch all the results of the query
-        fetchall = results.fetchall()
-        # fetchall = results.fetchone()
-        value = pd.DataFrame(fetchall,columns=results.keys())
+        # fetchall = results.fetchall()
+        # # fetchall = results.fetchone()
+        # value = pd.DataFrame(fetchall,columns=results.keys())
+        value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
 
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
