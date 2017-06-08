@@ -82,7 +82,7 @@ class MdxEngine:
         # surrended with try, except and PASS so we continue getting cubes from different
         # sources (db, csv...) without interruption
         if cls.DATA_FOLDER is not None:
-            home_directory = cls.DATA_FOLDER
+            home_directory = os.path.dirname(cls.DATA_FOLDER)
         elif RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
@@ -90,22 +90,24 @@ class MdxEngine:
 
         location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
 
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
         try:
             MdxEngine.csv_files_cubes = [
                 file for file in os.listdir(location)
                 if os.path.isdir(os.path.join(location, file))
             ]
-
         except Exception:
             print('no csv folders')
             pass
 
         # get postgres databases
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=cls.DATA_FOLDER)
-            connection = db.engine
             # TODO this work only with postgres
-            result = connection.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
+            result = db.engine.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
             available_tables = result.fetchall()
             # cursor.execute("""SELECT datname FROM pg_database
             # WHERE datistemplate = false;""")
