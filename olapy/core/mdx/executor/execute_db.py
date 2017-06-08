@@ -44,11 +44,8 @@ class StringFolder(object):
         # Look up the unicode value in the map and return
         # the object from the map. If there is no matching entry,
         # store this unicode object in the map and return it.
-        t = self.unicode_map.get(s, None)
-        if t is None:
-            # Put s in the map
-            t = self.unicode_map[s] = s
-        return t
+        return self.unicode_map.setdefault(s, s)
+
 
 def string_folding_wrapper(results):
     """
@@ -82,9 +79,7 @@ def _load_tables_db(executer_instance):
         #     'SELECT * FROM "{0}"'.format(table_name), db.engine)
 
         # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
-        results = (db.engine
-                   .execution_options(stream_results=True)
-                   .execute('SELECT * FROM "{0}"'.format(table_name)))
+        results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM "{0}"'.format(table_name))
         # Fetch all the results of the query
         # value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
         value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
