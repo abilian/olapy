@@ -1,0 +1,80 @@
+Memory summary:1 - before executing query //// _load_tables_db
+
+VM: 3160.52Mb
+
+Memory summary:2 - after query, before fetchall  /////// _load_tables_db
+
+VM: 3268.52Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 3268.52Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 3269.02Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 3269.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 3270.77Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 3270.77Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 3271.02Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 3271.02Mb
+
