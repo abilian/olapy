@@ -6,6 +6,11 @@ treelib<2
 SQLAlchemy
 psycopg2
 
+
+# tools
+pympler
+psutil
+
 # Test
 werkzeug
 
