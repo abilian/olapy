@@ -21,9 +21,9 @@ def _load_table_config_file(executer_instance, cube_obj):
 
     memory_usage("1 - before executing query //// _load_table_config_file")
     for table in cube_obj.dimensions:
-        with db.engine as connection:
-            value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                        connection)
+
+        value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
+                                    db.engine)
 
         tables[table.name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
@@ -53,17 +53,16 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     # load facts table
 
     memory_usage("1 - before executing query //// _construct_star_schema_config_file")
-    with db.engine as connection:
-        fusion = psql.read_sql_query(
-            "SELECT * FROM {0}".format(executer_instance.facts), connection)
+    fusion = psql.read_sql_query(
+        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
 
-        for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-            df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                connection)
+    for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
+        df = psql.read_sql_query(
+            "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+            db.engine)
 
-            fusion = fusion.merge(
-                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+        fusion = fusion.merge(
+            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
 
     memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
