@@ -34,7 +34,8 @@ def _load_table_config_file(executer_instance, cube_obj):
     for dimension in cube_obj.dimensions:
         if dimension.displayName and dimension.name and dimension.displayName != dimension.name:
             tables[dimension.displayName] = tables[dimension.name][
-                dimension.columns]
+                dimension.columns.keys()]
+
             executer_instance.dimension_display_name.append(dimension.name)
 
     return tables
