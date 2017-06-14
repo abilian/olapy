@@ -83,9 +83,9 @@ def _load_tables_db(executer_instance):
         # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
         results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM "{0}"'.format(table_name))
         # Fetch all the results of the query
-        # value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
+        value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
-        value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
+        # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
