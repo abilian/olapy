@@ -172,6 +172,20 @@ class MdxEngine:
     def get_measures(self):
         """:return: all numerical columns in facts table."""
         # col.lower()[-2:] != 'id' to ignore any id column
+
+        # if web get measures from config file
+        config_file_parser = ConfigParser(self.cube_path)
+        if self.client == 'web' and config_file_parser.config_file_exist('web'):
+            for cubes in config_file_parser.construct_cubes(self.client):
+
+                # TODO temp
+                # update facts name
+                self.facts = cubes.facts[0].table_name
+
+
+                if cubes.facts[0].measures:
+                    return cubes.facts[0].measures
+
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
