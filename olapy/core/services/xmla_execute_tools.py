@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function
 import itertools
 from collections import OrderedDict
 
+import numpy as np
+
 
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
@@ -330,7 +332,7 @@ class XmlaExecuteTools():
         cell_data = ""
         index = 0
         for value in columns_loop:
-            if value == -1:
+            if np.isnan(value) :
                 value = ''
             cell_data += """
             <Cell CellOrdinal="{0}">
