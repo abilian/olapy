@@ -41,7 +41,6 @@ class MdxEngine:
     csv_files_cubes = []
     postgres_db_cubes = []
     # to show just config file's dimensions
-    dimension_display_name = []
 
     def __init__(self,
                  cube_name,

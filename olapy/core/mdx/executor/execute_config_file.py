@@ -22,14 +22,13 @@ def _load_table_config_file(executer_instance, cube_obj):
     memory_usage("1 - before executing query //// _load_table_config_file")
     for dimension in cube_obj.dimensions:
 
+        df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
+                                 db.engine)
         # only certain columns
         if dimension.columns.keys():
-            df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
-                                        db.engine)[dimension.columns.keys()]
-        else:
-            df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
-                                        db.engine)
+            df = df[dimension.columns.keys()]
 
+        # change table display name
         if dimension.displayName:
             table_name = dimension.displayName
         else:
@@ -41,8 +40,6 @@ def _load_table_config_file(executer_instance, cube_obj):
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
         ]]
-
-        executer_instance.dimension_display_name.append(table_name)
 
     memory_usage("2 - after query, before fetchall  /////// _load_table_config_file")
 
@@ -79,6 +76,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
         fusion = fusion.merge(
             df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
+        # TODO CHOSE BETWEEN THOSES DF
         # fusion = fusion.merge(
         #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
         #     # remove suffixe from dimension and keep the same column name for facts
