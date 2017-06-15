@@ -20,28 +20,88 @@ def _load_table_config_file(executer_instance, cube_obj):
     db = MyDB(db=executer_instance.cube)
 
     memory_usage("1 - before executing query //// _load_table_config_file")
-    for table in cube_obj.dimensions:
+    for dimension in cube_obj.dimensions:
 
-        value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                    db.engine)
+        # only certain columns
+        if dimension.columns.keys():
+            df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
+                                        db.engine)[dimension.columns.keys()]
+        else:
+            df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
+                                        db.engine)
 
-        tables[table.name] = value[[
-            col for col in value.columns if col.lower()[-3:] != '_id'
+        if dimension.displayName:
+            table_name = dimension.displayName
+        else:
+            table_name = dimension.name
+
+        # rename columns if value not None
+        df.rename(columns=(dict((k, v) for k, v in dimension.columns.items() if v)), inplace=True)
+        
+        tables[table_name] = df[[
+            col for col in df.columns if col.lower()[-2:] != 'id'
         ]]
 
-    memory_usage("2 - after query, before fetchall  /////// _load_table_config_file")
-    # update table display name
-    for dimension in cube_obj.dimensions:
-        if dimension.displayName and dimension.name and dimension.displayName != dimension.name:
-            tables[dimension.displayName] = tables[dimension.name][
-                dimension.columns.keys()]
+        executer_instance.dimension_display_name.append(table_name)
 
-            executer_instance.dimension_display_name.append(dimension.name)
+    memory_usage("2 - after query, before fetchall  /////// _load_table_config_file")
 
     return tables
 
 
 def _construct_star_schema_config_file(executer_instance, cubes_obj):
+    """
+    Construct star schema DataFrame from configuration file.
+
+    :param cube_name:  cube name (or database name)
+    :param cubes_obj: cubes object
+    :return: star schema DataFrame
+    """
+    executer_instance.facts = cubes_obj.facts[0].table_name
+    db = MyDB(db=executer_instance.cube)
+    # load facts table
+
+    memory_usage("1 - before executing query //// _construct_star_schema_config_file")
+    fusion = psql.read_sql_query(
+        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
+
+    for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
+        df = psql.read_sql_query(
+            "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+            db.engine)
+
+        for dimension in cubes_obj.dimensions:
+            if dimension_and_key.split('.')[0] == dimension.name:
+                df.rename(columns=dimension.columns,inplace=True)
+
+
+        # todo test with this
+        fusion = fusion.merge(
+            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+
+        # fusion = fusion.merge(
+        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
+        #     # remove suffixe from dimension and keep the same column name for facts
+        #     suffixes=('', '_y'))
+
+
+    memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
+        # TODO CHOSE BETWEEN THOSES DF
+        # if separated dimensions
+        # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
+
+    # TODO CHOSE BETWEEN THOSES DF
+    # if facts contains all dimensions
+    # fusion = facts
+
+    # measures in config-file only
+    if cubes_obj.facts[0].measures:
+        executer_instance.measures = cubes_obj.facts[0].measures
+
+    return fusion
+
+
+def _construct_star_schema_config_file_OLD(executer_instance, cubes_obj):
     """
     Construct star schema DataFrame from configuration file.
 

@@ -67,8 +67,8 @@ class MdxEngine:
         self.client = client_type
         self.tables_loaded = self.load_tables()
         # all measures
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.measures = self.get_measures()
+        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
