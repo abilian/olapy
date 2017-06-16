@@ -222,7 +222,7 @@ application = Application(
 wsgi_application = WsgiApplication(application)
 
 
-def start_server(write_on_file=False):
+def start_server(host='0.0.0.0',port=5000,write_on_file=False):
     """
     Start the xmla server.
 
@@ -254,7 +254,7 @@ def start_server(write_on_file=False):
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
     logging.info("listening to http://127.0.0.1:8000/xmla")
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
-    server = make_server('0.0.0.0', 8000, wsgi_application)
+    server = make_server(host, port, wsgi_application)
     server.serve_forever()
 
 
