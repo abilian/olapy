@@ -17,7 +17,7 @@ def _load_table_config_file(executer_instance, cube_obj):
     # just one facts table right now
     executer_instance.facts = cube_obj.facts[0].table_name
 
-    db = MyDB(db=executer_instance.cube)
+    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
 
     memory_usage("1 - before executing query //// _load_table_config_file")
     for dimension in cube_obj.dimensions:
@@ -36,7 +36,7 @@ def _load_table_config_file(executer_instance, cube_obj):
 
         # rename columns if value not None
         df.rename(columns=(dict((k, v) for k, v in dimension.columns.items() if v)), inplace=True)
-        
+
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
         ]]
@@ -55,7 +55,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     :return: star schema DataFrame
     """
     executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db=executer_instance.cube)
+    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
     # load facts table
 
     memory_usage("1 - before executing query //// _construct_star_schema_config_file")
@@ -69,8 +69,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
 
         for dimension in cubes_obj.dimensions:
             if dimension_and_key.split('.')[0] == dimension.name:
-                df.rename(columns=dimension.columns,inplace=True)
-
+                df.rename(columns=dimension.columns, inplace=True)
 
         # todo test with this
         fusion = fusion.merge(
@@ -82,11 +81,10 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
         #     # remove suffixe from dimension and keep the same column name for facts
         #     suffixes=('', '_y'))
 
-
     memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
-        # TODO CHOSE BETWEEN THOSES DF
-        # if separated dimensions
-        # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
+    # TODO CHOSE BETWEEN THOSES DF
+    # if separated dimensions
+    # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
 
     # TODO CHOSE BETWEEN THOSES DF
     # if facts contains all dimensions
@@ -123,11 +121,10 @@ def _construct_star_schema_config_file_OLD(executer_instance, cubes_obj):
         fusion = fusion.merge(
             df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
-
     memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
-        # TODO CHOSE BETWEEN THOSES DF
-        # if separated dimensions
-        # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
+    # TODO CHOSE BETWEEN THOSES DF
+    # if separated dimensions
+    # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
 
     # TODO CHOSE BETWEEN THOSES DF
     # if facts contains all dimensions
@@ -151,19 +148,17 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     all_columns = []
 
     executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db=executer_instance.cube,db_config_file_path=os.path.dirname(executer_instance.cube_path))
+    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
     # load facts table
 
     if cubes_obj.facts[0].columns:
         all_columns += cubes_obj.facts[0].columns
-
 
     memory_usage("1 - before executing query //// 1111 _construct_web_star_schema_config_file ")
     fusion = psql.read_sql_query(
         "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
 
     memory_usage("2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file")
-
 
     tables = {}
     memory_usage("1 - before executing query //// 3333333333 _construct_web_star_schema_config_file ")
@@ -211,8 +206,8 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         # TODO check merge (how)
         fusion = fusion.merge(
             df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
-              # remove suffixe from dimension and keep the same column name for facts
-              suffixes=('', '_y'))
+            # remove suffixe from dimension and keep the same column name for facts
+            suffixes=('', '_y'))
 
     memory_usage("2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file")
 
