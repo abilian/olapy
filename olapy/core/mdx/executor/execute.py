@@ -133,7 +133,10 @@ class MdxEngine:
         else:
             home_directory = expanduser("~")
 
-        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
+        if 'olapy-data' not in home_directory:
+            home_directory = os.path.join(home_directory, 'olapy-data')
+
+        return os.path.join(home_directory, self.cube_folder)
 
     def _get_tables_name(self):
         """
