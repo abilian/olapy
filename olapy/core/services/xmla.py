@@ -7,9 +7,11 @@ from datetime import datetime
 from os.path import expanduser
 
 from lxml import etree
-from spyne import AnyXml, Application, ServiceBase, rpc
+from spyne import AnyXml, Application, ServiceBase, rpc, Fault
+from spyne.const.http import HTTP_200
 from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
+from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
@@ -18,6 +20,17 @@ from ..services.models import ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
+
+
+class XmlaSoap11(Soap11):
+    def create_in_document(self, ctx, charset=None):
+        if isinstance(ctx.transport, HttpTransportContext):
+            http_verb = ctx.transport.get_request_method()
+            if http_verb == "OPTIONS":
+                ctx.transport.resp_headers['allow'] = "POST, OPTIONS"
+                ctx.transport.respond(HTTP_200)
+                raise Fault("")
+        return Soap11.create_in_document(self, ctx, charset)
 
 
 class XmlaProviderService(ServiceBase):
@@ -214,8 +227,8 @@ class XmlaProviderService(ServiceBase):
 application = Application(
     [XmlaProviderService],
     'urn:schemas-microsoft-com:xml-analysis',
-    in_protocol=Soap11(validator='soft'),
-    out_protocol=Soap11(validator='soft'))
+    in_protocol=XmlaSoap11(validator='soft'),
+    out_protocol=XmlaSoap11(validator='soft'))
 
 # validator='soft' or nothing, this is important because spyne doesn't support encodingStyle until now !!!!
 
