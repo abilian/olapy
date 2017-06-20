@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 import uuid
 
 from lxml import etree
+import os
 
 from ..mdx.executor.execute import MdxEngine
 from .xmla_discover_xsds import (
@@ -152,9 +153,49 @@ class XmlaDiscoverTools():
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             """ + discover_preperties_xsd + """
+            <row>
+                <PropertyName>ServerName</PropertyName>
+                <PropertyDescription>ServerName</PropertyDescription>
+                <PropertyType>string</PropertyType>
+                <PropertyAccessType>Read</PropertyAccessType>
+                <IsRequired>false</IsRequired>
+                <Value>{0}</Value>
+            </row>
+            <row>
+                <PropertyName>ProviderVersion</PropertyName>
+                <PropertyDescription>ProviderVersion</PropertyDescription>
+                <PropertyType>string</PropertyType>
+                <PropertyAccessType>Read</PropertyAccessType>
+                <IsRequired>false</IsRequired>
+                <Value>0.0.3  25-Nov-2016 07:20:28 GMT</Value>
+            </row>
+            <row>
+                <PropertyName>MdpropMdxSubqueries</PropertyName>
+                <PropertyDescription>MdpropMdxSubqueries</PropertyDescription>
+                <PropertyType>int</PropertyType>
+                <PropertyAccessType>Read</PropertyAccessType>
+                <IsRequired>false</IsRequired>
+                <Value>15</Value>
+            </row>
+            <row>
+                <PropertyName>MdpropMdxDrillFunctions</PropertyName>
+                <PropertyDescription>MdpropMdxDrillFunctions</PropertyDescription>
+                <PropertyType>int</PropertyType>
+                <PropertyAccessType>Read</PropertyAccessType>
+                <IsRequired>false</IsRequired>
+                <Value>3</Value>
+            </row>
+            <row>
+                <PropertyName>MdpropMdxNamedSets</PropertyName>
+                <PropertyDescription>MdpropMdxNamedSets</PropertyDescription>
+                <PropertyType>int</PropertyType>
+                <PropertyAccessType>Read</PropertyAccessType>
+                <IsRequired>false</IsRequired>
+                <Value>15</Value>
+            </row>
             </root>
         </return>
-        """)
+        """.format(os.environ.get('USERNAME'),))
 
     def discover_schema_rowsets_response(self, request):
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
