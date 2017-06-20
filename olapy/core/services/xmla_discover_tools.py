@@ -74,12 +74,8 @@ class XmlaDiscoverTools():
     def discover_properties_response(self, request):
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + xsd + """
+            if PropertyName is not '':
+                rows = """
                 <row>
                     <PropertyName>{0}</PropertyName>
                     <PropertyDescription>{1}</PropertyDescription>
@@ -87,11 +83,63 @@ class XmlaDiscoverTools():
                     <PropertyAccessType>{3}</PropertyAccessType>
                     <IsRequired>{4}</IsRequired>
                     <Value>{5}</Value>
-                    </row>
-                    </root>
+                </row>
+                """.format(PropertyName, PropertyDescription, PropertyType,
+                       PropertyAccessType, IsRequired, Value)
+            else:
+                rows = """
+                <row>
+                    <PropertyName>ServerName</PropertyName>
+                    <PropertyDescription>ServerName</PropertyDescription>
+                    <PropertyType>string</PropertyType>
+                    <PropertyAccessType>Read</PropertyAccessType>
+                    <IsRequired>false</IsRequired>
+                    <Value>{0}</Value>
+                </row>
+                <row>
+                    <PropertyName>ProviderVersion</PropertyName>
+                    <PropertyDescription>ProviderVersion</PropertyDescription>
+                    <PropertyType>string</PropertyType>
+                    <PropertyAccessType>Read</PropertyAccessType>
+                    <IsRequired>false</IsRequired>
+                    <Value>0.0.3  25-Nov-2016 07:20:28 GMT</Value>
+                </row>
+                <row>
+                    <PropertyName>MdpropMdxSubqueries</PropertyName>
+                    <PropertyDescription>MdpropMdxSubqueries</PropertyDescription>
+                    <PropertyType>int</PropertyType>
+                    <PropertyAccessType>Read</PropertyAccessType>
+                    <IsRequired>false</IsRequired>
+                    <Value>15</Value>
+                </row>
+                <row>
+                    <PropertyName>MdpropMdxDrillFunctions</PropertyName>
+                    <PropertyDescription>MdpropMdxDrillFunctions</PropertyDescription>
+                    <PropertyType>int</PropertyType>
+                    <PropertyAccessType>Read</PropertyAccessType>
+                    <IsRequired>false</IsRequired>
+                    <Value>3</Value>
+                </row>
+                <row>
+                    <PropertyName>MdpropMdxNamedSets</PropertyName>
+                    <PropertyDescription>MdpropMdxNamedSets</PropertyDescription>
+                    <PropertyType>int</PropertyType>
+                    <PropertyAccessType>Read</PropertyAccessType>
+                    <IsRequired>false</IsRequired>
+                    <Value>15</Value>
+                </row>
+                """.format(os.getenv('USERNAME', 'default'))
+
+            return etree.fromstring("""
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                {0}
+                {1}
+                </root>
             </return>
-            """.format(PropertyName, PropertyDescription, PropertyType,
-                       PropertyAccessType, IsRequired, Value))
+            """.format(xsd,rows))
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -147,55 +195,7 @@ class XmlaDiscoverTools():
                                  'MdpropMdxNamedSets', 'int', 'Read', 'false',
                                  '15')
 
-        return etree.fromstring("""
-        <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            """ + discover_preperties_xsd + """
-            <row>
-                <PropertyName>ServerName</PropertyName>
-                <PropertyDescription>ServerName</PropertyDescription>
-                <PropertyType>string</PropertyType>
-                <PropertyAccessType>Read</PropertyAccessType>
-                <IsRequired>false</IsRequired>
-                <Value>{0}</Value>
-            </row>
-            <row>
-                <PropertyName>ProviderVersion</PropertyName>
-                <PropertyDescription>ProviderVersion</PropertyDescription>
-                <PropertyType>string</PropertyType>
-                <PropertyAccessType>Read</PropertyAccessType>
-                <IsRequired>false</IsRequired>
-                <Value>0.0.3  25-Nov-2016 07:20:28 GMT</Value>
-            </row>
-            <row>
-                <PropertyName>MdpropMdxSubqueries</PropertyName>
-                <PropertyDescription>MdpropMdxSubqueries</PropertyDescription>
-                <PropertyType>int</PropertyType>
-                <PropertyAccessType>Read</PropertyAccessType>
-                <IsRequired>false</IsRequired>
-                <Value>15</Value>
-            </row>
-            <row>
-                <PropertyName>MdpropMdxDrillFunctions</PropertyName>
-                <PropertyDescription>MdpropMdxDrillFunctions</PropertyDescription>
-                <PropertyType>int</PropertyType>
-                <PropertyAccessType>Read</PropertyAccessType>
-                <IsRequired>false</IsRequired>
-                <Value>3</Value>
-            </row>
-            <row>
-                <PropertyName>MdpropMdxNamedSets</PropertyName>
-                <PropertyDescription>MdpropMdxNamedSets</PropertyDescription>
-                <PropertyType>int</PropertyType>
-                <PropertyAccessType>Read</PropertyAccessType>
-                <IsRequired>false</IsRequired>
-                <Value>15</Value>
-            </row>
-            </root>
-        </return>
-        """.format(os.environ.get('USERNAME'),))
+        return get_props(discover_preperties_xsd, '','', '', '', '','')
 
     def discover_schema_rowsets_response(self, request):
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
