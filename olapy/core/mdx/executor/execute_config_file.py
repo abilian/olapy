@@ -72,14 +72,14 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
                 df.rename(columns=dimension.columns, inplace=True)
 
         # todo test with this
-        fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
+        # fusion = fusion.merge(
+        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
 
         # TODO CHOSE BETWEEN THOSES DF
-        # fusion = fusion.merge(
-        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
-        #     # remove suffixe from dimension and keep the same column name for facts
-        #     suffixes=('', '_y'))
+        fusion = fusion.merge(
+            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
+        # remove suffixe from dimension and keep the same column name for facts
+            suffixes=('', '_y'))
 
     memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
     # TODO CHOSE BETWEEN THOSES DF
