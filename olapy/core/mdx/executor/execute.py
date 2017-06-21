@@ -207,7 +207,7 @@ class MdxEngine:
         if config_file_parser.config_file_exist(
                 self.client
         ) and self.cube in config_file_parser.get_cubes_names(
-                client_type='web'):
+                client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
