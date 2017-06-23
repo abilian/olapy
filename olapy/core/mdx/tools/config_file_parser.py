@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 import os
+from collections import OrderedDict
 
 from lxml import etree
 
@@ -300,11 +301,11 @@ class ConfigParser:
                         name=xml_dimension.find('name').text,
                         # column_new_name = [key.attrib['column_new_name'] for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
-                        columns={
-                            column_name.text : None if not column_name.attrib else column_name.attrib['column_new_name']
+                        columns=OrderedDict(
+                            (column_name.text , None if not column_name.attrib else column_name.attrib['column_new_name'])
                             for column_name in xml_dimension.findall(
                                 'columns/name')
-                        })
+                        ))
                     for xml_dimension in tree.xpath(
                         '/cubes/cube/dimensions/dimension')
                 ]
