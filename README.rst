@@ -43,9 +43,6 @@ To use XMLA from Excel, just start the XMLA server by executing in the root dire
 
 and use the url: http://127.0.0.1:8000/xmla in Excel
 
-*  Be sure to use ``Provider=MSOLAP.6`` in Excel (see https://blogs.technet.microsoft.com/excel_services__powerpivot_for_sharepoint_support_blog/2015/10/30/configuring-the-msolap-data-provider-version).
-
-
 With the demo web app
 ~~~~~~~~~~~~~~~~~~~~~
 
