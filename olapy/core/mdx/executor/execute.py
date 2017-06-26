@@ -155,9 +155,10 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
 
-        if config_file_parser.config_file_exist(
-        ) and self.cube in config_file_parser.get_cubes_names(
-        ) and self.client != 'web':
+        if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client
+        ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client
+        ):
+            # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
 
                 # TODO working with cubes.source == 'csv'
@@ -176,16 +177,15 @@ class MdxEngine:
         """:return: all numerical columns in facts table."""
         # col.lower()[-2:] != 'id' to ignore any id column
 
-        # if web get measures from config file
+        # if web, get measures from config file
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
 
-                # TODO temp
                 # update facts name
                 self.facts = cubes.facts[0].table_name
 
-
+                # if measures are specified in the config file
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
 
