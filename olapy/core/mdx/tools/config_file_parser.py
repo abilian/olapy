@@ -71,6 +71,13 @@ class ConfigParser:
                         <!-- star building customized dimensions display in excel from the star schema -->             
                         <dimensions>
 
+                            <!-- ADD facts table name to the dimensions section like this (this is a little bug to be solved soon) -->
+
+                             <dimension>
+                                <name>stats_line</name>
+                                <displayName>stats_line</displayName>
+                            </dimension>
+
                             <dimension>
 
                                 <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
@@ -81,10 +88,12 @@ class ConfigParser:
                                 <columns>
 
                                     <!-- columns order matter -->
-                                    <name>type_demande</name>
-                                    <name>financeur</name>
-                                    <name>wf_state</name>
-                                    <name>type_recrutement</name>
+                                    <!-- column_new_name if you want to change column display name in excel -->
+                                    <!-- if you don't want to change display name , rewrite it in column_new_name -->
+                                    <name column_new_name="Type">type_demande</name>
+                                    <name column_new_name="Financeur">financeur</name>
+                                    <name column_new_name="Etat">wf_state</name>
+                                    <name column_new_name="type_recrutement">type_recrutement</name>
 
                                 </columns>
 
@@ -98,9 +107,9 @@ class ConfigParser:
 
                                 <columns>
                                     <!-- columns order matter -->
-                                    <name>type</name>
-                                    <name>nom</name>
-                                    <name>sigle</name>
+                                    <name column_new_name="type">type</name>
+                                    <name column_new_name="Nom">nom</name>
+                                    <name column_new_name="SIGLE">sigle</name>
                                 </columns>
 
                             </dimension>
@@ -154,6 +163,9 @@ class ConfigParser:
                     <name>duree_projet</name>
                  </measures>
 
+                 <!-- additional columns to keep other than measures and ids -->
+                 <columns>etat,aap,axes_de_developpement</columns>
+
               </facts>
 
               <!-- end building customized star schema -->
@@ -177,11 +189,55 @@ class ConfigParser:
                      <table name="contact">
 
                         <columns>id,nom,prenom,fonction</columns>
+                        <new_name old_column_name="fonction">Contact Fonction</new_name>
 
                      </table>
 
 
                   </tables>
+
+            <!-- Dashboards -->
+
+              <Dashboards>
+
+                 <Dashboard>
+
+                    <Global_table>
+                       <!-- IMPORTANT !! columns and rows names must be specified as above with their new names -->
+                       <!-- EXAMPLE <new_name old_column_name="label">Pole leader</new_name>, you put Pole leader -->
+                       <!-- marches,axes_de_developpement,statut_pour_book are columns from facts table  -->
+                       <columns>marches,axes_de_developpement</columns>
+                       <rows>statut_pour_book</rows>
+
+                    </Global_table>
+
+                    <!-- Contact Fonction,Type Organisation columns name from different tables (with ther new names) -->
+                    <PieCharts>Contact Fonction,Type Organisation</PieCharts>
+
+                    <!-- TODO BarCharts with Stacked Bar Chart -->
+                    <BarCharts>Avis</BarCharts>
+
+                    <!-- Preferably with time/date (or sequenced) tables-->
+                    <LineCharts>
+
+                       <table>
+                          <!-- date_debut_envisagee a column from facts table  -->
+                          <name>date_debut_envisagee</name>
+                          <!-- if not specified, then all columns attributs -->
+                          <!--<columns>1945,2000,2006,2015</columns> -->
+
+                       </table>
+
+                    </LineCharts>
+
+                 </Dashboard>
+
+
+
+              </Dashboards>
+
+
+              <!-- END Dashboards -->
 
            </cube>
 
@@ -189,7 +245,6 @@ class ConfigParser:
 
     """
 
-    # TODO one config file (I will try to merge dimensions between them in web part)
     def __init__(self,
                  cube_path = None,
                  file_name='cubes-config.xml',
@@ -214,7 +269,7 @@ class ConfigParser:
         self.file_name = file_name
         self.web_config_file_name = web_config_file_name
 
-    def config_file_exist(self, client_type='excel'):
+    def config_file_exist(self, client_type):
         """
         Check whether the config file exists or not.
 
@@ -231,7 +286,9 @@ class ConfigParser:
 
         :return: True | False
         """
-        if self.config_file_exist():
+
+        # xmla authentication only in excel
+        if self.config_file_exist(client_type='excel'):
             with open(os.path.join(self.cube_path,
                                    self.file_name)) as config_file:
 
@@ -246,7 +303,7 @@ class ConfigParser:
         else:
             return False
 
-    def get_cubes_names(self, client_type='excel'):
+    def get_cubes_names(self,client_type):
         """
         Get all cubes names in the config file.
 

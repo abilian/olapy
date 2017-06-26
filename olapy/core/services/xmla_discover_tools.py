@@ -1869,12 +1869,6 @@ class XmlaDiscoverTools():
 
             for tables in self.executer.get_all_tables_names(ignore_fact=True):
 
-                # TODO in another idea, change this
-                # TO CHANGE NAME DISPLAY THAT EXISTS IN CONFIG FILE
-
-                # if MdxEngine.dimension_display_name != [] and tables in MdxEngine.dimension_display_name:
-                #     continue
-
                 rows += """
                 <row>
                     <CATALOG_NAME>{0}</CATALOG_NAME>

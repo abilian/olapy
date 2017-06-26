@@ -6,6 +6,9 @@ from ..tools.mem_bench import memory_usage
 from ..tools.connection import MyDB
 import pandas.io.sql as psql
 
+# split execution into three part (execute from config files,
+# execute csv files if they respect olapy's start schema model,
+# and execute data base tables if they respect olapy's start schema model)
 
 class StringFolder(object):
     """

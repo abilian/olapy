@@ -7,16 +7,6 @@ from olapy_config_file_parser import DbConfigParser
 class MyDB(object):
     """Connect to sql database (postgres only right now)."""
 
-    # @staticmethod
-    # def db_credentials():
-    #     db_config = DbConfigParser()
-    #     if db_config.config_file_exist():
-    #         # many databases in the future maybe
-    #         return db_config.get_db_credentials()[0]
-    #     else:
-    #         raise Exception('Missing database config file')
-
-
     def __init__(self,db_config_file_path=None,db=None):
 
         # TODO temporary

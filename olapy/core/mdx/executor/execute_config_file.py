@@ -5,7 +5,9 @@ from ..tools.connection import MyDB
 import pandas.io.sql as psql
 import os
 
-
+# split execution into three part (execute from config files,
+# execute csv files if they respect olapy's start schema model,
+# and execute data base tables if they respect olapy's start schema model)
 def _load_table_config_file(executer_instance, cube_obj):
     """
     Load tables from config file.
@@ -45,10 +47,10 @@ def _load_table_config_file(executer_instance, cube_obj):
 
     return tables
 
-
+# excel client
 def _construct_star_schema_config_file(executer_instance, cubes_obj):
     """
-    Construct star schema DataFrame from configuration file.
+    Construct star schema DataFrame from configuration file for excel client.
 
     :param cube_name:  cube name (or database name)
     :param cubes_obj: cubes object
@@ -82,13 +84,6 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
             suffixes=('', '_y'))
 
     memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
-    # TODO CHOSE BETWEEN THOSES DF
-    # if separated dimensions
-    # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
-
-    # TODO CHOSE BETWEEN THOSES DF
-    # if facts contains all dimensions
-    # fusion = facts
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
@@ -96,50 +91,10 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
 
     return fusion
 
-
-def _construct_star_schema_config_file_OLD(executer_instance, cubes_obj):
-    """
-    Construct star schema DataFrame from configuration file.
-
-    :param cube_name:  cube name (or database name)
-    :param cubes_obj: cubes object
-    :return: star schema DataFrame
-    """
-    executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db=executer_instance.cube)
-    # load facts table
-
-    memory_usage("1 - before executing query //// _construct_star_schema_config_file")
-    fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
-
-    for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-        df = psql.read_sql_query(
-            "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-            db.engine)
-
-        fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
-
-    memory_usage("2 - after query, before fetchall  /////// _construct_star_schema_config_file")
-    # TODO CHOSE BETWEEN THOSES DF
-    # if separated dimensions
-    # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
-
-    # TODO CHOSE BETWEEN THOSES DF
-    # if facts contains all dimensions
-    # fusion = facts
-
-    # measures in config-file only
-    if cubes_obj.facts[0].measures:
-        executer_instance.measures = cubes_obj.facts[0].measures
-
-    return fusion
-
-
+# web client
 def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     """
-    Construct star schema DataFrame from configuration file.
+    Construct star schema DataFrame from configuration file for web client.
 
     :param cube_name:  cube name (or database name)
     :param cubes_obj: cubes object
@@ -167,6 +122,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         tab = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
                                   db.engine)
 
+        # todo verify this
         try:
             if table.columns:
                 tab = tab[table.columns]

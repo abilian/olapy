@@ -4,6 +4,9 @@ import os
 
 import pandas as pd
 
+# split execution into three part (execute from config files,
+# execute csv files if they respect olapy's start schema model,
+# and execute data base tables if they respect olapy's start schema model)
 
 def _load_tables_csv_files(executer_instance):
     """
