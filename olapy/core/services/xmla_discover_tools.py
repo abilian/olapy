@@ -1830,8 +1830,10 @@ class XmlaDiscoverTools():
 
                 # TODO in another idea, change this
                 # TO CHANGE NAME DISPLAY THAT EXISTS IN CONFIG FILE
-                if MdxEngine.dimension_display_name != [] and tables in MdxEngine.dimension_display_name:
-                    continue
+
+                # if MdxEngine.dimension_display_name != [] and tables in MdxEngine.dimension_display_name:
+                #     continue
+
                 rows += """
                 <row>
                     <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -1888,6 +1890,15 @@ class XmlaDiscoverTools():
                 for table_name, df in self.executer.tables_loaded.items():
                     if table_name == self.executer.facts:
                         continue
+
+                    # french caracteres
+                    # TODO encode dataframe
+                    if type(df.iloc[0][0]) == unicode:
+                        column_attribut = df.iloc[0][0].encode('utf-8')
+                    else:
+                        column_attribut = df.iloc[0][0]
+
+
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -1910,8 +1921,11 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                    """.format(self.selected_catalogue, table_name,
-                               df.columns[0], df.iloc[0][0])
+                    """.format(self.selected_catalogue,
+                               table_name,
+                               df.columns[0],
+                               column_attribut)
+
 
                 rows += """
                 <row>
@@ -1953,6 +1967,14 @@ class XmlaDiscoverTools():
                 for table_name, df in self.executer.tables_loaded.items():
                     if table_name == self.executer.facts:
                         continue
+
+                    # french caracteres
+                    # TODO encode dataframe
+                    if type(df.iloc[0][0]) == unicode:
+                        column_attribut = df.iloc[0][0].encode('utf-8')
+                    else:
+                        column_attribut = df.iloc[0][0]
+
                     rows += """
                     <row>
                         <CATALOG_NAME>{0}</CATALOG_NAME>
@@ -1975,8 +1997,10 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                        """.format(self.selected_catalogue, table_name,
-                                   df.columns[0], df.iloc[0][0])
+                        """.format(self.selected_catalogue,
+                                   table_name,
+                                   df.columns[0],
+                                   column_attribut)
 
                 rows += """
                 <row>

@@ -33,12 +33,14 @@ class MdxEngine:
     :param sep: separator in the csv files
     """
 
+    # DATA_FOLDER useful for olapy web (falsk instance_path)
+    # get olapy-data path with instance_path instead of 'expanduser'
+    DATA_FOLDER = None
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
     postgres_db_cubes = []
     # to show just config file's dimensions
-    dimension_display_name = []
 
     def __init__(self,
                  cube_name,
@@ -64,8 +66,8 @@ class MdxEngine:
         self.client = client_type
         self.tables_loaded = self.load_tables()
         # all measures
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.measures = self.get_measures()
+        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
@@ -75,32 +77,42 @@ class MdxEngine:
         """:return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)."""
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
-        if RUNNING_TOX:
+
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
+        if cls.DATA_FOLDER is not None:
+            home_directory = os.path.dirname(cls.DATA_FOLDER)
+        elif RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
             home_directory = expanduser("~")
 
         location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
 
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
         try:
             MdxEngine.csv_files_cubes = [
                 file for file in os.listdir(location)
                 if os.path.isdir(os.path.join(location, file))
             ]
-
         except Exception:
             print('no csv folders')
             pass
 
         # get postgres databases
+        # surrended with try, except and PASS so we continue getting cubes from different
+        # sources (db, csv...) without interruption
         try:
-            db = MyDB()
-            cursor = db.connection.cursor()
-            cursor.execute("""SELECT datname FROM pg_database
-            WHERE datistemplate = false;""")
+            db = MyDB(db_config_file_path=cls.DATA_FOLDER)
+            # TODO this work only with postgres
+            result = db.engine.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
+            available_tables = result.fetchall()
+            # cursor.execute("""SELECT datname FROM pg_database
+            # WHERE datistemplate = false;""")
 
             MdxEngine.postgres_db_cubes = [
-                database[0] for database in cursor.fetchall()
+                database[0] for database in available_tables
             ]
 
         except Exception:
@@ -112,12 +124,19 @@ class MdxEngine:
     def _get_default_cube_directory(self):
 
         # toxworkdir does not expanduser properly under tox
-        if RUNNING_TOX:
+        if 'OLAPY_PATH' in os.environ:
+            home_directory = os.environ.get('OLAPY_PATH')
+        elif MdxEngine.DATA_FOLDER is not None:
+            home_directory = MdxEngine.DATA_FOLDER
+        elif RUNNING_TOX:
             home_directory = os.environ.get('HOME_DIR')
         else:
             home_directory = expanduser("~")
 
-        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
+        if 'olapy-data' not in home_directory:
+            home_directory = os.path.join(home_directory, 'olapy-data')
+
+        return os.path.join(home_directory, self.cube_folder)
 
     def _get_tables_name(self):
         """
@@ -135,6 +154,7 @@ class MdxEngine:
         """
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
+
         if config_file_parser.config_file_exist(
         ) and self.cube in config_file_parser.get_cubes_names(
         ) and self.client != 'web':
@@ -155,6 +175,20 @@ class MdxEngine:
     def get_measures(self):
         """:return: all numerical columns in facts table."""
         # col.lower()[-2:] != 'id' to ignore any id column
+
+        # if web get measures from config file
+        config_file_parser = ConfigParser(self.cube_path)
+        if self.client == 'web' and config_file_parser.config_file_exist('web'):
+            for cubes in config_file_parser.construct_cubes(self.client):
+
+                # TODO temp
+                # update facts name
+                self.facts = cubes.facts[0].table_name
+
+
+                if cubes.facts[0].measures:
+                    return cubes.facts[0].measures
+
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
@@ -169,7 +203,6 @@ class MdxEngine:
         :return: star schema DataFrame
         """
         fusion = None
-
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 self.client
@@ -213,6 +246,8 @@ class MdxEngine:
 
         :return: path to the cube
         """
+        if MdxEngine.DATA_FOLDER is not None:
+            return os.path.join(MdxEngine.DATA_FOLDER, MdxEngine.CUBE_FOLDER, self.cube)
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function

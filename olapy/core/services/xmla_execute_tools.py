@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function
 import itertools
 from collections import OrderedDict
 
+import numpy as np
+
 
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
@@ -149,6 +151,12 @@ class XmlaExecuteTools():
 
             for tupl in tupls:
                 tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
+
+                # french caracteres
+                # TODO encode dataframe
+                if type(tuple_without_minus_1[-1]) == unicode:
+                    tuple_without_minus_1 = [x.encode('utf-8') for x in tuple_without_minus_1]
+
                 axis0 += """
                 <Member Hierarchy="[{0}].[{0}]">
                     <UName>[{0}].[{0}].[{1}].{2}</UName>
@@ -324,7 +332,7 @@ class XmlaExecuteTools():
         cell_data = ""
         index = 0
         for value in columns_loop:
-            if value == -1:
+            if np.isnan(value) :
                 value = ''
             cell_data += """
             <Cell CellOrdinal="{0}">
@@ -550,6 +558,14 @@ class XmlaExecuteTools():
                 set(table_name
                     for table_name in mdx_execution_result['columns_desc']
                     ['all'])):
+
+            # TODO encode dataframe
+            # french caracteres
+            if type(self.executer.tables_loaded[dim_diff].iloc[0][0]) == unicode:
+                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0].encode('utf-8')
+            else:
+                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0]
+
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">
                 <UName>[{0}].[{0}].[{1}].[{2}]</UName>
@@ -560,7 +576,7 @@ class XmlaExecuteTools():
             </Member>
             """.format(dim_diff,
                        self.executer.tables_loaded[dim_diff].columns[0],
-                       self.executer.tables_loaded[dim_diff].iloc[0][0])
+                       column_attribut)
 
         # if we have zero on one only measures used
         if len(self.executer.selected_measures) <= 1:

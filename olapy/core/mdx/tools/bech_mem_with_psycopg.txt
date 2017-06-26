@@ -1,0 +1,202 @@
+Memory summary:1 - before executing query //// _load_tables_db
+
+VM: 699.77Mb
+
+Memory summary:2 - after query, before fetchall  /////// _load_tables_db
+
+VM: 1763.52Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 1763.52Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 1763.77Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 1763.77Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+
+VM: 1764.27Mb
+
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+
+VM: 1764.27Mb
+
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+
+VM: 1764.52Mb
+
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+
+VM: 1764.52Mb
+
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+
+VM: 1764.52Mb
+
+**********************************
+
+  types |   # objects |   total size
+======= | =========== | ============
+   dict |        7235 |      8.59 MB
+    str |       58455 |      8.18 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// _load_tables_db
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         180 |    539.66 MB
+                                 dict |        7649 |      8.78 MB
+----------------------------
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         592 |    538.26 MB
+  <class 'pandas.core.frame.DataFrame |         179 |    538.22 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         618 |    539.70 MB
+  <class 'pandas.core.frame.DataFrame |         180 |    539.66 MB
+----------------------------
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         618 |    539.70 MB
+  <class 'pandas.core.frame.DataFrame |         180 |    539.66 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         185 |    540.42 MB
+    <class 'pandas.core.series.Series |         618 |    539.70 MB
+----------------------------
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         630 |    540.47 MB
+  <class 'pandas.core.frame.DataFrame |         185 |    540.42 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         185 |    540.83 MB
+    <class 'pandas.core.series.Series |         604 |    539.02 MB
+----------------------------
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         180 |    538.50 MB
+    <class 'pandas.core.series.Series |         592 |    538.26 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+  <class 'pandas.core.frame.DataFrame |         181 |    539.94 MB
+----------------------------
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+  <class 'pandas.core.frame.DataFrame |         181 |    539.94 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         186 |    540.71 MB
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+----------------------------
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         641 |    540.83 MB
+  <class 'pandas.core.frame.DataFrame |         186 |    540.71 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         186 |    541.11 MB
+    <class 'pandas.core.series.Series |         615 |    539.39 MB
+----------------------------
+Memory summary:1 - before executing query //// 1111 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         603 |    538.62 MB
+  <class 'pandas.core.frame.DataFrame |         180 |    538.50 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 222222222222 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+  <class 'pandas.core.frame.DataFrame |         181 |    539.94 MB
+----------------------------
+Memory summary:1 - before executing query //// 3333333333 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+  <class 'pandas.core.frame.DataFrame |         181 |    539.94 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 44444444 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         186 |    540.71 MB
+    <class 'pandas.core.series.Series |         629 |    540.06 MB
+----------------------------
+Memory summary:1 - before executing query //// 55555555 _construct_web_star_schema_config_file 
+                                types |   # objects |   total size
+===================================== | =========== | ============
+    <class 'pandas.core.series.Series |         641 |    540.83 MB
+  <class 'pandas.core.frame.DataFrame |         186 |    540.71 MB
+----------------------------
+Memory summary:2 - after query, before fetchall  /////// 6666666666 _construct_star_schema_config_file
+                                types |   # objects |   total size
+===================================== | =========== | ============
+  <class 'pandas.core.frame.DataFrame |         186 |    541.11 MB
+    <class 'pandas.core.series.Series |         615 |    539.39 MB
+
+

@@ -198,12 +198,18 @@ class ConfigParser:
         :param cube_path: path to cube (csv folders)
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         """
-        if cube_path is None:
+        # home_directory = home_directory
+        if 'OLAPY_PATH' in os.environ:
+            home_directory = os.environ['OLAPY_PATH']
+        else:
             from os.path import expanduser
             home_directory = expanduser("~")
+
+        if cube_path is None:
             self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
         else:
             self.cube_path = cube_path
+
         self.file_name = file_name
         self.web_config_file_name = web_config_file_name
 
@@ -284,15 +290,21 @@ class ConfigParser:
                         ]) for xml_facts in tree.xpath('/cubes/cube/facts')
                 ]
 
+                # keys = {
+                #            key.text: key.attrib['ref']
+                #            for key in xml_facts.findall('keys/column_name')
+                #        },
+
                 dimensions = [
                     Dimension(
                         name=xml_dimension.find('name').text,
+                        # column_new_name = [key.attrib['column_new_name'] for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
-                        columns=[
-                            column_name.text
+                        columns={
+                            column_name.text : None if not column_name.attrib else column_name.attrib['column_new_name']
                             for column_name in xml_dimension.findall(
                                 'columns/name')
-                        ])
+                        })
                     for xml_dimension in tree.xpath(
                         '/cubes/cube/dimensions/dimension')
                 ]
