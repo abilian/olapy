@@ -222,7 +222,7 @@ application = Application(
 wsgi_application = WsgiApplication(application)
 
 
-def start_server(host='0.0.0.0',port=5000,write_on_file=False):
+def start_server(host='0.0.0.0',port=8000,write_on_file=False):
     """
     Start the xmla server.
 
