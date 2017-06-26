@@ -11,7 +11,7 @@ from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
 from olapy.core.services.xmla import XmlaProviderService
-from tests.xs0_responses import TEST_QUERY_AXIS0
+from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230

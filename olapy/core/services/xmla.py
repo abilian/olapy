@@ -13,7 +13,7 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
-from ..services.models import DiscoverRequest  # , AuthenticationError
+from ..services.models import DiscoverRequest
 from ..services.models import ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -254,8 +254,7 @@ def start_server(write_on_file=False):
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
     logging.info("listening to http://127.0.0.1:8000/xmla")
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
-    server = make_server('127.0.0.1', 8000, wsgi_application)
-    # server = make_server('192.168.101.139', 8000, wsgi_application)
+    server = make_server('0.0.0.0', 8000, wsgi_application)
     server.serve_forever()
 
 

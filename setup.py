@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import zipfile
 from os.path import expanduser
+from shutil import copyfile
 
 from pip.download import PipSession
 from pip.req import parse_requirements
@@ -27,6 +28,10 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=install_requires,
     include_package_data=False,
+    # cmdclass={
+    #     # 'develop': PostDevelopCommand,
+    #     'install': PostInstallCommand,
+    # },
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
@@ -36,20 +41,19 @@ setup(
         # "Topic :: Business intelligence",
     ],)
 
-# # generate and set secret key
-# os.environ["SECRET_KEY"]
 
-# initiate cubes examples
 if RUNNING_TOX:
     home_directory = os.environ.get('HOME_DIR')
 else:
     home_directory = expanduser("~")
 
 if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
-    try:
-        os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
-        zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
-        zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
-        zip_ref.close()
-    except:
-        raise ('unable to create cubes directory !')
+    os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
+    zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
+    zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
+    zip_ref.close()
+
+if not os.path.isfile(os.path.join(home_directory, 'olapy-data','olapy-config.xml')):
+    copyfile('config/olapy-config.xml', os.path.join(home_directory, 'olapy-data','olapy-config.xml'))
+
+

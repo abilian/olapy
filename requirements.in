@@ -6,16 +6,19 @@ spyne<3
 treelib<2
 psycopg2
 
+# Test
+werkzeug
+
 # Web
-Flask
-SQLAlchemy<1.1
-WTForms<3
+#Flask
+#SQLAlchemy<1.1
+#WTForms<3
 # Pin these for now
-Flask-Login==0.3.2
-Flask-Script==2.0.5
-Flask-Session==0.3.0
-Flask-SQLAlchemy==2.1
-Flask-WTF==0.12
-plotly==1.12.9
-XlsxWriter==0.9.3
+#Flask-Login==0.3.2
+#Flask-Script==2.0.5
+#Flask-Session==0.3.0
+#Flask-SQLAlchemy==2.1
+#Flask-WTF==0.12
+#plotly==1.12.9
+#XlsxWriter==0.9.3
 

@@ -10,7 +10,12 @@ from os.path import expanduser
 
 import numpy as np
 import pandas as pd
-import pandas.io.sql as psql
+
+from .execute_csv_files import _load_tables_csv_files, _construct_star_schema_csv_files
+from .execute_db import _load_tables_db, _construct_star_schema_db
+from .execute_config_file import (_load_table_config_file,
+                                  _construct_web_star_schema_config_file,
+                                  _construct_star_schema_config_file)
 
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
@@ -37,17 +42,18 @@ class MdxEngine:
 
     def __init__(self,
                  cube_name,
+                 client_type='excel',
                  cubes_path=None,
                  mdx_query=None,
                  cube_folder=CUBE_FOLDER,
                  sep=';',
                  fact_table_name="Facts"):
+
         self.cube_folder = cube_folder
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self.mdx_query = mdx_query
-
         if cubes_path is None:
             self.cube_path = self._get_default_cube_directory()
         else:
@@ -55,11 +61,11 @@ class MdxEngine:
 
         # to get cubes in db
         self._ = self.get_cubes_names()
+        self.client = client_type
         self.tables_loaded = self.load_tables()
         # all measures
+        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.measures = self.get_measures()
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe(
-            cube_name)
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
@@ -96,6 +102,7 @@ class MdxEngine:
             MdxEngine.postgres_db_cubes = [
                 database[0] for database in cursor.fetchall()
             ]
+
         except Exception:
             print('no database connexion')
             pass
@@ -120,96 +127,28 @@ class MdxEngine:
         """
         return self.tables_loaded.keys()
 
-    def _load_table_config_file(self, cube_obj):
-        """
-        Load tables from config file.
-        
-        :param cube_obj: cubes object
-        :return: tables dict with table name as key and DataFrame as value
-        """
-        tables = {}
-        # just one facts table right now
-        self.facts = cube_obj.facts[0].table_name
-
-        db = MyDB(db=self.cube)
-
-        for table in cube_obj.dimensions:
-            value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                        db.connection)
-
-            tables[table.name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-
-        # update table display name
-        for dimension in cube_obj.dimensions:
-            if dimension.displayName and dimension.name and dimension.displayName != dimension.name:
-                tables[dimension.displayName] = tables[dimension.name][
-                    dimension.columns]
-                MdxEngine.dimension_display_name.append(dimension.name)
-
-        return tables
-
-    def _load_tables_csv_files(self):
-        """
-        Load tables from csv files.
-        
-        :return: tables dict with table name as key and dataframe as value
-        """
-        tables = {}
-        cube = self.get_cube()
-        for file in os.listdir(cube):
-            # to remove file extension ".csv"
-            table_name = os.path.splitext(file)[0]
-            value = pd.read_csv(os.path.join(cube, file), sep=self.sep)
-            tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-
-        return tables
-
-    def _load_tables_db(self):
-        """
-        Load tables from database.
-        
-        :return: tables dict with table name as key and dataframe as value
-        """
-        tables = {}
-        db = MyDB(db=self.cube)
-        cursor = db.connection.cursor()
-        cursor.execute("""SELECT table_name FROM information_schema.tables
-                          WHERE table_schema = 'public'""")
-
-        for table_name in cursor.fetchall():
-            value = psql.read_sql_query(
-                'SELECT * FROM "{0}" '.format(table_name[0]), db.connection)
-
-            tables[table_name[0]] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-        return tables
-
     def load_tables(self):
         """
         Load all tables { Table name : DataFrame } of the current cube instance.
-        
+
         :return: dict with key as table name and DataFrame as value
         """
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
         if config_file_parser.config_file_exist(
-        ) and self.cube in config_file_parser.get_cubes_names():
+        ) and self.cube in config_file_parser.get_cubes_names(
+        ) and self.client != 'web':
             for cubes in config_file_parser.construct_cubes():
 
                 # TODO working with cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    tables = self._load_table_config_file(cubes)
+                    tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
-            tables = self._load_tables_csv_files()
+            tables = _load_tables_csv_files(self)
 
         elif self.cube in self.postgres_db_cubes:
-            tables = self._load_tables_db()
+            tables = _load_tables_db(self)
 
         return tables
 
@@ -222,91 +161,7 @@ class MdxEngine:
                 include=[np.number]).columns if col.lower()[-2:] != 'id'
         ]
 
-    def _construct_star_schema_config_file(self, cube_name, cubes_obj):
-        """
-        Construct star schema DataFrame from configuration file.
-        
-        :param cube_name:  cube name (or database name)
-        :param cubes_obj: cubes object
-        :return: star schema DataFrame
-        """
-        self.facts = cubes_obj.facts[0].table_name
-        db = MyDB(db=cube_name)
-        # load facts table
-        fusion = psql.read_sql_query("SELECT * FROM {0}".format(self.facts),
-                                     db.connection)
-
-        for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-            df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.connection)
-
-            fusion = fusion.merge(
-                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
-
-            # TODO CHOSE BETWEEN THOSES DF
-            # if separated dimensions
-            # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
-
-        # TODO CHOSE BETWEEN THOSES DF
-        # if facts contains all dimensions
-        # fusion = facts
-
-        # measures in config-file only
-        if cubes_obj.facts[0].measures:
-            self.measures = cubes_obj.facts[0].measures
-
-        return fusion
-
-    def _construct_star_schema_csv_files(self, cube_name):
-        """
-        Construct star schema DataFrame from csv files.
-        
-        :param cube_name:  cube name (folder name)
-        :return: star schema DataFrame
-        """
-        cube = self.get_cube()
-        # loading facts table
-        fusion = pd.read_csv(
-            os.path.join(cube, self.facts + '.csv'), sep=self.sep)
-        for file_name in os.listdir(cube):
-            try:
-                fusion = fusion.merge(
-                    pd.read_csv(os.path.join(cube, file_name), sep=self.sep))
-            except:
-                print('No common column')
-                pass
-
-        return fusion
-
-    def _construct_star_schema_db(self, cube_name):
-        """
-        Construct star schema DataFrame from database.
-        
-        :param cube_name:  cube name (database name)
-        :return: star schema DataFrame
-        """
-        db = MyDB(db=cube_name)
-
-        # load facts table
-        fusion = psql.read_sql_query('SELECT * FROM "{0}" '.format(self.facts),
-                                     db.connection)
-
-        cursor = db.connection.cursor()
-        cursor.execute("""SELECT table_name FROM information_schema.tables
-                              WHERE table_schema = 'public'""")
-        for db_table_name in cursor.fetchall():
-            try:
-                fusion = fusion.merge(
-                    psql.read_sql_query("SELECT * FROM {0}".format(
-                        db_table_name[0]), db.connection))
-            except:
-                print('No common column')
-                pass
-
-        return fusion
-
-    def get_star_schema_dataframe(self, cube_name):
+    def get_star_schema_dataframe(self):
         """
         Merge all DataFrames as star schema.
 
@@ -317,18 +172,25 @@ class MdxEngine:
 
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
-        ) and cube_name in config_file_parser.get_cubes_names():
-            for cubes in config_file_parser.construct_cubes():
+                self.client
+        ) and self.cube in config_file_parser.get_cubes_names(
+                client_type='web'):
+            for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(
-                        cube_name, cubes)
+                    # TODO one config file (I will try to merge dimensions between them in web part)
+                    if self.client == 'web':
+                        fusion = _construct_web_star_schema_config_file(
+                            self, cubes)
+                    else:
+                        fusion = _construct_star_schema_config_file(
+                            self, cubes)
 
-        elif cube_name in self.csv_files_cubes:
-            fusion = self._construct_star_schema_csv_files(cube_name)
+        elif self.cube in self.csv_files_cubes:
+            fusion = _construct_star_schema_csv_files(self)
 
-        elif cube_name in self.postgres_db_cubes:
-            fusion = self._construct_star_schema_db(cube_name)
+        elif self.cube in self.postgres_db_cubes:
+            fusion = _construct_star_schema_db(self)
 
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
@@ -374,7 +236,7 @@ class MdxEngine:
                     FROM {sales}
 
             it returns :
-            
+
                 [
                 ['Geography','Geography','Continent'],
                 ['Geography','Geography','Continent','Europe'],
@@ -455,13 +317,13 @@ class MdxEngine:
     def change_measures(tuples_on_mdx):
         """
         Set measures to which exists in the query.
-        
+
         :param tuples_on_mdx: list of tuples:
-            
-            
+
+
             example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-            
-            
+
+
         :return: measures column's names
         """
         return [
@@ -516,12 +378,12 @@ class MdxEngine:
         Filter a DataFrame (Dataframe_in) with one tuple.   
 
             Example ::
-            
-    
+
+
                 tuple = ['Geography','Geography','Continent','Europe','France','olapy']
-        
+
                 Dataframe_in in :
-        
+
                 +-------------+----------+---------+---------+---------+
                 | Continent   | Country  | Company | Article | Amount  |
                 +=============+==========+=========+=========+=========+
@@ -531,9 +393,9 @@ class MdxEngine:
                 +-------------+----------+---------+---------+---------+
                 |  .....      |  .....   | ......  | .....   | .....   |
                 +-------------+----------+---------+---------+---------+
-        
+
                 out :
-        
+
                 +-------------+----------+---------+---------+---------+
                 | Continent   | Country  | Company | Article | Amount  |
                 +=============+==========+=========+=========+=========+
@@ -655,47 +517,47 @@ class MdxEngine:
         If we have multiple dimensions, with many columns like:
 
             columns_to_keep :
-    
+
                 Geo  -> Continent,Country
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                  
+
 
         we have to use only dimension's columns of current dimension that exist in tuple_as_list and keep other dimensions columns
-        
+
         so if tuple_as_list = ['Geography','Geography','Continent']
 
         columns_to_keep will be:
 
             columns_to_keep :
-    
+
                 Geo  -> Continent
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                
+
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
         :param tuple_as_list:  example : ['Geography','Geography','Continent']
         :param columns_to_keep:  
-            
+
             example :
-                 
+
                 {
-                
+
                 'Geography':
-                 
+
                     ['Continent','Country'],
-                    
+
                 'Time': 
-                
+
                     ['Year','Month','Day']
                 }
-                
+
         :return: updated columns_to_keep
         """
         if len(
