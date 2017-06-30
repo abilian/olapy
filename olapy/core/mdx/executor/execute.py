@@ -101,6 +101,8 @@ class MdxEngine:
                 if os.path.isdir(os.path.join(cubes_location, file))
             ]
         except Exception:
+            type, value, traceback = sys.exc_info()
+            print('Error opening %s: %s' % (value.filename, value.strerror))
             print('no csv folders')
             pass
 
@@ -120,6 +122,8 @@ class MdxEngine:
             ]
 
         except Exception:
+            type, value, traceback = sys.exc_info()
+            print('Error opening %s: %s' % (value.filename, value.strerror))
             print('no database connexion')
             pass
 
