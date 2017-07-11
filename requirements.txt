@@ -5,12 +5,12 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 lxml==3.6.0
-numpy==1.13.0             # via pandas
-pandas==0.20.2
+numpy==1.13.1             # via pandas
+pandas==0.20.3
 psutil==5.2.2
 psycopg2==2.7.1
 pympler==0.5
-python-dateutil==2.6.0    # via pandas
+python-dateutil==2.6.1    # via pandas
 pytz==2017.2              # via pandas, spyne
 six==1.10.0               # via python-dateutil
 spyne==2.12.14
