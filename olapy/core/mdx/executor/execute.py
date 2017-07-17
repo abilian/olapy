@@ -34,7 +34,7 @@ class MdxEngine:
     :param sep: separator in the csv files
     """
 
-    # DATA_FOLDER useful for olapy web (falsk instance_path)
+    # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
     DATA_FOLDER = None
     CUBE_FOLDER = "cubes"
