@@ -309,7 +309,7 @@ class MdxEngine:
             for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
         ]
                 for tup in re.compile(regex).findall(
-                    query.encode("utf-8")[start:stop])
+                    query.encode("utf-8",'replace')[start:stop])
                 if len(tup[0].split('.')) > 1]
 
     # TODO temporary function
@@ -326,7 +326,6 @@ class MdxEngine:
         on_where = []
 
         try:
-
             # ON ROWS
             if 'ON ROWS' in query:
                 stop = 'ON ROWS'

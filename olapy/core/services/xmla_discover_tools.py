@@ -1929,7 +1929,7 @@ class XmlaDiscoverTools():
                     # french caracteres
                     # TODO encode dataframe
                     if type(df.iloc[0][0]) == unicode:
-                        column_attribut = df.iloc[0][0].encode('utf-8')
+                        column_attribut = df.iloc[0][0].encode('utf-8','replace')
                     else:
                         column_attribut = df.iloc[0][0]
 
@@ -2006,7 +2006,7 @@ class XmlaDiscoverTools():
                     # french caracteres
                     # TODO encode dataframe
                     if type(df.iloc[0][0]) == unicode:
-                        column_attribut = df.iloc[0][0].encode('utf-8')
+                        column_attribut = df.iloc[0][0].encode('utf-8','replace')
                     else:
                         column_attribut = df.iloc[0][0]
 

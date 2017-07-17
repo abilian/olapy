@@ -155,7 +155,7 @@ class XmlaExecuteTools():
                 # french caracteres
                 # TODO encode dataframe
                 if type(tuple_without_minus_1[-1]) == unicode:
-                    tuple_without_minus_1 = [x.encode('utf-8') for x in tuple_without_minus_1]
+                    tuple_without_minus_1 = [x.encode('utf-8','replace') for x in tuple_without_minus_1]
 
                 axis0 += """
                 <Member Hierarchy="[{0}].[{0}]">
@@ -562,7 +562,7 @@ class XmlaExecuteTools():
             # TODO encode dataframe
             # french caracteres
             if type(self.executer.tables_loaded[dim_diff].iloc[0][0]) == unicode:
-                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0].encode('utf-8')
+                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0].encode('utf-8','replace')
             else:
                 column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0]
 
