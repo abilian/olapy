@@ -306,7 +306,7 @@ class MdxEngine:
         # clean the query (remove All, Members...)
         return [[
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').split('.')
+            for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
         ]
                 for tup in re.compile(regex).findall(
                     query.encode("utf-8")[start:stop])
