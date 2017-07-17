@@ -1,4 +1,3 @@
-
 CUBE = 'sales'
 
 query1 = """SELECT
