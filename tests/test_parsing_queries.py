@@ -20,22 +20,22 @@ query3 = """SELECT
 query4 = """SELECT
          {[Geography].[Economy].[Partnership]} ON COLUMNS,
          non empty {[Geography].[Geo].[Country].members} ON ROWS
-         from [sales]"""
+         FROM [sales]"""
 
 query5 = """select
          {[Geography].[Economy].[Country]} on 0,
          non empty {[Geography].[Geo].[Country].members} on 1
-         from [sales]"""
+         FROM [sales]"""
 
 query6 = """select
          {[Geography].[Economy].[Partnership]} on 0,
          {[Product].[Prod].[Company]} on 1
-         from [sales]"""
+         FROM [sales]"""
 
 query7 = """select
          {[Geography].[Economy].[Partnership].[EU]} on 0,
          {[Product].[Prod].[Company].[Crazy Development]} on 1
-         from [sales]"""
+         FROM [sales]"""
 
 query8 = """select
          {[Geography].[Economy].[Partnership].[EU],
@@ -44,20 +44,20 @@ query8 = """select
          {[Product].[Prod].[Company].[Crazy Development],
          [Product].[Prod].[Company].[Company_test],
          [Product].[Prod].[Company].[test_Development]} on 1
-         from [sales]"""
+         FROM [sales]"""
 
 query9 = """select
          {[Geography].[Economy].[Partnership].[EU],
          [Geography].[Economy].[Partnership].[None]} on 0
-         from [sales]"""
+         FROM [sales]"""
 
 query10 = """select
           {[Geography].[Geo].[Country].[France],
           [Geography].[Geo].[Country].[Spain]} on 0,
           non empty {[Measures].[Amount]} on 1
-          from [sales]"""
+          FROM [sales]"""
 
-where = "Where [Time].[Calendar].[Day].[May 12,2010]"
+where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
 
 query11 = """
           SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownMember({{
@@ -92,7 +92,7 @@ def test_parsing_query1():
 
     assert query_parts['all'] == [['Measures', 'Amount'], ['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['rows'] == []
-    assert query_parts['where'] == []
+    assert query_parts['where'] == [['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['columns'] == [['Measures', 'Amount']]
 
 
@@ -108,7 +108,7 @@ def test_parsing_query2():
 
     assert query_parts['all'] == [['Geography', 'Economy', 'Partnership'], ['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['rows'] == []
-    assert query_parts['where'] == []
+    assert query_parts['where'] == [['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['columns'] == [['Geography', 'Economy', 'Partnership']]
 
 
@@ -125,7 +125,7 @@ def test_parsing_query3():
     assert query_parts['all'] == [['Geography', 'Geo', 'Country'], ['Measures', 'Amount'],
                                   ['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['rows'] == [['Measures', 'Amount']]
-    assert query_parts['where'] == []
+    assert query_parts['where'] == [['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['columns'] == [['Geography', 'Geo', 'Country']]
 
 
@@ -142,5 +142,5 @@ def test_parsing_query4():
     assert query_parts['all'] == [['Geography', 'Economy', 'Partnership'], ['Geography', 'Geo', 'Country'],
                                   ['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['rows'] == [['Geography', 'Geo', 'Country']]
-    assert query_parts['where'] == []
+    assert query_parts['where'] == [['Time', 'Calendar', 'Day', 'May 12,2010']]
     assert query_parts['columns'] == [['Geography', 'Economy', 'Partnership']]
