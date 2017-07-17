@@ -21,4 +21,5 @@ class MicBench:
         to one million
         :return: float execution time in seconds
         """
-        return Timer(lambda: connection.Execute(query, Catalog=cube)).timeit(number=number)
+        return Timer(lambda: connection.Execute(query, Catalog=cube)).timeit(
+            number=number)

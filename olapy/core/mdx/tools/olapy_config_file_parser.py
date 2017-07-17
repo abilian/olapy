@@ -4,12 +4,11 @@ import os
 
 from lxml import etree
 
+
 class DbConfigParser:
 
     # TODO one config file (I will try to merge dimensions between them in web part)
-    def __init__(self,
-                 config_path = None,
-                 file_name='olapy-config.xml'):
+    def __init__(self, config_path=None, file_name='olapy-config.xml'):
         """
 
         :param cube_path: path to cube (csv folders)
@@ -46,10 +45,9 @@ class DbConfigParser:
             return [
                 {
                     # 'sgbd': db.find('sgbd').text,
-                 'user_name': db.find('user_name').text,
-                 'password': db.find('password').text,
-                 'host': db.find('host').text,
-                 'port': db.find('port').text,
-                 }
-                for db in tree.xpath('/olapy/database')
+                    'user_name': db.find('user_name').text,
+                    'password': db.find('password').text,
+                    'host': db.find('host').text,
+                    'port': db.find('port').text,
+                } for db in tree.xpath('/olapy/database')
             ]

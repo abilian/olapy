@@ -85,7 +85,7 @@ class XmlaDiscoverTools():
                     <Value>{5}</Value>
                 </row>
                 """.format(PropertyName, PropertyDescription, PropertyType,
-                       PropertyAccessType, IsRequired, Value)
+                           PropertyAccessType, IsRequired, Value)
             else:
                 rows = """
                 <row>
@@ -139,7 +139,7 @@ class XmlaDiscoverTools():
                 {1}
                 </root>
             </return>
-            """.format(xsd,rows))
+            """.format(xsd, rows))
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -195,7 +195,7 @@ class XmlaDiscoverTools():
                                  'MdpropMdxNamedSets', 'int', 'Read', 'false',
                                  '15')
 
-        return get_props(discover_preperties_xsd, '','', '', '', '','')
+        return get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
     def discover_schema_rowsets_response(self, request):
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
@@ -1929,10 +1929,10 @@ class XmlaDiscoverTools():
                     # french caracteres
                     # TODO encode dataframe
                     if type(df.iloc[0][0]) == unicode:
-                        column_attribut = df.iloc[0][0].encode('utf-8','replace')
+                        column_attribut = df.iloc[0][0].encode('utf-8',
+                                                               'replace')
                     else:
                         column_attribut = df.iloc[0][0]
-
 
                     rows += """
                     <row>
@@ -1956,11 +1956,8 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                    """.format(self.selected_catalogue,
-                               table_name,
-                               df.columns[0],
-                               column_attribut)
-
+                    """.format(self.selected_catalogue, table_name,
+                               df.columns[0], column_attribut)
 
                 rows += """
                 <row>
@@ -2006,7 +2003,8 @@ class XmlaDiscoverTools():
                     # french caracteres
                     # TODO encode dataframe
                     if type(df.iloc[0][0]) == unicode:
-                        column_attribut = df.iloc[0][0].encode('utf-8','replace')
+                        column_attribut = df.iloc[0][0].encode('utf-8',
+                                                               'replace')
                     else:
                         column_attribut = df.iloc[0][0]
 
@@ -2032,10 +2030,8 @@ class XmlaDiscoverTools():
                         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
                         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
                     </row>
-                        """.format(self.selected_catalogue,
-                                   table_name,
-                                   df.columns[0],
-                                   column_attribut)
+                        """.format(self.selected_catalogue, table_name,
+                                   df.columns[0], column_attribut)
 
                 rows += """
                 <row>

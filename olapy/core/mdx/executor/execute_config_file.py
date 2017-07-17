@@ -4,6 +4,7 @@ from ..tools.connection import MyDB
 import pandas.io.sql as psql
 import os
 
+
 # split execution into three part (execute from config files,
 # execute csv files if they respect olapy's start schema model,
 # and execute data base tables if they respect olapy's start schema model)
@@ -18,7 +19,9 @@ def _load_table_config_file(executer_instance, cube_obj):
     # just one facts table right now
     executer_instance.facts = cube_obj.facts[0].table_name
 
-    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
+    db = MyDB(
+        db_config_file_path=os.path.dirname(executer_instance.cube_path),
+        db=executer_instance.cube)
 
     for dimension in cube_obj.dimensions:
 
@@ -35,13 +38,16 @@ def _load_table_config_file(executer_instance, cube_obj):
             table_name = dimension.name
 
         # rename columns if value not None
-        df.rename(columns=(dict((k, v) for k, v in dimension.columns.items() if v)), inplace=True)
+        df.rename(
+            columns=(dict((k, v) for k, v in dimension.columns.items() if v)),
+            inplace=True)
 
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
         ]]
 
     return tables
+
 
 # excel client
 def _construct_star_schema_config_file(executer_instance, cubes_obj):
@@ -53,7 +59,9 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     :return: star schema DataFrame
     """
     executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
+    db = MyDB(
+        db_config_file_path=os.path.dirname(executer_instance.cube_path),
+        db=executer_instance.cube)
     # load facts table
 
     fusion = psql.read_sql_query(
@@ -74,8 +82,11 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
 
         # TODO CHOSE BETWEEN THOSES DF
         fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
-        # remove suffixe from dimension and keep the same column name for facts
+            df,
+            left_on=fact_key,
+            right_on=dimension_and_key.split('.')[1],
+            how='left',
+            # remove suffixe from dimension and keep the same column name for facts
             suffixes=('', '_y'))
 
     # measures in config-file only
@@ -83,6 +94,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
         executer_instance.measures = cubes_obj.facts[0].measures
 
     return fusion
+
 
 # web client
 def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
@@ -96,7 +108,9 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     all_columns = []
 
     executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db_config_file_path=os.path.dirname(executer_instance.cube_path), db=executer_instance.cube)
+    db = MyDB(
+        db_config_file_path=os.path.dirname(executer_instance.cube_path),
+        db=executer_instance.cube)
     # load facts table
 
     if cubes_obj.facts[0].columns:
@@ -147,9 +161,11 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
 
         # TODO check merge (how)
         fusion = fusion.merge(
-            df, left_on=fact_key, right_on=dimension_and_key.split('.')[1], how='left',
+            df,
+            left_on=fact_key,
+            right_on=dimension_and_key.split('.')[1],
+            how='left',
             # remove suffixe from dimension and keep the same column name for facts
             suffixes=('', '_y'))
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]
-

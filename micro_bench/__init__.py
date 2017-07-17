@@ -23,7 +23,8 @@ PROFILING_LINES = 15
 
 
 def main():
-    file = open('bench_result' + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
+    file = open('bench_result' +
+                str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
     XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
@@ -52,14 +53,18 @@ def main():
             WHERE ([Measures].[Amount])
             CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-    file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 1 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
 
     t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
 
     cmd = """SELECT
         NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
-        [table0].[table0].[table0A].[""" + str(XmlaProviderService.discover_tools.star_schema_dataframe.table0A[1]) + """]})))
+        [table0].[table0].[table0A].[""" + str(
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
+            1]) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS
         FROM [""" + CUBE_NAME + """]
@@ -67,12 +72,18 @@ def main():
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
         """
 
-    file.write("Query 2 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 2 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
 
-    tup = "[table0].[table0].[table0A].[" + str(XmlaProviderService.discover_tools.star_schema_dataframe.table0A[0]) + "]"
+    tup = "[table0].[table0].[table0A].[" + str(
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
+            0]) + "]"
     for d in range(REFINEMENT_LVL):
-        tup += ",\n[table0].[table0].[table0A].[" + str(XmlaProviderService.discover_tools.star_schema_dataframe.table0A[d + 1]) + "]"
+        tup += ",\n[table0].[table0].[table0A].[" + str(
+            XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
+                d + 1]) + "]"
 
     cmd = """
         SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
@@ -86,15 +97,25 @@ def main():
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
         """
 
-    file.write("Query 3 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 3 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
     file.write(str(t) + "\n\n")
 
     try:
-        file.write('******************************************************************************\n')
-        file.write('* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n')
-        file.write('* (olapy warehouse"s cube has more rows)                                     *\n')
-        file.write('******************************************************************************\n\n')
+        file.write(
+            '******************************************************************************\n'
+        )
+        file.write(
+            '* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n'
+        )
+        file.write(
+            '* (olapy warehouse"s cube has more rows)                                     *\n'
+        )
+        file.write(
+            '******************************************************************************\n\n'
+        )
 
         t = PrettyTable(['Query', 'mondrian', 'olapy'])
         p2 = xmla.XMLAProvider()
@@ -111,9 +132,13 @@ def main():
                FROM
                [Warehouse]"""
 
-        file.write("Query 1 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 1', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(conn, cmd, 'foodmart')])
-
+        file.write(
+            "Query 1 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 1', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
+                conn, cmd, 'foodmart')
+        ])
 
         cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
           [Product].[Product].[All brand_name].Members}}}, {
@@ -131,8 +156,13 @@ def main():
             DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON 0
             FROM [Warehouse]"""
 
-        file.write("Query 2 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 2', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(conn, cmd, 'foodmart')])
+        file.write(
+            "Query 2 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 2', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
+                conn, cmd, 'foodmart')
+        ])
 
         cmd = """SELECT NON EMPTY CrossJoin(Hierarchize(AddCalculatedMembers({
           [Product].[Product].[All brand_name].Members})), Hierarchize(AddCalculatedMembers({
@@ -151,8 +181,13 @@ def main():
             DIMENSION PROPERTIES PARENT_UNIQUE_NAME ON 0
             FROM [Warehouse]"""
 
-        file.write("Query 3 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 3', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(conn, cmd, 'foodmart')])
+        file.write(
+            "Query 3 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 3', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
+                conn, cmd, 'foodmart')
+        ])
 
         file.write(str(t) + "\n\n")
 
@@ -167,16 +202,23 @@ def main():
 
         t = PrettyTable(['Query', 'olapy', 'icCube'])
         p2 = xmla.XMLAProvider()
-        c2 = p2.connect(location="http://localhost:8282/icCube/xmla", username="demo",
-                        password="demo")
+        c2 = p2.connect(
+            location="http://localhost:8282/icCube/xmla",
+            username="demo",
+            password="demo")
 
         cmd = """SELECT
           FROM [Sales]
           WHERE ([Measures].[Amount])
           CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-        file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 1', mbench.bench(conn, cmd, 'sales'), mbench.bench(c2, cmd, 'Sales (Excel)')])
+        file.write(
+            "Query 1 :\n" + cmd +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 1', mbench.bench(conn, cmd, 'sales'), mbench.bench(
+                c2, cmd, 'Sales (Excel)')
+        ])
 
         cmd = """SELECT
                 NON EMPTY Hierarchize(AddCalculatedMembers({DrilldownLevel({
@@ -194,8 +236,13 @@ def main():
                   FROM [Sales]
                   WHERE ([Measures].[Amount])
                   CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-        file.write("Query 2 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 2', mbench.bench(conn, cmd2, 'sales'), mbench.bench(c2, cmd, 'Sales (Excel)')])
+        file.write(
+            "Query 2 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 2', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
+                c2, cmd, 'Sales (Excel)')
+        ])
 
         cmd = """SELECT
                  NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownLevel({
@@ -224,8 +271,13 @@ def main():
                   FROM [sales]
                   WHERE ([Measures].[Amount])
                   CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-        file.write("Query 3 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 3', mbench.bench(conn, cmd2, 'sales'), mbench.bench(c2, cmd, 'Sales (Excel)')])
+        file.write(
+            "Query 3 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 3', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
+                c2, cmd, 'Sales (Excel)')
+        ])
 
         cmd = """SELECT
                  NON EMPTY CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember
@@ -257,8 +309,13 @@ def main():
                   WHERE ([Measures].[Amount])
                   CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-        file.write("Query 4 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 4', mbench.bench(conn, cmd2, 'sales'), mbench.bench(c2, cmd, 'Sales (Excel)')])
+        file.write(
+            "Query 4 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 4', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
+                c2, cmd, 'Sales (Excel)')
+        ])
 
         cmd = """SELECT
                  NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers
@@ -307,8 +364,13 @@ def main():
                   WHERE ([Measures].[Amount])
                   CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-        file.write("Query 5 :\n" + cmd2 + "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query 5', mbench.bench(conn, cmd2, 'sales'), mbench.bench(c2, cmd, 'Sales (Excel)')])
+        file.write(
+            "Query 5 :\n" + cmd2 +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row([
+            'Query 5', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
+                c2, cmd, 'Sales (Excel)')
+        ])
 
         file.write(str(t) + "\n\n")
 
@@ -316,8 +378,8 @@ def main():
         print('Make sure icCube is running and containing sales Excel cube')
         pass
 
-
-    file.write('---------------- Profiling olapy Query 5 ------------------ \n\n')
+    file.write(
+        '---------------- Profiling olapy Query 5 ------------------ \n\n')
     cProfile.run("""cmd = '''
             SELECT
             NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
@@ -347,19 +409,19 @@ request.Command = Command(Statement = cmd)
 request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
 
 XmlaProviderService().Execute(XmlaProviderService(),request)""",
-                 "{}.profile".format(__file__)
-                 )
+                 "{}.profile".format(__file__))
 
     s = pstats.Stats("{}.profile".format(__file__), stream=file)
     s.strip_dirs()
     s.sort_stats("time").print_stats(PROFILING_LINES)
 
     try:
-        os.system('gprof2dot -f pstats __init__.py.profile | dot -Tpng -o profile.png')
+        os.system(
+            'gprof2dot -f pstats main.py.profile | dot -Tpng -o profile.png')
     except:
         print('make sure gprof2dot and graphviz are installed')
 
-    os.remove('__init__.py.profile ')
+    os.remove('main.py.profile ')
     gen.remove_temp_cube()
     file.close()
     server.stop()

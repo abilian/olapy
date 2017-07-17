@@ -246,7 +246,7 @@ class ConfigParser:
     """
 
     def __init__(self,
-                 cube_path = None,
+                 cube_path=None,
                  file_name='cubes-config.xml',
                  web_config_file_name='web_cube_config.xml'):
         """
@@ -262,7 +262,8 @@ class ConfigParser:
             home_directory = expanduser("~")
 
         if cube_path is None:
-            self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
+            self.cube_path = os.path.join(home_directory, 'olapy-data',
+                                          'cubes')
         else:
             self.cube_path = cube_path
 
@@ -303,7 +304,7 @@ class ConfigParser:
         else:
             return False
 
-    def get_cubes_names(self,client_type):
+    def get_cubes_names(self, client_type):
         """
         Get all cubes names in the config file.
 
@@ -359,10 +360,10 @@ class ConfigParser:
                         # column_new_name = [key.attrib['column_new_name'] for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
                         columns=OrderedDict(
-                            (column_name.text , None if not column_name.attrib else column_name.attrib['column_new_name'])
+                            (column_name.text, None if not column_name.attrib
+                             else column_name.attrib['column_new_name'])
                             for column_name in xml_dimension.findall(
-                                'columns/name')
-                        ))
+                                'columns/name')))
                     for xml_dimension in tree.xpath(
                         '/cubes/cube/dimensions/dimension')
                 ]
@@ -449,8 +450,7 @@ class ConfigParser:
                 global_table={
                     'columns':
                     dashboard.find('Global_table/columns').text.split(','),
-                    'rows':
-                    dashboard.find('Global_table/rows').text.split(',')
+                    'rows': dashboard.find('Global_table/rows').text.split(',')
                 },
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_charts=dashboard.find('BarCharts').text.split(','),

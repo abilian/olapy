@@ -104,11 +104,11 @@ class XmlaExecuteTools():
                 first_att = 3
 
         # query with on columns and on rows (without measure)
-        elif mdx_execution_result['columns_desc']['columns'] and mdx_execution_result['columns_desc']['rows']:
+        elif mdx_execution_result['columns_desc'][
+                'columns'] and mdx_execution_result['columns_desc']['rows']:
             # ['Geography','America']
             tuples = [
-                zip(
-                    *[[[key] + list(row)
+                zip(*[[[key] + list(row)
                        for row in splited_df[key].itertuples(index=False)]
                       for key in splited_df.keys()
                       if key is not self.executer.facts])
@@ -120,8 +120,7 @@ class XmlaExecuteTools():
         else:
             # ['Geography','Amount','America']
             tuples = [
-                zip(
-                    *[[[key] + [mes] + list(row)
+                zip(*[[[key] + [mes] + list(row)
                        for row in splited_df[key].itertuples(index=False)]
                       for key in splited_df.keys()
                       if key is not self.executer.facts])
@@ -155,7 +154,10 @@ class XmlaExecuteTools():
                 # french caracteres
                 # TODO encode dataframe
                 if type(tuple_without_minus_1[-1]) == unicode:
-                    tuple_without_minus_1 = [x.encode('utf-8','replace') for x in tuple_without_minus_1]
+                    tuple_without_minus_1 = [
+                        x.encode('utf-8', 'replace')
+                        for x in tuple_without_minus_1
+                    ]
 
                 axis0 += """
                 <Member Hierarchy="[{0}].[{0}]">
@@ -254,7 +256,8 @@ class XmlaExecuteTools():
         # TODO must be OPTIMIZED every time!!!!!
 
         dfs = self.split_dataframe(mdx_execution_result)
-        if mdx_execution_result['columns_desc']['rows'] and mdx_execution_result['columns_desc']['columns']:
+        if mdx_execution_result['columns_desc'][
+                'rows'] and mdx_execution_result['columns_desc']['columns']:
 
             return """
             {0}
@@ -306,12 +309,11 @@ class XmlaExecuteTools():
         """
         columns_loop = []
 
-        if (
-            (len(mdx_execution_result['columns_desc']['columns'].keys()) == 0)
+        if ((len(mdx_execution_result['columns_desc']['columns'].keys()) == 0)
                 ^
-            (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0)
-        ) and self.executer.facts in mdx_execution_result['columns_desc']['all'].keys(
-        ):
+            (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0
+             )) and self.executer.facts in mdx_execution_result[
+                 'columns_desc']['all'].keys():
 
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
@@ -332,7 +334,7 @@ class XmlaExecuteTools():
         cell_data = ""
         index = 0
         for value in columns_loop:
-            if np.isnan(value) :
+            if np.isnan(value):
                 value = ''
             cell_data += """
             <Cell CellOrdinal="{0}">
@@ -392,9 +394,9 @@ class XmlaExecuteTools():
             to_write = "[{0}].[{0}]".format(dim_diff)
             if dim_diff == 'Measures':
                 # if measures > 1 we don't have to write measure
-                if self.executer.facts in mdx_execution_result['columns_desc']['all'] and len(
-                        mdx_execution_result['columns_desc']['all']
-                    [self.executer.facts]) > 1:
+                if self.executer.facts in mdx_execution_result['columns_desc'][
+                        'all'] and len(mdx_execution_result['columns_desc'][
+                            'all'][self.executer.facts]) > 1:
                     continue
                 else:
                     to_write = "[Measures]"
@@ -452,9 +454,9 @@ class XmlaExecuteTools():
         """
         hierarchy_info = ""
         # measure must be written at the top
-        if self.executer.facts in mdx_execution_result['columns_desc'][mdx_query_axis].keys(
-        ) and len(mdx_execution_result['columns_desc'][mdx_query_axis]
-                  [self.executer.facts]) > 1:
+        if self.executer.facts in mdx_execution_result['columns_desc'][
+                mdx_query_axis].keys() and len(mdx_execution_result[
+                    'columns_desc'][mdx_query_axis][self.executer.facts]) > 1:
             hierarchy_info += """
             <HierarchyInfo name="{0}">
                 <UName name="{0}.[MEMBER_UNIQUE_NAME]" type="xs:string"/>
@@ -556,15 +558,18 @@ class XmlaExecuteTools():
         for dim_diff in list(
                 set(self.executer.get_all_tables_names(ignore_fact=True)) -
                 set(table_name
-                    for table_name in mdx_execution_result['columns_desc']
-                    ['all'])):
+                    for table_name in mdx_execution_result['columns_desc'][
+                        'all'])):
 
             # TODO encode dataframe
             # french caracteres
-            if type(self.executer.tables_loaded[dim_diff].iloc[0][0]) == unicode:
-                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0].encode('utf-8','replace')
+            if type(self.executer.tables_loaded[dim_diff].iloc[0][
+                    0]) == unicode:
+                column_attribut = self.executer.tables_loaded[dim_diff].iloc[
+                    0][0].encode('utf-8', 'replace')
             else:
-                column_attribut = self.executer.tables_loaded[dim_diff].iloc[0][0]
+                column_attribut = self.executer.tables_loaded[dim_diff].iloc[
+                    0][0]
 
             tuple += """
             <Member Hierarchy="[{0}].[{0}]">

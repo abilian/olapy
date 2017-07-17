@@ -9,8 +9,6 @@ import pandas.io.sql as psql
 # execute csv files if they respect olapy's start schema model,
 # and execute data base tables if they respect olapy's start schema model)
 
-
-
 # class StringFolder(object):
 #     """
 #     Class that will fold strings. See 'fold_string'.
@@ -68,6 +66,7 @@ import pandas.io.sql as psql
 
 # TODO try pandas.read_sql_table and pandas.read_sql
 
+
 def _load_tables_db(executer_instance):
     """
     Load tables from database.
@@ -75,7 +74,9 @@ def _load_tables_db(executer_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    db = MyDB(db_config_file_path=executer_instance.DATA_FOLDER,db=executer_instance.cube)
+    db = MyDB(
+        db_config_file_path=executer_instance.DATA_FOLDER,
+        db=executer_instance.cube)
     inspector = inspect(db.engine)
 
     for table_name in inspector.get_table_names():
@@ -84,9 +85,12 @@ def _load_tables_db(executer_instance):
         #     'SELECT * FROM "{0}"'.format(table_name), db.engine)
 
         # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
-        results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM "{0}"'.format(table_name))
+        results = db.engine.execution_options(stream_results=True).execute(
+            'SELECT * FROM "{0}"'.format(table_name))
         # Fetch all the results of the query
-        value = pd.DataFrame(iter(results),columns=results.keys())  # Pass results as an iterator
+        value = pd.DataFrame(
+            iter(results),
+            columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[

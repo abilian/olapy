@@ -41,6 +41,7 @@ class MdxEngine:
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
     postgres_db_cubes = []
+
     # to show just config file's dimensions
 
     def __init__(self,
@@ -113,7 +114,8 @@ class MdxEngine:
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
-            result = db.engine.execute('SELECT datname FROM pg_database WHERE datistemplate = false;')
+            result = db.engine.execute(
+                'SELECT datname FROM pg_database WHERE datistemplate = false;')
             available_tables = result.fetchall()
             # cursor.execute("""SELECT datname FROM pg_database
             # WHERE datistemplate = false;""")
@@ -164,9 +166,10 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
 
-        if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client
-        ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client
-        ):
+        if self.client == 'excel' and config_file_parser.config_file_exist(
+                client_type=self.
+                client) and self.cube in config_file_parser.get_cubes_names(
+                    client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
 
@@ -188,7 +191,8 @@ class MdxEngine:
 
         # if web, get measures from config file
         config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist('web'):
+        if self.client == 'web' and config_file_parser.config_file_exist(
+                'web'):
             for cubes in config_file_parser.construct_cubes(self.client):
 
                 # update facts name
@@ -214,19 +218,19 @@ class MdxEngine:
         fusion = None
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
-                self.client
-        ) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client):
+                self.
+                client) and self.cube in config_file_parser.get_cubes_names(
+                    client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     # TODO one config file (I will try to merge dimensions between them in web part)
                     if self.client == 'web':
-                        fusion = _construct_web_star_schema_config_file(
-                            self, cubes)
+                        fusion = _construct_web_star_schema_config_file(self,
+                                                                        cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(
-                            self, cubes)
+                        fusion = _construct_star_schema_config_file(self,
+                                                                    cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -256,7 +260,8 @@ class MdxEngine:
         :return: path to the cube
         """
         if MdxEngine.DATA_FOLDER is not None:
-            return os.path.join(MdxEngine.DATA_FOLDER, MdxEngine.CUBE_FOLDER, self.cube)
+            return os.path.join(MdxEngine.DATA_FOLDER, MdxEngine.CUBE_FOLDER,
+                                self.cube)
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
@@ -309,7 +314,7 @@ class MdxEngine:
             for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
         ]
                 for tup in re.compile(regex).findall(
-                    query.encode("utf-8",'replace')[start:stop])
+                    query.encode("utf-8", 'replace')[start:stop])
                 if len(tup[0].split('.')) > 1]
 
     # TODO temporary function
@@ -603,9 +608,8 @@ class MdxEngine:
 
         :return: updated columns_to_keep
         """
-        if len(
-                tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
+                tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
