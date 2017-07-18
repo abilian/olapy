@@ -15,5 +15,6 @@ pytz==2017.2              # via pandas, spyne
 six==1.10.0               # via python-dateutil
 spyne==2.12.14
 sqlalchemy==1.1.11
-treelib==1.3.5
+treelib==1.3.7
 werkzeug==0.12.2
+xmlwitch==0.3
