@@ -4,6 +4,10 @@ from __future__ import absolute_import, division, print_function
 
 import uuid
 
+import xmlwitch
+import HTMLParser
+
+
 from lxml import etree
 import os
 
@@ -52,94 +56,200 @@ class XmlaDiscoverTools():
 
     @staticmethod
     def discover_datasources_response():
-        return etree.fromstring("""
+
+        xml = xmlwitch.Builder()
+        with xml.root(discover_datasources_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                      **{'xmlns:EX': 'urn:schemas-microsoft-com:xml-analysis:exception',
+                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+
+                      # "xmlns:EX='urn:schemas-microsoft-com:xml-analysis:exception'"
+                      # "xmlns:xsd='http://www.w3.org/2001/XMLSchema'"
+                      # "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'",
+                      ):
+            with xml.row:
+                xml.DataSourceName('sales')
+                xml.DataSourceDescription('sales Sample Data')
+                xml.URL('http://127.0.0.1:8000/xmla')
+                xml.DataSourceInfo('-')
+                xml.ProviderName('olapy')
+                xml.ProviderType('MDP')
+                xml.AuthenticationMode('Unauthenticated')
+
+        return """
         <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:EX="urn:schemas-microsoft-com:xml-analysis:exception"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            """ + discover_datasources_xsd + """
-                <row>
-                    <DataSourceName>sales</DataSourceName>
-                    <DataSourceDescription>sales Sample Data</DataSourceDescription>
-                    <URL>http://127.0.0.1:8000/xmla</URL>
-                    <DataSourceInfo>-</DataSourceInfo>
-                    <ProviderName>olapy</ProviderName>
-                    <ProviderType>MDP</ProviderType>
-                    <AuthenticationMode>Unauthenticated</AuthenticationMode>
-                  </row>
-            </root>
-        </return>""")
+            {0}
+        </return>
+        """.format(str(xml))
+
+        # return etree.fromstring("""
+        # <return>
+        #     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+        #     xmlns:EX="urn:schemas-microsoft-com:xml-analysis:exception"
+        #     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        #     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        #     """ + discover_datasources_xsd + """
+        #         <row>
+        #             <DataSourceName>sales</DataSourceName>
+        #             <DataSourceDescription>sales Sample Data</DataSourceDescription>
+        #             <URL>http://127.0.0.1:8000/xmla</URL>
+        #             <DataSourceInfo>-</DataSourceInfo>
+        #             <ProviderName>olapy</ProviderName>
+        #             <ProviderType>MDP</ProviderType>
+        #             <AuthenticationMode>Unauthenticated</AuthenticationMode>
+        #           </row>
+        #     </root>
+        # </return>""")
 
     def discover_properties_response(self, request):
+
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
-            if PropertyName is not '':
-                rows = """
-                <row>
-                    <PropertyName>{0}</PropertyName>
-                    <PropertyDescription>{1}</PropertyDescription>
-                    <PropertyType>{2}</PropertyType>
-                    <PropertyAccessType>{3}</PropertyAccessType>
-                    <IsRequired>{4}</IsRequired>
-                    <Value>{5}</Value>
-                </row>
-                """.format(PropertyName, PropertyDescription, PropertyType,
-                           PropertyAccessType, IsRequired, Value)
-            else:
-                rows = """
-                <row>
-                    <PropertyName>ServerName</PropertyName>
-                    <PropertyDescription>ServerName</PropertyDescription>
-                    <PropertyType>string</PropertyType>
-                    <PropertyAccessType>Read</PropertyAccessType>
-                    <IsRequired>false</IsRequired>
-                    <Value>{0}</Value>
-                </row>
-                <row>
-                    <PropertyName>ProviderVersion</PropertyName>
-                    <PropertyDescription>ProviderVersion</PropertyDescription>
-                    <PropertyType>string</PropertyType>
-                    <PropertyAccessType>Read</PropertyAccessType>
-                    <IsRequired>false</IsRequired>
-                    <Value>0.0.3  25-Nov-2016 07:20:28 GMT</Value>
-                </row>
-                <row>
-                    <PropertyName>MdpropMdxSubqueries</PropertyName>
-                    <PropertyDescription>MdpropMdxSubqueries</PropertyDescription>
-                    <PropertyType>int</PropertyType>
-                    <PropertyAccessType>Read</PropertyAccessType>
-                    <IsRequired>false</IsRequired>
-                    <Value>15</Value>
-                </row>
-                <row>
-                    <PropertyName>MdpropMdxDrillFunctions</PropertyName>
-                    <PropertyDescription>MdpropMdxDrillFunctions</PropertyDescription>
-                    <PropertyType>int</PropertyType>
-                    <PropertyAccessType>Read</PropertyAccessType>
-                    <IsRequired>false</IsRequired>
-                    <Value>3</Value>
-                </row>
-                <row>
-                    <PropertyName>MdpropMdxNamedSets</PropertyName>
-                    <PropertyDescription>MdpropMdxNamedSets</PropertyDescription>
-                    <PropertyType>int</PropertyType>
-                    <PropertyAccessType>Read</PropertyAccessType>
-                    <IsRequired>false</IsRequired>
-                    <Value>15</Value>
-                </row>
-                """.format(os.getenv('USERNAME', 'default'))
 
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                {0}
-                {1}
-                </root>
-            </return>
-            """.format(xsd, rows))
+            xml = xmlwitch.Builder()
+
+            # xml.DataSourceName('sales')
+            # xml.DataSourceDescription('sales Sample Data')
+            # xml.URL('http://127.0.0.1:8000/xmla')
+            # xml.DataSourceInfo('-')
+            # xml.ProviderName('olapy')
+            # xml.ProviderType('MDP')
+            # xml.AuthenticationMode('Unauthenticated')
+
+            if PropertyName is not '':
+
+                # return """
+                #            <return>
+                #                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+                #                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                #                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                #                {0}
+                #                {1}
+                #                </root>
+                #            </return>
+                #            """.format(xsd, rows))
+
+                with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+
+                    with xml.row:
+                        xml.PropertyName(PropertyName)
+                        xml.PropertyDescription(PropertyDescription)
+                        xml.PropertyType(PropertyType)
+                        xml.PropertyAccessType(PropertyAccessType)
+                        xml.IsRequired(IsRequired)
+                        xml.Value(Value)
+                # rows = """
+                # <row>
+                #     <PropertyName>{0}</PropertyName>
+                #     <PropertyDescription>{1}</PropertyDescription>
+                #     <PropertyType>{2}</PropertyType>
+                #     <PropertyAccessType>{3}</PropertyAccessType>
+                #     <IsRequired>{4}</IsRequired>
+                #     <Value>{5}</Value>
+                # </row>
+                # """.format(PropertyName, PropertyDescription, PropertyType,
+                #            PropertyAccessType, IsRequired, Value)
+            else:
+                properties_names_n_description = ['ServerName',
+                                  'ProviderVersion',
+                                  'MdpropMdxSubqueries',
+                                  'MdpropMdxDrillFunctions',
+                                  'MdpropMdxNamedSets']
+                properties_types = ['string',
+                                  'string',
+                                  'int',
+                                  'int',
+                                  'int']
+                values = [os.getenv('USERNAME', 'default'),
+                          '0.0.3  25-Nov-2016 07:20:28 GMT',
+                          '15',
+                          '3',
+                          '15']
+
+
+
+                with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                    for idx,prop_desc in enumerate(properties_names_n_description):
+                        with xml.row:
+                            xml.PropertyName(prop_desc)
+                            xml.PropertyDescription(prop_desc)
+                            xml.PropertyType(properties_types[idx])
+                            xml.PropertyAccessType('Read')
+                            xml.IsRequired('false')
+                            xml.Value(values[idx])
+                #
+                #
+                # rows = """
+                # <row>
+                #     <PropertyName>ServerName</PropertyName>
+                #     <PropertyDescription>ServerName</PropertyDescription>
+                #     <PropertyType>string</PropertyType>
+                #     <PropertyAccessType>Read</PropertyAccessType>
+                #     <IsRequired>false</IsRequired>
+                #     <Value>{0}</Value>
+                # </row>
+                # <row>
+                #     <PropertyName>ProviderVersion</PropertyName>
+                #     <PropertyDescription>ProviderVersion</PropertyDescription>
+                #     <PropertyType>string</PropertyType>
+                #     <PropertyAccessType>Read</PropertyAccessType>
+                #     <IsRequired>false</IsRequired>
+                #     <Value>0.0.3  25-Nov-2016 07:20:28 GMT</Value>
+                # </row>
+                # <row>
+                #     <PropertyName>MdpropMdxSubqueries</PropertyName>
+                #     <PropertyDescription>MdpropMdxSubqueries</PropertyDescription>
+                #     <PropertyType>int</PropertyType>
+                #     <PropertyAccessType>Read</PropertyAccessType>
+                #     <IsRequired>false</IsRequired>
+                #     <Value>15</Value>
+                # </row>
+                # <row>
+                #     <PropertyName>MdpropMdxDrillFunctions</PropertyName>
+                #     <PropertyDescription>MdpropMdxDrillFunctions</PropertyDescription>
+                #     <PropertyType>int</PropertyType>
+                #     <PropertyAccessType>Read</PropertyAccessType>
+                #     <IsRequired>false</IsRequired>
+                #     <Value>3</Value>
+                # </row>
+                # <row>
+                #     <PropertyName>MdpropMdxNamedSets</PropertyName>
+                #     <PropertyDescription>MdpropMdxNamedSets</PropertyDescription>
+                #     <PropertyType>int</PropertyType>
+                #     <PropertyAccessType>Read</PropertyAccessType>
+                #     <IsRequired>false</IsRequired>
+                #     <Value>15</Value>
+                # </row>
+                # """.format(os.getenv('USERNAME', 'default'))
+            #
+            # return etree.fromstring("""
+            # <return>
+            #     <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+            #     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            #     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            #     {0}
+            #     {1}
+            #     </root>
+            # </return>
+            # """.format(xsd, rows))
+
+
+            # escape gt; lt; (from xsd)
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+
+            # return xml
+            return """
+                   <return>
+                        {0}
+                   </return>
+                   """.format(xml)
+
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:

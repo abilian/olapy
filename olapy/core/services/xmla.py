@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import, division, print_function
 
+import xmlwitch
 import os
 from datetime import datetime
 from os.path import expanduser
@@ -158,11 +159,16 @@ class XmlaProviderService(ServiceBase):
 
         if request.Command.Statement == '':
             # check if command contains a query
-            return etree.fromstring("""
+
+            xml = xmlwitch.Builder()
+            # xml.return return reserved of course
+            xml.root(xmlns="urn:schemas-microsoft-com:xml-analysis:empty")
+
+            return """
             <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:empty"/>
+                {0}
             </return>
-            """)
+            """.format(str(xml))
         else:
             XmlaProviderService.discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog)
@@ -170,6 +176,28 @@ class XmlaProviderService(ServiceBase):
             executer.mdx_query = request.Command.Statement
             df = executer.execute_mdx()
             xmla_tools = XmlaExecuteTools(executer)
+
+
+            # xml = xmlwitch.Builder()
+            # with xml.OlapInfo(xmla_tools.generate_cell_info()):
+            #     with xml.CubeInfo:
+            #         with xml.Cube:
+            #             xml.CubeName('Sales')
+            #             xml.LastDataUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            #                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
+            #             xml.LastSchemaUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            #                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
+            #     xml.AxesInfo(xmla_tools.generate_axes_info(df),
+            #                  xmla_tools.generate_axes_info_slicer(df))
+            #
+            # xml.Axes(xmla_tools.generate_xs0(df),
+            #          xmla_tools.generate_slicer_axis(df))
+            #
+            # xml.CellData(xmla_tools.generate_cell_data(df))
+
+
+
+
 
             return etree.fromstring("""
             <return>
