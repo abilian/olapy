@@ -561,7 +561,7 @@ class XmlaDiscoverTools():
         if request.Properties.PropertyList.Catalog is not None:
             return generate_resp(rows)
 
-        rows = [{
+        ext = [{
             'SchemaName': 'DBSCHEMA_TABLES',
             'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
             'restrictions': {
@@ -601,8 +601,11 @@ class XmlaDiscoverTools():
                 'restriction_types': ['string']
             },
             'RestrictionsMask': '1'
-        }] + rows
-        return generate_resp(rows)
+        }]
+
+        ext.extend(rows)
+
+        return generate_resp(ext)
 
     @staticmethod
     def discover_literals_response(request):
