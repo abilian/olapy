@@ -28,6 +28,7 @@ class XmlaDiscoverTools():
 
     def __init__(self):
         # right now the catalogue_name and cube name are the same
+        # todo bug double catalogue to fix
         self.catalogues = MdxEngine.get_cubes_names()
         self.selected_catalogue = self.catalogues[0]
         self.executer = MdxEngine(self.selected_catalogue)
@@ -84,7 +85,7 @@ class XmlaDiscoverTools():
 
             if PropertyName is not '':
                 with xml['return']:
-                    with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    with xml.root(xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                                   **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                      'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
@@ -114,7 +115,7 @@ class XmlaDiscoverTools():
                           '15']
 
                 with xml['return']:
-                    with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    with xml.root(xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                                   **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                      'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
                         for idx,prop_desc in enumerate(properties_names_n_description):
@@ -196,36 +197,6 @@ class XmlaDiscoverTools():
                                   'restriction_types': ['string']},
                  'RestrictionsMask': '1'
                  },
-                # {'SchemaName': 'DBSCHEMA_TABLES',
-                #  'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
-                #  'restrictions': {
-                #      'restriction_names': ['TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME', 'TABLE_TYPE',
-                #                            'TABLE_OLAP_TYPE'],
-                #      'restriction_types': ['string', 'string', 'string', 'string', 'string']},
-                #  'RestrictionsMask': '31'
-                #  },
-                # {'SchemaName': 'DISCOVER_DATASOURCES',
-                #  'SchemaGuid': '06C03D41-F66D-49F3-B1B8-987F7AF4CF18',
-                #  'restrictions': {
-                #      'restriction_names': ['DataSourceName', 'URL', 'ProviderName', 'ProviderType',
-                #                            'AuthenticationMode'],
-                #      'restriction_types': ['string', 'string', 'string', 'string', 'string']},
-                #  'RestrictionsMask': '31'
-                #  },
-                # {'SchemaName': 'DISCOVER_INSTANCES',
-                #  'SchemaGuid': '20518699-2474-4C15-9885-0E947EC7A7E3',
-                #  'restrictions': {
-                #      'restriction_names': ['INSTANCE_NAME'],
-                #      'restriction_types': ['string']},
-                #  'RestrictionsMask': '1'
-                #  },
-                # {'SchemaName': 'DISCOVER_KEYWORDS',
-                #  'SchemaGuid': '1426C443-4CDD-4A40-8F45-572FAB9BBAA1',
-                #  'restrictions': {
-                #      'restriction_names': ['Keyword'],
-                #      'restriction_types': ['string']},
-                #  'RestrictionsMask': '1'
-                #  },
                 {'SchemaName': 'DISCOVER_LITERALS',
                  'SchemaGuid': 'C3EF5ECB-0A07-4665-A140-B075722DBDC2',
                  'restrictions': {
@@ -547,7 +518,7 @@ class XmlaDiscoverTools():
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(str(discover_schema_rowsets_xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                with xml.root(discover_schema_rowsets_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                               **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                  'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
@@ -690,177 +661,166 @@ class XmlaDiscoverTools():
         if request.Properties.PropertyList.Content == 'SchemaData' \
                 and request.Properties.PropertyList.Format == 'Tabular':
 
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + discover_literals_xsd + """
-                  <row>
-                    <LiteralName>DBLITERAL_CATALOG_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>24</LiteralMaxLength>
-                    <LiteralNameEnumValue>2</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_CATALOG_SEPARATOR</LiteralName>
-                    <LiteralValue>.</LiteralValue>
-                    <LiteralMaxLength>0</LiteralMaxLength>
-                    <LiteralNameEnumValue>3</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_COLUMN_ALIAS</LiteralName>
-                    <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>5</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_COLUMN_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>6</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_CORRELATION_NAME</LiteralName>
-                    <LiteralInvalidChars>'&quot;[]</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>7</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_CUBE_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>21</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_DIMENSION_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>22</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_HIERARCHY_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>23</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_LEVEL_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>24</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_MEMBER_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>25</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_PROCEDURE_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>14</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_PROPERTY_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>26</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_QUOTE_PREFIX</LiteralName>
-                    <LiteralValue>[</LiteralValue>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>15</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_QUOTE_SUFFIX</LiteralName>
-                    <LiteralValue>]</LiteralValue>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>28</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_TABLE_NAME</LiteralName>
-                    <LiteralInvalidChars>.</LiteralInvalidChars>
-                    <LiteralInvalidStartingChars>0123456789</LiteralInvalidStartingChars>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>17</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_TEXT_COMMAND</LiteralName>
-                    <LiteralMaxLength>-1</LiteralMaxLength>
-                    <LiteralNameEnumValue>18</LiteralNameEnumValue>
-                  </row>
-                  <row>
-                    <LiteralName>DBLITERAL_USER_NAME</LiteralName>
-                    <LiteralMaxLength>0</LiteralMaxLength>
-                    <LiteralNameEnumValue>19</LiteralNameEnumValue>
-                  </row>
-                </root>
-            </return>
-                """)
+            rows = [{'LiteralName':'DBLITERAL_CATALOG_NAME',
+                     'LiteralInvalidChars' : '.',
+                     'LiteralInvalidStartingChars' : '0123456789',
+                     'LiteralMaxLength' : '24',
+                     'LiteralNameEnumValue' : '2'
+                     },
+                    {'LiteralName': 'DBLITERAL_CATALOG_SEPARATOR',
+                     'LiteralValue': '.',
+                     'LiteralMaxLength': '0',
+                     'LiteralNameEnumValue': '3'
+                     },
+                    {'LiteralName': 'DBLITERAL_COLUMN_ALIAS',
+                     'LiteralInvalidChars': "'&quot;[]",
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '5'
+                     },
+                    {'LiteralName': 'DBLITERAL_COLUMN_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '6'
+                     },
+                    {'LiteralName': 'DBLITERAL_CORRELATION_NAME',
+                     'LiteralInvalidChars': "'&quot;[]",
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '7'
+                     },
+                    {'LiteralName': 'DBLITERAL_CUBE_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '21'
+                     },
+                    {'LiteralName': 'DBLITERAL_DIMENSION_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '22'
+                     },
+                    {'LiteralName': 'DBLITERAL_LEVEL_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '24'
+                     },
+                    {'LiteralName': 'DBLITERAL_MEMBER_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '25'
+                     },
+                    {'LiteralName': 'DBLITERAL_PROCEDURE_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '14'
+                     },
+                    {'LiteralName': 'DBLITERAL_PROPERTY_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '26'
+                     },
+                    {'LiteralName': 'DBLITERAL_QUOTE_PREFIX',
+                     'LiteralValue': '[',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '15'
+                     },
+                    {'LiteralName': 'DBLITERAL_QUOTE_SUFFIX',
+                     'LiteralValue': ']',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '28'
+                     },
+                    {'LiteralName': 'DBLITERAL_TABLE_NAME',
+                     'LiteralInvalidChars': '.',
+                     'LiteralInvalidStartingChars': '0123456789',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '17'
+                     },
+                    {'LiteralName': 'DBLITERAL_TEXT_COMMAND',
+                     'LiteralMaxLength': '-1',
+                     'LiteralNameEnumValue': '18'
+                     },
+                    {'LiteralName': 'DBLITERAL_USER_NAME',
+                     'LiteralMaxLength': '0',
+                     'LiteralNameEnumValue': '19'
+                     },
+             ]
+
+            xml = xmlwitch.Builder()
+
+            with xml['return']:
+                with xml.root(discover_literals_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+
+                    for resp_row in rows:
+                        with xml.row:
+                            for att_name,value in resp_row.items():
+                                    xml[att_name](value)
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+            return xml
+
 
     def discover_mdschema_sets_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
                 and request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + mdschema_sets_xsd + """
-                </root>
-            </return>
-            """)
+
+            xml = xmlwitch.Builder()
+            with xml['return']:
+                xml.root(mdschema_sets_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+            return xml
+
 
     def discover_mdschema_kpis_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
                 and request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                  """ + mdschema_kpis_xsd + """
-                </root>
-              </return>
-                """)
+
+            xml = xmlwitch.Builder()
+            with xml['return']:
+                xml.root(mdschema_kpis_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                         **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+            return xml
+
 
     def discover_dbschema_catalogs_response(self, request):
-        _catalogues = ''
-        for cata in self.catalogues:
-            _catalogues += '''
-            <row>
-                <CATALOG_NAME>{0}</CATALOG_NAME>
-            </row>
-            '''.format(cata)
+        xml = xmlwitch.Builder()
+        with xml['return']:
+            with xml.root(dbschema_catalogs_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                     **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
-        return etree.fromstring("""
-        <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            """ + dbschema_catalogs_xsd + """
-            {0}
-            </root>
-        </return>
-        """.format(_catalogues))
+                for catalogue in self.catalogues:
+                    with xml.row:
+                        xml.CATALOG_NAME(catalogue)
+
+        html_parser = HTMLParser.HTMLParser()
+        xml = html_parser.unescape(str(xml))
+
+        return xml
 
     def discover_mdschema_cubes_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
