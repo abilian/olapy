@@ -321,6 +321,7 @@ class XmlaDiscoverTools():
 
                     for resp_row in rows:
                         with xml.row:
+                            xml.SchemaName(resp_row['SchemaName'])
                             xml.SchemaGuid(resp_row['SchemaGuid'])
                             for idx, restriction in enumerate(resp_row['restrictions']['restriction_names']):
                                 with xml.Restrictions:
