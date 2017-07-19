@@ -322,14 +322,14 @@ class XmlaDiscoverTools():
                                  'CUBE_SOURCE',
                                  'HIERARCHY_VISIBILITY']
             restriction_types = ['string',
-                                'string',
-                                'string',
-                                'string',
-                                'string',
-                                'string',
-                                'unsignedShort',
-                                'unsignedShort',
-                                'unsignedShort']
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'unsignedShort',
+                                 'unsignedShort',
+                                 'unsignedShort']
 
             xml = xmlwitch.Builder()
 
@@ -337,20 +337,18 @@ class XmlaDiscoverTools():
                           **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                              'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
-                for idx, restriction in enumerate(restriction_names):
-                    with xml.row:
-                        xml.SchemaName('MDSCHEMA_HIERARCHIES')
-                        xml.SchemaGuid('C8B522DA-5CF3-11CE-ADE5-00AA0044773D')
+                with xml.row:
+                    xml.SchemaName('MDSCHEMA_HIERARCHIES')
+                    xml.SchemaGuid('C8B522DA-5CF3-11CE-ADE5-00AA0044773D')
+                    for idx, restriction in enumerate(restriction_names):
                         with xml.Restrictions:
                             xml.Name(restriction)
                             xml.Type(restriction_types[idx])
 
-                # todo fix this
-                # xml.RestrictionsMask('511')
+                    xml.RestrictionsMask('511')
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
-
 
             return """
             <return>
