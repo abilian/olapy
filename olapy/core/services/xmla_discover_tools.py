@@ -58,29 +58,32 @@ class XmlaDiscoverTools():
     def discover_datasources_response():
 
         xml = xmlwitch.Builder()
-        with xml.root(discover_datasources_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                      **{'xmlns:EX': 'urn:schemas-microsoft-com:xml-analysis:exception',
-                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+        with xml['return']:
+            with xml.root(discover_datasources_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                          **{'xmlns:EX': 'urn:schemas-microsoft-com:xml-analysis:exception',
+                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
 
-                      # "xmlns:EX='urn:schemas-microsoft-com:xml-analysis:exception'"
-                      # "xmlns:xsd='http://www.w3.org/2001/XMLSchema'"
-                      # "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'",
-                      ):
-            with xml.row:
-                xml.DataSourceName('sales')
-                xml.DataSourceDescription('sales Sample Data')
-                xml.URL('http://127.0.0.1:8000/xmla')
-                xml.DataSourceInfo('-')
-                xml.ProviderName('olapy')
-                xml.ProviderType('MDP')
-                xml.AuthenticationMode('Unauthenticated')
+                          # "xmlns:EX='urn:schemas-microsoft-com:xml-analysis:exception'"
+                          # "xmlns:xsd='http://www.w3.org/2001/XMLSchema'"
+                          # "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'",
+                          ):
+                with xml.row:
+                    xml.DataSourceName('sales')
+                    xml.DataSourceDescription('sales Sample Data')
+                    xml.URL('http://127.0.0.1:8000/xmla')
+                    xml.DataSourceInfo('-')
+                    xml.ProviderName('olapy')
+                    xml.ProviderType('MDP')
+                    xml.AuthenticationMode('Unauthenticated')
 
-        return """
-        <return>
-            {0}
-        </return>
-        """.format(str(xml))
+        return xml
+
+        # return """
+        # <return>
+        #     {0}
+        # </return>
+        # """.format(str(xml))
 
         # return etree.fromstring("""
         # <return>
@@ -129,17 +132,18 @@ class XmlaDiscoverTools():
                 #            </return>
                 #            """.format(xsd, rows))
 
-                with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml['return']:
+                    with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                                  **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                     'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
-                    with xml.row:
-                        xml.PropertyName(PropertyName)
-                        xml.PropertyDescription(PropertyDescription)
-                        xml.PropertyType(PropertyType)
-                        xml.PropertyAccessType(PropertyAccessType)
-                        xml.IsRequired(IsRequired)
-                        xml.Value(Value)
+                        with xml.row:
+                            xml.PropertyName(PropertyName)
+                            xml.PropertyDescription(PropertyDescription)
+                            xml.PropertyType(PropertyType)
+                            xml.PropertyAccessType(PropertyAccessType)
+                            xml.IsRequired(IsRequired)
+                            xml.Value(Value)
                 # rows = """
                 # <row>
                 #     <PropertyName>{0}</PropertyName>
@@ -168,19 +172,18 @@ class XmlaDiscoverTools():
                           '3',
                           '15']
 
-
-
-                with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
-                    for idx,prop_desc in enumerate(properties_names_n_description):
-                        with xml.row:
-                            xml.PropertyName(prop_desc)
-                            xml.PropertyDescription(prop_desc)
-                            xml.PropertyType(properties_types[idx])
-                            xml.PropertyAccessType('Read')
-                            xml.IsRequired('false')
-                            xml.Value(values[idx])
+                with xml['return']:
+                    with xml.root(str(xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                                  **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                     'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                        for idx,prop_desc in enumerate(properties_names_n_description):
+                            with xml.row:
+                                xml.PropertyName(prop_desc)
+                                xml.PropertyDescription(prop_desc)
+                                xml.PropertyType(properties_types[idx])
+                                xml.PropertyAccessType('Read')
+                                xml.IsRequired('false')
+                                xml.Value(values[idx])
                 #
                 #
                 # rows = """
@@ -242,13 +245,12 @@ class XmlaDiscoverTools():
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
 
-
-            # return xml
-            return """
-                   <return>
-                        {0}
-                   </return>
-                   """.format(xml)
+            return xml
+            # return """
+            #        <return>
+            #             {0}
+            #        </return>
+            #        """.format(xml)
 
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
