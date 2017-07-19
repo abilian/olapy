@@ -3,8 +3,6 @@
 from __future__ import absolute_import, division, print_function
 
 import uuid
-from collections import OrderedDict
-
 import xmlwitch
 import HTMLParser
 
