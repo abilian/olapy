@@ -310,6 +310,30 @@ class XmlaDiscoverTools():
         return get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
     def discover_schema_rowsets_response(self, request):
+
+        def generate_resp(rows):
+            xml = xmlwitch.Builder()
+
+            with xml['return']:
+                with xml.root(str(discover_schema_rowsets_xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+
+                    for resp_row in rows:
+                        with xml.row:
+                            xml.SchemaGuid(resp_row['SchemaGuid'])
+                            for idx, restriction in enumerate(resp_row['restrictions']['restriction_names']):
+                                with xml.Restrictions:
+                                    xml.Name(restriction)
+                                    xml.Type(resp_row['restrictions']['restriction_types'][idx])
+
+                            xml.RestrictionsMask(resp_row['RestrictionsMask'])
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+            return xml
+
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
                         request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -333,130 +357,49 @@ class XmlaDiscoverTools():
                                  'unsignedShort',
                                  'unsignedShort']
 
-            xml = xmlwitch.Builder()
+            rows = [{'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                     'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                     'restrictions': {'restriction_names': restriction_names,
+                                      'restriction_types': restriction_types},
+                     'RestrictionsMask': '511'
+                     }
+                    ]
 
-            with xml.root(str(discover_schema_rowsets_xsd), xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                          **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+            return generate_resp(rows)
 
-                with xml.row:
-                    xml.SchemaName('MDSCHEMA_HIERARCHIES')
-                    xml.SchemaGuid('C8B522DA-5CF3-11CE-ADE5-00AA0044773D')
-                    for idx, restriction in enumerate(restriction_names):
-                        with xml.Restrictions:
-                            xml.Name(restriction)
-                            xml.Type(restriction_types[idx])
-
-                    xml.RestrictionsMask('511')
-
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return """
-            <return>
-                {0}                
-            </return>
-                """.format(xml)
-            # return etree.fromstring("""
-            #     <return>
-            #         <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            #         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            #         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            #         """ + discover_schema_rowsets_xsd + """
-            #         <row>
-            #         <SchemaName>MDSCHEMA_HIERARCHIES</SchemaName>
-            #         <SchemaGuid>C8B522DA-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
-            #         <Restrictions>
-            #           <Name>CATALOG_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>SCHEMA_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>CUBE_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>DIMENSION_UNIQUE_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>HIERARCHY_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>HIERARCHY_UNIQUE_NAME</Name>
-            #           <Type>string</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>HIERARCHY_ORIGIN</Name>
-            #           <Type>unsignedShort</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>CUBE_SOURCE</Name>
-            #           <Type>unsignedShort</Type>
-            #         </Restrictions>
-            #         <Restrictions>
-            #           <Name>HIERARCHY_VISIBILITY</Name>
-            #           <Type>unsignedShort</Type>
-            #         </Restrictions>
-            #         <RestrictionsMask>511</RestrictionsMask>
-            #         </row>
-            #         </root>
-            #     </return>
-            # """)
 
         if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and \
                         request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                      """ + discover_schema_rowsets_xsd + """
-                      <row>
-                        <SchemaName>MDSCHEMA_MEASURES</SchemaName>
-                        <SchemaGuid>C8B522DC-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
-                        <Restrictions>
-                            <Name>CATALOG_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>SCHEMA_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>CUBE_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>MEASURE_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>MEASURE_UNIQUE_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>MEASUREGROUP_NAME</Name>
-                            <Type>string</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>CUBE_SOURCE</Name>
-                            <Type>unsignedShort</Type>
-                        </Restrictions>
-                        <Restrictions>
-                            <Name>MEASURE_VISIBILITY</Name>
-                            <Type>unsignedShort</Type>
-                        </Restrictions>
-                        <RestrictionsMask>255</RestrictionsMask>
-                    </row>
-                    </root>
-                  </return>
-                """)
+
+
+            restriction_names = ['CATALOG_NAME',
+                                 'SCHEMA_NAME',
+                                 'CUBE_NAME',
+                                 'MEASURE_NAME',
+                                 'MEASURE_UNIQUE_NAME',
+                                 'MEASUREGROUP_NAME',
+                                 'CUBE_SOURCE',
+                                 'MEASURE_VISIBILITY']
+            restriction_types = ['string',
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'string',
+                                 'unsignedShort',
+                                 'unsignedShort']
+
+            rows = [{'SchemaName': 'MDSCHEMA_MEASURES',
+                     'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                     'restrictions': {'restriction_names': restriction_names,
+                                      'restriction_types': restriction_types},
+                     'RestrictionsMask': '255'
+                     }
+                    ]
+
+            return generate_resp(rows)
+
         # TODO delete
         if request.Properties.PropertyList.Catalog is not None:
             return etree.fromstring("""
