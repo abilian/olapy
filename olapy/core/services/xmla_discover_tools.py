@@ -8,7 +8,6 @@ from collections import OrderedDict
 import xmlwitch
 import HTMLParser
 
-
 from lxml import etree
 import os
 
@@ -61,11 +60,16 @@ class XmlaDiscoverTools():
 
         xml = xmlwitch.Builder()
         with xml['return']:
-            with xml.root(discover_datasources_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                          **{'xmlns:EX': 'urn:schemas-microsoft-com:xml-analysis:exception',
-                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
-                          ):
+            with xml.root(
+                    discover_datasources_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:EX':
+                        'urn:schemas-microsoft-com:xml-analysis:exception',
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    }):
                 with xml.row:
                     xml.DataSourceName('sales')
                     xml.DataSourceDescription('sales Sample Data')
@@ -78,7 +82,6 @@ class XmlaDiscoverTools():
         return xml
 
     def discover_properties_response(self, request):
-
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
 
@@ -86,9 +89,15 @@ class XmlaDiscoverTools():
 
             if PropertyName is not '':
                 with xml['return']:
-                    with xml.root(xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                                  **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                     'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                    with xml.root(
+                            xsd,
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            **{
+                                'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsi':
+                                'http://www.w3.org/2001/XMLSchema-instance'
+                            }):
 
                         with xml.row:
                             xml.PropertyName(PropertyName)
@@ -99,27 +108,28 @@ class XmlaDiscoverTools():
                             xml.Value(Value)
 
             else:
-                properties_names_n_description = ['ServerName',
-                                  'ProviderVersion',
-                                  'MdpropMdxSubqueries',
-                                  'MdpropMdxDrillFunctions',
-                                  'MdpropMdxNamedSets']
-                properties_types = ['string',
-                                  'string',
-                                  'int',
-                                  'int',
-                                  'int']
-                values = [os.getenv('USERNAME', 'default'),
-                          '0.0.3  25-Nov-2016 07:20:28 GMT',
-                          '15',
-                          '3',
-                          '15']
+                properties_names_n_description = [
+                    'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+                    'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+                ]
+                properties_types = ['string', 'string', 'int', 'int', 'int']
+                values = [
+                    os.getenv('USERNAME', 'default'),
+                    '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+                ]
 
                 with xml['return']:
-                    with xml.root(xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                                  **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                     'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
-                        for idx,prop_desc in enumerate(properties_names_n_description):
+                    with xml.root(
+                            xsd,
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            **{
+                                'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsi':
+                                'http://www.w3.org/2001/XMLSchema-instance'
+                            }):
+                        for idx, prop_desc in enumerate(
+                                properties_names_n_description):
                             with xml.row:
                                 xml.PropertyName(prop_desc)
                                 xml.PropertyDescription(prop_desc)
@@ -192,345 +202,301 @@ class XmlaDiscoverTools():
 
     def discover_schema_rowsets_response(self, request):
 
-        rows = [{'SchemaName': 'DBSCHEMA_CATALOGS',
-                 'SchemaGuid': 'C8B52211-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {'restriction_names': ['CATALOG_NAME'],
-                                  'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 },
-                {'SchemaName': 'DISCOVER_LITERALS',
-                 'SchemaGuid': 'C3EF5ECB-0A07-4665-A140-B075722DBDC2',
-                 'restrictions': {
-                     'restriction_names': ['LiteralName'],
-                     'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 },
-                {'SchemaName': 'DISCOVER_PROPERTIES',
-                 'SchemaGuid': '4B40ADFB-8B09-4758-97BB-636E8AE97BCF',
-                 'restrictions': {
-                     'restriction_names': ['PropertyName'],
-                     'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 },
-                {'SchemaName': 'DISCOVER_SCHEMA_ROWSETS',
-                 'SchemaGuid': 'EEA0302B-7922-4992-8991-0E605D0E5593',
-                 'restrictions': {
-                     'restriction_names': ['SchemaName'],
-                     'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 },
-                {'SchemaName': 'DMSCHEMA_MINING_MODELS',
-                 'SchemaGuid': '3ADD8A77-D8B9-11D2-8D2A-00E029154FDE',
-                 'restrictions': {
-                     'restriction_names': ['MODEL_CATALOG',
-                                           'MODEL_SCHEMA',
-                                           'MODEL_NAME',
-                                           'MODEL_TYPE',
-                                           'SERVICE_NAME',
-                                           'SERVICE_TYPE_ID',
-                                           'MINING_STRUCTURE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedInt',
-                                           'string']},
-                 'RestrictionsMask': '127'
-                 },
-                {'SchemaName': 'MDSCHEMA_ACTIONS',
-                 'SchemaGuid': 'A07CCD08-8148-11D0-87BB-00C04FC33942',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'ACTION_NAME',
-                                           'ACTION_TYPE',
-                                           'COORDINATE',
-                                           'COORDINATE_TYPE',
-                                           'INVOCATION',
-                                           'CUBE_SOURCE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'int',
-                                           'string',
-                                           'int',
-                                           'int',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '511'
-                 },
-                {'SchemaName': 'MDSCHEMA_CUBES',
-                 'SchemaGuid': 'C8B522D8-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'CUBE_SOURCE',
-                                           'BASE_CUBE_NAME'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'string']},
-                 'RestrictionsMask': '31'
-                 },
-                {'SchemaName': 'MDSCHEMA_DIMENSIONS',
-                 'SchemaGuid': 'C8B522D9-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'DIMENSION_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'CUBE_SOURCE',
-                                           'DIMENSION_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '127'
-                 },
-                {'SchemaName': 'MDSCHEMA_FUNCTIONS',
-                 'SchemaGuid': 'A07CCD07-8148-11D0-87BB-00C04FC33942',
-                 'restrictions': {
-                     'restriction_names': ['LIBRARY_NAME',
-                                           'INTERFACE_NAME',
-                                           'FUNCTION_NAME',
-                                           'ORIGIN'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'int']},
-                 'RestrictionsMask': '15'
-                 },
-                {'SchemaName': 'MDSCHEMA_HIERARCHIES',
-                 'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'HIERARCHY_NAME',
-                                           'HIERARCHY_UNIQUE_NAME',
-                                           'HIERARCHY_ORIGIN',
-                                           'CUBE_SOURCE',
-                                           'HIERARCHY_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'unsignedShort',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '511'
-                 },
-                {'SchemaName': 'MDSCHEMA_INPUT_DATASOURCES',
-                 'SchemaGuid': 'A07CCD32-8148-11D0-87BB-00C04FC33942',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'DATASOURCE_NAME',
-                                           'DATASOURCE_TYPE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string']},
-                 'RestrictionsMask': '15'
-                 },
-                {'SchemaName': 'MDSCHEMA_KPIS',
-                 'SchemaGuid': '2AE44109-ED3D-4842-B16F-B694D1CB0E3F',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'KPI_NAME',
-                                           'CUBE_SOURCE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '31'
-                 },
-                {'SchemaName': 'MDSCHEMA_LEVELS',
-                 'SchemaGuid': 'C8B522DB-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'HIERARCHY_UNIQUE_NAME',
-                                           'LEVEL_NAME',
-                                           'LEVEL_UNIQUE_NAME',
-                                           'LEVEL_ORIGIN',
-                                           'CUBE_SOURCE',
-                                           'LEVEL_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'unsignedShort',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '1023'
-                 },
-                {'SchemaName': 'MDSCHEMA_MEASUREGROUPS',
-                 'SchemaGuid': 'E1625EBF-FA96-42FD-BEA6-DB90ADAFD96B',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'MEASUREGROUP_NAME'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string']},
-                 'RestrictionsMask': '15'
-                 },
-                {'SchemaName': 'MDSCHEMA_MEASUREGROUP_DIMENSIONS',
-                 'SchemaGuid': 'A07CCD33-8148-11D0-87BB-00C04FC33942',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'MEASUREGROUP_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'DIMENSION_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '63'
-                 },
-                {'SchemaName': 'MDSCHEMA_MEASURES',
-                 'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'MEASURE_NAME',
-                                           'MEASURE_UNIQUE_NAME',
-                                           'MEASUREGROUP_NAME',
-                                           'CUBE_SOURCE',
-                                           'MEASURE_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '255'
-                 },
-                {'SchemaName': 'MDSCHEMA_MEMBERS',
-                 'SchemaGuid': 'C8B522DE-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'HIERARCHY_UNIQUE_NAME',
-                                           'LEVEL_UNIQUE_NAME',
-                                           'LEVEL_NUMBER',
-                                           'MEMBER_NAME',
-                                           'MEMBER_UNIQUE_NAME',
-                                           'MEMBER_CAPTION',
-                                           'MEMBER_TYPE',
-                                           'TREE_OP',
-                                           'CUBE_SOURCE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedInt',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'int',
-                                           'int',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '8191'
-                 },
-                {'SchemaName': 'MDSCHEMA_PROPERTIES',
-                 'SchemaGuid': 'C8B522DD-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'DIMENSION_UNIQUE_NAME',
-                                           'HIERARCHY_UNIQUE_NAME',
-                                           'LEVEL_UNIQUE_NAME',
-                                           'MEMBER_UNIQUE_NAME',
-                                           'PROPERTY_NAME',
-                                           'PROPERTY_TYPE',
-                                           'PROPERTY_CONTENT_TYPE',
-                                           'PROPERTY_ORIGIN',
-                                           'CUBE_SOURCE',
-                                           'PROPERTY_VISIBILITY'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'unsignedShort',
-                                           'unsignedShort',
-                                           'unsignedShort']},
-                 'RestrictionsMask': '8191'
-                 },
-                {'SchemaName': 'MDSCHEMA_SETS',
-                 'SchemaGuid': 'A07CCD0B-8148-11D0-87BB-00C04FC33942',
-                 'restrictions': {
-                     'restriction_names': ['CATALOG_NAME',
-                                           'SCHEMA_NAME',
-                                           'CUBE_NAME',
-                                           'SET_NAME',
-                                           'SCOPE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'int']},
-                 'RestrictionsMask': '31'
-                 },
-
-                ]
+        rows = [
+            {
+                'SchemaName': 'DBSCHEMA_CATALOGS',
+                'SchemaGuid': 'C8B52211-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': ['CATALOG_NAME'],
+                    'restriction_types': ['string']
+                },
+                'RestrictionsMask': '1'
+            },
+            {
+                'SchemaName': 'DISCOVER_LITERALS',
+                'SchemaGuid': 'C3EF5ECB-0A07-4665-A140-B075722DBDC2',
+                'restrictions': {
+                    'restriction_names': ['LiteralName'],
+                    'restriction_types': ['string']
+                },
+                'RestrictionsMask': '1'
+            },
+            {
+                'SchemaName': 'DISCOVER_PROPERTIES',
+                'SchemaGuid': '4B40ADFB-8B09-4758-97BB-636E8AE97BCF',
+                'restrictions': {
+                    'restriction_names': ['PropertyName'],
+                    'restriction_types': ['string']
+                },
+                'RestrictionsMask': '1'
+            },
+            {
+                'SchemaName': 'DISCOVER_SCHEMA_ROWSETS',
+                'SchemaGuid': 'EEA0302B-7922-4992-8991-0E605D0E5593',
+                'restrictions': {
+                    'restriction_names': ['SchemaName'],
+                    'restriction_types': ['string']
+                },
+                'RestrictionsMask': '1'
+            },
+            {
+                'SchemaName': 'DMSCHEMA_MINING_MODELS',
+                'SchemaGuid': '3ADD8A77-D8B9-11D2-8D2A-00E029154FDE',
+                'restrictions': {
+                    'restriction_names': [
+                        'MODEL_CATALOG', 'MODEL_SCHEMA', 'MODEL_NAME',
+                        'MODEL_TYPE', 'SERVICE_NAME', 'SERVICE_TYPE_ID',
+                        'MINING_STRUCTURE'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'unsignedInt', 'string'
+                    ]
+                },
+                'RestrictionsMask': '127'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_ACTIONS',
+                'SchemaGuid': 'A07CCD08-8148-11D0-87BB-00C04FC33942',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'ACTION_NAME', 'ACTION_TYPE', 'COORDINATE',
+                        'COORDINATE_TYPE', 'INVOCATION', 'CUBE_SOURCE'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'int',
+                        'string', 'int', 'int', 'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '511'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_CUBES',
+                'SchemaGuid': 'C8B522D8-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'CUBE_SOURCE', 'BASE_CUBE_NAME'
+                    ],
+                    'restriction_types':
+                    ['string', 'string', 'string', 'unsignedShort', 'string']
+                },
+                'RestrictionsMask': '31'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_DIMENSIONS',
+                'SchemaGuid': 'C8B522D9-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'DIMENSION_NAME', 'DIMENSION_UNIQUE_NAME',
+                        'CUBE_SOURCE', 'DIMENSION_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'unsignedShort', 'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '127'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_FUNCTIONS',
+                'SchemaGuid': 'A07CCD07-8148-11D0-87BB-00C04FC33942',
+                'restrictions': {
+                    'restriction_names': [
+                        'LIBRARY_NAME', 'INTERFACE_NAME', 'FUNCTION_NAME',
+                        'ORIGIN'
+                    ],
+                    'restriction_types': ['string', 'string', 'string', 'int']
+                },
+                'RestrictionsMask': '15'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
+                        'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN',
+                        'CUBE_SOURCE', 'HIERARCHY_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'string', 'unsignedShort', 'unsignedShort',
+                        'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '511'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_INPUT_DATASOURCES',
+                'SchemaGuid': 'A07CCD32-8148-11D0-87BB-00C04FC33942',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'DATASOURCE_NAME',
+                        'DATASOURCE_TYPE'
+                    ],
+                    'restriction_types':
+                    ['string', 'string', 'string', 'string']
+                },
+                'RestrictionsMask': '15'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_KPIS',
+                'SchemaGuid': '2AE44109-ED3D-4842-B16F-B694D1CB0E3F',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'KPI_NAME',
+                        'CUBE_SOURCE'
+                    ],
+                    'restriction_types':
+                    ['string', 'string', 'string', 'string', 'unsignedShort']
+                },
+                'RestrictionsMask': '31'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_LEVELS',
+                'SchemaGuid': 'C8B522DB-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'DIMENSION_UNIQUE_NAME', 'HIERARCHY_UNIQUE_NAME',
+                        'LEVEL_NAME', 'LEVEL_UNIQUE_NAME', 'LEVEL_ORIGIN',
+                        'CUBE_SOURCE', 'LEVEL_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'string', 'string', 'unsignedShort', 'unsignedShort',
+                        'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '1023'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_MEASUREGROUPS',
+                'SchemaGuid': 'E1625EBF-FA96-42FD-BEA6-DB90ADAFD96B',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'MEASUREGROUP_NAME'
+                    ],
+                    'restriction_types':
+                    ['string', 'string', 'string', 'string']
+                },
+                'RestrictionsMask': '15'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_MEASUREGROUP_DIMENSIONS',
+                'SchemaGuid': 'A07CCD33-8148-11D0-87BB-00C04FC33942',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'MEASUREGROUP_NAME', 'DIMENSION_UNIQUE_NAME',
+                        'DIMENSION_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '63'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_MEASURES',
+                'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'MEASURE_NAME', 'MEASURE_UNIQUE_NAME',
+                        'MEASUREGROUP_NAME', 'CUBE_SOURCE',
+                        'MEASURE_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'string', 'unsignedShort', 'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '255'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_MEMBERS',
+                'SchemaGuid': 'C8B522DE-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'DIMENSION_UNIQUE_NAME', 'HIERARCHY_UNIQUE_NAME',
+                        'LEVEL_UNIQUE_NAME', 'LEVEL_NUMBER', 'MEMBER_NAME',
+                        'MEMBER_UNIQUE_NAME', 'MEMBER_CAPTION', 'MEMBER_TYPE',
+                        'TREE_OP', 'CUBE_SOURCE'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'string', 'unsignedInt', 'string', 'string', 'string',
+                        'int', 'int', 'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '8191'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_PROPERTIES',
+                'SchemaGuid': 'C8B522DD-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                        'DIMENSION_UNIQUE_NAME', 'HIERARCHY_UNIQUE_NAME',
+                        'LEVEL_UNIQUE_NAME', 'MEMBER_UNIQUE_NAME',
+                        'PROPERTY_NAME', 'PROPERTY_TYPE',
+                        'PROPERTY_CONTENT_TYPE', 'PROPERTY_ORIGIN',
+                        'CUBE_SOURCE', 'PROPERTY_VISIBILITY'
+                    ],
+                    'restriction_types': [
+                        'string', 'string', 'string', 'string', 'string',
+                        'string', 'string', 'string', 'string', 'string',
+                        'unsignedShort', 'unsignedShort', 'unsignedShort'
+                    ]
+                },
+                'RestrictionsMask': '8191'
+            },
+            {
+                'SchemaName': 'MDSCHEMA_SETS',
+                'SchemaGuid': 'A07CCD0B-8148-11D0-87BB-00C04FC33942',
+                'restrictions': {
+                    'restriction_names': [
+                        'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'SET_NAME',
+                        'SCOPE'
+                    ],
+                    'restriction_types':
+                    ['string', 'string', 'string', 'string', 'int']
+                },
+                'RestrictionsMask': '31'
+            },
+        ]
 
         def generate_resp(rows):
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(discover_schema_rowsets_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml.root(
+                        discover_schema_rowsets_xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
 
                     for resp_row in rows:
                         with xml.row:
                             xml.SchemaName(resp_row['SchemaName'])
                             xml.SchemaGuid(resp_row['SchemaGuid'])
-                            for idx, restriction in enumerate(resp_row['restrictions']['restriction_names']):
+                            for idx, restriction in enumerate(resp_row[
+                                    'restrictions']['restriction_names']):
                                 with xml.Restrictions:
                                     xml.Name(restriction)
-                                    xml.Type(resp_row['restrictions']['restriction_types'][idx])
+                                    xml.Type(resp_row['restrictions'][
+                                        'restriction_types'][idx])
 
                             xml.RestrictionsMask(resp_row['RestrictionsMask'])
 
@@ -543,32 +509,26 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-            restriction_names = ['CATALOG_NAME',
-                                 'SCHEMA_NAME',
-                                 'CUBE_NAME',
-                                 'DIMENSION_UNIQUE_NAME',
-                                 'HIERARCHY_NAME',
-                                 'HIERARCHY_UNIQUE_NAME',
-                                 'HIERARCHY_ORIGIN',
-                                 'CUBE_SOURCE',
-                                 'HIERARCHY_VISIBILITY']
-            restriction_types = ['string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'unsignedShort',
-                                 'unsignedShort',
-                                 'unsignedShort']
+            restriction_names = [
+                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
+                'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
+                'HIERARCHY_VISIBILITY'
+            ]
+            restriction_types = [
+                'string', 'string', 'string', 'string', 'string', 'string',
+                'unsignedShort', 'unsignedShort', 'unsignedShort'
+            ]
 
-            rows = [{'SchemaName': 'MDSCHEMA_HIERARCHIES',
-                     'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
-                     'restrictions': {'restriction_names': restriction_names,
-                                      'restriction_types': restriction_types},
-                     'RestrictionsMask': '511'
-                     }
-                    ]
+            rows = [{
+                'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': restriction_names,
+                    'restriction_types': restriction_types
+                },
+                'RestrictionsMask': '511'
+            }]
 
             return generate_resp(rows)
 
@@ -577,31 +537,25 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
+            restriction_names = [
+                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
+                'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
+                'MEASURE_VISIBILITY'
+            ]
+            restriction_types = [
+                'string', 'string', 'string', 'string', 'string', 'string',
+                'unsignedShort', 'unsignedShort'
+            ]
 
-            restriction_names = ['CATALOG_NAME',
-                                 'SCHEMA_NAME',
-                                 'CUBE_NAME',
-                                 'MEASURE_NAME',
-                                 'MEASURE_UNIQUE_NAME',
-                                 'MEASUREGROUP_NAME',
-                                 'CUBE_SOURCE',
-                                 'MEASURE_VISIBILITY']
-            restriction_types = ['string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'string',
-                                 'unsignedShort',
-                                 'unsignedShort']
-
-            rows = [{'SchemaName': 'MDSCHEMA_MEASURES',
-                     'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
-                     'restrictions': {'restriction_names': restriction_names,
-                                      'restriction_types': restriction_types},
-                     'RestrictionsMask': '255'
-                     }
-                    ]
+            rows = [{
+                'SchemaName': 'MDSCHEMA_MEASURES',
+                'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': restriction_names,
+                    'restriction_types': restriction_types
+                },
+                'RestrictionsMask': '255'
+            }]
 
             return generate_resp(rows)
 
@@ -609,52 +563,47 @@ class XmlaDiscoverTools():
         if request.Properties.PropertyList.Catalog is not None:
             return generate_resp(rows)
 
-        rows = [
-                {'SchemaName': 'DBSCHEMA_TABLES',
-                 'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
-                 'restrictions': {
-                     'restriction_names': ['TABLE_CATALOG',
-                                           'TABLE_SCHEMA',
-                                           'TABLE_NAME',
-                                           'TABLE_TYPE',
-                                           'TABLE_OLAP_TYPE'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string']},
-                 'RestrictionsMask': '31'
-                 },
-                {'SchemaName': 'DISCOVER_DATASOURCES',
-                 'SchemaGuid': '06C03D41-F66D-49F3-B1B8-987F7AF4CF18',
-                 'restrictions': {
-                     'restriction_names': ['DataSourceName',
-                                           'URL',
-                                           'ProviderName',
-                                           'ProviderType',
-                                           'AuthenticationMode'],
-                     'restriction_types': ['string',
-                                           'string',
-                                           'string',
-                                           'string',
-                                           'string']},
-                 'RestrictionsMask': '31'
-                 },
-                {'SchemaName': 'DISCOVER_INSTANCES',
-                 'SchemaGuid': '20518699-2474-4C15-9885-0E947EC7A7E3',
-                 'restrictions': {
-                     'restriction_names': ['INSTANCE_NAME'],
-                     'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 },
-                {'SchemaName': 'DISCOVER_KEYWORDS',
-                 'SchemaGuid': '1426C443-4CDD-4A40-8F45-572FAB9BBAA1',
-                 'restrictions': {
-                     'restriction_names': ['Keyword'],
-                     'restriction_types': ['string']},
-                 'RestrictionsMask': '1'
-                 }
-                ] + rows
+        rows = [{
+            'SchemaName': 'DBSCHEMA_TABLES',
+            'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
+            'restrictions': {
+                'restriction_names': [
+                    'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME',
+                    'TABLE_TYPE', 'TABLE_OLAP_TYPE'
+                ],
+                'restriction_types':
+                ['string', 'string', 'string', 'string', 'string']
+            },
+            'RestrictionsMask': '31'
+        }, {
+            'SchemaName': 'DISCOVER_DATASOURCES',
+            'SchemaGuid': '06C03D41-F66D-49F3-B1B8-987F7AF4CF18',
+            'restrictions': {
+                'restriction_names': [
+                    'DataSourceName', 'URL', 'ProviderName', 'ProviderType',
+                    'AuthenticationMode'
+                ],
+                'restriction_types':
+                ['string', 'string', 'string', 'string', 'string']
+            },
+            'RestrictionsMask': '31'
+        }, {
+            'SchemaName': 'DISCOVER_INSTANCES',
+            'SchemaGuid': '20518699-2474-4C15-9885-0E947EC7A7E3',
+            'restrictions': {
+                'restriction_names': ['INSTANCE_NAME'],
+                'restriction_types': ['string']
+            },
+            'RestrictionsMask': '1'
+        }, {
+            'SchemaName': 'DISCOVER_KEYWORDS',
+            'SchemaGuid': '1426C443-4CDD-4A40-8F45-572FAB9BBAA1',
+            'restrictions': {
+                'restriction_names': ['Keyword'],
+                'restriction_types': ['string']
+            },
+            'RestrictionsMask': '1'
+        }] + rows
         return generate_resp(rows)
 
     @staticmethod
@@ -662,114 +611,135 @@ class XmlaDiscoverTools():
         if request.Properties.PropertyList.Content == 'SchemaData' \
                 and request.Properties.PropertyList.Format == 'Tabular':
 
-            rows = [{'LiteralName':'DBLITERAL_CATALOG_NAME',
-                     'LiteralInvalidChars' : '.',
-                     'LiteralInvalidStartingChars' : '0123456789',
-                     'LiteralMaxLength' : '24',
-                     'LiteralNameEnumValue' : '2'
-                     },
-                    {'LiteralName': 'DBLITERAL_CATALOG_SEPARATOR',
-                     'LiteralValue': '.',
-                     'LiteralMaxLength': '0',
-                     'LiteralNameEnumValue': '3'
-                     },
-                    {'LiteralName': 'DBLITERAL_COLUMN_ALIAS',
-                     'LiteralInvalidChars': "'&quot;[]",
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '5'
-                     },
-                    {'LiteralName': 'DBLITERAL_COLUMN_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '6'
-                     },
-                    {'LiteralName': 'DBLITERAL_CORRELATION_NAME',
-                     'LiteralInvalidChars': "'&quot;[]",
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '7'
-                     },
-                    {'LiteralName': 'DBLITERAL_CUBE_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '21'
-                     },
-                    {'LiteralName': 'DBLITERAL_DIMENSION_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '22'
-                     },
-                    {'LiteralName': 'DBLITERAL_LEVEL_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '24'
-                     },
-                    {'LiteralName': 'DBLITERAL_MEMBER_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '25'
-                     },
-                    {'LiteralName': 'DBLITERAL_PROCEDURE_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '14'
-                     },
-                    {'LiteralName': 'DBLITERAL_PROPERTY_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '26'
-                     },
-                    {'LiteralName': 'DBLITERAL_QUOTE_PREFIX',
-                     'LiteralValue': '[',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '15'
-                     },
-                    {'LiteralName': 'DBLITERAL_QUOTE_SUFFIX',
-                     'LiteralValue': ']',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '28'
-                     },
-                    {'LiteralName': 'DBLITERAL_TABLE_NAME',
-                     'LiteralInvalidChars': '.',
-                     'LiteralInvalidStartingChars': '0123456789',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '17'
-                     },
-                    {'LiteralName': 'DBLITERAL_TEXT_COMMAND',
-                     'LiteralMaxLength': '-1',
-                     'LiteralNameEnumValue': '18'
-                     },
-                    {'LiteralName': 'DBLITERAL_USER_NAME',
-                     'LiteralMaxLength': '0',
-                     'LiteralNameEnumValue': '19'
-                     },
-             ]
+            rows = [
+                {
+                    'LiteralName': 'DBLITERAL_CATALOG_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '24',
+                    'LiteralNameEnumValue': '2'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_CATALOG_SEPARATOR',
+                    'LiteralValue': '.',
+                    'LiteralMaxLength': '0',
+                    'LiteralNameEnumValue': '3'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_COLUMN_ALIAS',
+                    'LiteralInvalidChars': "'&quot;[]",
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '5'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_COLUMN_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '6'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_CORRELATION_NAME',
+                    'LiteralInvalidChars': "'&quot;[]",
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '7'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_CUBE_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '21'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_DIMENSION_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '22'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_LEVEL_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '24'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_MEMBER_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '25'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_PROCEDURE_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '14'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_PROPERTY_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '26'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_QUOTE_PREFIX',
+                    'LiteralValue': '[',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '15'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_QUOTE_SUFFIX',
+                    'LiteralValue': ']',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '28'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_TABLE_NAME',
+                    'LiteralInvalidChars': '.',
+                    'LiteralInvalidStartingChars': '0123456789',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '17'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_TEXT_COMMAND',
+                    'LiteralMaxLength': '-1',
+                    'LiteralNameEnumValue': '18'
+                },
+                {
+                    'LiteralName': 'DBLITERAL_USER_NAME',
+                    'LiteralMaxLength': '0',
+                    'LiteralNameEnumValue': '19'
+                },
+            ]
 
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(discover_literals_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml.root(
+                        discover_literals_xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
 
                     for resp_row in rows:
                         with xml.row:
-                            for att_name,value in resp_row.items():
-                                    xml[att_name](value)
+                            for att_name, value in resp_row.items():
+                                xml[att_name](value)
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
 
             return xml
-
 
     def discover_mdschema_sets_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
@@ -779,15 +749,19 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(mdschema_sets_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+                xml.root(
+                    mdschema_sets_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    })
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
 
             return xml
-
 
     def discover_mdschema_kpis_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
@@ -797,22 +771,31 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(mdschema_kpis_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                         **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+                xml.root(
+                    mdschema_kpis_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    })
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
 
             return xml
 
-
     def discover_dbschema_catalogs_response(self, request):
         xml = xmlwitch.Builder()
         with xml['return']:
-            with xml.root(dbschema_catalogs_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                     **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+            with xml.root(
+                    dbschema_catalogs_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    }):
 
                 for catalogue in self.catalogues:
                     with xml.row:
@@ -830,16 +813,22 @@ class XmlaDiscoverTools():
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(mdschema_cubes_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml.root(
+                        mdschema_cubes_xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
                         xml.CUBE_TYPE('CUBE')
                         xml.LAST_SCHEMA_UPDATE('2016-07-22T10:41:38')
                         xml.LAST_DATA_UPDATE('2016-07-22T10:41:38')
-                        xml.DESCRIPTION('MDX ' + self.selected_catalogue + 'results')
+                        xml.DESCRIPTION('MDX ' + self.selected_catalogue +
+                                        'results')
                         xml.IS_DRILLTHROUGH_ENABLED('true')
                         xml.IS_LINKABLE('false')
                         xml.IS_WRITE_ENABLED('false')
@@ -857,15 +846,19 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(dbschema_tables_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                         **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+                xml.root(
+                    dbschema_tables_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    })
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
 
             return xml
-
 
     def discover_mdschema_measures__response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
@@ -877,9 +870,14 @@ class XmlaDiscoverTools():
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(mdschema_measures_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml.root(
+                        mdschema_measures_xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
                     for mes in self.executer.measures:
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
@@ -900,7 +898,6 @@ class XmlaDiscoverTools():
             xml = html_parser.unescape(str(xml))
             return xml
 
-
     def discover_mdschema_dimensions_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and\
                         request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
@@ -911,11 +908,17 @@ class XmlaDiscoverTools():
             xml = xmlwitch.Builder()
 
             with xml['return']:
-                with xml.root(mdschema_dimensions_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                with xml.root(
+                        mdschema_dimensions_xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
 
-                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                    for tables in self.executer.get_all_tables_names(
+                            ignore_fact=True):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.CUBE_NAME(self.selected_catalogue)
@@ -925,7 +928,8 @@ class XmlaDiscoverTools():
                             xml.DIMENSION_ORDINAL(str(ord))
                             xml.DIMENSION_TYPE('3')
                             xml.DIMENSION_CARDINALITY('23')
-                            xml.DEFAULT_HIERARCHY('[' + tables + '].[' + tables + ']')
+                            xml.DEFAULT_HIERARCHY('[' + tables + '].[' + tables
+                                                  + ']')
                             xml.IS_VIRTUAL('false')
                             xml.IS_READWRITE('false')
                             xml.DIMENSION_UNIQUE_SETTINGS('1')
@@ -951,7 +955,6 @@ class XmlaDiscoverTools():
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
             return xml
-
 
     def discover_mdschema_hierarchies_response(self, request):
 

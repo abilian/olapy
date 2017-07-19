@@ -177,7 +177,6 @@ class XmlaProviderService(ServiceBase):
             df = executer.execute_mdx()
             xmla_tools = XmlaExecuteTools(executer)
 
-
             # xml = xmlwitch.Builder()
             # with xml.OlapInfo(xmla_tools.generate_cell_info()):
             #     with xml.CubeInfo:
@@ -194,10 +193,6 @@ class XmlaProviderService(ServiceBase):
             #          xmla_tools.generate_slicer_axis(df))
             #
             # xml.CellData(xmla_tools.generate_cell_data(df))
-
-
-
-
 
             return etree.fromstring("""
             <return>
