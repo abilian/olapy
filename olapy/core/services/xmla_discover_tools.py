@@ -3,6 +3,7 @@
 from __future__ import absolute_import, division, print_function
 
 import uuid
+from collections import OrderedDict
 
 import xmlwitch
 import HTMLParser
@@ -824,132 +825,81 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_cubes_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
-                and request.Properties.PropertyList.Catalog is not None:
+                or request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_cubes_xsd + """
-                        <row>
-                            <CATALOG_NAME>{0}</CATALOG_NAME>
-                            <CUBE_NAME>{1}</CUBE_NAME>
-                            <CUBE_TYPE>CUBE</CUBE_TYPE>
-                            <LAST_SCHEMA_UPDATE>2016-07-22T10:41:38</LAST_SCHEMA_UPDATE>
-                            <LAST_DATA_UPDATE>2016-07-22T10:41:38</LAST_DATA_UPDATE>
-                            <DESCRIPTION>MDX {1} results</DESCRIPTION>
-                            <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
-                            <IS_LINKABLE>false</IS_LINKABLE>
-                            <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
-                            <IS_SQL_ENABLED>false</IS_SQL_ENABLED>
-                            <CUBE_CAPTION>{1}</CUBE_CAPTION>
-                            <CUBE_SOURCE>1</CUBE_SOURCE>
-                        </row>
-                    </root>
-                  </return>
-                          """.format(self.selected_catalogue,
-                                     self.selected_catalogue))
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + mdschema_cubes_xsd + """
-                    <row>
-                        <CATALOG_NAME>{0}</CATALOG_NAME>
-                        <CUBE_NAME>{0}</CUBE_NAME>
-                        <CUBE_TYPE>CUBE</CUBE_TYPE>
-                        <LAST_SCHEMA_UPDATE>2016-07-25T15:18:20</LAST_SCHEMA_UPDATE>
-                        <LAST_DATA_UPDATE>2016-07-25T15:18:20</LAST_DATA_UPDATE>
-                        <DESCRIPTION>A demo. cube</DESCRIPTION>
-                        <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
-                        <IS_LINKABLE>false</IS_LINKABLE>
-                        <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
-                        <IS_SQL_ENABLED>false</IS_SQL_ENABLED>
-                        <CUBE_CAPTION>{0}</CUBE_CAPTION>
-                        <CUBE_SOURCE>1</CUBE_SOURCE>
-                    </row>
-                </root>
-            </return>""".format(self.selected_catalogue))
+            xml = xmlwitch.Builder()
 
-        if request.Properties.PropertyList.Catalog is not None:
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return etree.fromstring("""
-                                <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + mdschema_cubes_xsd + """
-                <row>
-                    <CATALOG_NAME>{0}</CATALOG_NAME>
-                    <CUBE_NAME>{0}</CUBE_NAME>
-                    <CUBE_TYPE>CUBE</CUBE_TYPE>
-                    <LAST_SCHEMA_UPDATE>2016-07-25T15:18:20</LAST_SCHEMA_UPDATE>
-                    <LAST_DATA_UPDATE>2016-07-25T15:18:20</LAST_DATA_UPDATE>
-                    <DESCRIPTION>A demo. cube</DESCRIPTION>
-                    <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
-                    <IS_LINKABLE>false</IS_LINKABLE>
-                    <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
-                    <IS_SQL_ENABLED>false</IS_SQL_ENABLED>
-                    <CUBE_CAPTION>{0}</CUBE_CAPTION>
-                    <CUBE_SOURCE>1</CUBE_SOURCE>
-                </row>
-            </root>
-        </return>
-        """.format(self.selected_catalogue))
+            with xml['return']:
+                with xml.root(mdschema_cubes_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                    with xml.row:
+                        xml.CATALOG_NAME(self.selected_catalogue)
+                        xml.CUBE_NAME(self.selected_catalogue)
+                        xml.CUBE_TYPE('CUBE')
+                        xml.LAST_SCHEMA_UPDATE('2016-07-22T10:41:38')
+                        xml.LAST_DATA_UPDATE('2016-07-22T10:41:38')
+                        xml.DESCRIPTION('MDX ' + self.selected_catalogue + 'results')
+                        xml.IS_DRILLTHROUGH_ENABLED('true')
+                        xml.IS_LINKABLE('false')
+                        xml.IS_WRITE_ENABLED('false')
+                        xml.IS_SQL_ENABLED('false')
+                        xml.CUBE_CAPTION(self.selected_catalogue)
+                        xml.CUBE_SOURCE('1')
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+            return xml
 
     def discover_dbschema_tables_response(self, request):
         if request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return etree.fromstring("""
-                <return>
-            <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + dbschema_tables_xsd + """
-            </root>
-        </return>
-        """)
+
+            xml = xmlwitch.Builder()
+            with xml['return']:
+                xml.root(dbschema_tables_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                         **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'})
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+
+            return xml
+
 
     def discover_mdschema_measures__response(self, request):
-        measures = ""
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
                         request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3 and\
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            for mes in self.executer.measures:
-                measures += """
-                <row>
-                    <CATALOG_NAME>{0}</CATALOG_NAME>
-                    <CUBE_NAME>{1}</CUBE_NAME>
-                    <MEASURE_NAME>{2}</MEASURE_NAME>
-                    <MEASURE_UNIQUE_NAME>[Measures].[{2}]</MEASURE_UNIQUE_NAME>
-                    <MEASURE_CAPTION>{2}</MEASURE_CAPTION>
-                    <MEASURE_AGGREGATOR>1</MEASURE_AGGREGATOR>
-                    <DATA_TYPE>5</DATA_TYPE>
-                    <NUMERIC_PRECISION>16</NUMERIC_PRECISION>
-                    <NUMERIC_SCALE>-1</NUMERIC_SCALE>
-                    <MEASURE_IS_VISIBLE>true</MEASURE_IS_VISIBLE>
-                    <MEASURE_NAME_SQL_COLUMN_NAME>{2}</MEASURE_NAME_SQL_COLUMN_NAME>
-                    <MEASURE_UNQUALIFIED_CAPTION>{2}</MEASURE_UNQUALIFIED_CAPTION>
-                    <MEASUREGROUP_NAME>default</MEASUREGROUP_NAME>
-                </row>
-                """.format(self.selected_catalogue, self.selected_catalogue,
-                           mes)
 
-            return etree.fromstring("""
-            <return>
-                <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                """ + mdschema_measures_xsd + """
-                {0}
-                </root>
-            </return>
-            """.format(measures))
+            xml = xmlwitch.Builder()
+
+            with xml['return']:
+                with xml.root(mdschema_measures_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
+                    for mes in self.executer.measures:
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_catalogue)
+                            xml.CUBE_NAME(self.selected_catalogue)
+                            xml.MEASURE_NAME(mes)
+                            xml.MEASURE_UNIQUE_NAME('[Measures].[' + mes + ']')
+                            xml.MEASURE_CAPTION(mes)
+                            xml.MEASURE_AGGREGATOR('1')
+                            xml.DATA_TYPE('5')
+                            xml.NUMERIC_PRECISION('16')
+                            xml.NUMERIC_SCALE('-1')
+                            xml.MEASURE_IS_VISIBLE('true')
+                            xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
+                            xml.MEASURE_UNQUALIFIED_CAPTION(mes)
+                            xml.MEASUREGROUP_NAME('default')
+
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+            return xml
+
 
     def discover_mdschema_dimensions_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and\
@@ -957,54 +907,51 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            rows = ""
             ord = 1
+            xml = xmlwitch.Builder()
 
-            for tables in self.executer.get_all_tables_names(ignore_fact=True):
+            with xml['return']:
+                with xml.root(mdschema_dimensions_xsd, xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                              **{'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'}):
 
-                rows += """
-                <row>
-                    <CATALOG_NAME>{0}</CATALOG_NAME>
-                    <CUBE_NAME>{0}</CUBE_NAME>
-                    <DIMENSION_NAME>{1}</DIMENSION_NAME>
-                    <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                    <DIMENSION_CAPTION>{1}</DIMENSION_CAPTION>
-                    <DIMENSION_ORDINAL>{2}</DIMENSION_ORDINAL>
-                    <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                    <DIMENSION_CARDINALITY>23</DIMENSION_CARDINALITY>
-                    <DEFAULT_HIERARCHY>[{1}].[{1}]</DEFAULT_HIERARCHY>
-                    <IS_VIRTUAL>false</IS_VIRTUAL>
-                    <IS_READWRITE>false</IS_READWRITE>
-                    <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                </row>""".format(self.selected_catalogue, tables, ord)
-                ord += 1
+                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_catalogue)
+                            xml.CUBE_NAME(self.selected_catalogue)
+                            xml.DIMENSION_NAME(tables)
+                            xml.DIMENSION_UNIQUE_NAME('[' + tables + ']')
+                            xml.DIMENSION_CAPTION(tables)
+                            xml.DIMENSION_ORDINAL(str(ord))
+                            xml.DIMENSION_TYPE('3')
+                            xml.DIMENSION_CARDINALITY('23')
+                            xml.DEFAULT_HIERARCHY('[' + tables + '].[' + tables + ']')
+                            xml.IS_VIRTUAL('false')
+                            xml.IS_READWRITE('false')
+                            xml.DIMENSION_UNIQUE_SETTINGS('1')
+                            xml.DIMENSION_IS_VISIBLE('true')
+                        ord += 1
 
-            rows += """
-            <row>
-                <CATALOG_NAME>{0}</CATALOG_NAME>
-                <CUBE_NAME>{0}</CUBE_NAME>
-                <DIMENSION_NAME>Measures</DIMENSION_NAME>
-                <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                <DIMENSION_CAPTION>Measures</DIMENSION_CAPTION>
-                <DIMENSION_ORDINAL>{1}</DIMENSION_ORDINAL>
-                <DIMENSION_TYPE>2</DIMENSION_TYPE>
-                <DIMENSION_CARDINALITY>0</DIMENSION_CARDINALITY>
-                <DEFAULT_HIERARCHY>[Measures]</DEFAULT_HIERARCHY>
-                <IS_VIRTUAL>false</IS_VIRTUAL>
-                <IS_READWRITE>false</IS_READWRITE>
-                <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-            </row>""".format(self.selected_catalogue, ord)
+                    # for measure
+                    with xml.row:
+                        xml.CATALOG_NAME(self.selected_catalogue)
+                        xml.CUBE_NAME(self.selected_catalogue)
+                        xml.DIMENSION_NAME('Measures')
+                        xml.DIMENSION_UNIQUE_NAME('[Measures]')
+                        xml.DIMENSION_CAPTION('Measures')
+                        xml.DIMENSION_ORDINAL(str(ord))
+                        xml.DIMENSION_TYPE('2')
+                        xml.DIMENSION_CARDINALITY('0')
+                        xml.DEFAULT_HIERARCHY('[Measures]')
+                        xml.IS_VIRTUAL('false')
+                        xml.IS_READWRITE('false')
+                        xml.DIMENSION_UNIQUE_SETTINGS('1')
+                        xml.DIMENSION_IS_VISIBLE('true')
 
-            return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                      """ + mdschema_dimensions_xsd + """
-                      {0}
-                    </root>
-              </return>
-                    """.format(rows))
+            html_parser = HTMLParser.HTMLParser()
+            xml = html_parser.unescape(str(xml))
+            return xml
+
 
     def discover_mdschema_hierarchies_response(self, request):
 
