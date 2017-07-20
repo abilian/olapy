@@ -6,7 +6,6 @@ import uuid
 import xmlwitch
 import HTMLParser
 
-from lxml import etree
 import os
 
 from ..mdx.executor.execute import MdxEngine
