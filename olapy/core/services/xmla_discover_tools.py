@@ -974,34 +974,40 @@ class XmlaDiscoverTools():
                             mdschema_hierarchies_xsd,
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
-                                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
-                                    'http://www.w3.org/2001/XMLSchema-instance'
+                                'http://www.w3.org/2001/XMLSchema-instance'
                             }):
 
-                        for table_name, df in self.executer.tables_loaded.items():
+                        for table_name, df in self.executer.tables_loaded.items(
+                        ):
                             if table_name == self.executer.facts:
                                 continue
 
                             # french caracteres
                             # TODO encode dataframe
                             if type(df.iloc[0][0]) == unicode:
-                                column_attribut = df.iloc[0][0].encode('utf-8',
-                                                                       'replace')
+                                column_attribut = df.iloc[0][0].encode(
+                                    'utf-8', 'replace')
                             else:
                                 column_attribut = df.iloc[0][0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)
                                 xml.CUBE_NAME(self.selected_catalogue)
-                                xml.DIMENSION_UNIQUE_NAME('[' + table_name + ']')
+                                xml.DIMENSION_UNIQUE_NAME('[' + table_name +
+                                                          ']')
                                 xml.HIERARCHY_NAME(table_name)
-                                xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(table_name))
+                                xml.HIERARCHY_UNIQUE_NAME(
+                                    '[{0}].[{0}]'.format(table_name))
                                 xml.HIERARCHY_CAPTION(table_name)
                                 xml.DIMENSION_TYPE('3')
                                 xml.HIERARCHY_CARDINALITY('6')
-                                xml.DEFAULT_MEMBER('[{0}].[{0}].[{1}].[{2}]'.format(table_name,
-                                                                                    df.columns[0], column_attribut))
+                                xml.DEFAULT_MEMBER(
+                                    '[{0}].[{0}].[{1}].[{2}]'.format(
+                                        table_name, df.columns[
+                                            0], column_attribut))
                                 xml.STRUCTURE('0')
                                 xml.IS_VIRTUAL('false')
                                 xml.IS_READWRITE('false')
@@ -1022,7 +1028,8 @@ class XmlaDiscoverTools():
                             xml.HIERARCHY_CAPTION('Measures')
                             xml.DIMENSION_TYPE('2')
                             xml.HIERARCHY_CARDINALITY('0')
-                            xml.DEFAULT_MEMBER('[Measures].[{0}]'.format(self.executer.measures[0]))
+                            xml.DEFAULT_MEMBER('[Measures].[{0}]'.format(
+                                self.executer.measures[0]))
                             xml.STRUCTURE('0')
                             xml.IS_VIRTUAL('false')
                             xml.IS_READWRITE('false')
@@ -1055,20 +1062,23 @@ class XmlaDiscoverTools():
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
 
-                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                    for tables in self.executer.get_all_tables_names(
+                            ignore_fact=True):
                         l_nb = 0
                         for col in self.executer.tables_loaded[tables].columns:
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)
                                 xml.CUBE_NAME(self.selected_catalogue)
-                                xml.DIMENSION_UNIQUE_NAME('['+tables+']')
-                                xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tables))
+                                xml.DIMENSION_UNIQUE_NAME('[' + tables + ']')
+                                xml.HIERARCHY_UNIQUE_NAME(
+                                    '[{0}].[{0}]'.format(tables))
                                 xml.LEVEL_NAME(str(col))
-                                xml.LEVEL_UNIQUE_NAME('[{0}].[{0}].[{1}]'.format(tables, col))
+                                xml.LEVEL_UNIQUE_NAME(
+                                    '[{0}].[{0}].[{1}]'.format(tables, col))
                                 xml.LEVEL_CAPTION(str(col))
                                 xml.LEVEL_NUMBER(str(l_nb))
                                 xml.LEVEL_CARDINALITY('0')
@@ -1118,7 +1128,7 @@ class XmlaDiscoverTools():
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
@@ -1147,9 +1157,10 @@ class XmlaDiscoverTools():
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-                    for tables in self.executer.get_all_tables_names(ignore_fact=True):
+                    for tables in self.executer.get_all_tables_names(
+                            ignore_fact=True):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.CUBE_NAME(self.selected_catalogue)
@@ -1159,25 +1170,33 @@ class XmlaDiscoverTools():
                             xml.DIMENSION_CARDINALITY('MANY')
                             xml.DIMENSION_IS_VISIBLE('true')
                             xml.DIMENSION_IS_FACT_DIMENSION('false')
-                            xml.DIMENSION_GRANULARITY('[{0}].[{0}]'.format(tables))
-
+                            xml.DIMENSION_GRANULARITY(
+                                '[{0}].[{0}]'.format(tables))
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
             return xml
 
-
     def discover_mdschema_properties_response(self, request):
         xml = xmlwitch.Builder()
         if request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and \
             request.Properties.PropertyList.Catalog is not None:
-            properties_names = ['FONT_FLAGS', 'LANGUAGE', 'style', 'ACTION_TYPE', 'FONT_SIZE', 'FORMAT_STRING',
-                                'className', 'UPDATEABLE', 'BACK_COLOR', 'CELL_ORDINAL', 'FONT_NAME', 'VALUE',
-                                'FORMATTED_VALUE', 'FORE_COLOR']
-            properties_captions = ['FONT_FLAGS', 'LANGUAGE', 'style', 'ACTION_TYPE', 'FONT_SIZE', 'FORMAT_STRING',
-                                   'className', 'UPDATEABLE', 'BACK_COLOR', 'CELL_ORDINAL', 'FONT_NAME', 'VALUE',
-                                   'FORMATTED_VALUE', 'FORE_COLOR']
-            properties_datas = ['3', '19', '130', '19', '18', '130', '130', '19', '19', '19', '130', '12', '130', '19']
+            properties_names = [
+                'FONT_FLAGS', 'LANGUAGE', 'style', 'ACTION_TYPE', 'FONT_SIZE',
+                'FORMAT_STRING', 'className', 'UPDATEABLE', 'BACK_COLOR',
+                'CELL_ORDINAL', 'FONT_NAME', 'VALUE', 'FORMATTED_VALUE',
+                'FORE_COLOR'
+            ]
+            properties_captions = [
+                'FONT_FLAGS', 'LANGUAGE', 'style', 'ACTION_TYPE', 'FONT_SIZE',
+                'FORMAT_STRING', 'className', 'UPDATEABLE', 'BACK_COLOR',
+                'CELL_ORDINAL', 'FONT_NAME', 'VALUE', 'FORMATTED_VALUE',
+                'FORE_COLOR'
+            ]
+            properties_datas = [
+                '3', '19', '130', '19', '18', '130', '130', '19', '19', '19',
+                '130', '12', '130', '19'
+            ]
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -1188,9 +1207,9 @@ class XmlaDiscoverTools():
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-                    for idx,prop_name in enumerate(properties_names):
+                    for idx, prop_name in enumerate(properties_names):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.PROPERTY_TYPE('2')
@@ -1205,18 +1224,17 @@ class XmlaDiscoverTools():
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             with xml['return']:
                 xml.root(
-                        mdschema_properties_properties_xsd,
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                        **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
-                        })
+                    mdschema_properties_properties_xsd,
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi':
+                        'http://www.w3.org/2001/XMLSchema-instance'
+                    })
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
             return xml
-
 
     def discover_mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
@@ -1242,18 +1260,21 @@ class XmlaDiscoverTools():
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
                         xml.DIMENSION_UNIQUE_NAME(separed_tuple[0])
-                        xml.HIERARCHY_UNIQUE_NAME('{0}.{0}'.format(separed_tuple[0]))
+                        xml.HIERARCHY_UNIQUE_NAME(
+                            '{0}.{0}'.format(separed_tuple[0]))
                         xml.LEVEL_UNIQUE_NAME(joined)
                         xml.LEVEL_NUMBER('0')
                         xml.MEMBER_ORDINAL('0')
                         xml.MEMBER_NAME(last_attribut)
-                        xml.MEMBER_UNIQUE_NAME(request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME)
+                        xml.MEMBER_UNIQUE_NAME(
+                            request.Restrictions.RestrictionList.
+                            MEMBER_UNIQUE_NAME)
                         xml.MEMBER_TYPE('1')
                         xml.MEMBER_CAPTION(last_attribut)
                         xml.CHILDREN_CARDINALITY('1')
