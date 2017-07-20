@@ -996,7 +996,7 @@ class XmlaDiscoverTools():
                                 xml.CUBE_NAME(self.selected_catalogue)
                                 xml.DIMENSION_UNIQUE_NAME('[' + table_name + ']')
                                 xml.HIERARCHY_NAME(table_name)
-                                xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(self.selected_catalogue))
+                                xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(table_name))
                                 xml.HIERARCHY_CAPTION(table_name)
                                 xml.DIMENSION_TYPE('3')
                                 xml.HIERARCHY_CARDINALITY('6')
