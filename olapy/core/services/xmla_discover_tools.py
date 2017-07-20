@@ -964,7 +964,8 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3:
+            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3 or \
+                            request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
                 rows = ""
                 for table_name, df in self.executer.tables_loaded.items():
                     if table_name == self.executer.facts:
@@ -1038,77 +1039,77 @@ class XmlaDiscoverTools():
             </return>
             """.format(rows))
 
-            if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
-                rows = ""
-                for table_name, df in self.executer.tables_loaded.items():
-                    if table_name == self.executer.facts:
-                        continue
-
-                    # french caracteres
-                    # TODO encode dataframe
-                    if type(df.iloc[0][0]) == unicode:
-                        column_attribut = df.iloc[0][0].encode('utf-8',
-                                                               'replace')
-                    else:
-                        column_attribut = df.iloc[0][0]
-
-                    rows += """
-                    <row>
-                        <CATALOG_NAME>{0}</CATALOG_NAME>
-                        <CUBE_NAME>{0}</CUBE_NAME>
-                        <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
-                        <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
-                        <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
-                        <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
-                        <DIMENSION_TYPE>3</DIMENSION_TYPE>
-                        <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
-                        <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
-                        <STRUCTURE>0</STRUCTURE>
-                        <IS_VIRTUAL>false</IS_VIRTUAL>
-                        <IS_READWRITE>false</IS_READWRITE>
-                        <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                        <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                        <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
-                        <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
-                        <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
-                        <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
-                        <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
-                    </row>
-                        """.format(self.selected_catalogue, table_name,
-                                   df.columns[0], column_attribut)
-
-                rows += """
-                <row>
-                    <CATALOG_NAME>{0}</CATALOG_NAME>
-                    <CUBE_NAME>{0}</CUBE_NAME>
-                    <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
-                    <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
-                    <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
-                    <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
-                    <DIMENSION_TYPE>2</DIMENSION_TYPE>
-                    <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
-                    <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
-                    <STRUCTURE>0</STRUCTURE>
-                    <IS_VIRTUAL>false</IS_VIRTUAL>
-                    <IS_READWRITE>false</IS_READWRITE>
-                    <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
-                    <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
-                    <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
-                    <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
-                    <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
-                    <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
-                    <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
-                </row>""".format(self.selected_catalogue,
-                                 self.executer.measures[0])
-                return etree.fromstring("""
-                <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    """ + mdschema_hierarchies_xsd + """
-                        {0}
-                    </root>
-                 </return>""".format(rows))
+            # if request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
+            #     rows = ""
+            #     for table_name, df in self.executer.tables_loaded.items():
+            #         if table_name == self.executer.facts:
+            #             continue
+            #
+            #         # french caracteres
+            #         # TODO encode dataframe
+            #         if type(df.iloc[0][0]) == unicode:
+            #             column_attribut = df.iloc[0][0].encode('utf-8',
+            #                                                    'replace')
+            #         else:
+            #             column_attribut = df.iloc[0][0]
+            #
+            #         rows += """
+            #         <row>
+            #             <CATALOG_NAME>{0}</CATALOG_NAME>
+            #             <CUBE_NAME>{0}</CUBE_NAME>
+            #             <DIMENSION_UNIQUE_NAME>[{1}]</DIMENSION_UNIQUE_NAME>
+            #             <HIERARCHY_NAME>{1}</HIERARCHY_NAME>
+            #             <HIERARCHY_UNIQUE_NAME>[{1}].[{1}]</HIERARCHY_UNIQUE_NAME>
+            #             <HIERARCHY_CAPTION>{1}</HIERARCHY_CAPTION>
+            #             <DIMENSION_TYPE>3</DIMENSION_TYPE>
+            #             <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
+            #             <DEFAULT_MEMBER>[{1}].[{1}].[{2}].[{3}]</DEFAULT_MEMBER>
+            #             <STRUCTURE>0</STRUCTURE>
+            #             <IS_VIRTUAL>false</IS_VIRTUAL>
+            #             <IS_READWRITE>false</IS_READWRITE>
+            #             <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+            #             <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            #             <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
+            #             <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+            #             <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
+            #             <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
+            #             <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
+            #         </row>
+            #             """.format(self.selected_catalogue, table_name,
+            #                        df.columns[0], column_attribut)
+            #
+            #     rows += """
+            #     <row>
+            #         <CATALOG_NAME>{0}</CATALOG_NAME>
+            #         <CUBE_NAME>{0}</CUBE_NAME>
+            #         <DIMENSION_UNIQUE_NAME>[Measures]</DIMENSION_UNIQUE_NAME>
+            #         <HIERARCHY_NAME>Measures</HIERARCHY_NAME>
+            #         <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
+            #         <HIERARCHY_CAPTION>Measures</HIERARCHY_CAPTION>
+            #         <DIMENSION_TYPE>2</DIMENSION_TYPE>
+            #         <HIERARCHY_CARDINALITY>0</HIERARCHY_CARDINALITY>
+            #         <DEFAULT_MEMBER>[Measures].[{1}]</DEFAULT_MEMBER>
+            #         <STRUCTURE>0</STRUCTURE>
+            #         <IS_VIRTUAL>false</IS_VIRTUAL>
+            #         <IS_READWRITE>false</IS_READWRITE>
+            #         <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+            #         <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            #         <HIERARCHY_ORDINAL>1</HIERARCHY_ORDINAL>
+            #         <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+            #         <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
+            #         <HIERARCHY_ORIGIN>1</HIERARCHY_ORIGIN>
+            #         <INSTANCE_SELECTION>0</INSTANCE_SELECTION>
+            #     </row>""".format(self.selected_catalogue,
+            #                      self.executer.measures[0])
+            #     return etree.fromstring("""
+            #     <return>
+            #         <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+            #         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            #         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            #         """ + mdschema_hierarchies_xsd + """
+            #             {0}
+            #         </root>
+            #      </return>""".format(rows))
 
     def discover_mdschema_levels__response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
