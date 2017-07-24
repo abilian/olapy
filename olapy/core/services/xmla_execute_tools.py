@@ -200,24 +200,24 @@ class XmlaExecuteTools():
                     #     ]), tuple_without_minus_1[-1],
                     #     len(tuple_without_minus_1) - first_att)
                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME
-                    if len(tuple_without_minus_1[first_att - 1:]) > 1:
-                        xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}].{2}'.format(
-                            tuple_without_minus_1[0],
-                            splited_df[tuple_without_minus_1[0]].columns[0],
-                            '.'.join([
-                                '[' + str(i) + ']'
-                                for i in tuple_without_minus_1[first_att - 1:-1]
-                            ])))
-                        # axis0 += """
-                        # <PARENT_UNIQUE_NAME>[{0}].[{0}].[{1}].{2}</PARENT_UNIQUE_NAME>""".format(
-                        #     tuple_without_minus_1[0],
-                        #     splited_df[tuple_without_minus_1[0]].columns[0],
-                        #     '.'.join([
-                        #         '[' + str(i) + ']'
-                        #         for i in tuple_without_minus_1[first_att - 1:-1]
-                        #     ]))
+                        if len(tuple_without_minus_1[first_att - 1:]) > 1:
+                            xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}].{2}'.format(
+                                tuple_without_minus_1[0],
+                                splited_df[tuple_without_minus_1[0]].columns[0],
+                                '.'.join([
+                                    '[' + str(i) + ']'
+                                    for i in tuple_without_minus_1[first_att - 1:-1]
+                                ])))
+                            # axis0 += """
+                            # <PARENT_UNIQUE_NAME>[{0}].[{0}].[{1}].{2}</PARENT_UNIQUE_NAME>""".format(
+                            #     tuple_without_minus_1[0],
+                            #     splited_df[tuple_without_minus_1[0]].columns[0],
+                            #     '.'.join([
+                            #         '[' + str(i) + ']'
+                            #         for i in tuple_without_minus_1[first_att - 1:-1]
+                            #     ]))
 
-                    xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
+                        xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
                     # axis0 += """
                     #     <HIERARCHY_UNIQUE_NAME>[{0}].[{0}]</HIERARCHY_UNIQUE_NAME>
                     # </Member>
