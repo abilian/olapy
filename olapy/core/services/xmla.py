@@ -9,7 +9,6 @@ import os
 from datetime import datetime
 from os.path import expanduser
 
-from lxml import etree
 from spyne import AnyXml, Application, ServiceBase, rpc, Fault
 from spyne.const.http import HTTP_200
 from spyne.error import InvalidCredentialsError
@@ -168,15 +167,6 @@ class XmlaProviderService(ServiceBase):
 
             return str(xml)
 
-            # xml = xmlwitch.Builder()
-            # # xml.return return reserved of course
-            # xml.root(xmlns="urn:schemas-microsoft-com:xml-analysis:empty")
-            #
-            # return """
-            # <return>
-            #     {0}
-            # </return>
-            # """.format(str(xml))
         else:
             XmlaProviderService.discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog)
@@ -185,24 +175,6 @@ class XmlaProviderService(ServiceBase):
             df = executer.execute_mdx()
             xmla_tools = XmlaExecuteTools(executer)
 
-            # xml = xmlwitch.Builder()
-            # with xml.OlapInfo(xmla_tools.generate_cell_info()):
-            #     with xml.CubeInfo:
-            #         with xml.Cube:
-            #             xml.CubeName('Sales')
-            #             xml.LastDataUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-            #                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
-            #             xml.LastSchemaUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-            #                                xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
-            #     xml.AxesInfo(xmla_tools.generate_axes_info(df),
-            #                  xmla_tools.generate_axes_info_slicer(df))
-            #
-            # xml.Axes(xmla_tools.generate_xs0(df),
-            #          xmla_tools.generate_slicer_axis(df))
-            #
-            # xml.CellData(xmla_tools.generate_cell_data(df))
-
-            # todo to check
             xml = xmlwitch.Builder()
             with xml['return']:
                 with xml.root(
@@ -211,22 +183,30 @@ class XmlaProviderService(ServiceBase):
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance'
                         }):
                     with xml.OlapInfo(xmla_tools.generate_cell_info()):
                         with xml.CubeInfo:
                             with xml.Cube:
                                 xml.CubeName('Sales')
-                                xml.LastDataUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-                                                   xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
-                                xml.LastSchemaUpdate(datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-                                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine")
+                                xml.LastDataUpdate(
+                                    datetime.now().strftime(
+                                        '%Y-%m-%dT%H:%M:%S'),
+                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
+                                )
+                                xml.LastSchemaUpdate(
+                                    datetime.now().strftime(
+                                        '%Y-%m-%dT%H:%M:%S'),
+                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
+                                )
 
-                        xml.AxesInfo(xmla_tools.generate_axes_info(df),
-                                          xmla_tools.generate_axes_info_slicer(df))
+                        xml.AxesInfo(
+                            xmla_tools.generate_axes_info(df),
+                            xmla_tools.generate_axes_info_slicer(df))
 
-                    xml.Axes(xmla_tools.generate_xs0(df),
-                             xmla_tools.generate_slicer_axis(df))
+                    xml.Axes(
+                        xmla_tools.generate_xs0(df),
+                        xmla_tools.generate_slicer_axis(df))
 
                     xml.CellData(xmla_tools.generate_cell_data(df))
 
@@ -234,55 +214,6 @@ class XmlaProviderService(ServiceBase):
             xml = html_parser.unescape(str(xml)).replace('&', '&amp;')
 
             return xml
-
-            # return etree.fromstring("""
-            # <return>
-            #     <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset"
-            #     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            #     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            #         {0}
-            #         <OlapInfo>
-            #             <CubeInfo>
-            #                 <Cube>
-            #                     <CubeName>Sales</CubeName>
-            #                     <LastDataUpdate
-            #                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{7}</LastDataUpdate>
-            #                     <LastSchemaUpdate
-            #                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">{7}</LastSchemaUpdate>
-            #                 </Cube>
-            #             </CubeInfo>
-            #             <AxesInfo>
-            #                 {1}
-            #                 {2}
-            #             </AxesInfo>
-            #                 {3}
-            #         </OlapInfo>
-            #         <Axes>
-            #             {4}
-            #             {5}
-            #         </Axes>
-            #         <CellData>
-            #             {6}
-            #         </CellData>
-            #     </root>
-            # </return>
-            # """.format(execute_xsd,
-            #            xmla_tools.generate_axes_info(df),
-            #            xmla_tools.generate_axes_info_slicer(df),
-            #            xmla_tools.generate_cell_info(),
-            #            xmla_tools.generate_xs0(df),
-            #            xmla_tools.generate_slicer_axis(df),
-            #            xmla_tools.generate_cell_data(df),
-            #            datetime.now().strftime('%Y-%m-%dT%H:%M:%S')).replace(
-            #                '&', '&amp;'))
-
-            # Problem:
-            # An XML parser returns the error “xmlParseEntityRef: noname”
-            #
-            # Cause:
-            # There is a stray ‘&’ (ampersand character) somewhere in the XML text eg. some text & some more text
-            # Solution
-            # .replace('&', '&amp;')
 
 
 application = Application(
