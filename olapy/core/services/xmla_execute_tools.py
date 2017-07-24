@@ -296,7 +296,6 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: CellData as string
         """
-        columns_loop = []
 
         if ((len(mdx_execution_result['columns_desc']['columns'].keys()) == 0)
                 ^
@@ -320,18 +319,16 @@ class XmlaExecuteTools():
                         index=False)
                 ])
 
-        cell_data = ""
+        xml = xmlwitch.Builder()
         index = 0
         for value in columns_loop:
             if np.isnan(value):
                 value = ''
-            cell_data += """
-            <Cell CellOrdinal="{0}">
-                <Value xsi:type="xsi:long">{1}</Value>
-            </Cell>
-            """.format(index, value)
+            with xml.Cell(CellOrdinal=str(index)):
+                xml.Value(str(value),**{'xsi:type': 'xsi:long'})
+
             index += 1
-        return cell_data
+        return str(xml)
 
     def generate_axes_info_slicer(self, mdx_execution_result):
         """
