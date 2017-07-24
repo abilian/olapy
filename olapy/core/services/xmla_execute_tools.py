@@ -89,14 +89,14 @@ class XmlaExecuteTools():
         :param splited_df:
         :return:
         """
-        # axis0 = ""
+
         xml = xmlwitch.Builder()
         # only measure selected
         if mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
-                self.executer.facts
+            self.executer.facts
         ]:
             if len(mdx_execution_result['columns_desc'][mdx_query_axis][
-                    self.executer.facts]) == 1:
+                       self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
@@ -107,7 +107,7 @@ class XmlaExecuteTools():
 
         # query with on columns and on rows (without measure)
         elif mdx_execution_result['columns_desc'][
-                'columns'] and mdx_execution_result['columns_desc']['rows']:
+            'columns'] and mdx_execution_result['columns_desc']['rows']:
             # ['Geography','America']
             tuples = [
                 zip(*[[[key] + list(row)
@@ -130,122 +130,64 @@ class XmlaExecuteTools():
             ]
             first_att = 3
 
-        for tupls in itertools.chain(*tuples):
-            # axis0 += "<Tuple>\n"
-            with xml.Tuple:
-                if tupls[0][1] in self.executer.measures and len(
-                        self.executer.selected_measures) > 1:
-                    with xml.Member(Hierarchy="[Measures]"):
-                        xml.UName('[Measures].[{0}]'.format(tupls[0][1]))
-                        xml.Caption('{0}'.format(tupls[0][1]))
-                        xml.LName('[Measures]')
-                        xml.LNum('0')
-                        xml.DisplayInfo('0')
-                        xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+        if tuples:
+            with xml.Axis(name=axis):
+                with xml.Tuples:
+                    for tupls in itertools.chain(*tuples):
+                        with xml.Tuple:
+                            if tupls[0][1] in self.executer.measures and len(
+                                    self.executer.selected_measures) > 1:
+                                with xml.Member(Hierarchy="[Measures]"):
+                                    xml.UName('[Measures].[{0}]'.format(tupls[0][1]))
+                                    xml.Caption('{0}'.format(tupls[0][1]))
+                                    xml.LName('[Measures]')
+                                    xml.LNum('0')
+                                    xml.DisplayInfo('0')
+                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
-                    # axis0 += """
-                    # <Member Hierarchy="[Measures]">
-                    #     <UName>[Measures].[{0}]</UName>
-                    #     <Caption>{0}</Caption>
-                    #     <LName>[Measures]</LName>
-                    #     <LNum>0</LNum>
-                    #     <DisplayInfo>0</DisplayInfo>
-                    #     <HIERARCHY_UNIQUE_NAME>[Measures]</HIERARCHY_UNIQUE_NAME>
-                    # </Member>
-                    # """.format(tupls[0][1])
+                                if tupls[0][-1] in self.executer.measures:
+                                    continue
 
-                    if tupls[0][-1] in self.executer.measures:
-                        # tocom
-                        # axis0 += "</Tuple>\n"
-                        continue
+                            for tupl in tupls:
+                                tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
 
-                for tupl in tupls:
-                    tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
+                                # french caracteres
+                                # TODO encode dataframe
+                                if type(tuple_without_minus_1[-1]) == unicode:
+                                    tuple_without_minus_1 = [
+                                        x.encode('utf-8', 'replace')
+                                        for x in tuple_without_minus_1
+                                    ]
 
-                    # french caracteres
-                    # TODO encode dataframe
-                    if type(tuple_without_minus_1[-1]) == unicode:
-                        tuple_without_minus_1 = [
-                            x.encode('utf-8', 'replace')
-                            for x in tuple_without_minus_1
-                        ]
+                                # todo ugly !!
+                                with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
+                                    xml.UName('[{0}].[{0}].[{1}].{2}'.format(tuple_without_minus_1[0],
+                                                                             splited_df[tuple_without_minus_1[
+                                                                                 0]].columns[len(
+                                                                                 tuple_without_minus_1) - first_att],
+                                                                             '.'.join(['[' + str(i) + ']' for i in
+                                                                                       tuple_without_minus_1[
+                                                                                       first_att - 1:]
+                                                                                       ])))
+                                    xml.Caption('{0}'.format(tuple_without_minus_1[-1]))
+                                    xml.LName('[{0}].[{0}].[{1}]'.format(
+                                        tuple_without_minus_1[0], splited_df[tuple_without_minus_1[
+                                            0]].columns[len(tuple_without_minus_1) - first_att]))
+                                    xml.LNum('{0}'.format(len(tuple_without_minus_1) - first_att))
+                                    xml.DisplayInfo('131076')
 
-                    # todo ugly !!
-                    with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
-                        xml.UName('[{0}].[{0}].[{1}].{2}'.format(tuple_without_minus_1[0],
-                                                                 splited_df[tuple_without_minus_1[
-                                                                     0]].columns[len(tuple_without_minus_1) - first_att],
-                                                                 '.'.join(['[' + str(i) + ']' for i in
-                                                                           tuple_without_minus_1[first_att - 1:]
-                                                                           ])))
-                        xml.Caption('{0}'.format(tuple_without_minus_1[-1]))
-                        xml.LName('[{0}].[{0}].[{1}]'.format(
-                            tuple_without_minus_1[0], splited_df[tuple_without_minus_1[
-                                0]].columns[len(tuple_without_minus_1) - first_att]))
-                        xml.LNum('{0}'.format(len(tuple_without_minus_1) - first_att))
-                        xml.DisplayInfo('131076')
+                                    # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
+                                    if len(tuple_without_minus_1[first_att - 1:]) > 1:
+                                        xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}].{2}'.format(
+                                            tuple_without_minus_1[0],
+                                            splited_df[tuple_without_minus_1[0]].columns[0],
+                                            '.'.join([
+                                                '[' + str(i) + ']'
+                                                for i in tuple_without_minus_1[first_att - 1:-1]
+                                            ])))
 
-                    # axis0 += """
-                    # <Member Hierarchy="[{0}].[{0}]">
-                    #     <UName>[{0}].[{0}].[{1}].{2}</UName>
-                    #     <Caption>{3}</Caption>
-                    #     <LName>[{0}].[{0}].[{1}]</LName>
-                    #     <LNum>{4}</LNum>
-                    #     <DisplayInfo>131076</DisplayInfo>""".format(
-                    #     tuple_without_minus_1[0], splited_df[tuple_without_minus_1[
-                    #         0]].columns[len(tuple_without_minus_1) - first_att],
-                    #     '.'.join([
-                    #         '[' + str(i) + ']'
-                    #         for i in tuple_without_minus_1[first_att - 1:]
-                    #     ]), tuple_without_minus_1[-1],
-                    #     len(tuple_without_minus_1) - first_att)
-                    # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME
-                        if len(tuple_without_minus_1[first_att - 1:]) > 1:
-                            xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}].{2}'.format(
-                                tuple_without_minus_1[0],
-                                splited_df[tuple_without_minus_1[0]].columns[0],
-                                '.'.join([
-                                    '[' + str(i) + ']'
-                                    for i in tuple_without_minus_1[first_att - 1:-1]
-                                ])))
-                            # axis0 += """
-                            # <PARENT_UNIQUE_NAME>[{0}].[{0}].[{1}].{2}</PARENT_UNIQUE_NAME>""".format(
-                            #     tuple_without_minus_1[0],
-                            #     splited_df[tuple_without_minus_1[0]].columns[0],
-                            #     '.'.join([
-                            #         '[' + str(i) + ']'
-                            #         for i in tuple_without_minus_1[first_att - 1:-1]
-                            #     ]))
+                                    xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
 
-                        xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
-                    # axis0 += """
-                    #     <HIERARCHY_UNIQUE_NAME>[{0}].[{0}]</HIERARCHY_UNIQUE_NAME>
-                    # </Member>
-                    # """.format(tuple_without_minus_1[0])
-
-                # axis0 += "</Tuple>\n"
-        print(xml)
-        print(type(xml))
-        print(str(xml) == '')
-        if str(xml) != '':
-            xml = """
-            <Axis name="{0}">
-                <Tuples>
-                    {1}
-                </Tuples>
-            </Axis>
-            """.format(axis, str(xml))
-
-        # if axis0:
-        #     axis0 = """
-        #     <Axis name="{0}">
-        #         <Tuples>
-        #             {1}
-        #         </Tuples>
-        #     </Axis>
-        #     """.format(axis, axis0)
-
-        print(xml)
         return str(xml)
 
     def generate_xs0(self, mdx_execution_result):
