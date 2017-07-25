@@ -533,8 +533,101 @@ class XmlaDiscoverTools():
             # if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_LEVELS' and \
             #                 request.Properties.PropertyList.Catalog is not None:
 
+            if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES":
+                return """
+                <return>
+                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" 
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    
+                    <xsd:schema elementFormDefault="qualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:sql="urn:schemas-microsoft-com:xml-sql">
+                    <xsd:element name="root">
+                    <xsd:complexType>
+                    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+                    <xsd:element name="row" type="row"/>
+                    </xsd:sequence>
+                    </xsd:complexType>
+                    </xsd:element>
+                    <xsd:simpleType name="uuid">
+                    <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+                    </xsd:restriction>
+                    </xsd:simpleType>
+                    <xsd:complexType name="xmlDocument">
+                    <xsd:sequence>
+                    <xsd:any/>
+                    </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:complexType name="row">
+                    <xsd:sequence>
+                    <xsd:element minOccurs="0" name="SchemaName" sql:field="SchemaName" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="SchemaGuid" sql:field="SchemaGuid" type="uuid"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="Restrictions" sql:field="Restrictions">
+                    <xsd:complexType>
+                    <xsd:sequence>
+                    <xsd:element minOccurs="0" name="Name" sql:field="Name" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="Type" sql:field="Type" type="xsd:string"/>
+                    </xsd:sequence>
+                    </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="Description" sql:field="Description" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="RestrictionsMask" sql:field="RestrictionsMask" type="xsd:unsignedLong"/>
+                    </xsd:sequence>
+                    </xsd:complexType>
+                    </xsd:schema>
+                    
+                        <row>
+                        <SchemaName>MDSCHEMA_LEVELS</SchemaName>
+                        <SchemaGuid>C8B522DB-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+                        <Restrictions>
+                        <Name>CATALOG_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>SCHEMA_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>CUBE_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>DIMENSION_UNIQUE_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>HIERARCHY_UNIQUE_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>LEVEL_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>LEVEL_UNIQUE_NAME</Name>
+                        <Type>xsd:string</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>LEVEL_ORIGIN</Name>
+                        <Type>xsd:unsignedShort</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>CUBE_SOURCE</Name>
+                        <Type>xsd:unsignedShort</Type>
+                        </Restrictions>
+                        <Restrictions>
+                        <Name>LEVEL_VISIBILITY</Name>
+                        <Type>xsd:unsignedShort</Type>
+                        </Restrictions>
+                        <RestrictionsMask>1023</RestrictionsMask>
+                        </row>
+                    </root>
+                    
+                </return>
+                    """
 
-            if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES':
+
+            if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_LEVELS':
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
 
                 restriction_names = [
@@ -865,7 +958,6 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_measures__response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3 and\
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -899,6 +991,7 @@ class XmlaDiscoverTools():
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml))
+
             return xml
 
     def discover_mdschema_dimensions_response(self, request):
