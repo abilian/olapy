@@ -197,6 +197,7 @@ class XmlaDiscoverTools():
 
         return get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
+    # todo check here 4 convert 2 formulas
     def discover_schema_rowsets_response(self, request):
 
         rows = [
@@ -502,63 +503,65 @@ class XmlaDiscoverTools():
 
             return xml
 
-        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
-                        request.Properties.PropertyList.Catalog is not None:
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+        if request.Properties.PropertyList.Catalog is not None:
+            if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES":
+                self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-            restriction_names = [
-                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
-                'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
-                'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
-                'HIERARCHY_VISIBILITY'
-            ]
-            restriction_types = [
-                'string', 'string', 'string', 'string', 'string', 'string',
-                'unsignedShort', 'unsignedShort', 'unsignedShort'
-            ]
+                restriction_names = [
+                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                    'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
+                    'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
+                    'HIERARCHY_VISIBILITY'
+                ]
+                restriction_types = [
+                    'string', 'string', 'string', 'string', 'string', 'string',
+                    'unsignedShort', 'unsignedShort', 'unsignedShort'
+                ]
 
-            rows = [{
-                'SchemaName': 'MDSCHEMA_HIERARCHIES',
-                'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
-                'restrictions': {
-                    'restriction_names': restriction_names,
-                    'restriction_types': restriction_types
-                },
-                'RestrictionsMask': '511'
-            }]
+                rows = [{
+                    'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                    'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                    'restrictions': {
+                        'restriction_names': restriction_names,
+                        'restriction_types': restriction_types
+                    },
+                    'RestrictionsMask': '511'
+                }]
 
-            return generate_resp(rows)
+                return generate_resp(rows)
+
+            # if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_LEVELS' and \
+            #                 request.Properties.PropertyList.Catalog is not None:
 
 
-        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and \
-                        request.Properties.PropertyList.Catalog is not None:
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES':
+                self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-            restriction_names = [
-                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
-                'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
-                'MEASURE_VISIBILITY'
-            ]
-            restriction_types = [
-                'string', 'string', 'string', 'string', 'string', 'string',
-                'unsignedShort', 'unsignedShort'
-            ]
+                restriction_names = [
+                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
+                    'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
+                    'MEASURE_VISIBILITY'
+                ]
+                restriction_types = [
+                    'string', 'string', 'string', 'string', 'string', 'string',
+                    'unsignedShort', 'unsignedShort'
+                ]
 
-            rows = [{
-                'SchemaName': 'MDSCHEMA_MEASURES',
-                'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
-                'restrictions': {
-                    'restriction_names': restriction_names,
-                    'restriction_types': restriction_types
-                },
-                'RestrictionsMask': '255'
-            }]
+                rows = [{
+                    'SchemaName': 'MDSCHEMA_MEASURES',
+                    'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                    'restrictions': {
+                        'restriction_names': restriction_names,
+                        'restriction_types': restriction_types
+                    },
+                    'RestrictionsMask': '255'
+                }]
 
-            return generate_resp(rows)
+                return generate_resp(rows)
 
         # TODO delete
-        if request.Properties.PropertyList.Catalog is not None:
-            return generate_resp(rows)
+        # if request.Properties.PropertyList.Catalog is not None:
+        #     return generate_resp(rows)
 
         ext = [{
             'SchemaName': 'DBSCHEMA_TABLES',
