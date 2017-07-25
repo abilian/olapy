@@ -592,7 +592,6 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: SlicerAxis as string
         """
-        tuple = ""
         # not used dimensions
         unused_dimensions = list(
             set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
@@ -640,4 +639,4 @@ class XmlaExecuteTools():
                                 xml.LNum('0')
                                 xml.DisplayInfo('0')
 
-        return tuple
+        return str(xml)
