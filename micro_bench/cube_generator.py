@@ -1,5 +1,6 @@
 import string
 import os
+from os.path import expanduser
 
 import pandas as pd
 import numpy as np
@@ -27,6 +28,8 @@ class CubeGen:
         self.number_dimensions = number_dimensions
         self.rows_length = rows_length
         self.columns_length = columns_length
+        self.cube_path = os.path.join(expanduser('~'), 'olapy-data',
+                                      MdxEngine.CUBE_FOLDER)
 
     def generate_cube(self, min_val=5, max_val=100):
         """
@@ -57,30 +60,24 @@ class CubeGen:
         tables['Facts'] = facts
         return tables
 
-    @staticmethod
-    def generate_csv(tables):
+    def generate_csv(self,tables):
         """
         Generate csv files for the generated DataFrames.
         
         :param tables: dict of DataFrames
         """
-        cube_path = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
-            MdxEngine.CUBE_FOLDER)
-        if not os.path.isdir(os.path.join(cube_path, CUBE_NAME)):
-            os.makedirs(os.path.join(cube_path, CUBE_NAME))
-        cube_path = os.path.join(cube_path, CUBE_NAME)
+
+        if not os.path.isdir(os.path.join(self.cube_path, CUBE_NAME)):
+            os.makedirs(os.path.join(self.cube_path, CUBE_NAME))
+        cube_path = os.path.join(self.cube_path, CUBE_NAME)
         for (table_name, table_value) in tables.items():
             table_value.to_csv(
                 os.path.join(os.path.join(cube_path, table_name + '.csv')),
                 sep=";",
                 index=False)
 
-    @staticmethod
-    def remove_temp_cube():
+    def remove_temp_cube(self):
         """Remove the temporary cube."""
-        cube_path = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
-            MdxEngine.CUBE_FOLDER)
-        if os.path.isdir(os.path.join(cube_path, CUBE_NAME)):
-            shutil.rmtree(os.path.join(cube_path, CUBE_NAME))
+
+        if os.path.isdir(os.path.join(self.cube_path, CUBE_NAME)):
+            shutil.rmtree(os.path.join(self.cube_path, CUBE_NAME))
