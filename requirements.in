@@ -5,6 +5,7 @@ spyne<3
 treelib<2
 SQLAlchemy
 psycopg2
+xmlwitch
 
 # Test
 werkzeug
