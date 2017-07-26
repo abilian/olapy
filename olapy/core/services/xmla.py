@@ -170,121 +170,267 @@ class XmlaProviderService(ServiceBase):
         elif 'WITH MEMBER' in request.Command.Statement :
             return """
                 <return>
-                    <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset">
-                    """ + execute_xsd + """   
-                        <OlapInfo>
-                                <CubeInfo>
-                                        <Cube>
-                                                <CubeName>Sales</CubeName>
-                                                <LastDataUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-26T13:06:46</LastDataUpdate>
-                                                <LastSchemaUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-26T13:06:46</LastSchemaUpdate>
-                                        </Cube>
-                                </CubeInfo>
-                                <AxesInfo>
-                                        <AxisInfo name="Axis0">
-                                                <HierarchyInfo name="[Measures]">
-                                                    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                                                    <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
-                                                    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                                                    <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
-                                                    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-                                                </HierarchyInfo>
-                                        </AxisInfo>
-                                        <AxisInfo name="SlicerAxis">
-                                                <HierarchyInfo name="[Product].[Product]">
-                                                        <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
-                                                        <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xs:string"/>
-                                                        <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
-                                                        <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xs:int"/>
-                                                        <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xs:unsignedInt"/>
-                                                </HierarchyInfo>
-                                                <HierarchyInfo name="[Time].[Time]">
-                                                        <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
-                                                        <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xs:string"/>
-                                                        <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
-                                                        <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xs:int"/>
-                                                        <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xs:unsignedInt"/>
-                                                </HierarchyInfo>
-                                                <HierarchyInfo name="[Geography].[Geography]">
-                                                        <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
-                                                        <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xs:string"/>
-                                                        <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
-                                                        <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xs:int"/>
-                                                        <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xs:unsignedInt"/>
-                                                </HierarchyInfo>
-                                        </AxisInfo>
-                                </AxesInfo>
-                                <CellInfo>
-                                    <Value name="VALUE"/>
-                                </CellInfo>
-                        </OlapInfo>
-                        <Axes>
-                                <Axis name="Axis0">
-                                    <Tuples>
-                                        <Tuple>
-                                            <Member Hierarchy="[Measures]">
-                                                <UName>[Measures].[XL_SD0]</UName>
-                                                <Caption>XL_SD0</Caption>
-                                                <LName>[Measures]</LName>
-                                                <LNum>0</LNum>
-                                                <DisplayInfo>0</DisplayInfo>
-                                            </Member>
-                                        </Tuple>
-                                        <Tuple>
-                                            <Member Hierarchy="[Measures]">
-                                                <UName>[Measures].[XL_SD1]</UName>
-                                                <Caption>XL_SD1</Caption>
-                                                <LName>[Measures]</LName>
-                                                <LNum>0</LNum>
-                                                <DisplayInfo>0</DisplayInfo>
-                                            </Member>
-                                        </Tuple>
-                                        <Tuple>
-                                            <Member Hierarchy="[Measures]">
-                                                <UName>[Measures].[XL_SD2]</UName>
-                                                <Caption>XL_SD2</Caption>
-                                                <LName>[Measures]</LName>
-                                                <LNum>0</LNum>
-                                                <DisplayInfo>0</DisplayInfo>
-                                            </Member>
-                                        </Tuple>
-                                    </Tuples>
-                                </Axis>
-                                <Axis name="SlicerAxis">
-                                        <Tuples>
-                                                <Tuple>
-                                                        <Member Hierarchy="[Product].[Product]">
-                                                                <UName>[Product].[Product].[Company].[Crazy Development]</UName>
-                                                                <Caption>Crazy Development</Caption>
-                                                                <LName>[Product].[Product].[Company]</LName>
-                                                                <LNum>0</LNum>
-                                                                <DisplayInfo>2</DisplayInfo>
-                                                        </Member>
-                                                        <Member Hierarchy="[Time].[Time]">
-                                                                <UName>[Time].[Time].[Year].[2010]</UName>
-                                                                <Caption>2010</Caption>
-                                                                <LName>[Time].[Time].[Year]</LName>
-                                                                <LNum>0</LNum>
-                                                                <DisplayInfo>2</DisplayInfo>
-                                                        </Member>
-                                                        <Member Hierarchy="[Geography].[Geography]">
-                                                                <UName>[Geography].[Geography].[Continent].[America]</UName>
-                                                                <Caption>America</Caption>
-                                                                <LName>[Geography].[Geography].[Continent]</LName>
-                                                                <LNum>0</LNum>
-                                                                <DisplayInfo>2</DisplayInfo>
-                                                        </Member>
-                                                </Tuple>
-                                        </Tuples>
-                                </Axis>
-                        </Axes>
-                        <CellData>
-                                <Cell CellOrdinal="0">
-                                        <Value type="xs:long">1023</Value>
-                                </Cell>
-                        </CellData>
-                    </root>
-                </return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <xs:schema elementFormDefault="qualified" 
+                    targetNamespace="urn:schemas-microsoft-com:xml-analysis:mddataset" 
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                        <xs:complexType name="MemberType">
+                            <xs:sequence>
+                                <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##targetNamespace" 
+                                processContents="skip"/>
+                            </xs:sequence>
+                            <xs:attribute name="Hierarchy" type="xs:string"/>
+                        </xs:complexType>
+                        <xs:complexType name="PropType">
+                            <xs:sequence>
+                                <xs:element minOccurs="0" name="Default"/>
+                            </xs:sequence>
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                            <xs:attribute name="type" type="xs:QName"/>
+                        </xs:complexType>
+                        <xs:complexType name="TupleType">
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="Member" type="MemberType"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:complexType name="MembersType">
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" minOccurs="0" name="Member" type="MemberType"/>
+                            </xs:sequence>
+                            <xs:attribute name="Hierarchy" type="xs:string" use="required"/>
+                        </xs:complexType>
+                        <xs:complexType name="TuplesType">
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" minOccurs="0" name="Tuple" type="TupleType"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:group name="SetType">
+                            <xs:choice>
+                                <xs:element name="Members" type="MembersType"/>
+                                <xs:element name="Tuples" type="TuplesType"/>
+                                <xs:element name="CrossProduct" type="SetListType"/>
+                                <xs:element name="Union">
+                                    <xs:complexType>
+                                        <xs:group maxOccurs="unbounded" minOccurs="0" ref="SetType"/>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:choice>
+                        </xs:group>
+                        <xs:complexType name="SetListType">
+                            <xs:group maxOccurs="unbounded" minOccurs="0" ref="SetType"/>
+                            <xs:attribute name="Size" type="xs:unsignedInt"/>
+                        </xs:complexType>
+                        <xs:complexType name="OlapInfo">
+                            <xs:sequence>
+                                <xs:element name="CubeInfo">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element maxOccurs="unbounded" name="Cube">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                        <xs:element name="CubeName" type="xs:string"/>
+                                                        <xs:element minOccurs="0" name="LastDataUpdate" type="xs:dateTime"/>
+                                                        <xs:element minOccurs="0" name="LastSchemaUpdate" type="xs:dateTime"/>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="AxesInfo">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element maxOccurs="unbounded" name="AxisInfo">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                        <xs:element maxOccurs="unbounded" minOccurs="0" name="HierarchyInfo">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##targetNamespace" processContents="skip"/>
+                                                                </xs:sequence>
+                                                                <xs:attribute name="name" type="xs:string" use="required"/>
+                                                            </xs:complexType>
+                                                        </xs:element>
+                                                    </xs:sequence>
+                                                    <xs:attribute name="name" type="xs:string"/>
+                                                </xs:complexType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="CellInfo">
+                                    <xs:complexType>
+                                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                            <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##targetNamespace" processContents="skip"/>
+                                        </xs:choice>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:complexType name="Axes">
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="Axis">
+                                    <xs:complexType>
+                                        <xs:group maxOccurs="unbounded" minOccurs="0" ref="SetType"/>
+                                        <xs:attribute name="name" type="xs:string"/>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:complexType name="CellData">
+                            <xs:sequence>
+                                <xs:element maxOccurs="unbounded" minOccurs="0" name="Cell">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##targetNamespace" processContents="skip"/>
+                                        </xs:sequence>
+                                        <xs:attribute name="CellOrdinal" type="xs:unsignedInt" use="required"/>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:element name="root">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:any minOccurs="0" namespace="http://www.w3.org/2001/XMLSchema" processContents="strict"/>
+                                    <xs:element minOccurs="0" name="OlapInfo" type="OlapInfo"/>
+                                    <xs:element minOccurs="0" name="Axes" type="Axes"/>
+                                    <xs:element minOccurs="0" name="CellData" type="CellData"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:schema>
+                    <OlapInfo>
+                        <CubeInfo>
+                            <Cube>
+                                <CubeName>Sales</CubeName>
+                                <LastDataUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-26T13:08:48</LastDataUpdate>
+                                <LastSchemaUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-26T13:08:48</LastSchemaUpdate>
+                            </Cube>
+                        </CubeInfo>
+                        <AxesInfo>
+                            <AxisInfo name="Axis0">
+                                <HierarchyInfo name="[Measures]">
+                                    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                                    <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
+                                    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                                    <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
+                                    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                                </HierarchyInfo>
+                            </AxisInfo>
+                            
+                            
+                            <AxisInfo name="SlicerAxis">
+                            
+                                <HierarchyInfo name="[Time].[Time]">
+                                    <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                                    <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xsd:string"/>
+                                    <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                                    <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xsd:int"/>
+                                    <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                                </HierarchyInfo>
+                                <HierarchyInfo name="[Geography].[Geography]">
+                                    <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                                    <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xsd:string"/>
+                                    <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                                    <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xsd:int"/>
+                                    <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                                  </HierarchyInfo>
+    
+                                <HierarchyInfo name="[Product].[Product]">
+                                        <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                                        <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xsd:string"/>
+                                        <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                                        <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xsd:int"/>
+                                        <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                                </HierarchyInfo>
+                            
+                            </AxisInfo>
+                            
+                        </AxesInfo>
+                        <CellInfo>
+                            <Value name="VALUE"/>
+                        </CellInfo>
+                    </OlapInfo>
+                    <Axes>
+                        <Axis name="Axis0">
+                            <Tuples>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD0]</UName>
+                                        <Caption>XL_SD0</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD1]</UName>
+                                        <Caption>XL_SD1</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD2]</UName>
+                                        <Caption>XL_SD2</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                        <Axis name="SlicerAxis">
+                            <Tuples>
+                                <Tuple>
+                                
+                                    <Member Hierarchy="[Product].[Product]">
+                                        <UName>[Product].[Product].[Company].[Crazy Development]</UName>
+                                        <Caption>Crazy Development</Caption>
+                                        <LName>[Product].[Product].[Company]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                    
+                                    <Member Hierarchy="[Time].[Time]">
+                                        <UName>[Time].[Time].[Year].[2010]</UName>
+                                        <Caption>2010</Caption>
+                                        <LName>[Time].[Time].[Year]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                    <Member Hierarchy="[Geography].[Geography]">
+                                        <UName>[Geography].[Geography].[Continent].[America]</UName>
+                                        <Caption>America</Caption>
+                                        <LName>[Geography].[Geography].[Continent]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                    </Axes>
+                    <CellData>
+                        <Cell CellOrdinal="0">
+                            <Value>[Product].[Product].[Company].[Crazy Development]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="1">
+                            <Value>Crazy Development</Value>
+                        </Cell>
+                        <Cell CellOrdinal="2">
+                            <Value>[Product].[Product].[Company]</Value>
+                        </Cell>
+                    </CellData>
+                </root>
+            </return>
             """
         else:
             XmlaProviderService.discover_tools.change_catalogue(
