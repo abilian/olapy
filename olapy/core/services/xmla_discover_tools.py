@@ -1226,7 +1226,6 @@ class XmlaDiscoverTools():
     def discover_mdschema_levels__response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -1311,7 +1310,7 @@ class XmlaDiscoverTools():
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
-                        xml.MEASUREGROUP_NAME('CUBE_NAME')
+                        xml.MEASUREGROUP_NAME('default')
                         xml.DESCRIPTION('-')
                         xml.IS_WRITE_ENABLED('true')
                         xml.MEASUREGROUP_CAPTION('default')
