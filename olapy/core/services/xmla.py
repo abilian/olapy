@@ -168,7 +168,485 @@ class XmlaProviderService(ServiceBase):
 
             return str(xml)
 
+
         elif 'WITH MEMBER' in request.Command.Statement :
+
+            if """WITH MEMBER [Measures].[XL_SD0] AS 'strtomember("[Measures].[Amount]").UniqueName' MEMBER [Measures].[XL_SD1] AS 'strtomember("[Measures].[Amount]").properties("caption")' MEMBER [Measures].[XL_SD2] AS '{strtomember("[Measures].[Amount]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD3] AS 'strtomember("[Geography].[Geography].[Continent].[America]").UniqueName' MEMBER [Measures].[XL_SD4] AS 'strtomember("[Geography].[Geography].[Continent].[America]").properties("caption")' MEMBER [Measures].[XL_SD5] AS '{strtomember("[Geography].[Geography].[Continent].[America]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD6] AS 'strtomember("[Geography].[Geography].[Country].[America].[United States]").UniqueName' MEMBER [Measures].[XL_SD7] AS 'strtomember("[Geography].[Geography].[Country].[America].[United States]").properties("caption")' MEMBER [Measures].[XL_SD8] AS '{strtomember("[Geography].[Geography].[Country].[America].[United States]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD9] AS 'strtomember("[Product].[Product].[Company].[Crazy Development]").UniqueName' MEMBER [Measures].[XL_SD10] AS 'strtomember("[Product].[Product].[Company].[Crazy Development]").properties("caption")' MEMBER [Measures].[XL_SD11] AS '{strtomember("[Product].[Product].[Company].[Crazy Development]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD12] AS 'strtomember("[Product].[Product].[Article].[Crazy Development].[olapy]").UniqueName' MEMBER [Measures].[XL_SD13] AS 'strtomember("[Product].[Product].[Article].[Crazy Development].[olapy]").properties("caption")' MEMBER [Measures].[XL_SD14] AS '{strtomember("[Product].[Product].[Article].[Crazy Development].[olapy]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD15] AS 'strtomember("[Geography].[Geography].[Continent].[Europe]").UniqueName' MEMBER [Measures].[XL_SD16] AS 'strtomember("[Geography].[Geography].[Continent].[Europe]").properties("caption")' MEMBER [Measures].[XL_SD17] AS '{strtomember("[Geography].[Geography].[Continent].[Europe]")}.item(0).item(0).level.UniqueName' SELECT {[Measures].[XL_SD0],[Measures].[XL_SD1],[Measures].[XL_SD2],[Measures].[XL_SD3],[Measures].[XL_SD4],[Measures].[XL_SD5],[Measures].[XL_SD6],[Measures].[XL_SD7],[Measures].[XL_SD8],[Measures].[XL_SD9],[Measures].[XL_SD10],[Measures].[XL_SD11],[Measures].[XL_SD12],[Measures].[XL_SD13],[Measures].[XL_SD14],[Measures].[XL_SD15],[Measures].[XL_SD16],[Measures].[XL_SD17]} ON 0 FROM [sales]""" in request.Command.Statement:
+                return """
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """ + execute_xsd + """
+                    <OlapInfo>
+                        <CubeInfo>
+                            <Cube>
+                                <CubeName>Sales</CubeName>
+                                <LastDataUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-28T11:17:39</LastDataUpdate>
+                                <LastSchemaUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-28T11:17:39</LastSchemaUpdate></Cube>
+                        </CubeInfo>
+                        <AxesInfo>
+                            <AxisInfo name="Axis0">
+                                <HierarchyInfo name="[Measures]">
+                                    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Measures].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Measures].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                            </AxisInfo>
+                            <AxisInfo name="SlicerAxis">
+                                <HierarchyInfo name="[Geography].[Geography]">
+                                    <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                                <HierarchyInfo name="[Product].[Product]">
+                                    <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                                <HierarchyInfo name="[Time].[Time]">
+                                    <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                            </AxisInfo>
+                        </AxesInfo>
+                        <CellInfo>
+                            <Value name="VALUE"/>
+                        </CellInfo>
+                    </OlapInfo>
+                    <Axes>
+                        <Axis name="Axis0">
+                            <Tuples>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD0]</UName>
+                                        <Caption>XL_SD0</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD1]</UName>
+                                        <Caption>XL_SD1</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD2]</UName>
+                                        <Caption>XL_SD2</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD3]</UName>
+                                        <Caption>XL_SD3</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD4]</UName>
+                                        <Caption>XL_SD4</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD5]</UName>
+                                        <Caption>XL_SD5</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD6]</UName>
+                                        <Caption>XL_SD6</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD7]</UName>
+                                        <Caption>XL_SD7</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD8]</UName>
+                                        <Caption>XL_SD8</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD9]</UName>
+                                        <Caption>XL_SD9</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD10]</UName>
+                                        <Caption>XL_SD10</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD11]</UName>
+                                        <Caption>XL_SD11</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD12]</UName>
+                                        <Caption>XL_SD12</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD13]</UName>
+                                        <Caption>XL_SD13</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD14]</UName>
+                                        <Caption>XL_SD14</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD15]</UName>
+                                        <Caption>XL_SD15</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD16]</UName>
+                                        <Caption>XL_SD16</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD17]</UName>
+                                        <Caption>XL_SD17</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                        <Axis name="SlicerAxis">
+                            <Tuples>
+                                <Tuple>
+                                    <Member Hierarchy="[Geography].[Geography]">
+                                        <UName>[Geography].[Geography].[Continent].[America]</UName>
+                                        <Caption>America</Caption>
+                                        <LName>[Geography].[Geography].[Continent]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                    <Member Hierarchy="[Product].[Product]">
+                                        <UName>[Product].[Product].[Company].[Crazy Development]</UName>
+                                        <Caption>Crazy Development</Caption>
+                                        <LName>[Product].[Product].[Company]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>131076</DisplayInfo>
+                                    </Member>
+                                    <Member Hierarchy="[Time].[Time]">
+                                        <UName>[Time].[Time].[Year].[2010]</UName>
+                                        <Caption>2010</Caption>
+                                        <LName>[Time].[Time].[Year]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                    </Axes>
+                    <CellData>
+                        <Cell CellOrdinal="0">
+                            <Value>[Measures].[Amount]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="1">
+                            <Value>Amount</Value>
+                        </Cell>
+                        <Cell CellOrdinal="2">
+                            <Value>[Measures]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="3">
+                            <Value>[Geography].[Geography].[Continent].[America]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="4">
+                            <Value>America</Value>
+                        </Cell>
+                        <Cell CellOrdinal="5">
+                            <Value>[Geography].[Geography].[Continent]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="6">
+                            <Value>[Geography].[Geography].[Country].[America].[United States]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="7">
+                            <Value>United States</Value>
+                        </Cell>
+                        <Cell CellOrdinal="8">
+                            <Value>[Geography].[Geography].[Country].[America]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="9">
+                            <Value>[Product].[Product].[Company].[Crazy Development]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="10">
+                            <Value>Crazy Development</Value>
+                        </Cell>
+                        <Cell CellOrdinal="11">
+                            <Value>[Product].[Product].[Company]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="12">
+                            <Value>[Product].[Product].[Article].[Crazy Development].[olapy]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="13">
+                            <Value>olapy</Value>
+                        </Cell>
+                        <Cell CellOrdinal="14">
+                            <Value>[Product].[Product].[Article].[Crazy Development]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="15">
+                            <Value>[Geography].[Geography].[Continent].[Europe]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="16">
+                            <Value>Europe</Value>
+                        </Cell>
+                        <Cell CellOrdinal="17">
+                            <Value>[Geography].[Geography].[Continent]</Value>
+                        </Cell>
+                    </CellData>
+                </root>
+            </return>
+            """
+
+            elif """WITH MEMBER [Measures].[XL_SD0] AS 'strtomember("[Geography].[Geography].[Continent].[America]").UniqueName' MEMBER [Measures].[XL_SD1] AS 'strtomember("[Geography].[Geography].[Continent].[America]").properties("caption")' MEMBER [Measures].[XL_SD2] AS '{strtomember("[Geography].[Geography].[Continent].[America]")}.item(0).item(0).level.UniqueName' MEMBER [Measures].[XL_SD3] AS 'strtomember("[Geography].[Geography].[Continent].[Europe]").UniqueName' MEMBER [Measures].[XL_SD4] AS 'strtomember("[Geography].[Geography].[Continent].[Europe]").properties("caption")' MEMBER [Measures].[XL_SD5] AS '{strtomember("[Geography].[Geography].[Continent].[Europe]")}.item(0).item(0).level.UniqueName' SELECT {[Measures].[XL_SD0],[Measures].[XL_SD1],[Measures].[XL_SD2],[Measures].[XL_SD3],[Measures].[XL_SD4],[Measures].[XL_SD5]}""" in request.Command.Statement:
+                return """
+            <return>
+                <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                """+ execute_xsd +"""
+                    <OlapInfo>
+                        <CubeInfo>
+                            <Cube>
+                                <CubeName>Sales</CubeName>
+                                <LastDataUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-28T11:17:39</LastDataUpdate>
+                                <LastSchemaUpdate xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">2017-07-28T11:17:39</LastSchemaUpdate></Cube>
+                        </CubeInfo>
+                        <AxesInfo>
+                            <AxisInfo name="Axis0">
+                                <HierarchyInfo name="[Measures]">
+                                    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Measures].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Measures].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                            </AxisInfo>
+                            <AxisInfo name="SlicerAxis">
+                                <HierarchyInfo name="[Geography].[Geography]">
+                                    <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                                <HierarchyInfo name="[Product].[Product]">
+                                    <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                                <HierarchyInfo name="[Time].[Time]">
+                                    <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                                    <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xs:string"/>
+                                    <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                                    <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xs:int"/>
+                                    <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xs:unsignedInt"/>
+                                </HierarchyInfo>
+                            </AxisInfo>
+                        </AxesInfo>
+                        <CellInfo>
+                            <Value name="VALUE"/>
+                        </CellInfo>
+                    </OlapInfo>
+                    <Axes>
+                        <Axis name="Axis0">
+                            <Tuples>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD0]</UName>
+                                        <Caption>XL_SD0</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD1]</UName>
+                                        <Caption>XL_SD1</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD2]</UName>
+                                        <Caption>XL_SD2</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD3]</UName>
+                                        <Caption>XL_SD3</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD4]</UName>
+                                        <Caption>XL_SD4</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                                <Tuple>
+                                    <Member Hierarchy="[Measures]">
+                                        <UName>[Measures].[XL_SD5]</UName>
+                                        <Caption>XL_SD5</Caption>
+                                        <LName>[Measures]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>0</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                        <Axis name="SlicerAxis">
+                            <Tuples>
+                                <Tuple>
+                                    <Member Hierarchy="[Geography].[Geography]">
+                                        <UName>[Geography].[Geography].[Continent].[America]</UName>
+                                        <Caption>America</Caption>
+                                        <LName>[Geography].[Geography].[Continent]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                    <Member Hierarchy="[Product].[Product]">
+                                        <UName>[Product].[Product].[Company].[Crazy Development]</UName>
+                                        <Caption>Crazy Development</Caption>
+                                        <LName>[Product].[Product].[Company]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>131076</DisplayInfo>
+                                    </Member>
+                                    <Member Hierarchy="[Time].[Time]">
+                                        <UName>[Time].[Time].[Year].[2010]</UName>
+                                        <Caption>2010</Caption>
+                                        <LName>[Time].[Time].[Year]</LName>
+                                        <LNum>0</LNum>
+                                        <DisplayInfo>2</DisplayInfo>
+                                    </Member>
+                                </Tuple>
+                            </Tuples>
+                        </Axis>
+                    </Axes>
+                    <CellData>
+                        <Cell CellOrdinal="0">
+                            <Value>[Geography].[Geography].[Continent].[America]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="1">
+                            <Value>America</Value>
+                        </Cell>
+                        <Cell CellOrdinal="2">
+                            <Value>[Geography].[Geography].[Continent]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="3">
+                            <Value>[Geography].[Geography].[Continent].[Europe]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="4">
+                            <Value>Europe</Value>
+                        </Cell>
+                        <Cell CellOrdinal="5">
+                            <Value>[Geography].[Geography].[Continent]</Value>
+                        </Cell>
+                    </CellData>
+                </root>
+            </return>
+            """
+
+            # WITH
+            # MEMBER [Measures].[XL_SD0] AS 'strtomember("[Measures].[Amount]").UniqueName'
+            # MEMBER [Measures].[XL_SD1] AS 'strtomember("[Measures].[Amount]").properties("caption")'
+            # MEMBER [Measures].[XL_SD2] AS '{strtomember("[Measures].[Amount]")}.item(0).item(0).level.UniqueName'
+            # SELECT {[Measures].[XL_SD0],[Measures].[XL_SD1],[Measures].[XL_SD2]} ON 0
+            # FROM [sales] CELL PROPERTIES VALUE
             return """
             <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
@@ -186,36 +664,36 @@ class XmlaProviderService(ServiceBase):
                 <AxesInfo>
                 <AxisInfo name="Axis0">
                 <HierarchyInfo name="[Measures]">
-                <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                <Caption name="[Measures].[MEMBER_CAPTION]" type="xs:string"/>
+                <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                <LNum name="[Measures].[LEVEL_NUMBER]" type="xs:int"/>
+                <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xs:unsignedInt"/>
                 </HierarchyInfo>
                 </AxisInfo>
                 <AxisInfo name="SlicerAxis">
                 <HierarchyInfo name="[Geography].[Geography]">
-                    <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                    <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xsd:string"/>
-                    <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                    <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xsd:int"/>
-                    <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                    <UName name="[Geography].[Geography].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                    <Caption name="[Geography].[Geography].[MEMBER_CAPTION]" type="xs:string"/>
+                    <LName name="[Geography].[Geography].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                    <LNum name="[Geography].[Geography].[LEVEL_NUMBER]" type="xs:int"/>
+                    <DisplayInfo name="[Geography].[Geography].[DISPLAY_INFO]" type="xs:unsignedInt"/>
                 </HierarchyInfo>
                 
                 <HierarchyInfo name="[Product].[Product]">
-                    <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                    <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xsd:string"/>
-                    <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                    <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xsd:int"/>
-                    <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                    <UName name="[Product].[Product].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                    <Caption name="[Product].[Product].[MEMBER_CAPTION]" type="xs:string"/>
+                    <LName name="[Product].[Product].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                    <LNum name="[Product].[Product].[LEVEL_NUMBER]" type="xs:int"/>
+                    <DisplayInfo name="[Product].[Product].[DISPLAY_INFO]" type="xs:unsignedInt"/>
                 </HierarchyInfo>
                 
                 <HierarchyInfo name="[Time].[Time]">
-                    <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                    <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xsd:string"/>
-                    <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                    <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xsd:int"/>
-                    <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                    <UName name="[Time].[Time].[MEMBER_UNIQUE_NAME]" type="xs:string"/>
+                    <Caption name="[Time].[Time].[MEMBER_CAPTION]" type="xs:string"/>
+                    <LName name="[Time].[Time].[LEVEL_UNIQUE_NAME]" type="xs:string"/>
+                    <LNum name="[Time].[Time].[LEVEL_NUMBER]" type="xs:int"/>
+                    <DisplayInfo name="[Time].[Time].[DISPLAY_INFO]" type="xs:unsignedInt"/>
                 </HierarchyInfo>
                 
                 </AxisInfo>
@@ -307,6 +785,7 @@ class XmlaProviderService(ServiceBase):
 
         elif "SELECT {[Measures].[Amount]} ON 0 FROM [sales]" in request.Command.Statement or \
                         'SELECT {([Measures].[Amount])} ON 0 FROM [sales]' in request.Command.Statement :
+
             return """
                 <return>
                 <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" 
