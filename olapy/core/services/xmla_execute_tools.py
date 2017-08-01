@@ -555,7 +555,7 @@ class XmlaExecuteTools():
 
 
                 # todo   Hierarchize to delete/ change ASAP
-                if 'Hierarchize' not in self.executer.mdx_query:
+                if 'ON 0' in self.executer.mdx_query:
                     with xml.HierarchyInfo(name='[Measures]'):
                         xml.UName(
                             name="[Measures].[MEMBER_UNIQUE_NAME]",
