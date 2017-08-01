@@ -309,6 +309,7 @@ class MdxEngine:
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
+
         return [[
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
@@ -412,10 +413,23 @@ class MdxEngine:
                     else:
                         continue
                 else:
+
+                    # if 'Hierarchize' not in self.mdx_query:
+                    #     tables_columns.update({
+                    #         tupl[0]:
+                    #         self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
+                    #     })
+                    # else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
                     })
+
+                    # else:
+                    #     tables_columns.update({
+                    #         tupl[0]:
+                    #             self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
+                    #     })
 
             axes.update({axis: tables_columns})
 
@@ -638,6 +652,7 @@ class MdxEngine:
         """
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
+
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -649,10 +664,17 @@ class MdxEngine:
             (table, columns)
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
+
         # if we have measures on axes we have to ignore them
+        # if 'Hierarchize' in self.mdx_query:
+        #     end = None
+        # else:
+        #     end = -1
+
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
+
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
@@ -660,6 +682,7 @@ class MdxEngine:
             df_to_fusion = []
             table_name = tuples_on_mdx_query[0][0]
             # in every tuple
+
             for tupl in tuples_on_mdx_query:
 
                 # if we have measures in columns or rows axes like :
@@ -691,6 +714,18 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
+            # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
+            if 'Hierarchize' not in self.mdx_query:
+                for table,columns in columns_to_keep.items():
+                    columns_to_keep[table] = list(columns)[:-1]
+
+                for axis, table_columns in tables_n_columns.items():
+                    for table,columns in table_columns.items():
+                        if table != 'Facts':
+                            table_columns[table] = list(columns)[:-1]
+                    tables_n_columns[axis] = table_columns
+
+
             cols = list(
                 itertools.chain.from_iterable(columns_to_keep.values()))
 
@@ -705,8 +740,8 @@ class MdxEngine:
             for next_df in df_to_fusion[1:]:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
-            # TODO groupby in web demo (remove it for more performance)
             # TODO margins=True for columns total !!!!!
+
             return {
                 'result': df.groupby(cols).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
