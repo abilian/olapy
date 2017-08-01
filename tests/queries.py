@@ -40,3 +40,6 @@ query6 = """
           """
 
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
+
+
+# TODO queries without
