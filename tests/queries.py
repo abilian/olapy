@@ -1,27 +1,27 @@
 CUBE = 'sales'
 
-query1 = """SELECT
-         {[Measures].[Amount]} ON COLUMNS
+query1 = """SELECT Hierarchize(
+         {[Measures].[Amount]}) ON COLUMNS
          FROM [sales]"""
 
-query2 = """SELECT
-         {[Geography].[Economy].[Partnership]} ON COLUMNS
+query2 = """SELECT Hierarchize(
+         {[Geography].[Economy].[Partnership]}) ON COLUMNS
          FROM [sales]"""
 
-query3 = """SELECT
-         non empty {[Geography].[Geo].[Country].members} ON COLUMNS,
-         {[Measures].[Amount]} ON ROWS
+query3 = """SELECT Hierarchize(
+         non empty {[Geography].[Geo].[Country].members}) ON COLUMNS,
+         Hierarchize({[Measures].[Amount]}) ON ROWS
          FROM [sales]"""
 
-query4 = """SELECT
-         {[Geography].[Economy].[Partnership]} ON COLUMNS,
-         non empty {[Geography].[Geo].[Country].members} ON ROWS
+query4 = """SELECT Hierarchize(
+         {[Geography].[Economy].[Partnership]}) ON COLUMNS,
+         Hierarchize(non empty {[Geography].[Geo].[Country].members}) ON ROWS
          FROM [sales]"""
 
-query5 = """SELECT
+query5 = """SELECT Hierarchize(
          {[Geography].[Economy].[Partnership].[EU],
          [Geography].[Economy].[Partnership].[None],
-         [Geography].[Economy].[Partnership].[NAFTA]} ON COLUMNS,
+         [Geography].[Economy].[Partnership].[NAFTA]}) ON COLUMNS,
          {[Product].[Prod].[Company].[Crazy Development],
          [Product].[Prod].[Company].[Company_test],
          [Product].[Prod].[Company].[test_Development]} ON ROWS
