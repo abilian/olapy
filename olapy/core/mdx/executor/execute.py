@@ -347,6 +347,13 @@ class MdxEngine:
                 stop = 'ON COLUMNS'
                 on_columns = self.get_tuples(query, start, stop)
 
+            # todo Hierarchize
+            # ON COLUMNS (AS 0)
+            if 'ON 0' in query:
+                start = 'SELECT'
+                stop = 'ON 0'
+                on_columns = self.get_tuples(query, start, stop)
+
             # WHERE
             if 'WHERE' in query:
                 start = 'FROM'

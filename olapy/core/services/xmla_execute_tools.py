@@ -187,8 +187,9 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('131076')
 
                                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
+                                    # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
                                     if len(tuple_without_minus_1[first_att -
-                                                                 1:]) > 1:
+                                                                 1:]) > 1 and 'Hierarchize' in self.executer.mdx_query:
                                         xml.PARENT_UNIQUE_NAME(
                                             '[{0}].[{0}].[{1}].{2}'.format(
                                                 tuple_without_minus_1[0],
@@ -201,9 +202,21 @@ class XmlaExecuteTools():
                                                         first_att - 1:-1]
                                                 ])))
 
-                                    xml.HIERARCHY_UNIQUE_NAME(
-                                        '[{0}].[{0}]'.format(
-                                            tuple_without_minus_1[0]))
+                                    if 'Hierarchize' in self.executer.mdx_query:
+                                        xml.HIERARCHY_UNIQUE_NAME(
+                                            '[{0}].[{0}]'.format(
+                                                tuple_without_minus_1[0]))
+
+                            # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
+                            if 'Hierarchize' not in self.executer.mdx_query and 'ON 0' in self.executer.mdx_query:
+                                with xml.Member(Hierarchy="[Measures]"):
+                                    xml.UName(
+                                        '[Measures].[{0}]'.format(tupls[0][1]))
+                                    xml.Caption('{0}'.format(tupls[0][1]))
+                                    xml.LName('[Measures]')
+                                    xml.LNum('0')
+                                    xml.DisplayInfo('0')
+                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
 
@@ -338,6 +351,7 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
         index = 0
+
         for value in columns_loop:
             if np.isnan(value):
                 value = ''
@@ -399,11 +413,20 @@ class XmlaExecuteTools():
                     to_write = "[{0}].[{0}]".format(dim_diff)
                     if dim_diff == 'Measures':
                         # if measures > 1 we don't have to write measure
+
                         if self.executer.facts in mdx_execution_result[
-                                'columns_desc']['all'] and len(
-                                    mdx_execution_result['columns_desc'][
-                                        'all'][self.executer.facts]) > 1:
+                            'columns_desc']['all'] and len(
+                            mdx_execution_result['columns_desc'][
+                                'all'][self.executer.facts]) > 1:
                             continue
+
+                        # todo Hierarchize delete/change ASAP and cleeeannn
+                        elif self.executer.facts in mdx_execution_result[
+                            'columns_desc']['all'] and 'Hierarchize' not in self.executer.mdx_query and not \
+                                mdx_execution_result[
+                                    'columns_desc']['where']:
+                            continue
+
                         else:
                             to_write = "[Measures]"
 
@@ -463,9 +486,11 @@ class XmlaExecuteTools():
         :param Axis: Axis0 or Axis1 (Axis0 by default)
         :return:
         """
+        # todo AxisInfo name= without Hierarchize !!
 
         axis_tables = mdx_execution_result['columns_desc'][mdx_query_axis]
         xml = xmlwitch.Builder()
+
         # measure must be written at the top
         if axis_tables:
             with xml.AxisInfo(name=Axis):
@@ -527,6 +552,32 @@ class XmlaExecuteTools():
                                 name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".
                                 format(table_name),
                                 **{'type': 'xs:string'})
+
+
+                # todo   Hierarchize to delete/ change ASAP
+                if 'Hierarchize' not in self.executer.mdx_query:
+                    with xml.HierarchyInfo(name='[Measures]'):
+                        xml.UName(
+                            name="[Measures].[MEMBER_UNIQUE_NAME]",
+                            **{'type': 'xs:string'})
+                        xml.Caption(
+                            name="[Measures].[MEMBER_CAPTION]",
+                            **{'type': 'xs:string'})
+                        xml.LName(
+                            name="[Measures].[LEVEL_UNIQUE_NAME]",
+                            **{'type': 'xs:string'})
+                        xml.LNum(
+                            name="[Measures].[LEVEL_NUMBER]",
+                            **{'type': 'xs:int'})
+                        xml.DisplayInfo(
+                            name="[Measures].[DISPLAY_INFO]",
+                            **{'type': 'xs:unsignedInt'})
+                        xml.PARENT_UNIQUE_NAME(
+                            name="[Measures].[PARENT_UNIQUE_NAME]",
+                            **{'type': 'xs:string'})
+                        xml.HIERARCHY_UNIQUE_NAME(
+                            name="[Measures].[HIERARCHY_UNIQUE_NAME]",
+                            **{'type': 'xs:string'})
 
         return str(xml)
 
@@ -627,8 +678,8 @@ class XmlaExecuteTools():
                                 xml.LNum('0')
                                 xml.DisplayInfo('2')
 
-                        # if we have zero on one only measures used
-                        if len(self.executer.selected_measures) <= 1:
+                        # todo Hierarchize delete/change !!
+                        if len(self.executer.selected_measures) <= 1 and 'ON 0' not in self.executer.mdx_query:
                             with xml.Member(
                                     Hierarchy="[Measures]".format(dim_diff)):
                                 xml.UName('[Measures].[{0}]'.format(
