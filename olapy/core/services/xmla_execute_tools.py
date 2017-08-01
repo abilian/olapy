@@ -208,7 +208,7 @@ class XmlaExecuteTools():
                                                 tuple_without_minus_1[0]))
 
                             # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
-                            if 'Hierarchize' not in self.executer.mdx_query and 'ON 0' in self.executer.mdx_query:
+                            if 'ON 0' in self.executer.mdx_query:
                                 with xml.Member(Hierarchy="[Measures]"):
                                     xml.UName(
                                         '[Measures].[{0}]'.format(tupls[0][1]))
@@ -217,6 +217,20 @@ class XmlaExecuteTools():
                                     xml.LNum('0')
                                     xml.DisplayInfo('0')
                                     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+
+        # todo delete change 'Hierarchize'!!!!
+        elif 'ON 0' in self.executer.mdx_query:
+            with xml.Axis(name=axis):
+                with xml.Tuples:
+                    with xml.Tuple:
+                        with xml.Member(Hierarchy="[Measures]"):
+                            xml.UName(
+                                '[Measures].[{0}]'.format(self.executer.selected_measures[0]))
+                            xml.Caption('{0}'.format(self.executer.selected_measures[0]))
+                            xml.LName('[Measures]')
+                            xml.LNum('0')
+                            xml.DisplayInfo('0')
+                            xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
 
@@ -293,6 +307,8 @@ class XmlaExecuteTools():
                     mdx_query_axis='rows',
                     axis="Axis1"))
 
+
+        # todo   Hierarchize to delete/ change ASAP
         # only one measure selected
         elif not mdx_execution_result['columns_desc'][
                 'rows'] and not mdx_execution_result['columns_desc']['columns'] and\
@@ -522,6 +538,7 @@ class XmlaExecuteTools():
 
                 for table_name in axis_tables:
                     if table_name != self.executer.facts:
+
                         with xml.HierarchyInfo(
                                 name='[{0}].[{0}]'.format(table_name)):
                             xml.UName(
