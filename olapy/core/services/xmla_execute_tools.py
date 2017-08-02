@@ -664,7 +664,48 @@ class XmlaExecuteTools():
         return str(xml)
 
     def _generate_axes_info_convert2formulas(self):
-        return ''
+        xml = xmlwitch.Builder()
+        with xml.AxisInfo(name='Axis0'):
+            # many measures , then write this on the top
+
+            with xml.HierarchyInfo(name='[Measures]'):
+                xml.UName(
+                    name="[Measures].[MEMBER_UNIQUE_NAME]",
+                    **{'type': 'xs:string'})
+                xml.Caption(
+                    name="[Measures].[MEMBER_CAPTION]",
+                    **{'type': 'xs:string'})
+                xml.LName(
+                    name="[Measures].[LEVEL_UNIQUE_NAME]",
+                    **{'type': 'xs:string'})
+                xml.LNum(
+                    name="[Measures].[LEVEL_NUMBER]",
+                    **{'type': 'xs:int'})
+                xml.DisplayInfo(
+                    name="[Measures].[DISPLAY_INFO]",
+                        **{'type': 'xs:unsignedInt'})
+
+        with xml.AxisInfo(name='SlicerAxis'):
+            for dim in self.executer.get_all_tables_names(ignore_fact=True):
+                to_write = "[{0}].[{0}]".format(dim)
+                with xml.HierarchyInfo(name=to_write):
+                    xml.UName(
+                        name="{0}.[MEMBER_UNIQUE_NAME]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.Caption(
+                        name="{0}.[MEMBER_CAPTION]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.LName(
+                        name="{0}.[LEVEL_UNIQUE_NAME]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.LNum(
+                        name="{0}.[LEVEL_NUMBER]".format(to_write),
+                        **{'type': 'xs:int'})
+                    xml.DisplayInfo(
+                        name="{0}.[DISPLAY_INFO]".format(to_write),
+                        **{'type': 'xs:unsignedInt'})
+
+        return str(xml)
 
 
 

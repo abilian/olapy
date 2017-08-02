@@ -1259,7 +1259,7 @@ class XmlaProviderService(ServiceBase):
             executer = XmlaProviderService.discover_tools.executer
             executer.mdx_query = request.Command.Statement
 
-
+            # todo Hierarchize
             if all(key in request.Command.Statement for key in ['WITH MEMBER',
                                                             'strtomember',
                                                             '[Measures].[XL_SD0]']):
