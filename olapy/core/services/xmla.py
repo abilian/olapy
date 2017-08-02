@@ -1270,13 +1270,6 @@ class XmlaProviderService(ServiceBase):
 
             xmla_tools = XmlaExecuteTools(executer,convert2formulas)
 
-            celli_info = xmla_tools.generate_cell_info()
-            axes_info = xmla_tools.generate_axes_info()
-            axes_info_slicer = xmla_tools.generate_axes_info_slicer()
-            xs0 = xmla_tools.generate_xs0()
-            slicer_axis = xmla_tools.generate_slicer_axis()
-            cell_data = xmla_tools.generate_cell_data()
-
             with xml['return']:
                 with xml.root(
                         execute_xsd,
@@ -1286,7 +1279,7 @@ class XmlaProviderService(ServiceBase):
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-                    with xml.OlapInfo(celli_info):
+                    with xml.OlapInfo(xmla_tools.generate_cell_info()):
                         with xml.CubeInfo:
                             with xml.Cube:
                                 xml.CubeName('Sales')
@@ -1302,14 +1295,14 @@ class XmlaProviderService(ServiceBase):
                                 )
 
                         xml.AxesInfo(
-                            axes_info,
-                            axes_info_slicer)
+                            xmla_tools.generate_axes_info(),
+                            xmla_tools.generate_axes_info_slicer())
 
                     xml.Axes(
-                        xs0,
-                        slicer_axis)
+                        xmla_tools.generate_xs0(),
+                        xmla_tools.generate_slicer_axis())
 
-                    xml.CellData(cell_data)
+                    xml.CellData(xmla_tools.generate_cell_data())
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml)).replace('&', '&amp;')
