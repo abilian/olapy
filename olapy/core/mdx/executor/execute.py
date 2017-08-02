@@ -23,7 +23,6 @@ from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
-
 class MdxEngine:
     """
     The principal class for executing a query.
@@ -33,6 +32,11 @@ class MdxEngine:
     :param mdx_query: query to execute
     :param sep: separator in the csv files
     """
+
+    # french characters
+    # or use new regex 2017.02.08
+    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
+            "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
@@ -298,10 +302,6 @@ class MdxEngine:
         :param stop:  key-word in the query where we stop (examples start = ON ROWS)
         :return:  nested list of tuples (see the example)
         """
-        # french characters
-        # or use new regex 2017.02.08
-        regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
-                "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
         if start is not None:
             start = query.index(start)
@@ -314,7 +314,7 @@ class MdxEngine:
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
             for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
         ]
-                for tup in re.compile(regex).findall(
+                for tup in re.compile(MdxEngine.regex).findall(
                     query.encode("utf-8", 'replace')[start:stop])
                 if len(tup[0].split('.')) > 1]
 

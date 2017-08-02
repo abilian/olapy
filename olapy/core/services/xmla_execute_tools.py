@@ -4,17 +4,89 @@ import itertools
 from collections import OrderedDict
 
 import numpy as np
+import re
 import xmlwitch
 
 
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
 
-    def __init__(self, executer):
+    def __init__(self, executer,convert2formulas=False):
         self.executer = executer
+        self.convert2formulas = convert2formulas
+        if convert2formulas:
+            self.mdx_execution_result = self._execute_convert_formulas_query()
+        else:
+            self.mdx_execution_result = executer.execute_mdx()
 
-    @staticmethod
-    def split_dataframe(mdx_execution_result):
+
+    def _execute_convert_formulas_query(self):
+        """
+        <Cell CellOrdinal="0">
+                            <Value>[Measures].[Amount]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="1">
+                            <Value>Amount</Value>
+                        </Cell>
+                        <Cell CellOrdinal="2">
+                            <Value>[Measures]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="3">
+                            <Value>[Geography].[Geo].[All Regions].&amp;[America]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="4">
+                            <Value>America</Value>
+                        </Cell>
+                        <Cell CellOrdinal="5">
+                            <Value>[Geography].[Geo].[Continent]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="6">
+                            <Value>[Geography].[Geo].[All Regions].&amp;[America].&amp;[US]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="7">
+                            <Value>United States</Value>
+                        </Cell>
+                        <Cell CellOrdinal="8">
+                            <Value>[Geography].[Geo].[Country]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="9">
+                            <Value>[Product].[Prod].[Company].&amp;[Crazy Development ]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="10">
+                            <Value>Crazy Development </Value>
+                        </Cell>
+                        <Cell CellOrdinal="11">
+                            <Value>[Product].[Prod].[Company]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="12">
+                            <Value>[Product].[Prod].[Company].&amp;[Crazy Development ].&amp;[icCube]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="13">
+                            <Value>icCube</Value>
+                        </Cell>
+                        <Cell CellOrdinal="14">
+                            <Value>[Product].[Prod].[Article]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="15">
+                            <Value>[Geography].[Geo].[All Regions].&amp;[Europe]</Value>
+                        </Cell>
+                        <Cell CellOrdinal="16">
+                            <Value>Europe</Value>
+                        </Cell>
+                        <Cell CellOrdinal="17">
+                            <Value>[Geography].[Geo].[Continent]</Value>
+        :return:
+        """
+
+        from ..mdx.executor.execute import MdxEngine
+        return {
+            # todo change remove (temporary) !!!
+            'columns_desc': [tup[0] for tup in re.compile(MdxEngine.regex).findall(self.executer.mdx_query) if
+                             '[Measures].[XL_SD' not in tup[0] and tup[1]][::3]
+        }
+
+
+    def split_dataframe(self):
         """
         Split DataFrame into multiple ones by dimension.
         
@@ -53,8 +125,8 @@ class XmlaExecuteTools():
         """
         # TODO new version with facts as splited df maybe
         return OrderedDict(
-            (key, mdx_execution_result['result'].reset_index()[list(value)])
-            for key, value in mdx_execution_result['columns_desc']['all']
+            (key, self.mdx_execution_result['result'].reset_index()[list(value)])
+            for key, value in self.mdx_execution_result['columns_desc']['all']
             .items())
 
     @staticmethod
@@ -79,7 +151,6 @@ class XmlaExecuteTools():
         return tuple
 
     def generate_xs0_one_axis(self,
-                              mdx_execution_result,
                               splited_df,
                               mdx_query_axis='all',
                               axis="Axis0"):
@@ -92,10 +163,10 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
         # only measure selected
-        if mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
+        if self.mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
                 self.executer.facts
         ]:
-            if len(mdx_execution_result['columns_desc'][mdx_query_axis][
+            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][
                     self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
@@ -106,8 +177,8 @@ class XmlaExecuteTools():
                 first_att = 3
 
         # query with on columns and on rows (without measure)
-        elif mdx_execution_result['columns_desc'][
-                'columns'] and mdx_execution_result['columns_desc']['rows']:
+        elif self.mdx_execution_result['columns_desc'][
+                'columns'] and self.mdx_execution_result['columns_desc']['rows']:
             # ['Geography','America']
             tuples = [
                 zip(*[[[key] + list(row)
@@ -234,7 +305,7 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def generate_xs0(self, mdx_execution_result):
+    def generate_xs0(self):
         """
         Example of xs0::
 
@@ -288,21 +359,19 @@ class XmlaExecuteTools():
         """
         # TODO must be OPTIMIZED every time!!!!!
 
-        dfs = self.split_dataframe(mdx_execution_result)
-        if mdx_execution_result['columns_desc'][
-                'rows'] and mdx_execution_result['columns_desc']['columns']:
+        dfs = self.split_dataframe()
+        if self.mdx_execution_result['columns_desc'][
+                'rows'] and self.mdx_execution_result['columns_desc']['columns']:
 
             return """
             {0}
             {1}
             """.format(
                 self.generate_xs0_one_axis(
-                    mdx_execution_result,
                     dfs,
                     mdx_query_axis='columns',
                     axis="Axis0"),
                 self.generate_xs0_one_axis(
-                    mdx_execution_result,
                     dfs,
                     mdx_query_axis='rows',
                     axis="Axis1"))
@@ -310,24 +379,22 @@ class XmlaExecuteTools():
 
         # todo   Hierarchize to delete/ change ASAP
         # only one measure selected
-        elif not mdx_execution_result['columns_desc'][
-                'rows'] and not mdx_execution_result['columns_desc']['columns'] and\
-                mdx_execution_result['columns_desc']['where']:
+        elif not self.mdx_execution_result['columns_desc'][
+                'rows'] and not self.mdx_execution_result['columns_desc']['columns'] and\
+                self.mdx_execution_result['columns_desc']['where']:
             return """
             {0}
             """.format(
                 self.generate_xs0_one_axis(
-                    mdx_execution_result,
                     dfs,
                     mdx_query_axis='where',
                     axis="Axis0"))
 
         # one axis
-        return self.generate_xs0_one_axis(
-            mdx_execution_result, dfs, mdx_query_axis='columns', axis="Axis0")
+        return self.generate_xs0_one_axis(dfs, mdx_query_axis='columns', axis="Axis0")
 
     # TODO maybe fusion with generate xs0 for less iteration
-    def generate_cell_data(self, mdx_execution_result):
+    def generate_cell_data(self):
         """
         Examle of CellData::
 
@@ -343,16 +410,16 @@ class XmlaExecuteTools():
         :return: CellData as string
         """
 
-        if ((len(mdx_execution_result['columns_desc']['columns'].keys()) == 0)
+        if ((len(self.mdx_execution_result['columns_desc']['columns'].keys()) == 0)
                 ^
-            (len(mdx_execution_result['columns_desc']['rows'].keys()) == 0
-             )) and self.executer.facts in mdx_execution_result[
+            (len(self.mdx_execution_result['columns_desc']['rows'].keys()) == 0
+             )) and self.executer.facts in self.mdx_execution_result[
                  'columns_desc']['all'].keys():
 
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
-                mdx_execution_result['result'][measure]
-                for measure in mdx_execution_result['result'].columns
+                self.mdx_execution_result['result'][measure]
+                for measure in self.mdx_execution_result['result'].columns
             ])
 
         else:
@@ -361,7 +428,7 @@ class XmlaExecuteTools():
             columns_loop = itertools.chain(
                 *[
                     tuple
-                    for tuple in mdx_execution_result['result'].itertuples(
+                    for tuple in self.mdx_execution_result['result'].itertuples(
                         index=False)
                 ])
 
@@ -377,7 +444,7 @@ class XmlaExecuteTools():
             index += 1
         return str(xml)
 
-    def generate_axes_info_slicer(self, mdx_execution_result):
+    def generate_axes_info_slicer(self):
         """
         Not used dimensions.
 
@@ -415,7 +482,7 @@ class XmlaExecuteTools():
         slicer_list = list(
             set(all_dimensions_names) - set(
                 table_name
-                for table_name in mdx_execution_result['columns_desc']['all']))
+                for table_name in self.mdx_execution_result['columns_desc']['all']))
 
         # we have to write measures after dimensions ! (todo change xsd)
         if 'Measures' in slicer_list:
@@ -430,16 +497,16 @@ class XmlaExecuteTools():
                     if dim_diff == 'Measures':
                         # if measures > 1 we don't have to write measure
 
-                        if self.executer.facts in mdx_execution_result[
+                        if self.executer.facts in self.mdx_execution_result[
                             'columns_desc']['all'] and len(
-                            mdx_execution_result['columns_desc'][
+                            self.mdx_execution_result['columns_desc'][
                                 'all'][self.executer.facts]) > 1:
                             continue
 
                         # todo Hierarchize delete/change ASAP and cleeeannn
-                        elif self.executer.facts in mdx_execution_result[
+                        elif self.executer.facts in self.mdx_execution_result[
                             'columns_desc']['all'] and 'Hierarchize' not in self.executer.mdx_query and not \
-                                mdx_execution_result[
+                                self.mdx_execution_result[
                                     'columns_desc']['where']:
                             continue
 
@@ -466,7 +533,6 @@ class XmlaExecuteTools():
         return str(xml)
 
     def generate_one_axis_info(self,
-                               mdx_execution_result,
                                mdx_query_axis='columns',
                                Axis='Axis0'):
         """
@@ -503,8 +569,7 @@ class XmlaExecuteTools():
         :return:
         """
         # todo AxisInfo name= without Hierarchize !!
-
-        axis_tables = mdx_execution_result['columns_desc'][mdx_query_axis]
+        axis_tables = self.mdx_execution_result['columns_desc'][mdx_query_axis]
         xml = xmlwitch.Builder()
 
         # measure must be written at the top
@@ -598,25 +663,32 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def generate_axes_info(self, mdx_execution_result):
+    def _generate_axes_info_convert2formulas(self):
+        return ''
+
+
+
+    def generate_axes_info(self):
         """
         
         :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
-        if mdx_execution_result['columns_desc']['rows']:
+
+        if self.convert2formulas:
+            return self._generate_axes_info_convert2formulas()
+
+        if self.mdx_execution_result['columns_desc']['rows']:
             return """
             {0}
             {1}
             """.format(
                 self.generate_one_axis_info(
-                    mdx_execution_result,
                     mdx_query_axis='columns',
                     Axis='Axis0'),
-                self.generate_one_axis_info(
-                    mdx_execution_result, mdx_query_axis='rows', Axis='Axis1'))
+                self.generate_one_axis_info(mdx_query_axis='rows', Axis='Axis1'))
 
-        return self.generate_one_axis_info(mdx_execution_result)
+        return self.generate_one_axis_info()
 
     @staticmethod
     def generate_cell_info():
@@ -631,7 +703,7 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def generate_slicer_axis(self, mdx_execution_result):
+    def generate_slicer_axis(self):
         """
         Example SlicerAxis::
 
@@ -664,7 +736,7 @@ class XmlaExecuteTools():
         unused_dimensions = list(
             set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
                 table_name
-                for table_name in mdx_execution_result['columns_desc']['all']))
+                for table_name in self.mdx_execution_result['columns_desc']['all']))
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):

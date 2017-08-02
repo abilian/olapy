@@ -1254,12 +1254,29 @@ class XmlaProviderService(ServiceBase):
 
             XmlaProviderService.discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog)
-            executer = XmlaProviderService.discover_tools.executer
-            executer.mdx_query = request.Command.Statement
-            df = executer.execute_mdx()
-            xmla_tools = XmlaExecuteTools(executer)
 
             xml = xmlwitch.Builder()
+            executer = XmlaProviderService.discover_tools.executer
+            executer.mdx_query = request.Command.Statement
+
+
+            if all(key in request.Command.Statement for key in ['WITH MEMBER',
+                                                            'strtomember',
+                                                            '[Measures].[XL_SD0]']):
+
+                convert2formulas = True
+            else:
+                convert2formulas = False
+
+            xmla_tools = XmlaExecuteTools(executer,convert2formulas)
+
+            celli_info = xmla_tools.generate_cell_info()
+            axes_info = xmla_tools.generate_axes_info()
+            axes_info_slicer = xmla_tools.generate_axes_info_slicer()
+            xs0 = xmla_tools.generate_xs0()
+            slicer_axis = xmla_tools.generate_slicer_axis()
+            cell_data = xmla_tools.generate_cell_data()
+
             with xml['return']:
                 with xml.root(
                         execute_xsd,
@@ -1269,7 +1286,7 @@ class XmlaProviderService(ServiceBase):
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-                    with xml.OlapInfo(xmla_tools.generate_cell_info()):
+                    with xml.OlapInfo(celli_info):
                         with xml.CubeInfo:
                             with xml.Cube:
                                 xml.CubeName('Sales')
@@ -1285,14 +1302,14 @@ class XmlaProviderService(ServiceBase):
                                 )
 
                         xml.AxesInfo(
-                            xmla_tools.generate_axes_info(df),
-                            xmla_tools.generate_axes_info_slicer(df))
+                            axes_info,
+                            axes_info_slicer)
 
                     xml.Axes(
-                        xmla_tools.generate_xs0(df),
-                        xmla_tools.generate_slicer_axis(df))
+                        xs0,
+                        slicer_axis)
 
-                    xml.CellData(xmla_tools.generate_cell_data(df))
+                    xml.CellData(cell_data)
 
             html_parser = HTMLParser.HTMLParser()
             xml = html_parser.unescape(str(xml)).replace('&', '&amp;')
