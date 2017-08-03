@@ -11,12 +11,11 @@ import os
 from ..mdx.executor.execute import MdxEngine
 from .xmla_discover_xsds import (
     dbschema_catalogs_xsd, dbschema_tables_xsd, discover_datasources_xsd,
-    discover_literals_xsd, discover_preperties_xsd,
-    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd,
-    mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd,
-    mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd,
-    mdschema_measuresgroups_xsd, mdschema_members_xsd,
-    mdschema_properties_properties_xsd, mdschema_sets_xsd)
+    discover_literals_xsd, discover_preperties_xsd, discover_schema_rowsets_xsd,
+    mdschema_cubes_xsd, mdschema_dimensions_xsd, mdschema_hierarchies_xsd,
+    mdschema_kpis_xsd, mdschema_levels_xsd, mdschema_measures_xsd,
+    mdschema_measuresgroups_dimensions_xsd, mdschema_measuresgroups_xsd,
+    mdschema_members_xsd, mdschema_properties_properties_xsd, mdschema_sets_xsd)
 
 
 # TODO clean
@@ -64,8 +63,7 @@ class XmlaDiscoverTools():
                         'xmlns:EX':
                         'urn:schemas-microsoft-com:xml-analysis:exception',
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     }):
                 with xml.row:
                     xml.DataSourceName('sales')
@@ -79,6 +77,7 @@ class XmlaDiscoverTools():
         return xml
 
     def discover_properties_response(self, request):
+
         def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
                       PropertyAccessType, IsRequired, Value):
 
@@ -90,8 +89,7 @@ class XmlaDiscoverTools():
                             xsd,
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
                             }):
@@ -120,8 +118,7 @@ class XmlaDiscoverTools():
                             xsd,
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
                             }):
@@ -161,15 +158,15 @@ class XmlaDiscoverTools():
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
+                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
+                                 '15')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+                return get_props(discover_preperties_xsd, 'MdpropMdxSubqueries',
+                                 'MdpropMdxSubqueries', 'int', 'Read', 'false',
+                                 '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
             if 'Unspecified' in request.Properties.PropertyList.Catalog:
@@ -263,8 +260,8 @@ class XmlaDiscoverTools():
                         'COORDINATE_TYPE', 'INVOCATION', 'CUBE_SOURCE'
                     ],
                     'restriction_types': [
-                        'string', 'string', 'string', 'string', 'int',
-                        'string', 'int', 'int', 'unsignedShort'
+                        'string', 'string', 'string', 'string', 'int', 'string',
+                        'int', 'int', 'unsignedShort'
                     ]
                 },
                 'RestrictionsMask': '511'
@@ -408,8 +405,7 @@ class XmlaDiscoverTools():
                     'restriction_names': [
                         'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
                         'MEASURE_NAME', 'MEASURE_UNIQUE_NAME',
-                        'MEASUREGROUP_NAME', 'CUBE_SOURCE',
-                        'MEASURE_VISIBILITY'
+                        'MEASUREGROUP_NAME', 'CUBE_SOURCE', 'MEASURE_VISIBILITY'
                     ],
                     'restriction_types': [
                         'string', 'string', 'string', 'string', 'string',
@@ -709,7 +705,6 @@ class XmlaDiscoverTools():
                 </return>
                 """
 
-
             if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_LEVELS':
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -744,8 +739,8 @@ class XmlaDiscoverTools():
             'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
             'restrictions': {
                 'restriction_names': [
-                    'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME',
-                    'TABLE_TYPE', 'TABLE_OLAP_TYPE'
+                    'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME', 'TABLE_TYPE',
+                    'TABLE_OLAP_TYPE'
                 ],
                 'restriction_types':
                 ['string', 'string', 'string', 'string', 'string']
@@ -933,8 +928,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     })
 
             html_parser = HTMLParser.HTMLParser()
@@ -955,8 +949,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     })
 
             html_parser = HTMLParser.HTMLParser()
@@ -972,8 +965,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     }):
 
                 for catalogue in self.catalogues:
@@ -1030,8 +1022,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     })
 
             html_parser = HTMLParser.HTMLParser()
@@ -1152,8 +1143,7 @@ class XmlaDiscoverTools():
                             mdschema_hierarchies_xsd,
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
                             }):
@@ -1405,8 +1395,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     })
 
             html_parser = HTMLParser.HTMLParser()

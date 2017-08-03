@@ -25,6 +25,7 @@ from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaSoap11(Soap11):
+
     def create_in_document(self, ctx, charset=None):
         if isinstance(ctx.transport, HttpTransportContext):
             http_verb = ctx.transport.get_request_method()
@@ -116,8 +117,7 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(
-                request)
+            return discover_tools.discover_mdschema_dimensions_response(request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -136,8 +136,7 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(
-                request)
+            return discover_tools.discover_mdschema_properties_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)
@@ -177,15 +176,15 @@ class XmlaProviderService(ServiceBase):
             executer.mdx_query = request.Command.Statement
 
             # todo Hierarchize
-            if all(key in request.Command.Statement for key in ['WITH MEMBER',
-                                                            'strtomember',
-                                                            '[Measures].[XL_SD0]']):
+            if all(key in request.Command.Statement
+                   for key in
+                   ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
 
                 convert2formulas = True
             else:
                 convert2formulas = False
 
-            xmla_tools = XmlaExecuteTools(executer,convert2formulas)
+            xmla_tools = XmlaExecuteTools(executer, convert2formulas)
 
             with xml['return']:
                 with xml.root(
@@ -211,13 +210,11 @@ class XmlaProviderService(ServiceBase):
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
 
-                        xml.AxesInfo(
-                            xmla_tools.generate_axes_info(),
-                            xmla_tools.generate_axes_info_slicer())
+                        xml.AxesInfo(xmla_tools.generate_axes_info(),
+                                     xmla_tools.generate_axes_info_slicer())
 
-                    xml.Axes(
-                        xmla_tools.generate_xs0(),
-                        xmla_tools.generate_slicer_axis())
+                    xml.Axes(xmla_tools.generate_xs0(),
+                             xmla_tools.generate_slicer_axis())
 
                     xml.CellData(xmla_tools.generate_cell_data())
 

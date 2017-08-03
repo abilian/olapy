@@ -23,6 +23,7 @@ from ..tools.connection import MyDB
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
+
 class MdxEngine:
     """
     The principal class for executing a query.
@@ -195,8 +196,7 @@ class MdxEngine:
 
         # if web, get measures from config file
         config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist(
-                'web'):
+        if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
 
                 # update facts name
@@ -233,8 +233,7 @@ class MdxEngine:
                         fusion = _construct_web_star_schema_config_file(self,
                                                                         cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(self,
-                                                                    cubes)
+                        fusion = _construct_star_schema_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -429,7 +428,7 @@ class MdxEngine:
                     # else:
                     tables_columns.update({
                         tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
                     })
 
                     # else:
@@ -723,18 +722,16 @@ class MdxEngine:
 
             # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
             if 'Hierarchize' not in self.mdx_query:
-                for table,columns in columns_to_keep.items():
+                for table, columns in columns_to_keep.items():
                     columns_to_keep[table] = list(columns)[:-1]
 
                 for axis, table_columns in tables_n_columns.items():
-                    for table,columns in table_columns.items():
+                    for table, columns in table_columns.items():
                         if table != 'Facts':
                             table_columns[table] = list(columns)[:-1]
                     tables_n_columns[axis] = table_columns
 
-
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)
