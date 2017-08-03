@@ -924,8 +924,21 @@ class XmlaExecuteTools():
 
         return self.generate_one_axis_info()
 
-    @staticmethod
-    def generate_cell_info():
+
+    def _generate_cell_info_convert2formuls(self):
+        xml = xmlwitch.Builder()
+        with xml.CellInfo:
+            xml.Value(name="VALUE")
+
+        return str(xml)
+
+
+    def generate_cell_info(self):
+
+
+        if self.convert2formulas:
+            return self._generate_cell_info_convert2formuls()
+
         xml = xmlwitch.Builder()
         with xml.CellInfo:
             xml.Value(name="VALUE")
