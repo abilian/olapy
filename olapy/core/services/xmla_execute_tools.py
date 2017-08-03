@@ -79,11 +79,9 @@ class XmlaExecuteTools():
         """
 
         from ..mdx.executor.execute import MdxEngine
-        return {
-            # todo change remove (temporary) !!!
-            'columns_desc': [tup[0] for tup in re.compile(MdxEngine.regex).findall(self.executer.mdx_query) if
-                             '[Measures].[XL_SD' not in tup[0] and tup[1]][::3]
-        }
+        # todo change remove (temporary) !!!
+        return [tup[0] for tup in re.compile(MdxEngine.regex).findall(self.executer.mdx_query) if
+                '[Measures].[XL_SD' not in tup[0] and tup[1]][::3]
 
 
     def split_dataframe(self):
@@ -305,6 +303,96 @@ class XmlaExecuteTools():
 
         return str(xml)
 
+    def _generate_xs0_convert2formulas(self):
+        xml = xmlwitch.Builder()
+        with xml.Axis(name="Axis0"):
+            with xml.Tuples:
+                if isinstance(self.mdx_execution_result, list):
+                    for idx in xrange(len(self.mdx_execution_result) * 3):
+                        with xml.Tuple:
+                            with xml.Member(Hierarchy="[Measures]"):
+                                xml.UName(
+                                    '[Measures].[{0}]'.format('XL_SD' + str(idx)))
+                                xml.Caption('{0}'.format('XL_SD' + str(idx)))
+                                xml.LName('[Measures]')
+                                xml.LNum('0')
+                                xml.DisplayInfo('0')
+        return str(xml)
+
+    def _generate_slicer_convert2formulas(self):
+        """
+        <Axis name="SlicerAxis">
+            <Tuples>
+                <Tuple>
+                    <Member Hierarchy="[Geography].[Geo]">
+                        <UName>[Geography].[Geo].[All Regions]</UName>
+                        <Caption>All Regions</Caption>
+                        <LName>[Geography].[Geo].[All-Level]</LName>
+                        <LNum>0</LNum>
+                        <DisplayInfo>2</DisplayInfo>
+                    </Member>
+                    <Member Hierarchy="[Geography].[Economy]">
+                        <UName>[Geography].[Economy].[All]</UName>
+                        <Caption>All</Caption>
+                        <LName>[Geography].[Economy].[All-Level]</LName>
+                        <LNum>0</LNum>
+                        <DisplayInfo>3</DisplayInfo>
+                    </Member>
+                    <Member Hierarchy="[Product].[Prod]">
+                        <UName>[Product].[Prod].[Company].&amp;[Crazy Development ]</UName>
+                        <Caption>Crazy Development </Caption>
+                        <LName>[Product].[Prod].[Company]</LName>
+                        <LNum>0</LNum>
+                        <DisplayInfo>1</DisplayInfo>
+                    </Member>
+                    <Member Hierarchy="[Time].[Calendar]">
+                        <UName>[Time].[Calendar].[Year].&amp;[2010]</UName>
+                        <Caption>2010</Caption>
+                        <LName>[Time].[Calendar].[Year]</LName>
+                        <LNum>0</LNum>
+                        <DisplayInfo>4</DisplayInfo>
+                    </Member>
+                </Tuple>
+            </Tuples>
+        </Axis>
+
+        :return:
+        """
+        xml = xmlwitch.Builder()
+        with xml.Axis(name="SlicerAxis"):
+            with xml.Tuples:
+                with xml.Tuple:
+                    for dim_diff in self.executer.get_all_tables_names(ignore_fact=True):
+                        # TODO encode dataframe
+                        # french caracteres
+                        if type(self.executer.tables_loaded[dim_diff].iloc[
+                                    0][0]) == unicode:
+                            column_attribut = self.executer.tables_loaded[
+                                dim_diff].iloc[0][0].encode('utf-8',
+                                                            'replace')
+                        else:
+                            column_attribut = self.executer.tables_loaded[
+                                dim_diff].iloc[0][0]
+
+                        with xml.Member(
+                                Hierarchy="[{0}].[{0}]".format(dim_diff)):
+                            xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(
+                                dim_diff, self.executer.tables_loaded[
+                                    dim_diff].columns[0], column_attribut))
+                            xml.Caption(str(column_attribut))
+                            xml.LName('[{0}].[{0}].[{1}]'.format(
+                                dim_diff, self.executer.tables_loaded[
+                                    dim_diff].columns[0]))
+                            xml.LNum('0')
+                            xml.DisplayInfo('2')
+
+        return str(xml)
+
+    def _generate_axes_convert2formulas(self):
+        return self._generate_xs0_convert2formulas()
+
+
+
     def generate_xs0(self):
         """
         Example of xs0::
@@ -359,6 +447,10 @@ class XmlaExecuteTools():
         """
         # TODO must be OPTIMIZED every time!!!!!
 
+        if self.convert2formulas:
+            return self._generate_axes_convert2formulas()
+
+
         dfs = self.split_dataframe()
         if self.mdx_execution_result['columns_desc'][
                 'rows'] and self.mdx_execution_result['columns_desc']['columns']:
@@ -393,6 +485,51 @@ class XmlaExecuteTools():
         # one axis
         return self.generate_xs0_one_axis(dfs, mdx_query_axis='columns', axis="Axis0")
 
+    def _generate_cells_data_convert2formulas(self):
+
+        """
+
+        :return:
+        """
+
+        """
+        for each tuple:
+        <Cell CellOrdinal="0">
+            <Value>[Measures].[Amount]</Value>
+        </Cell>
+        <Cell CellOrdinal="1">
+            <Value>Amount</Value>
+        </Cell>
+        <Cell CellOrdinal="2">
+            <Value>[Measures]</Value>
+        </Cell>
+        """
+
+        xml = xmlwitch.Builder()
+        index = 0
+        for tupl in self.mdx_execution_result:
+            with xml.Cell(CellOrdinal=str(index)):
+                xml.Value(tupl)
+            index += 1
+            with xml.Cell(CellOrdinal=str(index)):
+                xml.Value(tupl.split('.')[-1].replace('[','').replace(']',''))
+            index += 1
+
+            tupl2list = tupl.split('.')
+            if tupl2list[0].upper() == '[MEASURES]':
+                value = '[Measures]'
+            else:
+                value = '{0}.{0}.[{1}]'.format(tupl2list[0],
+                                             self.executer.tables_loaded[tupl2list[0].replace('[','').replace(']','')].columns[len(tupl2list[4:])]
+                                             )
+
+            with xml.Cell(CellOrdinal=str(index)):
+                xml.Value(value)
+            index += 1
+
+        return str(xml)
+
+
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
         """
@@ -409,6 +546,9 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: CellData as string
         """
+
+        if self.convert2formulas:
+            return self._generate_cells_data_convert2formulas()
 
         if ((len(self.mdx_execution_result['columns_desc']['columns'].keys()) == 0)
                 ^
@@ -444,6 +584,30 @@ class XmlaExecuteTools():
             index += 1
         return str(xml)
 
+    def _generate_axes_info_sliver_convert2formulas(self):
+        xml = xmlwitch.Builder()
+        with xml.AxisInfo(name='SlicerAxis'):
+            for dim in self.executer.get_all_tables_names(ignore_fact=True):
+                to_write = "[{0}].[{0}]".format(dim)
+                with xml.HierarchyInfo(name=to_write):
+                    xml.UName(
+                        name="{0}.[MEMBER_UNIQUE_NAME]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.Caption(
+                        name="{0}.[MEMBER_CAPTION]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.LName(
+                        name="{0}.[LEVEL_UNIQUE_NAME]".format(to_write),
+                        **{'type': 'xs:string'})
+                    xml.LNum(
+                        name="{0}.[LEVEL_NUMBER]".format(to_write),
+                        **{'type': 'xs:int'})
+                    xml.DisplayInfo(
+                        name="{0}.[DISPLAY_INFO]".format(to_write),
+                        **{'type': 'xs:unsignedInt'})
+
+        return str(xml)
+
     def generate_axes_info_slicer(self):
         """
         Not used dimensions.
@@ -473,6 +637,11 @@ class XmlaExecuteTools():
         :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
+
+        if self.convert2formulas:
+            return self._generate_axes_info_sliver_convert2formulas()
+
+
         all_dimensions_names = self.executer.get_all_tables_names(
             ignore_fact=True)
         all_dimensions_names.append('Measures')
@@ -664,6 +833,50 @@ class XmlaExecuteTools():
         return str(xml)
 
     def _generate_axes_info_convert2formulas(self):
+        """
+        always:
+
+        <AxisInfo name="Axis0">
+            <HierarchyInfo name="[Measures]">
+                <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
+                <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
+                <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+            </HierarchyInfo>
+        </AxisInfo>
+        <AxisInfo name="SlicerAxis">
+            <HierarchyInfo name="[Geography].[Geo]">
+                <UName name="[Geography].[Geo].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                <Caption name="[Geography].[Geo].[MEMBER_CAPTION]" type="xsd:string"/>
+                <LName name="[Geography].[Geo].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                <LNum name="[Geography].[Geo].[LEVEL_NUMBER]" type="xsd:int"/>
+                <DisplayInfo name="[Geography].[Geo].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+            </HierarchyInfo>
+            <HierarchyInfo name="[Geography].[Economy]">
+                <UName name="[Geography].[Economy].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                <Caption name="[Geography].[Economy].[MEMBER_CAPTION]" type="xsd:string"/>
+                <LName name="[Geography].[Economy].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                <LNum name="[Geography].[Economy].[LEVEL_NUMBER]" type="xsd:int"/>
+                <DisplayInfo name="[Geography].[Economy].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+            </HierarchyInfo>
+            <HierarchyInfo name="[Product].[Prod]">
+                <UName name="[Product].[Prod].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                <Caption name="[Product].[Prod].[MEMBER_CAPTION]" type="xsd:string"/>
+                <LName name="[Product].[Prod].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                <LNum name="[Product].[Prod].[LEVEL_NUMBER]" type="xsd:int"/>
+                <DisplayInfo name="[Product].[Prod].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+            </HierarchyInfo>
+            <HierarchyInfo name="[Time].[Calendar]">
+                <UName name="[Time].[Calendar].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                <Caption name="[Time].[Calendar].[MEMBER_CAPTION]" type="xsd:string"/>
+                <LName name="[Time].[Calendar].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                <LNum name="[Time].[Calendar].[LEVEL_NUMBER]" type="xsd:int"/>
+                <DisplayInfo name="[Time].[Calendar].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+            </HierarchyInfo>
+        </AxisInfo>
+        :return:
+        """
         xml = xmlwitch.Builder()
         with xml.AxisInfo(name='Axis0'):
             # many measures , then write this on the top
@@ -683,26 +896,6 @@ class XmlaExecuteTools():
                     **{'type': 'xs:int'})
                 xml.DisplayInfo(
                     name="[Measures].[DISPLAY_INFO]",
-                        **{'type': 'xs:unsignedInt'})
-
-        with xml.AxisInfo(name='SlicerAxis'):
-            for dim in self.executer.get_all_tables_names(ignore_fact=True):
-                to_write = "[{0}].[{0}]".format(dim)
-                with xml.HierarchyInfo(name=to_write):
-                    xml.UName(
-                        name="{0}.[MEMBER_UNIQUE_NAME]".format(to_write),
-                        **{'type': 'xs:string'})
-                    xml.Caption(
-                        name="{0}.[MEMBER_CAPTION]".format(to_write),
-                        **{'type': 'xs:string'})
-                    xml.LName(
-                        name="{0}.[LEVEL_UNIQUE_NAME]".format(to_write),
-                        **{'type': 'xs:string'})
-                    xml.LNum(
-                        name="{0}.[LEVEL_NUMBER]".format(to_write),
-                        **{'type': 'xs:int'})
-                    xml.DisplayInfo(
-                        name="{0}.[DISPLAY_INFO]".format(to_write),
                         **{'type': 'xs:unsignedInt'})
 
         return str(xml)
@@ -744,6 +937,7 @@ class XmlaExecuteTools():
 
         return str(xml)
 
+
     def generate_slicer_axis(self):
         """
         Example SlicerAxis::
@@ -774,6 +968,11 @@ class XmlaExecuteTools():
         :return: SlicerAxis as string
         """
         # not used dimensions
+
+        if self.convert2formulas:
+            return self._generate_slicer_convert2formulas()
+
+
         unused_dimensions = list(
             set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
                 table_name
