@@ -1,0 +1,18 @@
+sudo: required
+dist: trusty
+
+language: python
+cache: pip
+python:
+  - "2.7"
+
+script:
+  - tox
+
+notifications:
+  slack:
+    rooms:
+      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
+    on_success: change
+    on_failure: always
+
