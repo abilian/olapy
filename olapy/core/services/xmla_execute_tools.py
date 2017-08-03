@@ -23,58 +23,59 @@ class XmlaExecuteTools():
     def _execute_convert_formulas_query(self):
         """
         <Cell CellOrdinal="0">
-                            <Value>[Measures].[Amount]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="1">
-                            <Value>Amount</Value>
-                        </Cell>
-                        <Cell CellOrdinal="2">
-                            <Value>[Measures]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="3">
-                            <Value>[Geography].[Geo].[All Regions].&amp;[America]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="4">
-                            <Value>America</Value>
-                        </Cell>
-                        <Cell CellOrdinal="5">
-                            <Value>[Geography].[Geo].[Continent]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="6">
-                            <Value>[Geography].[Geo].[All Regions].&amp;[America].&amp;[US]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="7">
-                            <Value>United States</Value>
-                        </Cell>
-                        <Cell CellOrdinal="8">
-                            <Value>[Geography].[Geo].[Country]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="9">
-                            <Value>[Product].[Prod].[Company].&amp;[Crazy Development ]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="10">
-                            <Value>Crazy Development </Value>
-                        </Cell>
-                        <Cell CellOrdinal="11">
-                            <Value>[Product].[Prod].[Company]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="12">
-                            <Value>[Product].[Prod].[Company].&amp;[Crazy Development ].&amp;[icCube]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="13">
-                            <Value>icCube</Value>
-                        </Cell>
-                        <Cell CellOrdinal="14">
-                            <Value>[Product].[Prod].[Article]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="15">
-                            <Value>[Geography].[Geo].[All Regions].&amp;[Europe]</Value>
-                        </Cell>
-                        <Cell CellOrdinal="16">
-                            <Value>Europe</Value>
-                        </Cell>
-                        <Cell CellOrdinal="17">
-                            <Value>[Geography].[Geo].[Continent]</Value>
+                <Value>[Measures].[Amount]</Value>
+            </Cell>
+            <Cell CellOrdinal="1">
+                <Value>Amount</Value>
+            </Cell>
+            <Cell CellOrdinal="2">
+                <Value>[Measures]</Value>
+            </Cell>
+            <Cell CellOrdinal="3">
+                <Value>[Geography].[Geo].[All Regions].&amp;[America]</Value>
+            </Cell>
+            <Cell CellOrdinal="4">
+                <Value>America</Value>
+            </Cell>
+            <Cell CellOrdinal="5">
+                <Value>[Geography].[Geo].[Continent]</Value>
+            </Cell>
+            <Cell CellOrdinal="6">
+                <Value>[Geography].[Geo].[All Regions].&amp;[America].&amp;[US]</Value>
+            </Cell>
+            <Cell CellOrdinal="7">
+                <Value>United States</Value>
+            </Cell>
+            <Cell CellOrdinal="8">
+                <Value>[Geography].[Geo].[Country]</Value>
+            </Cell>
+            <Cell CellOrdinal="9">
+                <Value>[Product].[Prod].[Company].&amp;[Crazy Development ]</Value>
+            </Cell>
+            <Cell CellOrdinal="10">
+                <Value>Crazy Development </Value>
+            </Cell>
+            <Cell CellOrdinal="11">
+                <Value>[Product].[Prod].[Company]</Value>
+            </Cell>
+            <Cell CellOrdinal="12">
+                <Value>[Product].[Prod].[Company].&amp;[Crazy Development ].&amp;[icCube]</Value>
+            </Cell>
+            <Cell CellOrdinal="13">
+                <Value>icCube</Value>
+            </Cell>
+            <Cell CellOrdinal="14">
+                <Value>[Product].[Prod].[Article]</Value>
+            </Cell>
+            <Cell CellOrdinal="15">
+                <Value>[Geography].[Geo].[All Regions].&amp;[Europe]</Value>
+            </Cell>
+            <Cell CellOrdinal="16">
+                <Value>Europe</Value>
+            </Cell>
+            <Cell CellOrdinal="17">
+                <Value>[Geography].[Geo].[Continent]</Value>
+            </Cell>
         :return:
         """
 
