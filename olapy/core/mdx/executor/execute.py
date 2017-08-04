@@ -104,7 +104,7 @@ class MdxEngine:
             ]
         except Exception:
             type, value, traceback = sys.exc_info()
-            print('Error opening %s: %s' % (value.filename, value.strerror))
+            print('Error opening %s' % (value))
             print('no csv folders')
             pass
 
@@ -126,7 +126,7 @@ class MdxEngine:
 
         except Exception:
             type, value, traceback = sys.exc_info()
-            print('Error opening %s: %s' % (value.filename, value.strerror))
+            print('Error opening %s' % (value))
             print('no database connexion')
             pass
 
