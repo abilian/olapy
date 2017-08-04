@@ -34,27 +34,12 @@ or just::
 Usage
 -----
 
-With an XMLA client
-~~~~~~~~~~~~~~~~~~~
 
 To use XMLA from Excel, just start the XMLA server by executing in the root directory::
 
     python olapy ( -c | --console , if you want to print logs only in the console)
 
 and use the url: http://127.0.0.1:8000/xmla in Excel
-
-With the demo web app
-~~~~~~~~~~~~~~~~~~~~~
-
-Run:
-
-1. `python manage.py initdb` to initialize the db
-
-2. `python manage.py runserver` to run application, using the following credential to log in:
-
-  - **login**: admin
-
-  - **password**: admin
 
 
 Developing
