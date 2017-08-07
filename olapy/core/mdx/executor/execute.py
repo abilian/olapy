@@ -381,9 +381,9 @@ class MdxEngine:
 
         :return: measures column's names
         """
-        return [
+        return list({
             tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
-        ]
+        })
 
     def get_tables_and_columns(self, tuple_as_list):
         # TODO update docstring
@@ -677,9 +677,11 @@ class MdxEngine:
         # else:
         #     end = -1
 
+
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
+
 
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
@@ -688,14 +690,11 @@ class MdxEngine:
             df_to_fusion = []
             table_name = tuples_on_mdx_query[0][0]
             # in every tuple
-
             for tupl in tuples_on_mdx_query:
-
                 # if we have measures in columns or rows axes like :
                 # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
                 # we use only used columns for dimension in that tuple and keep other dimension's columns
                 self.update_columns_to_keep(tupl, columns_to_keep)
-
                 # a tuple with new dimension
                 if tupl[0] != table_name:
                     # if we change dimension , we have to work on the exection's result on previous DataFrames
@@ -721,7 +720,9 @@ class MdxEngine:
                                            columns_to_keep.values()))
 
             # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
+
             if 'Hierarchize' not in self.mdx_query:
+
                 for table, columns in columns_to_keep.items():
                     # if you ask for last column , you get it , not the previous one
                     # example ; when not Hierarchize , if you ask for day column you get day column , not month because
@@ -732,6 +733,8 @@ class MdxEngine:
                 for axis, table_columns in tables_n_columns.items():
                     for table, columns in table_columns.items():
                         if table != 'Facts':
+                            # if len(self.tables_loaded[table].columns) != len(columns):
+                            #     table_columns[table] = list(columns)[:-1]
                             table_columns[table] = list(columns)[:-1]
                     tables_n_columns[axis] = table_columns
 
