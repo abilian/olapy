@@ -723,7 +723,11 @@ class MdxEngine:
             # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
             if 'Hierarchize' not in self.mdx_query:
                 for table, columns in columns_to_keep.items():
-                    columns_to_keep[table] = list(columns)[:-1]
+                    # if you ask for last column , you get it , not the previous one
+                    # example ; when not Hierarchize , if you ask for day column you get day column , not month because
+                    # this is the last column in the table
+                    if len(self.tables_loaded[table].columns) != len(columns):
+                        columns_to_keep[table] = list(columns)[:-1]
 
                 for axis, table_columns in tables_n_columns.items():
                     for table, columns in table_columns.items():
