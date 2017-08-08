@@ -656,6 +656,7 @@ class MdxEngine:
             }
 
         """
+
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
 
@@ -733,9 +734,9 @@ class MdxEngine:
                 for axis, table_columns in tables_n_columns.items():
                     for table, columns in table_columns.items():
                         if table != 'Facts':
-                            # if len(self.tables_loaded[table].columns) != len(columns):
-                            #     table_columns[table] = list(columns)[:-1]
-                            table_columns[table] = list(columns)[:-1]
+                            if len(self.tables_loaded[table].columns) != len(columns):
+                                table_columns[table] = list(columns)[:-1]
+                            # table_columns[table] = list(columns)[:-1]
                     tables_n_columns[axis] = table_columns
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
@@ -752,7 +753,6 @@ class MdxEngine:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
             # TODO margins=True for columns total !!!!!
-
             return {
                 'result': df.groupby(cols).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
