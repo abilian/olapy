@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 import numpy as np
 import re
+
 import xmlwitch
 
 
@@ -165,9 +166,8 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
         # only measure selected
-        if self.mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
-                self.executer.facts
-        ]:
+        if self.mdx_execution_result['columns_desc'][
+                mdx_query_axis].keys() == [self.executer.facts]:
             if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][
                     self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
@@ -248,15 +248,16 @@ class XmlaExecuteTools():
                                                     tuple_without_minus_1[
                                                         first_att - 1:]
                                                 ])))
-                                    xml.Caption(
-                                        '{0}'.format(tuple_without_minus_1[-1]))
+                                    xml.Caption('{0}'.format(
+                                        tuple_without_minus_1[-1]))
                                     xml.LName('[{0}].[{0}].[{1}]'.format(
                                         tuple_without_minus_1[0], splited_df[
                                             tuple_without_minus_1[0]].columns[
                                                 len(tuple_without_minus_1) -
                                                 first_att]))
                                     xml.LNum('{0}'.format(
-                                        len(tuple_without_minus_1) - first_att))
+                                        len(tuple_without_minus_1) -
+                                        first_att))
                                     xml.DisplayInfo('131076')
 
                                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
@@ -459,7 +460,6 @@ class XmlaExecuteTools():
         if self.mdx_execution_result['columns_desc'][
                 'rows'] and self.mdx_execution_result['columns_desc'][
                     'columns']:
-
             return """
             {0}
             {1}
@@ -509,7 +509,8 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(tupl.split('.')[-1].replace('[', '').replace(']', ''))
+                xml.Value(
+                    tupl.split('.')[-1].replace('[', '').replace(']', ''))
             index += 1
 
             tupl2list = tupl.split('.')
@@ -547,12 +548,11 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.mdx_execution_result['columns_desc']['columns'].keys()) ==
-             0) ^
+        if ((len(self.mdx_execution_result['columns_desc']['columns'].keys())
+             == 0) ^
             (len(self.mdx_execution_result['columns_desc']['rows'].keys()) == 0
-            )) and self.executer.facts in self.mdx_execution_result[
-                'columns_desc']['all'].keys():
-
+             )) and self.executer.facts in self.mdx_execution_result[
+                 'columns_desc']['all'].keys():
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
                 self.mdx_execution_result['result'][measure]
@@ -560,13 +560,12 @@ class XmlaExecuteTools():
             ])
 
         else:
-
             # iterate DataFrame vertically
             columns_loop = itertools.chain(
                 *[
                     tuple
-                    for tuple in self.mdx_execution_result['result'].itertuples(
-                        index=False)
+                    for tuple in self.mdx_execution_result['result']
+                    .itertuples(index=False)
                 ])
 
         xml = xmlwitch.Builder()
@@ -880,11 +879,13 @@ class XmlaExecuteTools():
                     name="[Measures].[MEMBER_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
                 xml.Caption(
-                    name="[Measures].[MEMBER_CAPTION]", **{'type': 'xs:string'})
+                    name="[Measures].[MEMBER_CAPTION]",
+                    **{'type': 'xs:string'})
                 xml.LName(
                     name="[Measures].[LEVEL_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
-                xml.LNum(name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
+                xml.LNum(
+                    name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
                 xml.DisplayInfo(
                     name="[Measures].[DISPLAY_INFO]",
                     **{'type': 'xs:unsignedInt'})
@@ -1006,8 +1007,9 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('2')
 
                         # todo Hierarchize delete/change !!
-                        if len(self.executer.selected_measures
-                              ) <= 1 and 'ON 0' not in self.executer.mdx_query:
+                        if len(
+                                self.executer.selected_measures
+                        ) <= 1 and 'ON 0' not in self.executer.mdx_query:
                             with xml.Member(
                                     Hierarchy="[Measures]".format(dim_diff)):
                                 xml.UName('[Measures].[{0}]'.format(

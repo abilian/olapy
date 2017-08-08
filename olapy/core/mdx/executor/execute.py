@@ -196,7 +196,8 @@ class MdxEngine:
 
         # if web, get measures from config file
         config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist('web'):
+        if self.client == 'web' and config_file_parser.config_file_exist(
+                'web'):
             for cubes in config_file_parser.construct_cubes(self.client):
 
                 # update facts name
@@ -233,7 +234,8 @@ class MdxEngine:
                         fusion = _construct_web_star_schema_config_file(self,
                                                                         cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(self, cubes)
+                        fusion = _construct_star_schema_config_file(self,
+                                                                    cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -382,7 +384,8 @@ class MdxEngine:
         :return: measures column's names
         """
         return list({
-            tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
+            tple[-1]
+            for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
         })
 
     def get_tables_and_columns(self, tuple_as_list):
@@ -678,11 +681,9 @@ class MdxEngine:
         # else:
         #     end = -1
 
-
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
-
 
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
@@ -734,12 +735,14 @@ class MdxEngine:
                 for axis, table_columns in tables_n_columns.items():
                     for table, columns in table_columns.items():
                         if table != 'Facts':
-                            if len(self.tables_loaded[table].columns) != len(columns):
+                            if len(self.tables_loaded[table].columns) != len(
+                                    columns):
                                 table_columns[table] = list(columns)[:-1]
                             # table_columns[table] = list(columns)[:-1]
                     tables_n_columns[axis] = table_columns
 
-            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(
+                itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)
