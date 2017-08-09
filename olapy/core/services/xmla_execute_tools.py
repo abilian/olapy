@@ -292,7 +292,7 @@ class XmlaExecuteTools():
                                     xml.LName('[Measures]')
                                     xml.LNum('0')
                                     xml.DisplayInfo('0')
-                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                                    # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         # todo delete change 'Hierarchize'!!!!
         elif 'ON 0' in self.executer.mdx_query:
@@ -757,12 +757,13 @@ class XmlaExecuteTools():
                         xml.DisplayInfo(
                             name="[Measures].[DISPLAY_INFO]",
                             **{'type': 'xs:unsignedInt'})
-                        xml.PARENT_UNIQUE_NAME(
-                            name="[Measures].[PARENT_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.HIERARCHY_UNIQUE_NAME(
-                            name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
+                        if 'Hierarchize' in self.executer.mdx_query:
+                            xml.PARENT_UNIQUE_NAME(
+                                name="[Measures].[PARENT_UNIQUE_NAME]",
+                                **{'type': 'xs:string'})
+                            xml.HIERARCHY_UNIQUE_NAME(
+                                name="[Measures].[HIERARCHY_UNIQUE_NAME]",
+                                **{'type': 'xs:string'})
 
                 for table_name in axis_tables:
                     if table_name != self.executer.facts:
@@ -789,14 +790,16 @@ class XmlaExecuteTools():
                                 name="[{0}].[{0}].[DISPLAY_INFO]".format(
                                     table_name),
                                 **{'type': 'xs:unsignedInt'})
-                            xml.PARENT_UNIQUE_NAME(
-                                name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
-                                    table_name),
-                                **{'type': 'xs:string'})
-                            xml.HIERARCHY_UNIQUE_NAME(
-                                name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".
-                                format(table_name),
-                                **{'type': 'xs:string'})
+
+                            if 'Hierarchize' in self.executer.mdx_query:
+                                xml.PARENT_UNIQUE_NAME(
+                                    name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
+                                        table_name),
+                                    **{'type': 'xs:string'})
+                                xml.HIERARCHY_UNIQUE_NAME(
+                                    name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".
+                                    format(table_name),
+                                    **{'type': 'xs:string'})
 
                 # todo   Hierarchize to delete/ change ASAP
                 if 'ON 0' in self.executer.mdx_query:
@@ -816,12 +819,12 @@ class XmlaExecuteTools():
                         xml.DisplayInfo(
                             name="[Measures].[DISPLAY_INFO]",
                             **{'type': 'xs:unsignedInt'})
-                        xml.PARENT_UNIQUE_NAME(
-                            name="[Measures].[PARENT_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.HIERARCHY_UNIQUE_NAME(
-                            name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
+                        # xml.PARENT_UNIQUE_NAME(
+                        #     name="[Measures].[PARENT_UNIQUE_NAME]",
+                        #     **{'type': 'xs:string'})
+                        # xml.HIERARCHY_UNIQUE_NAME(
+                        #     name="[Measures].[HIERARCHY_UNIQUE_NAME]",
+                        #     **{'type': 'xs:string'})
 
         return str(xml)
 

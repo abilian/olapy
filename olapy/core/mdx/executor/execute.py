@@ -423,16 +423,16 @@ class MdxEngine:
                         continue
                 else:
 
-                    # if 'Hierarchize' not in self.mdx_query:
-                    #     tables_columns.update({
-                    #         tupl[0]:
-                    #         self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
-                    #     })
-                    # else:
-                    tables_columns.update({
-                        tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
-                    })
+                    if 'Hierarchize' not in self.mdx_query:
+                        tables_columns.update({
+                            tupl[0]:
+                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
+                        })
+                    else:
+                        tables_columns.update({
+                            tupl[0]:
+                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                        })
 
                     # else:
                     #     tables_columns.update({
@@ -441,7 +441,6 @@ class MdxEngine:
                     #     })
 
             axes.update({axis: tables_columns})
-
         return axes
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
@@ -636,8 +635,12 @@ class MdxEngine:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
-            cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[2:])]
+            if 'Hierarchize' in self.mdx_query:
+                cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
+                    tuple_as_list[2:])]
+            else:
+                cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
+                    tuple_as_list[3:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -675,6 +678,7 @@ class MdxEngine:
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
 
+
         # if we have measures on axes we have to ignore them
         # if 'Hierarchize' in self.mdx_query:
         #     end = None
@@ -684,6 +688,7 @@ class MdxEngine:
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
+
 
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
@@ -723,23 +728,21 @@ class MdxEngine:
 
             # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
 
-            if 'Hierarchize' not in self.mdx_query:
-
-                for table, columns in columns_to_keep.items():
-                    # if you ask for last column , you get it , not the previous one
-                    # example ; when not Hierarchize , if you ask for day column you get day column , not month because
-                    # this is the last column in the table
-                    if len(self.tables_loaded[table].columns) != len(columns):
-                        columns_to_keep[table] = list(columns)[:-1]
-
-                for axis, table_columns in tables_n_columns.items():
-                    for table, columns in table_columns.items():
-                        if table != 'Facts':
-                            if len(self.tables_loaded[table].columns) != len(
-                                    columns):
-                                table_columns[table] = list(columns)[:-1]
-                            # table_columns[table] = list(columns)[:-1]
-                    tables_n_columns[axis] = table_columns
+            # if 'Hierarchize' not in self.mdx_query:
+            #     for table, columns in columns_to_keep.items():
+            #         # if you ask for last column , you get it , not the previous one
+            #         # example ; when not Hierarchize , if you ask for day column you get day column , not month because
+            #         # this is the last column in the table
+            #         if len(self.tables_loaded[table].columns) != len(columns):
+            #             columns_to_keep[table] = list(columns)[:-1]
+            #     for axis, table_columns in tables_n_columns.items():
+            #         for table, columns in table_columns.items():
+            #             if table != 'Facts':
+            #                 if len(self.tables_loaded[table].columns) != len(
+            #                         columns):
+            #                     table_columns[table] = list(columns)[:-1]
+            #                 # table_columns[table] = list(columns)[:-1]
+            #         tables_n_columns[axis] = table_columns
 
             cols = list(
                 itertools.chain.from_iterable(columns_to_keep.values()))
