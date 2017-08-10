@@ -638,12 +638,8 @@ class MdxEngine:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
-            # if 'Hierarchize' in self.mdx_query:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
                 tuple_as_list[columns:])]
-            # else:
-            #     cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-            #         tuple_as_list[3:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
