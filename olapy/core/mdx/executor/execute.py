@@ -162,6 +162,15 @@ class MdxEngine:
         """
         return self.tables_loaded.keys()
 
+    def hierarchize_tuples(self):
+        """
+        check if hierarchized mdx query
+        :return: True | False
+        """
+        return 'Hierarchize' in self.mdx_query
+
+
+
     def load_tables(self):
         """
         Load all tables { Table name : DataFrame } of the current cube instance.
@@ -327,6 +336,10 @@ class MdxEngine:
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
         """
+
+        # Hierarchize -> ON COLUMNS , ON ROWS ...
+        # without Hierarchize -> ON 0
+
         tuples_on_mdx_query = self.get_tuples(query)
         on_rows = []
         on_columns = []
@@ -407,6 +420,7 @@ class MdxEngine:
             }
         """
         axes = {}
+
         # TODO optimize
         for axis, tuples in tuple_as_list.items():
             measures = []
@@ -422,23 +436,10 @@ class MdxEngine:
                     else:
                         continue
                 else:
-
-                    if 'Hierarchize' not in self.mdx_query:
-                        tables_columns.update({
-                            tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
-                        })
-                    else:
-                        tables_columns.update({
-                            tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
-                        })
-
-                    # else:
-                    #     tables_columns.update({
-                    #         tupl[0]:
-                    #             self.tables_loaded[tupl[0]].columns[:len(tupl[2:-1])]
-                    #     })
+                    tables_columns.update({
+                        tupl[0]:
+                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:None if self.hierarchize_tuples() else 1])]
+                    })
 
             axes.update({axis: tables_columns})
         return axes
@@ -630,17 +631,16 @@ class MdxEngine:
 
         :return: updated columns_to_keep
         """
+
+        columns = 2 if self.hierarchize_tuples() else 3
+
         if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
                 tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
-            if 'Hierarchize' in self.mdx_query:
-                cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                    tuple_as_list[2:])]
-            else:
-                cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                    tuple_as_list[3:])]
+            cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
+                tuple_as_list[columns:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
