@@ -438,7 +438,7 @@ class MdxEngine:
                 else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:None if self.hierarchize_tuples() else 1])]
+                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:None if self.hierarchize_tuples() else -1])]
                     })
 
             axes.update({axis: tables_columns})
@@ -446,7 +446,7 @@ class MdxEngine:
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
         """
-        Filter a DataFrame (Dataframe_in) with one tuple.   
+        Filter a DataFrame (Dataframe_in) with one tuple.
 
             Example ::
 
@@ -476,7 +476,7 @@ class MdxEngine:
 
         :param tuple_as_list: tuple as list
         :param Dataframe_in: DataFrame in with you want to execute tuple
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx) 
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
             other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
@@ -614,7 +614,7 @@ class MdxEngine:
         we need columns_to_keep for grouping our columns in the DataFrame
 
         :param tuple_as_list:  example : ['Geography','Geography','Continent']
-        :param columns_to_keep:  
+        :param columns_to_keep:
 
             example :
 
@@ -624,7 +624,7 @@ class MdxEngine:
 
                     ['Continent','Country'],
 
-                'Time': 
+                'Time':
 
                     ['Year','Month','Day']
                 }
@@ -633,14 +633,17 @@ class MdxEngine:
         """
 
         columns = 2 if self.hierarchize_tuples() else 3
-
         if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
                 tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
+            # if 'Hierarchize' in self.mdx_query:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
                 tuple_as_list[columns:])]
+            # else:
+            #     cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
+            #         tuple_as_list[3:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
