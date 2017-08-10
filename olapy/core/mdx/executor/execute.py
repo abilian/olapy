@@ -396,10 +396,13 @@ class MdxEngine:
 
         :return: measures column's names
         """
-        return list({
-            tple[-1]
-            for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
-        })
+
+        list_measures = []
+        for tple in tuples_on_mdx:
+            if tple[0].upper() == "MEASURES" and tple[-1] not in list_measures:
+                list_measures.append(tple[-1])
+
+        return  list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
         # TODO update docstring
