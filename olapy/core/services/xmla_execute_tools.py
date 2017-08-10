@@ -757,7 +757,9 @@ class XmlaExecuteTools():
                         xml.DisplayInfo(
                             name="[Measures].[DISPLAY_INFO]",
                             **{'type': 'xs:unsignedInt'})
-                        if 'Hierarchize' in self.executer.mdx_query:
+
+                        # todo hieararchize
+                        if 'ON COLUMNS' in self.executer.mdx_query:
                             xml.PARENT_UNIQUE_NAME(
                                 name="[Measures].[PARENT_UNIQUE_NAME]",
                                 **{'type': 'xs:string'})
