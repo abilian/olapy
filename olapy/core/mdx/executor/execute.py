@@ -238,7 +238,6 @@ class MdxEngine:
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    # TODO one config file (I will try to merge dimensions between them in web part)
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(self,
                                                                         cubes)
@@ -361,7 +360,6 @@ class MdxEngine:
                 stop = 'ON COLUMNS'
                 on_columns = self.get_tuples(query, start, stop)
 
-            # todo Hierarchize
             # ON COLUMNS (AS 0)
             if 'ON 0' in query:
                 start = 'SELECT'
@@ -417,7 +415,7 @@ class MdxEngine:
 
             example :
             {
-            Geography : ['Continent','Country'],
+            Geography : ['Continent','Country'],²
             Product : ['Company']
             Facts :  ['Amount','Count']
             }
@@ -680,13 +678,6 @@ class MdxEngine:
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
 
-
-        # if we have measures on axes we have to ignore them
-        # if 'Hierarchize' in self.mdx_query:
-        #     end = None
-        # else:
-        #     end = -1
-
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
@@ -727,24 +718,6 @@ class MdxEngine:
                 df_to_fusion.append(
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
-
-            # todo TEMP !! delete change ASAP (just to testconvert2formulas !!!!
-
-            # if 'Hierarchize' not in self.mdx_query:
-            #     for table, columns in columns_to_keep.items():
-            #         # if you ask for last column , you get it , not the previous one
-            #         # example ; when not Hierarchize , if you ask for day column you get day column , not month because
-            #         # this is the last column in the table
-            #         if len(self.tables_loaded[table].columns) != len(columns):
-            #             columns_to_keep[table] = list(columns)[:-1]
-            #     for axis, table_columns in tables_n_columns.items():
-            #         for table, columns in table_columns.items():
-            #             if table != 'Facts':
-            #                 if len(self.tables_loaded[table].columns) != len(
-            #                         columns):
-            #                     table_columns[table] = list(columns)[:-1]
-            #                 # table_columns[table] = list(columns)[:-1]
-            #         tables_n_columns[axis] = table_columns
 
             cols = list(
                 itertools.chain.from_iterable(columns_to_keep.values()))
