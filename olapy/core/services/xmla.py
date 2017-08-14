@@ -2,8 +2,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-import HTMLParser
-
 import xmlwitch
 import os
 from datetime import datetime
@@ -178,14 +176,15 @@ class XmlaProviderService(ServiceBase):
             xml = xmlwitch.Builder()
             with xml['return']:
                 with xml.root(
-                        execute_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-                    with xml.OlapInfo(xmla_tools.generate_cell_info()):
+                    xml.write(execute_xsd)
+                    with xml.OlapInfo:
+                        xml.write(xmla_tools.generate_cell_info())
                         with xml.CubeInfo:
                             with xml.Cube:
                                 xml.CubeName('Sales')
@@ -200,20 +199,18 @@ class XmlaProviderService(ServiceBase):
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
 
-                        xml.AxesInfo(
-                            xmla_tools.generate_axes_info(df),
-                            xmla_tools.generate_axes_info_slicer(df))
+                        with xml.AxesInfo:
+                            xml.write(xmla_tools.generate_axes_info(df))
+                            xml.write(xmla_tools.generate_axes_info_slicer(df))
 
-                    xml.Axes(
-                        xmla_tools.generate_xs0(df),
-                        xmla_tools.generate_slicer_axis(df))
+                    with xml.Axes:
+                        xml.write(xmla_tools.generate_xs0(df))
+                        xml.write(xmla_tools.generate_slicer_axis(df))
 
-                    xml.CellData(xmla_tools.generate_cell_data(df))
+                    with xml.CellData:
+                        xml.write(xmla_tools.generate_cell_data(df))
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml)).replace('&', '&amp;')
-
-            return xml
+            return str(xml)
 
 
 application = Application(
