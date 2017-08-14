@@ -660,19 +660,14 @@ class XmlaExecuteTools():
                 for dim_diff in slicer_list:
                     to_write = "[{0}].[{0}]".format(dim_diff)
                     if dim_diff == 'Measures':
+
                         # if measures > 1 we don't have to write measure
-
                         if self.executer.facts in self.mdx_execution_result[
-                                'columns_desc']['all'] and len(
-                                    self.mdx_execution_result['columns_desc'][
-                                        'all'][self.executer.facts]) > 1:
-                            continue
-
-                        # todo Hierarchize delete/change ASAP and cleeeannn
-                        elif self.executer.facts in self.mdx_execution_result[
-                            'columns_desc']['all'] and 'Hierarchize' not in self.executer.mdx_query and not \
-                                self.mdx_execution_result[
-                                    'columns_desc']['where']:
+                            'columns_desc']['all'] and (len(
+                            self.mdx_execution_result['columns_desc'][
+                                'all'][self.executer.facts]) > 1) or (
+                                'ON 0' in self.executer.mdx_query and not self.mdx_execution_result[
+                            'columns_desc']['where']):
                             continue
 
                         else:
