@@ -453,9 +453,9 @@ class XmlaExecuteTools():
             return self._generate_axes_convert2formulas()
 
         dfs = self.split_dataframe()
-        if self.mdx_execution_result['columns_desc'][
-                'rows'] and self.mdx_execution_result['columns_desc'][
-                    'columns']:
+        columns_desc = self.mdx_execution_result['columns_desc']
+
+        if columns_desc['rows'] and columns_desc['columns']:
             return """
             {0}
             {1}
@@ -467,9 +467,7 @@ class XmlaExecuteTools():
 
         # todo   Hierarchize to delete/ change ASAP
         # only one measure selected
-        elif not self.mdx_execution_result['columns_desc'][
-                'rows'] and not self.mdx_execution_result['columns_desc']['columns'] and\
-                self.mdx_execution_result['columns_desc']['where']:
+        elif not columns_desc['rows'] and not columns_desc['columns'] and columns_desc['where']:
             return """
             {0}
             """.format(
@@ -813,12 +811,6 @@ class XmlaExecuteTools():
                         xml.DisplayInfo(
                             name="[Measures].[DISPLAY_INFO]",
                             **{'type': 'xs:unsignedInt'})
-                        # xml.PARENT_UNIQUE_NAME(
-                        #     name="[Measures].[PARENT_UNIQUE_NAME]",
-                        #     **{'type': 'xs:string'})
-                        # xml.HIERARCHY_UNIQUE_NAME(
-                        #     name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                        #     **{'type': 'xs:string'})
 
         return str(xml)
 
