@@ -326,7 +326,8 @@ class ConfigParser:
                     for cube in tree.xpath('/cubes/cube')
                 }
             except:
-                raise ('missed name or source tags')
+                print('missed name or source tags')
+                raise ValueError
 
     def _construct_cubes_excel(self):
         try:
@@ -377,7 +378,8 @@ class ConfigParser:
                 for xml_cube in tree.xpath('/cubes/cube')
             ]
         except:
-            raise ('Bad configuration in the configuration file')
+            print('Bad configuration in the configuration file')
+            raise
 
     def construct_cubes(self, client_type='excel'):
         """
@@ -393,7 +395,8 @@ class ConfigParser:
                 return self._construct_cubes_web()
 
         else:
-            raise ("Config file don't exist")
+            print("Config file don't exist")
+            raise
 
     def _construct_cubes_web(self):
 
