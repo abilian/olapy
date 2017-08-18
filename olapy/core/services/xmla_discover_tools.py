@@ -4,7 +4,15 @@ from __future__ import absolute_import, division, print_function
 
 import uuid
 import xmlwitch
-import HTMLParser
+
+
+# todo don"t use HTMLParser at all
+try :
+    import HTMLParser
+except:
+    # python 3
+    import html.parser as HTMLParser
+
 
 import os
 
@@ -974,11 +982,11 @@ class XmlaDiscoverTools():
 
                             # french caracteres
                             # TODO encode dataframe
-                            if type(df.iloc[0][0]) == unicode:
-                                column_attribut = df.iloc[0][0].encode(
-                                    'utf-8', 'replace')
-                            else:
-                                column_attribut = df.iloc[0][0]
+                            # if type(df.iloc[0][0]) == unicode:
+                            #     column_attribut = df.iloc[0][0].encode(
+                            #         'utf-8', 'replace')
+                            # else:
+                            column_attribut = df.iloc[0][0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)
