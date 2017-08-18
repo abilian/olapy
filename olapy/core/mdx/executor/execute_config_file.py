@@ -96,7 +96,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     return fusion
 
 
-def _get_columns_n_tables(tables_cubes_obj,connector):
+def _get_columns_n_tables(tables_cubes_obj, connector):
 
     all_columns = []
     tables = {}
@@ -126,7 +126,7 @@ def _get_columns_n_tables(tables_cubes_obj,connector):
         all_columns += list(tab.columns)
         tables.update({table.name: tab})
 
-    return all_columns,tables
+    return all_columns, tables
 
 
 # web client
@@ -148,7 +148,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     fusion = psql.read_sql_query(
         "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
 
-    all_columns,tables = _get_columns_n_tables(cubes_obj.tables,db.engine)
+    all_columns, tables = _get_columns_n_tables(cubes_obj.tables, db.engine)
 
     # load facts table columns
     if cubes_obj.facts[0].columns:
