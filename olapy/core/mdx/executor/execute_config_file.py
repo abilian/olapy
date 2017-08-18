@@ -96,34 +96,15 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     return fusion
 
 
-# web client
-def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
-    """
-    Construct star schema DataFrame from configuration file for web client.
+def _get_columns_n_tables(tables_cubes_obj,connector):
 
-    :param cube_name:  cube name (or database name)
-    :param cubes_obj: cubes object
-    :return: star schema DataFrame
-    """
     all_columns = []
-
-    executer_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(
-        db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube)
-    # load facts table
-
-    if cubes_obj.facts[0].columns:
-        all_columns += cubes_obj.facts[0].columns
-
-    fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
-
     tables = {}
-    for table in cubes_obj.tables:
+
+    for table in tables_cubes_obj:
 
         tab = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                  db.engine)
+                                  connector)
 
         # todo verify this
         try:
@@ -144,6 +125,34 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
 
         all_columns += list(tab.columns)
         tables.update({table.name: tab})
+
+    return all_columns,tables
+
+
+# web client
+def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
+    """
+    Construct star schema DataFrame from configuration file for web client.
+
+    :param cube_name:  cube name (or database name)
+    :param cubes_obj: cubes object
+    :return: star schema DataFrame
+    """
+
+    executer_instance.facts = cubes_obj.facts[0].table_name
+    db = MyDB(
+        db_config_file_path=os.path.dirname(executer_instance.cube_path),
+        db=executer_instance.cube)
+
+    # load facts table
+    fusion = psql.read_sql_query(
+        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
+
+    all_columns,tables = _get_columns_n_tables(cubes_obj.tables,db.engine)
+
+    # load facts table columns
+    if cubes_obj.facts[0].columns:
+        all_columns += cubes_obj.facts[0].columns
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
