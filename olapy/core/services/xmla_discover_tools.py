@@ -11,7 +11,7 @@ try :
     import HTMLParser
 except:
     # python 3
-    import html.parser as HTMLParser
+    from html.parser import HTMLParser
 
 
 import os
