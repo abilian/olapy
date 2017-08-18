@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 import numpy as np
 import xmlwitch
+from six.moves import zip
 
 
 class XmlaExecuteTools():
