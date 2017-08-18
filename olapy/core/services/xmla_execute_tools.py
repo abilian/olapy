@@ -165,7 +165,8 @@ class XmlaExecuteTools():
 
                                 # french caracteres
                                 # TODO encode dataframe
-                                if type(tuple_without_minus_1[-1]) == unicode:
+                                # if type(tuple_without_minus_1[-1]) == unicode:
+                                if not isinstance(tuple_without_minus_1[-1] , str):
                                     tuple_without_minus_1 = [
                                         x.encode('utf-8', 'replace')
                                         for x in tuple_without_minus_1
@@ -270,7 +271,6 @@ class XmlaExecuteTools():
         :return: xs0 xml as string
         """
         # TODO must be OPTIMIZED every time!!!!!
-
         dfs = self.split_dataframe(mdx_execution_result)
         if mdx_execution_result['columns_desc'][
                 'rows'] and mdx_execution_result['columns_desc']['columns']:
@@ -614,10 +614,13 @@ class XmlaExecuteTools():
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
 
+
                             # TODO encode dataframe
                             # french caracteres
-                            if type(self.executer.tables_loaded[dim_diff].iloc[
-                                    0][0]) == unicode:
+                            # if type(self.executer.tables_loaded[dim_diff].iloc[
+                            #         0][0]) == unicode:
+                            if not isinstance(self.executer.tables_loaded[dim_diff].iloc[
+                                    0][0], str):
                                 column_attribut = self.executer.tables_loaded[
                                     dim_diff].iloc[0][0].encode('utf-8',
                                                                 'replace')
