@@ -614,7 +614,6 @@ class XmlaExecuteTools():
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
 
-
                             # TODO encode dataframe
                             # french caracteres
                             # if type(self.executer.tables_loaded[dim_diff].iloc[

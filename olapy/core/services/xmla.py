@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function
 import HTMLParser
 import sys
 
-
 import xmlwitch
 import os
 from datetime import datetime
