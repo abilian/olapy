@@ -78,20 +78,10 @@ class XmlaExecuteTools():
 
         return tuple
 
-    def generate_xs0_one_axis(self,
-                              mdx_execution_result,
-                              splited_df,
-                              mdx_query_axis='all',
-                              axis="Axis0"):
-        """
-        
-        :param mdx_execution_result:
-        :param splited_df:
-        :return:
-        """
+    def _generate_tuples_xs0(self,mdx_execution_result,splited_df,mdx_query_axis):
 
-        xml = xmlwitch.Builder()
-        # only measure selected
+        first_att = None
+
         if mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
                 self.executer.facts
         ]:
@@ -130,6 +120,25 @@ class XmlaExecuteTools():
             ]
             first_att = 3
 
+        return tuples,first_att
+
+    def generate_xs0_one_axis(self,
+                              mdx_execution_result,
+                              splited_df,
+                              mdx_query_axis='all',
+                              axis="Axis0"):
+        """
+        
+        :param mdx_execution_result:
+        :param splited_df:
+        :return:
+        """
+
+        xml = xmlwitch.Builder()
+
+        tuples, first_att = self._generate_tuples_xs0(mdx_execution_result,
+                                                  splited_df,
+                                                  mdx_query_axis)
         if tuples:
             with xml.Axis(name=axis):
                 with xml.Tuples:
