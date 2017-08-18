@@ -78,68 +78,69 @@ class XmlaDiscoverTools():
 
         return xml
 
-    def discover_properties_response(self, request):
-        def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
-                      PropertyAccessType, IsRequired, Value):
+    @staticmethod
+    def _get_props(xsd, PropertyName, PropertyDescription, PropertyType,
+                   PropertyAccessType, IsRequired, Value):
 
-            xml = xmlwitch.Builder()
+        xml = xmlwitch.Builder()
 
-            if PropertyName is not '':
-                with xml['return']:
-                    with xml.root(
-                            xsd,
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
+        if PropertyName is not '':
+            with xml['return']:
+                with xml.root(
+                        xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd':
                                 'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
+                            'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
-                            }):
+                        }):
+                    with xml.row:
+                        xml.PropertyName(PropertyName)
+                        xml.PropertyDescription(PropertyDescription)
+                        xml.PropertyType(PropertyType)
+                        xml.PropertyAccessType(PropertyAccessType)
+                        xml.IsRequired(IsRequired)
+                        xml.Value(Value)
 
+        else:
+            properties_names_n_description = [
+                'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+                'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+            ]
+            properties_types = ['string', 'string', 'int', 'int', 'int']
+            values = [
+                os.getenv('USERNAME', 'default'),
+                '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+            ]
+
+            with xml['return']:
+                with xml.root(
+                        xsd,
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                                'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    for idx, prop_desc in enumerate(
+                            properties_names_n_description):
                         with xml.row:
-                            xml.PropertyName(PropertyName)
-                            xml.PropertyDescription(PropertyDescription)
-                            xml.PropertyType(PropertyType)
-                            xml.PropertyAccessType(PropertyAccessType)
-                            xml.IsRequired(IsRequired)
-                            xml.Value(Value)
+                            xml.PropertyName(prop_desc)
+                            xml.PropertyDescription(prop_desc)
+                            xml.PropertyType(properties_types[idx])
+                            xml.PropertyAccessType('Read')
+                            xml.IsRequired('false')
+                            xml.Value(values[idx])
 
-            else:
-                properties_names_n_description = [
-                    'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
-                    'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
-                ]
-                properties_types = ['string', 'string', 'int', 'int', 'int']
-                values = [
-                    os.getenv('USERNAME', 'default'),
-                    '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
-                ]
+        # escape gt; lt; (from xsd)
+        html_parser = HTMLParser.HTMLParser()
+        xml = html_parser.unescape(str(xml))
 
-                with xml['return']:
-                    with xml.root(
-                            xsd,
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
-                            }):
-                        for idx, prop_desc in enumerate(
-                                properties_names_n_description):
-                            with xml.row:
-                                xml.PropertyName(prop_desc)
-                                xml.PropertyDescription(prop_desc)
-                                xml.PropertyType(properties_types[idx])
-                                xml.PropertyAccessType('Read')
-                                xml.IsRequired('false')
-                                xml.Value(values[idx])
+        return xml
 
-            # escape gt; lt; (from xsd)
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+    def discover_properties_response(self, request):
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -147,55 +148,41 @@ class XmlaDiscoverTools():
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"
-            return get_props(discover_preperties_xsd, 'Catalog', 'Catalog',
+
+            return self._get_props(discover_preperties_xsd, 'Catalog', 'Catalog',
                              'string', 'ReadWrite', 'false', value)
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ServerName':
-            return get_props(discover_preperties_xsd, 'ServerName',
+            return self._get_props(discover_preperties_xsd, 'ServerName',
                              'ServerName', 'string', 'Read', 'false', 'Mouadh')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ProviderVersion':
-            return get_props(discover_preperties_xsd, 'ProviderVersion',
+            return self._get_props(discover_preperties_xsd, 'ProviderVersion',
                              'ProviderVersion', 'string', 'Read', 'false',
                              '0.02  08-Mar-2016 08:41:28 GMT')
 
-        elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+        elif (request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries'):
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd,
+            return self._get_props(discover_preperties_xsd,
                                  'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
                                  'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(
-                    discover_preperties_xsd, 'MdpropMdxDrillFunctions',
-                    'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(
+            return self._get_props(
                     discover_preperties_xsd, 'MdpropMdxDrillFunctions',
                     'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxNamedSets':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
+            return self._get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
                                  'MdpropMdxNamedSets', 'int', 'Read', 'false',
                                  '15')
 
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
-                                 'MdpropMdxNamedSets', 'int', 'Read', 'false',
-                                 '15')
-
-        return get_props(discover_preperties_xsd, '', '', '', '', '', '')
+        return self._get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
     def discover_schema_rowsets_response(self, request):
 
