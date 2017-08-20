@@ -25,13 +25,13 @@ class MyDB(object):
             #                              format(username, password, host))
             self.engine = create_engine(
                 'postgresql+psycopg2://{0}:{1}@{3}:{4}/{2}'.format(
-                    username, password, 'postgres', host, port))
+                    username, password, 'postgres', host, port),encoding='utf-8')
 
         else:
             # and then we connect to the user db
             self.engine = create_engine(
                 'postgresql+psycopg2://{0}:{1}@{3}:{4}/{2}'.format(
-                    username, password, db, host, port))
+                    username, password, db, host, port),encoding='utf-8')
             # self.connection = pg.connect(
             #     "user={0} password={1} dbname='{2}' host='{3}'".format(
             #         username, password, db, host))
