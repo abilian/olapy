@@ -82,58 +82,57 @@ class XmlaDiscoverTools():
 
         xml = xmlwitch.Builder()
 
+        if PropertyName is not '':
+            with xml['return']:
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd':
+                            'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(xsd)
+                    with xml.row:
+                        xml.PropertyName(PropertyName)
+                        xml.PropertyDescription(PropertyDescription)
+                        xml.PropertyType(PropertyType)
+                        xml.PropertyAccessType(PropertyAccessType)
+                        xml.IsRequired(IsRequired)
+                        xml.Value(Value)
 
-            if PropertyName is not '':
-                with xml['return']:
-                    with xml.root(
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
-                            }):
-                        xml.write(xsd)
+        else:
+            properties_names_n_description = [
+              'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+              'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+            ]
+            properties_types = ['string', 'string', 'int', 'int', 'int']
+            values = [
+              os.getenv('USERNAME', 'default'),
+              '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+            ]
+
+            with xml['return']:
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd':
+                            'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(xsd)
+                    for idx, prop_desc in enumerate(
+                            properties_names_n_description):
                         with xml.row:
-                            xml.PropertyName(PropertyName)
-                            xml.PropertyDescription(PropertyDescription)
-                            xml.PropertyType(PropertyType)
-                            xml.PropertyAccessType(PropertyAccessType)
-                            xml.IsRequired(IsRequired)
-                            xml.Value(Value)
+                            xml.PropertyName(prop_desc)
+                            xml.PropertyDescription(prop_desc)
+                            xml.PropertyType(properties_types[idx])
+                            xml.PropertyAccessType('Read')
+                            xml.IsRequired('false')
+                            xml.Value(values[idx])
 
-          else:
-              properties_names_n_description = [
-                  'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
-                  'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
-              ]
-              properties_types = ['string', 'string', 'int', 'int', 'int']
-              values = [
-                  os.getenv('USERNAME', 'default'),
-                  '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
-              ]
-
-                with xml['return']:
-                    with xml.root(
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance'
-                            }):
-                        xml.write(xsd)
-                        for idx, prop_desc in enumerate(
-                                properties_names_n_description):
-                            with xml.row:
-                                xml.PropertyName(prop_desc)
-                                xml.PropertyDescription(prop_desc)
-                                xml.PropertyType(properties_types[idx])
-                                xml.PropertyAccessType('Read')
-                                xml.IsRequired('false')
-                                xml.Value(values[idx])
-
-            return str(xml)
+        return str(xml)
 
     def discover_properties_response(self, request):
 
