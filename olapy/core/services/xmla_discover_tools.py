@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, print_function
 
 import uuid
 import xmlwitch
-
 import os
 
 from ..mdx.executor.execute import MdxEngine
@@ -77,11 +76,12 @@ class XmlaDiscoverTools():
 
         return str(xml)
 
-    def discover_properties_response(self, request):
-        def get_props(xsd, PropertyName, PropertyDescription, PropertyType,
-                      PropertyAccessType, IsRequired, Value):
+    @staticmethod
+    def _get_props(xsd, PropertyName, PropertyDescription, PropertyType,
+                   PropertyAccessType, IsRequired, Value):
 
-            xml = xmlwitch.Builder()
+        xml = xmlwitch.Builder()
+
 
             if PropertyName is not '':
                 with xml['return']:
@@ -102,16 +102,16 @@ class XmlaDiscoverTools():
                             xml.IsRequired(IsRequired)
                             xml.Value(Value)
 
-            else:
-                properties_names_n_description = [
-                    'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
-                    'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
-                ]
-                properties_types = ['string', 'string', 'int', 'int', 'int']
-                values = [
-                    os.getenv('USERNAME', 'default'),
-                    '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
-                ]
+          else:
+              properties_names_n_description = [
+                  'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+                  'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+              ]
+              properties_types = ['string', 'string', 'int', 'int', 'int']
+              values = [
+                  os.getenv('USERNAME', 'default'),
+                  '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+              ]
 
                 with xml['return']:
                     with xml.root(
@@ -135,61 +135,53 @@ class XmlaDiscoverTools():
 
             return str(xml)
 
+    def discover_properties_response(self, request):
+
+
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"
-            return get_props(discover_preperties_xsd, 'Catalog', 'Catalog',
-                             'string', 'ReadWrite', 'false', value)
+
+            return self._get_props(discover_preperties_xsd, 'Catalog',
+                                   'Catalog', 'string', 'ReadWrite', 'false',
+                                   value)
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ServerName':
-            return get_props(discover_preperties_xsd, 'ServerName',
-                             'ServerName', 'string', 'Read', 'false', 'Mouadh')
+            return self._get_props(discover_preperties_xsd, 'ServerName',
+                                   'ServerName', 'string', 'Read', 'false',
+                                   'Mouadh')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ProviderVersion':
-            return get_props(discover_preperties_xsd, 'ProviderVersion',
-                             'ProviderVersion', 'string', 'Read', 'false',
-                             '0.02  08-Mar-2016 08:41:28 GMT')
+            return self._get_props(discover_preperties_xsd, 'ProviderVersion',
+                                   'ProviderVersion', 'string', 'Read',
+                                   'false', '0.02  08-Mar-2016 08:41:28 GMT')
 
-        elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxSubqueries':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+        elif (request.Restrictions.RestrictionList.PropertyName ==
+              'MdpropMdxSubqueries'):
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd,
-                                 'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
-                                 'int', 'Read', 'false', '15')
+            return self._get_props(
+                discover_preperties_xsd, 'MdpropMdxSubqueries',
+                'MdpropMdxSubqueries', 'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(
-                    discover_preperties_xsd, 'MdpropMdxDrillFunctions',
-                    'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(
-                    discover_preperties_xsd, 'MdpropMdxDrillFunctions',
-                    'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
+            return self._get_props(
+                discover_preperties_xsd, 'MdpropMdxDrillFunctions',
+                'MdpropMdxDrillFunctions', 'int', 'Read', 'false', '3')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxNamedSets':
-            if 'Unspecified' in request.Properties.PropertyList.Catalog:
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
-                                 'MdpropMdxNamedSets', 'int', 'Read', 'false',
-                                 '15')
+            return self._get_props(discover_preperties_xsd,
+                                   'MdpropMdxNamedSets', 'MdpropMdxNamedSets',
+                                   'int', 'Read', 'false', '15')
 
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
-                return get_props(discover_preperties_xsd, 'MdpropMdxNamedSets',
-                                 'MdpropMdxNamedSets', 'int', 'Read', 'false',
-                                 '15')
-
-        return get_props(discover_preperties_xsd, '', '', '', '', '', '')
+        return self._get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
     def discover_schema_rowsets_response(self, request):
 
@@ -951,11 +943,11 @@ class XmlaDiscoverTools():
 
                             # french caracteres
                             # TODO encode dataframe
-                            if type(df.iloc[0][0]) == unicode:
-                                column_attribut = df.iloc[0][0].encode(
-                                    'utf-8', 'replace')
-                            else:
-                                column_attribut = df.iloc[0][0]
+                            # if type(df.iloc[0][0]) == unicode:
+                            #     column_attribut = df.iloc[0][0].encode(
+                            #         'utf-8', 'replace')
+                            # else:
+                            column_attribut = df.iloc[0][0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)

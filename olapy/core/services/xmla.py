@@ -206,9 +206,11 @@ class XmlaProviderService(ServiceBase):
                     with xml.Axes:
                         xml.write(xmla_tools.generate_xs0(df))
                         xml.write(xmla_tools.generate_slicer_axis(df))
-
+                        
                     with xml.CellData:
                         xml.write(xmla_tools.generate_cell_data(df))
+
+
 
             return str(xml)
 
@@ -235,6 +237,9 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
     :return: server instance
     """
     import logging
+
+    reload(sys)  # Reload is a hack
+    sys.setdefaultencoding('UTF8')
 
     from wsgiref.simple_server import make_server
 
