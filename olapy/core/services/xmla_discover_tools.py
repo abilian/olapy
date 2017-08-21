@@ -4,16 +4,6 @@ from __future__ import absolute_import, division, print_function
 
 import uuid
 import xmlwitch
-
-
-# todo don"t use HTMLParser at all
-try :
-    import HTMLParser
-except:
-    # python 3
-    from html.parser import HTMLParser
-
-
 import os
 
 from ..mdx.executor.execute import MdxEngine
@@ -66,7 +56,6 @@ class XmlaDiscoverTools():
         xml = xmlwitch.Builder()
         with xml['return']:
             with xml.root(
-                    discover_datasources_xsd,
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:EX':
@@ -75,6 +64,7 @@ class XmlaDiscoverTools():
                         'xmlns:xsi':
                         'http://www.w3.org/2001/XMLSchema-instance'
                     }):
+                xml.write(discover_datasources_xsd)
                 with xml.row:
                     xml.DataSourceName('sales')
                     xml.DataSourceDescription('sales Sample Data')
@@ -84,7 +74,7 @@ class XmlaDiscoverTools():
                     xml.ProviderType('MDP')
                     xml.AuthenticationMode('Unauthenticated')
 
-        return xml
+        return str(xml)
 
     @staticmethod
     def _get_props(xsd, PropertyName, PropertyDescription, PropertyType,
@@ -92,61 +82,61 @@ class XmlaDiscoverTools():
 
         xml = xmlwitch.Builder()
 
-        if PropertyName is not '':
-            with xml['return']:
-                with xml.root(
-                        xsd,
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                        **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance'
-                        }):
-                    with xml.row:
-                        xml.PropertyName(PropertyName)
-                        xml.PropertyDescription(PropertyDescription)
-                        xml.PropertyType(PropertyType)
-                        xml.PropertyAccessType(PropertyAccessType)
-                        xml.IsRequired(IsRequired)
-                        xml.Value(Value)
 
-        else:
-            properties_names_n_description = [
-                'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
-                'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
-            ]
-            properties_types = ['string', 'string', 'int', 'int', 'int']
-            values = [
-                os.getenv('USERNAME', 'default'),
-                '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
-            ]
-
-            with xml['return']:
-                with xml.root(
-                        xsd,
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                        **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance'
-                        }):
-                    for idx, prop_desc in enumerate(
-                            properties_names_n_description):
+            if PropertyName is not '':
+                with xml['return']:
+                    with xml.root(
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            **{
+                                'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsi':
+                                'http://www.w3.org/2001/XMLSchema-instance'
+                            }):
+                        xml.write(xsd)
                         with xml.row:
-                            xml.PropertyName(prop_desc)
-                            xml.PropertyDescription(prop_desc)
-                            xml.PropertyType(properties_types[idx])
-                            xml.PropertyAccessType('Read')
-                            xml.IsRequired('false')
-                            xml.Value(values[idx])
+                            xml.PropertyName(PropertyName)
+                            xml.PropertyDescription(PropertyDescription)
+                            xml.PropertyType(PropertyType)
+                            xml.PropertyAccessType(PropertyAccessType)
+                            xml.IsRequired(IsRequired)
+                            xml.Value(Value)
 
-        # escape gt; lt; (from xsd)
-        html_parser = HTMLParser.HTMLParser()
-        xml = html_parser.unescape(str(xml))
+          else:
+              properties_names_n_description = [
+                  'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+                  'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+              ]
+              properties_types = ['string', 'string', 'int', 'int', 'int']
+              values = [
+                  os.getenv('USERNAME', 'default'),
+                  '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+              ]
 
-        return xml
+                with xml['return']:
+                    with xml.root(
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            **{
+                                'xmlns:xsd':
+                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsi':
+                                'http://www.w3.org/2001/XMLSchema-instance'
+                            }):
+                        xml.write(xsd)
+                        for idx, prop_desc in enumerate(
+                                properties_names_n_description):
+                            with xml.row:
+                                xml.PropertyName(prop_desc)
+                                xml.PropertyDescription(prop_desc)
+                                xml.PropertyType(properties_types[idx])
+                                xml.PropertyAccessType('Read')
+                                xml.IsRequired('false')
+                                xml.Value(values[idx])
+
+            return str(xml)
 
     def discover_properties_response(self, request):
+
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -472,14 +462,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        discover_schema_rowsets_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-
+                    xml.write(discover_schema_rowsets_xsd)
                     for resp_row in rows:
                         with xml.row:
                             xml.SchemaName(resp_row['SchemaName'])
@@ -493,10 +482,7 @@ class XmlaDiscoverTools():
 
                             xml.RestrictionsMask(resp_row['RestrictionsMask'])
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+            return str(xml)
 
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
                         request.Properties.PropertyList.Catalog is not None:
@@ -719,23 +705,19 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        discover_literals_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-
+                    xml.write(discover_literals_xsd)
                     for resp_row in rows:
                         with xml.row:
                             for att_name, value in resp_row.items():
                                 xml[att_name](value)
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+            return str(xml)
 
     def discover_mdschema_sets_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
@@ -745,19 +727,16 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(
-                    mdschema_sets_xsd,
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
-                    })
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(mdschema_sets_xsd)
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+            return str(xml)
 
     def discover_mdschema_kpis_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
@@ -767,40 +746,33 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(
-                    mdschema_kpis_xsd,
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
-                    })
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(mdschema_kpis_xsd)
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+            return str(xml)
 
     def discover_dbschema_catalogs_response(self, request):
         xml = xmlwitch.Builder()
         with xml['return']:
             with xml.root(
-                    dbschema_catalogs_xsd,
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                         'xmlns:xsi':
                         'http://www.w3.org/2001/XMLSchema-instance'
                     }):
-
+                xml.write(dbschema_catalogs_xsd)
                 for catalogue in self.catalogues:
                     with xml.row:
                         xml.CATALOG_NAME(catalogue)
 
-        html_parser = HTMLParser.HTMLParser()
-        xml = html_parser.unescape(str(xml))
-
-        return xml
+        return str(xml)
 
     def discover_mdschema_cubes_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
@@ -810,13 +782,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_cubes_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_cubes_xsd)
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
@@ -832,9 +804,7 @@ class XmlaDiscoverTools():
                         xml.CUBE_CAPTION(self.selected_catalogue)
                         xml.CUBE_SOURCE('1')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_dbschema_tables_response(self, request):
         if request.Properties.PropertyList.Catalog is not None:
@@ -842,19 +812,16 @@ class XmlaDiscoverTools():
 
             xml = xmlwitch.Builder()
             with xml['return']:
-                xml.root(
-                    dbschema_tables_xsd,
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
-                    })
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(dbschema_tables_xsd)
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-
-            return xml
+            return str(xml)
 
     def discover_mdschema_measures__response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
@@ -867,13 +834,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_measures_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_measures_xsd)
                     for mes in self.executer.measures:
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
@@ -890,9 +857,7 @@ class XmlaDiscoverTools():
                             xml.MEASURE_UNQUALIFIED_CAPTION(mes)
                             xml.MEASUREGROUP_NAME('default')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_dimensions_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and\
@@ -905,14 +870,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_dimensions_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
-
+                    xml.write(mdschema_dimensions_xsd)
                     for tables in self.executer.get_all_tables_names(
                             ignore_fact=True):
                         with xml.row:
@@ -948,9 +912,7 @@ class XmlaDiscoverTools():
                         xml.DIMENSION_UNIQUE_SETTINGS('1')
                         xml.DIMENSION_IS_VISIBLE('true')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_hierarchies_response(self, request):
 
@@ -966,7 +928,6 @@ class XmlaDiscoverTools():
 
                 with xml['return']:
                     with xml.root(
-                            mdschema_hierarchies_xsd,
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
                                 'xmlns:xsd':
@@ -974,7 +935,7 @@ class XmlaDiscoverTools():
                                 'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
                             }):
-
+                        xml.write(mdschema_hierarchies_xsd)
                         for table_name, df in self.executer.tables_loaded.items(
                         ):
                             if table_name == self.executer.facts:
@@ -1036,9 +997,7 @@ class XmlaDiscoverTools():
                             xml.HIERARCHY_ORIGIN('1')
                             xml.INSTANCE_SELECTION('0')
 
-                html_parser = HTMLParser.HTMLParser()
-                xml = html_parser.unescape(str(xml))
-                return xml
+                return str(xml)
 
     def discover_mdschema_levels__response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
@@ -1052,7 +1011,6 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_levels_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
@@ -1060,6 +1018,7 @@ class XmlaDiscoverTools():
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
 
+                    xml.write(mdschema_levels_xsd)
                     for tables in self.executer.get_all_tables_names(
                             ignore_fact=True):
                         l_nb = 0
@@ -1104,9 +1063,7 @@ class XmlaDiscoverTools():
                         xml.LEVEL_KEY_CARDINALITY('1')
                         xml.LEVEL_ORIGIN('2')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_measuresgroups_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
@@ -1118,13 +1075,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_measuresgroups_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_measuresgroups_xsd)
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
@@ -1133,9 +1090,7 @@ class XmlaDiscoverTools():
                         xml.IS_WRITE_ENABLED('true')
                         xml.MEASUREGROUP_CAPTION('default')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_measuresgroups_dimensions_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
@@ -1147,13 +1102,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_measuresgroups_dimensions_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_measuresgroups_dimensions_xsd)
                     for tables in self.executer.get_all_tables_names(
                             ignore_fact=True):
                         with xml.row:
@@ -1168,9 +1123,7 @@ class XmlaDiscoverTools():
                             xml.DIMENSION_GRANULARITY(
                                 '[{0}].[{0}]'.format(tables))
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_properties_response(self, request):
         xml = xmlwitch.Builder()
@@ -1197,13 +1150,13 @@ class XmlaDiscoverTools():
 
             with xml['return']:
                 with xml.root(
-                        mdschema_properties_properties_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_properties_properties_xsd)
                     for idx, prop_name in enumerate(properties_names):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
@@ -1212,24 +1165,20 @@ class XmlaDiscoverTools():
                             xml.PROPERTY_CAPTION(properties_captions[idx])
                             xml.DATA_TYPE(properties_datas[idx])
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             with xml['return']:
-                xml.root(
-                    mdschema_properties_properties_xsd,
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
-                    })
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance'
+                        }):
+                    xml.write(mdschema_properties_properties_xsd)
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
 
     def discover_mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
@@ -1250,13 +1199,13 @@ class XmlaDiscoverTools():
             xml = xmlwitch.Builder()
             with xml['return']:
                 with xml.root(
-                        mdschema_members_xsd,
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
+                    xml.write(mdschema_members_xsd)
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
@@ -1279,6 +1228,4 @@ class XmlaDiscoverTools():
                         xml.IS_PLACEHOLDERMEMBER('false')
                         xml.IS_DATAMEMBER('false')
 
-            html_parser = HTMLParser.HTMLParser()
-            xml = html_parser.unescape(str(xml))
-            return xml
+            return str(xml)
