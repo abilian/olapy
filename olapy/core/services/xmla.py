@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 import xmlwitch
 import os
+import sys
 from datetime import datetime
 from os.path import expanduser
 
