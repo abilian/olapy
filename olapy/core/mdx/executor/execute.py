@@ -722,6 +722,7 @@ class MdxEngine:
             cols = list(
                 itertools.chain.from_iterable(columns_to_keep.values()))
 
+
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)
             # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
@@ -733,9 +734,14 @@ class MdxEngine:
             for next_df in df_to_fusion[1:]:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
+
+            if 'Hierarchize' in self.executer.mdx_query:
+                sort = True
+            else:
+                sort = False
             # TODO margins=True for columns total !!!!!
             return {
-                'result': df.groupby(cols).sum()[self.selected_measures],
+                'result': df.groupby(cols,sort=sort).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
             }
 
