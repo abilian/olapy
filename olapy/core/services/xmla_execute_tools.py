@@ -643,7 +643,7 @@ class XmlaExecuteTools():
                         # if we have zero on one only measures used
                         if len(self.executer.selected_measures) <= 1:
                             with xml.Member(
-                                    Hierarchy="[Measures]".format(dim_diff)):
+                                    Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0]))
                                 xml.Caption(

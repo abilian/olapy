@@ -396,7 +396,6 @@ class ConfigParser:
 
         else:
             print("Config file don't exist")
-            raise
 
     def _construct_cubes_web(self):
 
