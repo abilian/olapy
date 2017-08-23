@@ -692,15 +692,16 @@ class MdxEngine:
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
+        if self.hierarchize_tuples():
+            # todo check !!!!!!!!!!
+            tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
+            # todo check also !!!!!!!!!!
+            # some query tuples are not grouped together
+            # todo avoid this every time (slow execution)
+            tuples_on_mdx_query.sort(key=lambda x: x[0])
+
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
-        # todo check !!!!!!!!!!
-        tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
-        # todo check also !!!!!!!!!!
-        # some query tuples are not grouped together
-        # todo avoid this every time (slow execution)
-        tuples_on_mdx_query.sort(key=lambda x: x[0])
-
         if tuples_on_mdx_query:
 
             df_to_fusion = []
