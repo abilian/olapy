@@ -644,6 +644,16 @@ class MdxEngine:
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
+    # todo to check
+    def _uniquefy_tuples(self,tuples):
+        uniquefy = []
+        for tup in tuples:
+            if tup not in uniquefy:
+                uniquefy.append(tup)
+
+        return uniquefy
+
+
     def execute_mdx(self):
         """
         Execute an MDX Query.
@@ -682,9 +692,12 @@ class MdxEngine:
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
-
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
+
+        # todo check !!!!!!!!!!
+        tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
+
         if tuples_on_mdx_query:
 
             df_to_fusion = []
