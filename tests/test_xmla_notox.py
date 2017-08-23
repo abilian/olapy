@@ -20,7 +20,7 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 class Member(object):
     """
-    encapsulating xs0 response attributes 
+    encapsulating xs0 response attributes
     """
 
     def __init__(self, **kwargs):

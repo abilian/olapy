@@ -4,14 +4,17 @@ class Facts:
     def __init__(self, **kwargs):
         """
         :param kwargs: {table_name : 'something',
-                        keys : 
-                            {
-                            column_name : 'something',
-                            ref : 'something'
-                            },
-                        measures : 
-                            { name : 'something' }
-                        }
+            keys :
+                {
+                    column_name : 'something',
+                    ref : 'something'
+                },
+            measures :
+                {
+                    name : 'something'
+                }
+
+            }
 
         """
         self.__dict__.update(kwargs)
@@ -28,9 +31,9 @@ class Dimension:
         :param kwargs: {
                         name : 'something',
                         displayName : 'something',
-                        columns : 
+                        columns :
                             { name : 'something' }
-                        }     
+                        }
         """
         self.__dict__.update(kwargs)
 
@@ -42,7 +45,7 @@ class Cube:
     """Cube class used to encapsulate config file attributes."""
 
     def __init__(self, **kwargs):
-        """   
+        """
         :param kwargs: {
                         name : 'something',
                         source : 'something',
@@ -63,7 +66,7 @@ class Table:
                         table_name      : 'something',
                         old_column_name : 'something',
                         new_column_name : 'something'
-                        }     
+                        }
         """
         self.__dict__.update(kwargs)
 
@@ -80,7 +83,7 @@ class Dashboard:
                         table_name      : 'something',
                         old_column_name : 'something',
                         new_column_name : 'something'
-                        }     
+                        }
         """
         self.__dict__.update(kwargs)
 

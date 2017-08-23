@@ -87,8 +87,7 @@ class XmlaDiscoverTools():
                 with xml.root(
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
-                            'xmlns:xsd':
-                            'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
@@ -103,21 +102,20 @@ class XmlaDiscoverTools():
 
         else:
             properties_names_n_description = [
-              'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
-              'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
+                'ServerName', 'ProviderVersion', 'MdpropMdxSubqueries',
+                'MdpropMdxDrillFunctions', 'MdpropMdxNamedSets'
             ]
             properties_types = ['string', 'string', 'int', 'int', 'int']
             values = [
-              os.getenv('USERNAME', 'default'),
-              '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
+                os.getenv('USERNAME', 'default'),
+                '0.0.3  25-Nov-2016 07:20:28 GMT', '15', '3', '15'
             ]
 
             with xml['return']:
                 with xml.root(
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
-                            'xmlns:xsd':
-                            'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
                             'http://www.w3.org/2001/XMLSchema-instance'
                         }):
@@ -135,7 +133,6 @@ class XmlaDiscoverTools():
         return str(xml)
 
     def discover_properties_response(self, request):
-
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
@@ -483,8 +480,7 @@ class XmlaDiscoverTools():
 
             return str(xml)
 
-        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and \
-                        request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -510,9 +506,7 @@ class XmlaDiscoverTools():
 
             return generate_resp(rows)
 
-
-        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and \
-                        request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -920,8 +914,7 @@ class XmlaDiscoverTools():
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3 or \
-                            request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
+            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3 or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
 
                 xml = xmlwitch.Builder()
 
@@ -1126,8 +1119,7 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_properties_response(self, request):
         xml = xmlwitch.Builder()
-        if request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and \
-            request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and request.Properties.PropertyList.Catalog is not None:
             properties_names = [
                 'FONT_FLAGS', 'LANGUAGE', 'style', 'ACTION_TYPE', 'FONT_SIZE',
                 'FORMAT_STRING', 'className', 'UPDATEABLE', 'BACK_COLOR',

@@ -423,7 +423,7 @@ class MdxEngine:
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
         """
-        Filter a DataFrame (Dataframe_in) with one tuple.   
+        Filter a DataFrame (Dataframe_in) with one tuple.
 
             Example ::
 
@@ -453,8 +453,8 @@ class MdxEngine:
 
         :param tuple_as_list: tuple as list
         :param Dataframe_in: DataFrame in with you want to execute tuple
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx) 
-            other columns to keep in the execution except the current tuple
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
+        other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
         df = Dataframe_in
@@ -591,7 +591,7 @@ class MdxEngine:
         we need columns_to_keep for grouping our columns in the DataFrame
 
         :param tuple_as_list:  example : ['Geography','Geography','Continent']
-        :param columns_to_keep:  
+        :param columns_to_keep:
 
             example :
 
@@ -601,7 +601,7 @@ class MdxEngine:
 
                     ['Continent','Country'],
 
-                'Time': 
+                'Time':
 
                     ['Year','Month','Day']
                 }

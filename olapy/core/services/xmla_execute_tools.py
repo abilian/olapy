@@ -18,30 +18,30 @@ class XmlaExecuteTools():
     def split_dataframe(mdx_execution_result):
         """
         Split DataFrame into multiple ones by dimension.
-        
+
         example::
 
             in :
-    
+
             +-------------+----------+----------+---------+---------+
             | Continent   | Country  | Company  |Article  | Amount  |
             +=============+==========+==========+=========+=========+
             | America     | US       | MS       |Crazy De | 35150   |
             +-------------+----------+----------+---------+---------+
-    
+
             out :
-    
+
             'Geography':
-    
+
                 +-------------+----------+---------+
                 | Continent   | Country  | Amount  |
                 +=============+==========+=========+
                 | America     | US       | 35150   |
                 +-------------+----------+---------+
-    
-    
+
+
             'Product':
-    
+
                 +----------+---------+---------+
                 | Company  |Article  | Amount  |
                 +==========+=========+=========+
@@ -66,7 +66,7 @@ class XmlaExecuteTools():
         example:
 
             in  : ['Geography','Continent','-1']
-    
+
             out : ['Geography','Continent']
 
         :param tuple: tuple as list
@@ -130,7 +130,7 @@ class XmlaExecuteTools():
                               mdx_query_axis='all',
                               axis="Axis0"):
         """
-        
+
         :param mdx_execution_result:
         :param splited_df:
         :return:
@@ -542,7 +542,7 @@ class XmlaExecuteTools():
 
     def generate_axes_info(self, mdx_execution_result):
         """
-        
+
         :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """

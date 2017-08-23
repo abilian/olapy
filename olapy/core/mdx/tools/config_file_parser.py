@@ -23,7 +23,7 @@ class ConfigParser:
 
                 <cubes>
 
-                    <!-- if you want to set an authentication mechanism in excel so to access cube, 
+                    <!-- if you want to set an authentication mechanism in excel so to access cube,
                         user must set a token with login url like 'http://127.0.0.1/admin  -->
 
                     <!-- default password = admin -->
@@ -64,11 +64,11 @@ class ConfigParser:
                                 <name>cout_total_mensuel</name>
                             </measures>
 
-                        </facts>        
+                        </facts>
                         <!-- end building customized star schema -->
 
 
-                        <!-- star building customized dimensions display in excel from the star schema -->             
+                        <!-- star building customized dimensions display in excel from the star schema -->
                         <dimensions>
 
                             <!-- ADD facts table name to the dimensions section like this (this is a little bug to be solved soon) -->
