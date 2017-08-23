@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function
 import xmlwitch
 import os
 import sys
+import logging
+import imp
 from datetime import datetime
 from os.path import expanduser
 
@@ -237,9 +239,9 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
 
     :return: server instance
     """
-    import logging
 
-    reload(sys)  # Reload is a hack
+    imp.reload(sys)
+    # reload(sys)  # Reload is a hack
     sys.setdefaultencoding('UTF8')
 
     from wsgiref.simple_server import make_server
