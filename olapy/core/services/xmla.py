@@ -4,6 +4,9 @@ from __future__ import absolute_import, division, print_function
 
 import HTMLParser
 
+import sys
+
+import imp
 import xmlwitch
 import os
 from datetime import datetime
@@ -146,7 +149,7 @@ class XmlaProviderService(ServiceBase):
     # we encapsulate them in ExecuteRequest object
     @rpc(ExecuteRequest,
          _returns=AnyXml,
-         _body_style="bare",
+         _body_style=AnyXml,
          _out_header=Session)
     def Execute(ctx, request):
         """
@@ -247,6 +250,10 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
     :return: server instance
     """
     import logging
+    imp.reload(sys)
+    # reload(sys)  # Reload is a hack
+
+    sys.setdefaultencoding('UTF8')
 
     from wsgiref.simple_server import make_server
 
