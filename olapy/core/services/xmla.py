@@ -149,7 +149,7 @@ class XmlaProviderService(ServiceBase):
     # we encapsulate them in ExecuteRequest object
     @rpc(ExecuteRequest,
          _returns=AnyXml,
-         _body_style=AnyXml,
+         _body_style="bare",
          _out_header=Session)
     def Execute(ctx, request):
         """
