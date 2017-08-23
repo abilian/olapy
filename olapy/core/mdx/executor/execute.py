@@ -735,10 +735,7 @@ class MdxEngine:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
 
-            if 'Hierarchize' in self.executer.mdx_query:
-                sort = True
-            else:
-                sort = False
+            sort = self.hierarchize_tuples()
             # TODO margins=True for columns total !!!!!
             return {
                 'result': df.groupby(cols,sort=sort).sum()[self.selected_measures],
