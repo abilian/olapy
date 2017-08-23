@@ -163,7 +163,6 @@ class XmlaExecuteTools():
         :param splited_df:
         :return:
         """
-
         xml = xmlwitch.Builder()
         # only measure selected
         if self.mdx_execution_result['columns_desc'][
