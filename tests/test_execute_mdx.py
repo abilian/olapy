@@ -5,7 +5,7 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 from pandas.util.testing import assert_frame_equal
 
-from tests.queries import query1, CUBE, query3, query6
+from tests.queries import query1, CUBE, query3, query6, query7
 
 executer = MdxEngine(CUBE)
 
@@ -53,5 +53,39 @@ def test_execution_query6():
         ],
         'Amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['Year', 'Quarter', 'Month', 'Day']).sum()
+
+    assert assert_frame_equal(df, test_df) is None
+
+
+def test_execution_query7():
+    executer.mdx_query = query7
+
+    df = executer.execute_mdx()['result']
+    test_df = pd.DataFrame({
+        'Company': [
+            'Crazy Development','Crazy Development','Crazy Development','Crazy Development',
+            'Crazy Development','Crazy Development','Crazy Development','Crazy Development'
+        ],
+        'Year': [
+            2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010
+        ],
+        'Quarter': [
+            'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
+            'Q2 2010', 'Q2 2010', 'Q2 2010'
+        ],
+        'Month': [
+            'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
+            'May 2010', 'May 2010', 'May 2010'
+        ],
+        'Day': [
+            'May 18,2010', 'May 16,2010', 'May 14,2010',
+            'May 12,2010', 'May 13,2010', 'May 15,2010', 'May 17,2010',
+            'May 19,2010',
+        ],
+        'Continent': [
+            'Europe','Europe','Europe','Europe','Europe','Europe','Europe','Europe'
+        ],
+        'Amount': [64, 16, 4, 1, 2, 8, 32, 128]
+    }).groupby(['Company','Year', 'Quarter', 'Month', 'Day','Continent'],sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
