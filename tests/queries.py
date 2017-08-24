@@ -85,6 +85,21 @@ query7 = """
 
     """
 
+query8 = """
+        SELECT {(
+        [Geography].[Geography].[Country].[Europe].[Spain],
+        [Measures].[Amount]),
+        
+        ([Geography].[Geography].[Country].[Europe].[France],
+        [Measures].[Amount]),
+        
+        ([Geography].[Geography].[Country].[Europe].[Switzerland],
+        [Measures].[Amount])} 
+        
+        ON 0 
+        FROM [sales] 
+        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+"""
 
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
 

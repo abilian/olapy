@@ -5,7 +5,7 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 from pandas.util.testing import assert_frame_equal
 
-from tests.queries import query1, CUBE, query3, query6, query7
+from tests.queries import query1, CUBE, query3, query6, query7, query8
 
 executer = MdxEngine(CUBE)
 
@@ -87,5 +87,23 @@ def test_execution_query7():
         ],
         'Amount': [64, 16, 4, 1, 2, 8, 32, 128]
     }).groupby(['Company','Year', 'Quarter', 'Month', 'Day','Continent'],sort=False).sum()
+
+    assert assert_frame_equal(df, test_df) is None
+
+
+
+def test_execution_query8():
+    executer.mdx_query = query8
+
+    df = executer.execute_mdx()['result']
+    test_df = pd.DataFrame({
+        'Continent': [
+            'Europe','Europe','Europe'
+        ],
+        'Country': [
+            'Spain', 'France', 'Switzerland'
+        ],
+        'Amount': [3,4,248]
+    }).groupby(['Continent','Country'],sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
