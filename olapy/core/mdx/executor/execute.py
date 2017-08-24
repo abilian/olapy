@@ -692,7 +692,7 @@ class MdxEngine:
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
-        if self.hierarchize_tuples():
+        if not self.hierarchize_tuples():
             # todo check !!!!!!!!!!
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             # todo check also !!!!!!!!!!
