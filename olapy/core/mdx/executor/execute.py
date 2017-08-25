@@ -169,8 +169,6 @@ class MdxEngine:
         """
         return 'Hierarchize' in self.mdx_query
 
-
-
     def load_tables(self):
         """
         Load all tables { Table name : DataFrame } of the current cube instance.
@@ -318,16 +316,19 @@ class MdxEngine:
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
-        return [[
-            tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            # todo fix .Members
-            for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '').split('].[') if tup_att
+        return [
+            [
+                tup_att.replace('All ', '').replace('[', "").replace("]", "")
+                # todo fix .Members
+                for tup_att in tup[0].replace('.Members', '').replace(
+                    '.MEMBERS', '').split('].[') if tup_att
+            ]
+            for tup in re.compile(MdxEngine.regex).findall(
+                query.encode("utf-8", 'replace')[start:stop])
+            if len(tup[0].split('].[')) > 1
         ]
-                for tup in re.compile(MdxEngine.regex).findall(
-                    query.encode("utf-8", 'replace')[start:stop])
-                if len(tup[0].split('].[')) > 1]
 
-    def seperate_tuples(self,tuple):
+    def seperate_tuples(self, tuple):
         tuples_as_list = tuple.split('].[')
         tuples_as_list[0] = tuples_as_list[0].replace('[', '')
         tuples_as_list[-1] = tuples_as_list[-1].replace(']', '')
@@ -406,7 +407,7 @@ class MdxEngine:
             if tple[0].upper() == "MEASURES" and tple[-1] not in list_measures:
                 list_measures.append(tple[-1])
 
-        return  list_measures
+        return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
         # TODO update docstring
@@ -444,8 +445,8 @@ class MdxEngine:
                         continue
                 else:
                     tables_columns.update({
-                        tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:None if self.hierarchize_tuples() else -1])]
+                        tupl[0]: self.tables_loaded[tupl[0]].columns[:len(tupl[
+                            2:None if self.hierarchize_tuples() else -1])]
                     })
 
             axes.update({axis: tables_columns})
@@ -651,14 +652,13 @@ class MdxEngine:
         columns_to_keep.update({tuple_as_list[0]: cols})
 
     # todo to check
-    def _uniquefy_tuples(self,tuples):
+    def _uniquefy_tuples(self, tuples):
         uniquefy = []
         for tup in tuples:
             if tup not in uniquefy:
                 uniquefy.append(tup)
 
         return uniquefy
-
 
     def execute_mdx(self):
         """
@@ -745,7 +745,6 @@ class MdxEngine:
             cols = list(
                 itertools.chain.from_iterable(columns_to_keep.values()))
 
-
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)
             # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
@@ -757,11 +756,11 @@ class MdxEngine:
             for next_df in df_to_fusion[1:]:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
-
             sort = self.hierarchize_tuples()
             # TODO margins=True for columns total !!!!!
             return {
-                'result': df.groupby(cols,sort=sort).sum()[self.selected_measures],
+                'result':
+                df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
             }
 

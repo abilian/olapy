@@ -262,17 +262,19 @@ class XmlaExecuteTools():
                                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
                                     # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
                                     if 'Hierarchize' in self.executer.mdx_query:
-                                        if len(tuple_without_minus_1[first_att - 1:]) > 1:
+                                        if len(tuple_without_minus_1[
+                                                first_att - 1:]) > 1:
                                             xml.PARENT_UNIQUE_NAME(
                                                 '[{0}].[{0}].[{1}].{2}'.format(
                                                     tuple_without_minus_1[0],
                                                     splited_df[
-                                                        tuple_without_minus_1[0]]
-                                                        .columns[0], '.'.join([
+                                                        tuple_without_minus_1[
+                                                            0]]
+                                                    .columns[0], '.'.join([
                                                         '[' + str(i) + ']'
                                                         for i in
                                                         tuple_without_minus_1[
-                                                        first_att - 1:-1]
+                                                            first_att - 1:-1]
                                                     ])))
                                         xml.HIERARCHY_UNIQUE_NAME(
                                             '[{0}].[{0}]'.format(
@@ -289,7 +291,7 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('0')
                                     # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
-        # todo delete change 'Hierarchize'!!!!
+                                # todo delete change 'Hierarchize'!!!!
         elif 'ON 0' in self.executer.mdx_query:
             with xml.Axis(name=axis):
                 with xml.Tuples:
@@ -466,7 +468,8 @@ class XmlaExecuteTools():
 
         # todo   Hierarchize to delete/ change ASAP
         # only one measure selected
-        elif not columns_desc['rows'] and not columns_desc['columns'] and columns_desc['where']:
+        elif not columns_desc['rows'] and not columns_desc[
+                'columns'] and columns_desc['where']:
             return """
             {0}
             """.format(
@@ -502,8 +505,7 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(
-                    self.executer.seperate_tuples(tupl)[-1])
+                xml.Value(self.executer.seperate_tuples(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')
@@ -657,11 +659,12 @@ class XmlaExecuteTools():
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
                         if self.executer.facts in self.mdx_execution_result[
-                            'columns_desc']['all'] and (len(
-                            self.mdx_execution_result['columns_desc'][
-                                'all'][self.executer.facts]) > 1) or (
-                                'ON 0' in self.executer.mdx_query and not self.mdx_execution_result[
-                            'columns_desc']['where']):
+                                'columns_desc']['all'] and (len(
+                                    self.mdx_execution_result['columns_desc']
+                                    ['all'][self.executer.facts]) > 1) or (
+                                        'ON 0' in self.executer.mdx_query and
+                                        not self.mdx_execution_result[
+                                            'columns_desc']['where']):
                             continue
 
                         else:
@@ -784,8 +787,8 @@ class XmlaExecuteTools():
 
                             if 'Hierarchize' in self.executer.mdx_query:
                                 xml.PARENT_UNIQUE_NAME(
-                                    name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
-                                        table_name),
+                                    name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".
+                                    format(table_name),
                                     **{'type': 'xs:string'})
                                 xml.HIERARCHY_UNIQUE_NAME(
                                     name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".
