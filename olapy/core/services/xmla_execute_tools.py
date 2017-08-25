@@ -200,7 +200,6 @@ class XmlaExecuteTools():
         return tuples, first_att
 
     def generate_xs0_one_axis(self,
-                              mdx_execution_result,
                               splited_df,
                               mdx_query_axis='all',
                               axis="Axis0"):
@@ -213,8 +212,7 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
 
-        tuples, first_att = self._generate_tuples_xs0(
-            mdx_execution_result, splited_df, mdx_query_axis)
+        tuples, first_att = self._generate_tuples_xs0(splited_df, mdx_query_axis)
         if tuples:
             with xml.Axis(name=axis):
                 with xml.Tuples:
