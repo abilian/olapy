@@ -124,6 +124,7 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_hierarchies_response(
                 request)
 
+        # todo back here !!
         elif request.RequestType == "MDSCHEMA_LEVELS":
             return discover_tools.discover_mdschema_levels__response(request)
 
@@ -158,7 +159,6 @@ class XmlaProviderService(ServiceBase):
         :return: Execute response in xml format
         """
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
-
         if request.Command.Statement == '':
             # check if command contains a query
 
@@ -169,14 +169,25 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
+
             XmlaProviderService.discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog)
-            executer = XmlaProviderService.discover_tools.executer
-            executer.mdx_query = request.Command.Statement
-            df = executer.execute_mdx()
-            xmla_tools = XmlaExecuteTools(executer)
 
             xml = xmlwitch.Builder()
+            executer = XmlaProviderService.discover_tools.executer
+            executer.mdx_query = request.Command.Statement
+
+            # todo Hierarchize
+            if all(key in request.Command.Statement
+                   for key in
+                   ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
+
+                convert2formulas = True
+            else:
+                convert2formulas = False
+
+            xmla_tools = XmlaExecuteTools(executer, convert2formulas)
+
             with xml['return']:
                 with xml.root(
                         xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
@@ -202,16 +213,18 @@ class XmlaProviderService(ServiceBase):
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
 
-                        with xml.AxesInfo:
-                            xml.write(xmla_tools.generate_axes_info(df))
-                            xml.write(xmla_tools.generate_axes_info_slicer(df))
+                        withxml.AxesInfo:
+                            xml.write(
+                            xmla_tools.generate_axes_info())
+                            xml.write(xmla_tools.generate_axes_info_slicer())
 
-                    with xml.Axes:
-                        xml.write(xmla_tools.generate_xs0(df))
-                        xml.write(xmla_tools.generate_slicer_axis(df))
+                    withxml.Axes:
+                        xml.write(
+                        xmla_tools.generate_xs0())
+                        xml.write(xmla_tools.generate_slicer_axis())
 
                     with xml.CellData:
-                        xml.write(xmla_tools.generate_cell_data(df))
+                        xml.write(xmla_tools.generate_cell_data())
 
             return str(xml)
 

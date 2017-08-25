@@ -179,6 +179,7 @@ class XmlaDiscoverTools():
 
         return self._get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
+    # todo check here 4 convert 2 formulas
     def discover_schema_rowsets_response(self, request):
 
         rows = [
@@ -483,57 +484,57 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-            restriction_names = [
-                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
-                'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
-                'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
-                'HIERARCHY_VISIBILITY'
-            ]
-            restriction_types = [
-                'string', 'string', 'string', 'string', 'string', 'string',
-                'unsignedShort', 'unsignedShort', 'unsignedShort'
-            ]
+                restriction_names = [
+                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                    'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
+                    'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
+                    'HIERARCHY_VISIBILITY'
+                ]
+                restriction_types = [
+                    'string', 'string', 'string', 'string', 'string', 'string',
+                    'unsignedShort', 'unsignedShort', 'unsignedShort'
+                ]
 
-            rows = [{
-                'SchemaName': 'MDSCHEMA_HIERARCHIES',
-                'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
-                'restrictions': {
-                    'restriction_names': restriction_names,
-                    'restriction_types': restriction_types
-                },
-                'RestrictionsMask': '511'
-            }]
+                rows = [{
+                    'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                    'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                    'restrictions': {
+                        'restriction_names': restriction_names,
+                        'restriction_types': restriction_types
+                    },
+                    'RestrictionsMask': '511'
+                }]
 
-            return generate_resp(rows)
+                return generate_resp(rows)
 
         if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-            restriction_names = [
-                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
-                'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
-                'MEASURE_VISIBILITY'
-            ]
-            restriction_types = [
-                'string', 'string', 'string', 'string', 'string', 'string',
-                'unsignedShort', 'unsignedShort'
-            ]
+                restriction_names = [
+                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
+                    'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
+                    'MEASURE_VISIBILITY'
+                ]
+                restriction_types = [
+                    'string', 'string', 'string', 'string', 'string', 'string',
+                    'unsignedShort', 'unsignedShort'
+                ]
 
-            rows = [{
-                'SchemaName': 'MDSCHEMA_MEASURES',
-                'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
-                'restrictions': {
-                    'restriction_names': restriction_names,
-                    'restriction_types': restriction_types
-                },
-                'RestrictionsMask': '255'
-            }]
+                rows = [{
+                    'SchemaName': 'MDSCHEMA_MEASURES',
+                    'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                    'restrictions': {
+                        'restriction_names': restriction_names,
+                        'restriction_types': restriction_types
+                    },
+                    'RestrictionsMask': '255'
+                }]
 
-            return generate_resp(rows)
+                return generate_resp(rows)
 
         # TODO delete
-        if request.Properties.PropertyList.Catalog is not None:
-            return generate_resp(rows)
+        # if request.Properties.PropertyList.Catalog is not None:
+        #     return generate_resp(rows)
 
         ext = [{
             'SchemaName': 'DBSCHEMA_TABLES',
@@ -818,7 +819,6 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_measures__response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Restrictions.RestrictionList.MEASURE_VISIBILITY == 3 and\
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -849,6 +849,7 @@ class XmlaDiscoverTools():
                             xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
                             xml.MEASURE_UNQUALIFIED_CAPTION(mes)
                             xml.MEASUREGROUP_NAME('default')
+
 
             return str(xml)
 
@@ -994,7 +995,6 @@ class XmlaDiscoverTools():
     def discover_mdschema_levels__response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
                         request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
@@ -1077,7 +1077,7 @@ class XmlaDiscoverTools():
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
-                        xml.MEASUREGROUP_NAME('CUBE_NAME')
+                        xml.MEASUREGROUP_NAME('default')
                         xml.DESCRIPTION('-')
                         xml.IS_WRITE_ENABLED('true')
                         xml.MEASUREGROUP_CAPTION('default')
@@ -1176,10 +1176,9 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
                 request.Properties.PropertyList.Catalog is not None and \
                 request.Restrictions.RestrictionList.TREE_OP == 8:
-
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            separed_tuple = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME.split(
-                ".")
+            separed_tuple = self.executer.seperate_tuples(
+                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME)
             joined = ".".join(separed_tuple[:-1])
             # exple
             # separed_tuple -> [Product].[Product].[Company].[Crazy Development]

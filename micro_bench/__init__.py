@@ -417,11 +417,12 @@ XmlaProviderService().Execute(XmlaProviderService(),request)""",
 
     try:
         os.system(
-            'gprof2dot -f pstats main.py.profile | dot -Tpng -o profile.png')
+            'gprof2dot -f pstats __init__.py.profile | dot -Tpng -o profile.png')
     except:
         print('make sure gprof2dot and graphviz are installed')
 
-    os.remove('main.py.profile ')
+    os.remove('__init__.py.profile')
+
     gen.remove_temp_cube()
     file.close()
     server.stop()

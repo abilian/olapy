@@ -34,6 +34,11 @@ class MdxEngine:
     :param sep: separator in the csv files
     """
 
+    # french characters
+    # or use new regex 2017.02.08
+    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
+            "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
+
     # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
     DATA_FOLDER = None
@@ -157,6 +162,13 @@ class MdxEngine:
         """
         return self.tables_loaded.keys()
 
+    def hierarchize_tuples(self):
+        """
+        check if hierarchized mdx query
+        :return: True | False
+        """
+        return 'Hierarchize' in self.mdx_query
+
     def load_tables(self):
         """
         Load all tables { Table name : DataFrame } of the current cube instance.
@@ -224,7 +236,6 @@ class MdxEngine:
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
-                    # TODO one config file (I will try to merge dimensions between them in web part)
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(self,
                                                                         cubes)
@@ -298,10 +309,6 @@ class MdxEngine:
         :param stop:  key-word in the query where we stop (examples start = ON ROWS)
         :return:  nested list of tuples (see the example)
         """
-        # french characters
-        # or use new regex 2017.02.08
-        regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
-                "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
         if start is not None:
             start = query.index(start)
@@ -309,13 +316,23 @@ class MdxEngine:
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
-        return [[
-            tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
+        return [
+            [
+                tup_att.replace('All ', '').replace('[', "").replace("]", "")
+                # todo fix .Members
+                for tup_att in tup[0].replace('.Members', '').replace(
+                    '.MEMBERS', '').split('].[') if tup_att
+            ]
+            for tup in re.compile(MdxEngine.regex).findall(
+                query.encode("utf-8", 'replace')[start:stop])
+            if len(tup[0].split('].[')) > 1
         ]
-                for tup in re.compile(regex).findall(
-                    query.encode("utf-8", 'replace')[start:stop])
-                if len(tup[0].split('.')) > 1]
+
+    def seperate_tuples(self, tuple):
+        tuples_as_list = tuple.split('].[')
+        tuples_as_list[0] = tuples_as_list[0].replace('[', '')
+        tuples_as_list[-1] = tuples_as_list[-1].replace(']', '')
+        return tuples_as_list
 
     # TODO temporary function
     def decorticate_query(self, query):
@@ -325,6 +342,10 @@ class MdxEngine:
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
         """
+
+        # Hierarchize -> ON COLUMNS , ON ROWS ...
+        # without Hierarchize -> ON 0
+
         tuples_on_mdx_query = self.get_tuples(query)
         on_rows = []
         on_columns = []
@@ -344,6 +365,12 @@ class MdxEngine:
             if 'ON COLUMNS' in query:
                 start = 'SELECT'
                 stop = 'ON COLUMNS'
+                on_columns = self.get_tuples(query, start, stop)
+
+            # ON COLUMNS (AS 0)
+            if 'ON 0' in query:
+                start = 'SELECT'
+                stop = 'ON 0'
                 on_columns = self.get_tuples(query, start, stop)
 
             # WHERE
@@ -374,9 +401,13 @@ class MdxEngine:
 
         :return: measures column's names
         """
-        return [
-            tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
-        ]
+
+        list_measures = []
+        for tple in tuples_on_mdx:
+            if tple[0].upper() == "MEASURES" and tple[-1] not in list_measures:
+                list_measures.append(tple[-1])
+
+        return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
         # TODO update docstring
@@ -413,12 +444,11 @@ class MdxEngine:
                         continue
                 else:
                     tables_columns.update({
-                        tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
+                        tupl[0]: self.tables_loaded[tupl[0]].columns[:len(tupl[
+                            2:None if self.hierarchize_tuples() else -1])]
                     })
 
             axes.update({axis: tables_columns})
-
         return axes
 
     def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
@@ -608,15 +638,26 @@ class MdxEngine:
 
         :return: updated columns_to_keep
         """
+
+        columns = 2 if self.hierarchize_tuples() else 3
         if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
                 tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[2:])]
+                tuple_as_list[columns:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
+
+    # todo to check
+    def _uniquefy_tuples(self, tuples):
+        uniquefy = []
+        for tup in tuples:
+            if tup not in uniquefy:
+                uniquefy.append(tup)
+
+        return uniquefy
 
     def execute_mdx(self):
         """
@@ -636,8 +677,10 @@ class MdxEngine:
             }
 
         """
+
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
+
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -649,10 +692,19 @@ class MdxEngine:
             (table, columns)
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
-        # if we have measures on axes we have to ignore them
+
         tuples_on_mdx_query = [
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
+
+        if not self.hierarchize_tuples():
+            # todo check !!!!!!!!!!
+            tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
+            # todo check also !!!!!!!!!!
+            # some query tuples are not grouped together
+            # todo avoid this every time (slow execution)
+            tuples_on_mdx_query.sort(key=lambda x: x[0])
+
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
@@ -661,12 +713,10 @@ class MdxEngine:
             table_name = tuples_on_mdx_query[0][0]
             # in every tuple
             for tupl in tuples_on_mdx_query:
-
                 # if we have measures in columns or rows axes like :
                 # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
                 # we use only used columns for dimension in that tuple and keep other dimension's columns
                 self.update_columns_to_keep(tupl, columns_to_keep)
-
                 # a tuple with new dimension
                 if tupl[0] != table_name:
                     # if we change dimension , we have to work on the exection's result on previous DataFrames
@@ -705,10 +755,11 @@ class MdxEngine:
             for next_df in df_to_fusion[1:]:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
-            # TODO groupby in web demo (remove it for more performance)
+            sort = self.hierarchize_tuples()
             # TODO margins=True for columns total !!!!!
             return {
-                'result': df.groupby(cols).sum()[self.selected_measures],
+                'result':
+                df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc': tables_n_columns
             }
 
