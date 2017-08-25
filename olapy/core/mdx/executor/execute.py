@@ -318,14 +318,13 @@ class MdxEngine:
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
-
         return [[
             tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').split('.') if tup_att
+            for tup_att in tup[0].replace('.Members', '').split('].[') if tup_att
         ]
                 for tup in re.compile(MdxEngine.regex).findall(
                     query.encode("utf-8", 'replace')[start:stop])
-                if len(tup[0].split('.')) > 1]
+                if len(tup[0].split('].[')) > 1]
 
     # TODO temporary function
     def decorticate_query(self, query):
