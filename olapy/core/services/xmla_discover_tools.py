@@ -1417,12 +1417,9 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
                 request.Properties.PropertyList.Catalog is not None and \
                 request.Restrictions.RestrictionList.TREE_OP == 8:
-            print(request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME)
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executer.seperate_tuples(request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME)
             joined = ".".join(separed_tuple[:-1])
-
-            print(separed_tuple)
             # exple
             # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
             # joined -> [Product].[Product].[Company]
