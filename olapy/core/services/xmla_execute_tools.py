@@ -154,16 +154,12 @@ class XmlaExecuteTools():
 
         return tuple
 
-    def _generate_tuples_xs0(self,
-
-                              splited_df,
-                              mdx_query_axis):
+    def _generate_tuples_xs0(self, splited_df, mdx_query_axis):
 
         first_att = None
 
-
-        if self.mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
-                self.executer.facts]:
+        if self.mdx_execution_result['columns_desc'][
+                mdx_query_axis].keys() == [self.executer.facts]:
 
             if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][
                     self.executer.facts]) == 1:
@@ -468,7 +464,7 @@ class XmlaExecuteTools():
         # TODO must be OPTIMIZED every time!!!!!
 
         if self.convert2formulas:
-        return self._generate_axes_convert2formulas()
+            return self._generate_axes_convert2formulas()
 
         dfs = self.split_dataframe()
         columns_desc = self.mdx_execution_result['columns_desc']
@@ -1021,8 +1017,7 @@ class XmlaExecuteTools():
                         if len(
                                 self.executer.selected_measures
                         ) <= 1 and 'ON 0' not in self.executer.mdx_query:
-                            with xml.Member(
-                                    Hierarchy="[Measures]"):
+                            with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0]))
                                 xml.Caption(

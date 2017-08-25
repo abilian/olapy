@@ -484,53 +484,53 @@ class XmlaDiscoverTools():
         if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-                restriction_names = [
-                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
-                    'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
-                    'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
-                    'HIERARCHY_VISIBILITY'
-                ]
-                restriction_types = [
-                    'string', 'string', 'string', 'string', 'string', 'string',
-                    'unsignedShort', 'unsignedShort', 'unsignedShort'
-                ]
+            restriction_names = [
+                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
+                'DIMENSION_UNIQUE_NAME', 'HIERARCHY_NAME',
+                'HIERARCHY_UNIQUE_NAME', 'HIERARCHY_ORIGIN', 'CUBE_SOURCE',
+                'HIERARCHY_VISIBILITY'
+            ]
+            restriction_types = [
+                'string', 'string', 'string', 'string', 'string', 'string',
+                'unsignedShort', 'unsignedShort', 'unsignedShort'
+            ]
 
-                rows = [{
-                    'SchemaName': 'MDSCHEMA_HIERARCHIES',
-                    'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
-                    'restrictions': {
-                        'restriction_names': restriction_names,
-                        'restriction_types': restriction_types
-                    },
-                    'RestrictionsMask': '511'
-                }]
+            rows = [{
+                'SchemaName': 'MDSCHEMA_HIERARCHIES',
+                'SchemaGuid': 'C8B522DA-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': restriction_names,
+                    'restriction_types': restriction_types
+                },
+                'RestrictionsMask': '511'
+            }]
 
-                return generate_resp(rows)
+            return generate_resp(rows)
 
         if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
-                restriction_names = [
-                    'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
-                    'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
-                    'MEASURE_VISIBILITY'
-                ]
-                restriction_types = [
-                    'string', 'string', 'string', 'string', 'string', 'string',
-                    'unsignedShort', 'unsignedShort'
-                ]
+            restriction_names = [
+                'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME', 'MEASURE_NAME',
+                'MEASURE_UNIQUE_NAME', 'MEASUREGROUP_NAME', 'CUBE_SOURCE',
+                'MEASURE_VISIBILITY'
+            ]
+            restriction_types = [
+                'string', 'string', 'string', 'string', 'string', 'string',
+                'unsignedShort', 'unsignedShort'
+            ]
 
-                rows = [{
-                    'SchemaName': 'MDSCHEMA_MEASURES',
-                    'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
-                    'restrictions': {
-                        'restriction_names': restriction_names,
-                        'restriction_types': restriction_types
-                    },
-                    'RestrictionsMask': '255'
-                }]
+            rows = [{
+                'SchemaName': 'MDSCHEMA_MEASURES',
+                'SchemaGuid': 'C8B522DC-5CF3-11CE-ADE5-00AA0044773D',
+                'restrictions': {
+                    'restriction_names': restriction_names,
+                    'restriction_types': restriction_types
+                },
+                'RestrictionsMask': '255'
+            }]
 
-                return generate_resp(rows)
+            return generate_resp(rows)
 
         # TODO delete
         # if request.Properties.PropertyList.Catalog is not None:
@@ -849,7 +849,6 @@ class XmlaDiscoverTools():
                             xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
                             xml.MEASURE_UNQUALIFIED_CAPTION(mes)
                             xml.MEASUREGROUP_NAME('default')
-
 
             return str(xml)
 

@@ -213,14 +213,12 @@ class XmlaProviderService(ServiceBase):
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
 
-                        withxml.AxesInfo:
-                            xml.write(
-                            xmla_tools.generate_axes_info())
+                        with xml.AxesInfo:
+                            xml.write(xmla_tools.generate_axes_info())
                             xml.write(xmla_tools.generate_axes_info_slicer())
 
-                    withxml.Axes:
-                        xml.write(
-                        xmla_tools.generate_xs0())
+                    with xml.Axes:
+                        xml.write(xmla_tools.generate_xs0())
                         xml.write(xmla_tools.generate_slicer_axis())
 
                     with xml.CellData:
