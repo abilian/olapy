@@ -9,13 +9,13 @@ query2 = """SELECT Hierarchize(
          FROM [sales]"""
 
 query3 = """SELECT Hierarchize(
-         non empty {[Geography].[Geo].[Country].members}) ON COLUMNS,
+         non empty {[Geography].[Geo].[Country].Members}) ON COLUMNS,
          Hierarchize({[Measures].[Amount]}) ON ROWS
          FROM [sales]"""
 
 query4 = """SELECT Hierarchize(
          {[Geography].[Economy].[Partnership]}) ON COLUMNS,
-         Hierarchize(non empty {[Geography].[Geo].[Country].members}) ON ROWS
+         Hierarchize(non empty {[Geography].[Geo].[Country].Members}) ON ROWS
          FROM [sales]"""
 
 query5 = """SELECT Hierarchize(
