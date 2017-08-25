@@ -236,15 +236,6 @@ class XmlaExecuteTools():
                                 tuple_without_minus_1 = self.get_tuple_without_nan(
                                     tupl)
 
-                                # french caracteres
-                                # TODO encode dataframe
-                                # if type(tuple_without_minus_1[-1]) == unicode:
-                                # if not isinstance(tuple_without_minus_1[-1] , str):
-                                #     tuple_without_minus_1 = [
-                                #         x.encode('utf-8', 'replace')
-                                #         for x in tuple_without_minus_1
-                                #     ]
-
                                 # todo ugly !!
                                 with xml.Member(Hierarchy="[{0}].[{0}]".format(
                                         tuple_without_minus_1[0])):
@@ -302,7 +293,7 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('0')
                                     # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
-                                # todo delete change 'Hierarchize'!!!!
+        # todo delete change 'Hierarchize'!!!!
         elif 'ON 0' in self.executer.mdx_query:
             with xml.Axis(name=axis):
                 with xml.Tuples:
@@ -380,15 +371,9 @@ class XmlaExecuteTools():
                 with xml.Tuple:
                     for dim_diff in self.executer.get_all_tables_names(
                             ignore_fact=True):
-                        # TODO encode dataframe
-                        # french caracteres
-                        if type(self.executer.tables_loaded[dim_diff].iloc[0][
-                                0]) == unicode:
-                            column_attribut = self.executer.tables_loaded[
-                                dim_diff].iloc[0][0].encode('utf-8', 'replace')
-                        else:
-                            column_attribut = self.executer.tables_loaded[
-                                dim_diff].iloc[0][0]
+
+                        column_attribut = self.executer.tables_loaded[
+                            dim_diff].iloc[0][0]
 
                         with xml.Member(
                                 Hierarchy="[{0}].[{0}]".format(dim_diff)):
@@ -984,18 +969,6 @@ class XmlaExecuteTools():
                 with xml.Tuples:
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
-
-                            # TODO encode dataframe
-                            # french caracteres
-                            # if type(self.executer.tables_loaded[dim_diff].iloc[
-                            #         0][0]) == unicode:
-                            # if not isinstance(self.executer.tables_loaded[dim_diff].iloc[
-                            #         0][0], str):
-                            #     column_attribut = self.executer.tables_loaded[
-                            #         dim_diff].iloc[0][0].encode('utf-8',
-                            #                                     'replace')
-                            # else:
-
                             column_attribut = self.executer.tables_loaded[
                                 dim_diff].iloc[0][0]
 

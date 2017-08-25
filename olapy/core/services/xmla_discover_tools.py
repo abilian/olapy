@@ -532,10 +532,6 @@ class XmlaDiscoverTools():
 
             return generate_resp(rows)
 
-        # TODO delete
-        # if request.Properties.PropertyList.Catalog is not None:
-        #     return generate_resp(rows)
-
         ext = [{
             'SchemaName': 'DBSCHEMA_TABLES',
             'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
@@ -910,8 +906,7 @@ class XmlaDiscoverTools():
     def discover_mdschema_hierarchies_response(self, request):
 
         # Enumeration of hierarchies in all dimensions
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Properties.PropertyList.Catalog is not None:
+        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3 or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
@@ -933,12 +928,6 @@ class XmlaDiscoverTools():
                             if table_name == self.executer.facts:
                                 continue
 
-                            # french caracteres
-                            # TODO encode dataframe
-                            # if type(df.iloc[0][0]) == unicode:
-                            #     column_attribut = df.iloc[0][0].encode(
-                            #         'utf-8', 'replace')
-                            # else:
                             column_attribut = df.iloc[0][0]
 
                             with xml.row:
