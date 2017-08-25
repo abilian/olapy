@@ -503,7 +503,7 @@ class XmlaExecuteTools():
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
                 xml.Value(
-                    tupl.split('.')[-1].replace('[', '').replace(']', ''))
+                    self.executer.seperate_tuples(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')

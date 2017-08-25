@@ -327,6 +327,12 @@ class MdxEngine:
                     query.encode("utf-8", 'replace')[start:stop])
                 if len(tup[0].split('].[')) > 1]
 
+    def seperate_tuples(self,tuple):
+        tuples_as_list = tuple.split('].[')
+        tuples_as_list[0] = tuples_as_list[0].replace('[', '')
+        tuples_as_list[-1] = tuples_as_list[-1].replace(']', '')
+        return tuples_as_list
+
     # TODO temporary function
     def decorticate_query(self, query):
         """
