@@ -212,7 +212,8 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
 
-        tuples, first_att = self._generate_tuples_xs0(splited_df, mdx_query_axis)
+        tuples, first_att = self._generate_tuples_xs0(splited_df,
+                                                      mdx_query_axis)
         if tuples:
             with xml.Axis(name=axis):
                 with xml.Tuples:
@@ -293,7 +294,7 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('0')
                                     # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
-        # todo delete change 'Hierarchize'!!!!
+                                # todo delete change 'Hierarchize'!!!!
         elif 'ON 0' in self.executer.mdx_query:
             with xml.Axis(name=axis):
                 with xml.Tuples:
@@ -315,7 +316,7 @@ class XmlaExecuteTools():
         with xml.Axis(name="Axis0"):
             with xml.Tuples:
                 if isinstance(self.mdx_execution_result, list):
-                    for idx in xrange(len(self.mdx_execution_result) * 3):
+                    for idx in range(len(self.mdx_execution_result) * 3):
                         with xml.Tuple:
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format('XL_SD' +
