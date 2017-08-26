@@ -79,8 +79,8 @@ query7 = """
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]
 
-    )} ON 0 
-    FROM [sales] 
+    )} ON 0
+    FROM [sales]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 
     """
@@ -89,15 +89,15 @@ query8 = """
         SELECT {(
         [Geography].[Geography].[Country].[Europe].[Spain],
         [Measures].[Amount]),
-        
+
         ([Geography].[Geography].[Country].[Europe].[France],
         [Measures].[Amount]),
-        
+
         ([Geography].[Geography].[Country].[Europe].[Switzerland],
-        [Measures].[Amount])} 
-        
-        ON 0 
-        FROM [sales] 
+        [Measures].[Amount])}
+
+        ON 0
+        FROM [sales]
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
@@ -105,38 +105,38 @@ query9 = """
     SELECT {([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 15,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 13,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 12,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 14,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 16,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Amount]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 18,2010],
     [Geography].[Geography].[Continent].[Europe],
-    [Measures].[Amount])} 
-    
-    ON 0 
-    FROM [sales] 
-    
+    [Measures].[Amount])}
+
+    ON 0
+    FROM [sales]
+
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
@@ -145,41 +145,40 @@ query10 = """
     [Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 15,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 13,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 12,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 14,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 16,2010],
     [Geography].[Geography].[Continent].[Europe],
     [Measures].[Count]),
-    
+
     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 18,2010],
     [Geography].[Geography].[Continent].[Europe],
-    [Measures].[Count])} 
-    
-    ON 0 
-    FROM [sales] 
+    [Measures].[Count])}
+
+    ON 0
+    FROM [sales]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
-
 
 # TODO queries without
