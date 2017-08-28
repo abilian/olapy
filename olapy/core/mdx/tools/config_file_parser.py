@@ -9,123 +9,121 @@ from .models import Cube, Dashboard, Dimension, Facts, Table
 
 
 class ConfigParser:
-    """
-    Parse olapy config files.
+    """Parse olapy config files.
 
-    Config file used if you want to show only some measures, dimensions, columns... in excel
+    Config file used if you want to show only some measures, dimensions,
+    columns... in excel
 
     Config file should be under 'home-directory/olapy-data/cubes/cubes-config.xml'
 
     Excel Config file Structure::
 
+        <?xml version="1.0" encoding="UTF-8"?>
 
-            <?xml version="1.0" encoding="UTF-8"?>
+            <cubes>
 
-                <cubes>
+                <!-- if you want to set an authentication mechanism in excel so to access cube,
+                    user must set a token with login url like 'http://127.0.0.1/admin  -->
 
-                    <!-- if you want to set an authentication mechanism in excel so to access cube,
-                        user must set a token with login url like 'http://127.0.0.1/admin  -->
+                <!-- default password = admin -->
 
-                    <!-- default password = admin -->
+                <xmla_authentication>False</xmla_authentication>
 
-                    <xmla_authentication>False</xmla_authentication>
+                <cube>
+                    <!-- cube name => db name -->
 
-                    <cube>
-                        <!-- cube name => db name -->
+                    <name>labster</name>
 
-                        <name>labster</name>
+                    <!-- source : postgres | csv -->
 
-                        <!-- source : postgres | csv -->
-
-                        <source>postgres</source>
-
-
-                        <!-- star building customized star schema -->
-                        <facts>
-
-                            <!-- facts table name -->
-
-                            <table_name>stats_line</table_name>
-
-                            <keys>
-
-                                <!-- ref = table_name.column  -->
-
-                                <column_name ref="orgunit.id">departement_id</column_name>
-
-                            </keys>
-
-                            <!-- specify measures explicitly -->
-                            <measures>
-
-                                <!-- by default, all number type columns in facts table, or you can specify them here -->
-                                <name>montant</name>
-                                <name>salaire_brut_mensuel</name>
-                                <name>cout_total_mensuel</name>
-                            </measures>
-
-                        </facts>
-                        <!-- end building customized star schema -->
+                    <source>postgres</source>
 
 
-                        <!-- star building customized dimensions display in excel from the star schema -->
-                        <dimensions>
+                    <!-- star building customized star schema -->
+                    <facts>
 
-                            <!-- ADD facts table name to the dimensions section like this (this is a little bug to be solved soon) -->
+                        <!-- facts table name -->
 
-                             <dimension>
-                                <name>stats_line</name>
-                                <displayName>stats_line</displayName>
-                            </dimension>
+                        <table_name>stats_line</table_name>
 
-                            <dimension>
+                        <keys>
 
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+                            <!-- ref = table_name.column  -->
 
-                                <name>stats_line</name>
-                                <displayName>Demande</displayName>
+                            <column_name ref="orgunit.id">departement_id</column_name>
 
-                                <columns>
+                        </keys>
 
-                                    <!-- columns order matter -->
-                                    <!-- column_new_name if you want to change column display name in excel -->
-                                    <!-- if you don't want to change display name , rewrite it in column_new_name -->
-                                    <name column_new_name="Type">type_demande</name>
-                                    <name column_new_name="Financeur">financeur</name>
-                                    <name column_new_name="Etat">wf_state</name>
-                                    <name column_new_name="type_recrutement">type_recrutement</name>
+                        <!-- specify measures explicitly -->
+                        <measures>
 
-                                </columns>
+                            <!-- by default, all number type columns in facts table, or you can specify them here -->
+                            <name>montant</name>
+                            <name>salaire_brut_mensuel</name>
+                            <name>cout_total_mensuel</name>
+                        </measures>
 
-                            </dimension>
-
-                            <dimension>
-
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                                <name>orgunit</name>
-                                <displayName>Organisation</displayName>
-
-                                <columns>
-                                    <!-- columns order matter -->
-                                    <name column_new_name="type">type</name>
-                                    <name column_new_name="Nom">nom</name>
-                                    <name column_new_name="SIGLE">sigle</name>
-                                </columns>
-
-                            </dimension>
-
-                        </dimensions>
-
-                        <!-- end building customized dimensions display in excel from the star schema -->
+                    </facts>
+                    <!-- end building customized star schema -->
 
 
-                    </cube>
+                    <!-- star building customized dimensions display in excel from the star schema -->
+                    <dimensions>
 
-                </cubes>
+                        <!-- ADD facts table name to the dimensions section like this (this is a little bug to be solved soon) -->
+
+                         <dimension>
+                            <name>stats_line</name>
+                            <displayName>stats_line</displayName>
+                        </dimension>
+
+                        <dimension>
+
+                            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+
+                            <name>stats_line</name>
+                            <displayName>Demande</displayName>
+
+                            <columns>
+
+                                <!-- columns order matter -->
+                                <!-- column_new_name if you want to change column display name in excel -->
+                                <!-- if you don't want to change display name , rewrite it in column_new_name -->
+                                <name column_new_name="Type">type_demande</name>
+                                <name column_new_name="Financeur">financeur</name>
+                                <name column_new_name="Etat">wf_state</name>
+                                <name column_new_name="type_recrutement">type_recrutement</name>
+
+                            </columns>
+
+                        </dimension>
+
+                        <dimension>
+
+                            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+                            <name>orgunit</name>
+                            <displayName>Organisation</displayName>
+
+                            <columns>
+                                <!-- columns order matter -->
+                                <name column_new_name="type">type</name>
+                                <name column_new_name="Nom">nom</name>
+                                <name column_new_name="SIGLE">sigle</name>
+                            </columns>
+
+                        </dimension>
+
+                    </dimensions>
+
+                    <!-- end building customized dimensions display in excel from the star schema -->
+
+
+                </cube>
+
+            </cubes>
 
 
     WEB Config file Structure::
-
 
         <cubes>
 
@@ -306,8 +304,7 @@ class ConfigParser:
             return False
 
     def get_cubes_names(self, client_type):
-        """
-        Get all cubes names in the config file.
+        """Get all cubes names in the config file.
 
         :return: dict of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
         """
