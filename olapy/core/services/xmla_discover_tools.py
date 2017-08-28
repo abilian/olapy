@@ -35,7 +35,8 @@ class XmlaDiscoverTools():
 
     def change_catalogue(self, new_catalogue):
         """
-        If you change the catalogue (cube) in any request, we have to instantiate the MdxEngine with the new catalogue.
+        If you change the catalogue (cube) in any request, we have to
+        instantiate the MdxEngine with the new catalogue.
 
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
@@ -326,8 +327,13 @@ class XmlaDiscoverTools():
                         'CUBE_SOURCE',
                         'BASE_CUBE_NAME',
                     ],
-                    'restriction_types':
-                    ['string', 'string', 'string', 'unsignedShort', 'string'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'unsignedShort',
+                        'string',
+                    ],
                 },
                 'RestrictionsMask': '31',
             },
@@ -366,7 +372,12 @@ class XmlaDiscoverTools():
                         'FUNCTION_NAME',
                         'ORIGIN',
                     ],
-                    'restriction_types': ['string', 'string', 'string', 'int'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'int',
+                    ],
                 },
                 'RestrictionsMask': '15',
             },
@@ -409,8 +420,12 @@ class XmlaDiscoverTools():
                         'DATASOURCE_NAME',
                         'DATASOURCE_TYPE',
                     ],
-                    'restriction_types':
-                    ['string', 'string', 'string', 'string'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'string',
+                    ],
                 },
                 'RestrictionsMask': '15',
             },
@@ -425,8 +440,13 @@ class XmlaDiscoverTools():
                         'KPI_NAME',
                         'CUBE_SOURCE',
                     ],
-                    'restriction_types':
-                    ['string', 'string', 'string', 'string', 'unsignedShort'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'string',
+                        'unsignedShort',
+                    ],
                 },
                 'RestrictionsMask': '31',
             },
@@ -471,8 +491,12 @@ class XmlaDiscoverTools():
                         'CUBE_NAME',
                         'MEASUREGROUP_NAME',
                     ],
-                    'restriction_types':
-                    ['string', 'string', 'string', 'string'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'string',
+                    ],
                 },
                 'RestrictionsMask': '15',
             },
@@ -611,8 +635,13 @@ class XmlaDiscoverTools():
                         'SET_NAME',
                         'SCOPE',
                     ],
-                    'restriction_types':
-                    ['string', 'string', 'string', 'string', 'int'],
+                    'restriction_types': [
+                        'string',
+                        'string',
+                        'string',
+                        'string',
+                        'int',
+                    ],
                 },
                 'RestrictionsMask': '31',
             },

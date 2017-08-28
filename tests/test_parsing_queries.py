@@ -168,7 +168,9 @@ def test_parsing_query5():
         ['Product', 'Prod', 'Company', 'test_Development'],
     ]
 
-    assert query_parts['where'] == [['Time', 'Calendar', 'Day', 'May 12,2010'],]
+    assert query_parts['where'] == [
+        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+    ]
 
     assert query_parts['columns'] == [
         ['Geography', 'Economy', 'Partnership', 'EU'],
