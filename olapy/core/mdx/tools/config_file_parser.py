@@ -245,10 +245,11 @@ class ConfigParser:
 
     """
 
-    def __init__(self,
-                 cube_path=None,
-                 file_name='cubes-config.xml',
-                 web_config_file_name='web_cube_config.xml'):
+    def __init__(
+            self,
+            cube_path=None,
+            file_name='cubes-config.xml',
+            web_config_file_name='web_cube_config.xml',):
         """
 
         :param cube_path: path to cube (csv folders)
@@ -277,7 +278,7 @@ class ConfigParser:
         """
         if client_type == 'web':
             return os.path.isfile(
-                os.path.join(self.cube_path, self.web_config_file_name))
+                os.path.join(self.cube_path, self.web_config_file_name),)
         return os.path.isfile(os.path.join(self.cube_path, self.file_name))
 
     def xmla_authentication(self):
@@ -289,8 +290,9 @@ class ConfigParser:
 
         # xmla authentication only in excel
         if self.config_file_exist(client_type='excel'):
-            with open(os.path.join(self.cube_path,
-                                   self.file_name)) as config_file:
+            with open(os.path.join(
+                    self.cube_path,
+                    self.file_name,)) as config_file:
 
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
@@ -330,8 +332,9 @@ class ConfigParser:
 
     def _construct_cubes_excel(self):
         try:
-            with open(os.path.join(self.cube_path,
-                                   self.file_name)) as config_file:
+            with open(os.path.join(
+                    self.cube_path,
+                    self.file_name,)) as config_file:
 
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
@@ -346,7 +349,7 @@ class ConfigParser:
                         measures=[
                             mes.text
                             for mes in xml_facts.findall('measures/name')
-                        ]) for xml_facts in tree.xpath('/cubes/cube/facts')
+                        ],) for xml_facts in tree.xpath('/cubes/cube/facts')
                 ]
 
                 # keys = {
@@ -360,12 +363,14 @@ class ConfigParser:
                         # column_new_name = [key.attrib['column_new_name'] for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
                         columns=OrderedDict(
-                            (column_name.text, None if not column_name.attrib
-                             else column_name.attrib['column_new_name'])
+                            (
+                                column_name.text,
+                                None if not column_name.attrib else
+                                column_name.attrib['column_new_name'],)
                             for column_name in xml_dimension.findall(
-                                'columns/name')))
+                                'columns/name',)),)
                     for xml_dimension in tree.xpath(
-                        '/cubes/cube/dimensions/dimension')
+                        '/cubes/cube/dimensions/dimension',)
                 ]
 
             return [
@@ -373,7 +378,7 @@ class ConfigParser:
                     name=xml_cube.find('name').text,
                     source=xml_cube.find('source').text,
                     facts=facts,
-                    dimensions=dimensions)
+                    dimensions=dimensions,)
                 for xml_cube in tree.xpath('/cubes/cube')
             ]
         except:
@@ -399,8 +404,9 @@ class ConfigParser:
     def _construct_cubes_web(self):
 
         # try:
-        with open(os.path.join(self.cube_path,
-                               self.web_config_file_name)) as config_file:
+        with open(os.path.join(
+                self.cube_path,
+                self.web_config_file_name,)) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -414,7 +420,7 @@ class ConfigParser:
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
                     ],
-                    columns=xml_facts.find('columns').text.split(','))
+                    columns=xml_facts.find('columns').text.split(','),)
                 for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
@@ -425,7 +431,7 @@ class ConfigParser:
                     new_names={
                         new_col.attrib['old_column_name']: new_col.text
                         for new_col in xml_column.findall('new_name')
-                    }) for xml_column in tree.xpath('/cubes/cube/tables/table')
+                    },) for xml_column in tree.xpath('/cubes/cube/tables/table')
             ]
 
         return [
@@ -433,7 +439,7 @@ class ConfigParser:
                 name=xml_cube.find('name').text,
                 source=xml_cube.find('source').text,
                 facts=facts,
-                tables=tables) for xml_cube in tree.xpath('/cubes/cube')
+                tables=tables,) for xml_cube in tree.xpath('/cubes/cube')
         ]
         # except:
         #     raise ('Bad configuration in the configuration file')
@@ -441,8 +447,9 @@ class ConfigParser:
     def construct_web_dashboard(self):
 
         # try:
-        with open(os.path.join(self.cube_path,
-                               self.web_config_file_name)) as config_file:
+        with open(os.path.join(
+                self.cube_path,
+                self.web_config_file_name,)) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -452,7 +459,7 @@ class ConfigParser:
                     'columns':
                     dashboard.find('Global_table/columns').text.split(','),
                     'rows':
-                    dashboard.find('Global_table/rows').text.split(',')
+                    dashboard.find('Global_table/rows').text.split(','),
                 },
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_charts=dashboard.find('BarCharts').text.split(','),
@@ -461,7 +468,7 @@ class ConfigParser:
                     (table.find('columns').text.split(',')
                      if table.find('columns') is not None else 'ALL')
                     for table in dashboard.findall('LineCharts/table')
-                })
+                },)
             for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
         ]
         # except:

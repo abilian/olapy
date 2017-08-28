@@ -23,12 +23,13 @@ def _load_table_config_file(executer_instance, cube_obj):
 
     db = MyDB(
         db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube)
+        db=executer_instance.cube,)
 
     for dimension in cube_obj.dimensions:
 
-        df = psql.read_sql_query("SELECT * FROM {0}".format(dimension.name),
-                                 db.engine)
+        df = psql.read_sql_query(
+            "SELECT * FROM {0}".format(dimension.name),
+            db.engine,)
         # only certain columns
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
@@ -42,7 +43,7 @@ def _load_table_config_file(executer_instance, cube_obj):
         # rename columns if value not None
         df.rename(
             columns=(dict((k, v) for k, v in dimension.columns.items() if v)),
-            inplace=True)
+            inplace=True,)
 
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
@@ -53,8 +54,7 @@ def _load_table_config_file(executer_instance, cube_obj):
 
 # excel client
 def _construct_star_schema_config_file(executer_instance, cubes_obj):
-    """
-    Construct star schema DataFrame from configuration file for excel client.
+    """Construct star schema DataFrame from configuration file for excel client.
 
     :param cube_name:  cube name (or database name)
     :param cubes_obj: cubes object
@@ -63,16 +63,17 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
     executer_instance.facts = cubes_obj.facts[0].table_name
     db = MyDB(
         db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube)
+        db=executer_instance.cube,)
     # load facts table
 
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
+        "SELECT * FROM {0}".format(executer_instance.facts),
+        db.engine,)
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
         df = psql.read_sql_query(
             "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-            db.engine)
+            db.engine,)
 
         for dimension in cubes_obj.dimensions:
             if dimension_and_key.split('.')[0] == dimension.name:
@@ -89,7 +90,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
             right_on=dimension_and_key.split('.')[1],
             how='left',
             # remove suffixe from dimension and keep the same column name for facts
-            suffixes=('', '_y'))
+            suffixes=('', '_y'),)
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
@@ -105,8 +106,9 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
 
     for table in tables_cubes_obj:
 
-        tab = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                  connector)
+        tab = psql.read_sql_query(
+            "SELECT * FROM {0}".format(table.name),
+            connector,)
 
         # todo verify this
         try:
@@ -133,8 +135,7 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
 
 # web client
 def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
-    """
-    Construct star schema DataFrame from configuration file for web client.
+    """Construct star schema DataFrame from configuration file for web client.
 
     :param cube_name:  cube name (or database name)
     :param cubes_obj: cubes object
@@ -144,11 +145,12 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     executer_instance.facts = cubes_obj.facts[0].table_name
     db = MyDB(
         db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube)
+        db=executer_instance.cube,)
 
     # load facts table
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts), db.engine)
+        "SELECT * FROM {0}".format(executer_instance.facts),
+        db.engine,)
 
     all_columns, tables = _get_columns_n_tables(cubes_obj.tables, db.engine)
 
@@ -168,7 +170,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
         else:
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.engine)
+                db.engine,)
 
         # TODO check merge (how)
         fusion = fusion.merge(
@@ -177,6 +179,6 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
             right_on=dimension_and_key.split('.')[1],
             how='left',
             # remove suffixe from dimension and keep the same column name for facts
-            suffixes=('', '_y'))
+            suffixes=('', '_y'),)
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]

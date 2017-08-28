@@ -39,12 +39,13 @@ def _construct_star_schema_csv_files(executer_instance):
     # loading facts table
     fusion = pd.read_csv(
         os.path.join(cube, executer_instance.facts + '.csv'),
-        sep=executer_instance.sep)
+        sep=executer_instance.sep,)
     for file_name in os.listdir(cube):
         try:
             fusion = fusion.merge(
                 pd.read_csv(
-                    os.path.join(cube, file_name), sep=executer_instance.sep))
+                    os.path.join(cube, file_name),
+                    sep=executer_instance.sep,),)
         except:
             print('No common column')
             pass

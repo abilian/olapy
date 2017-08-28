@@ -62,7 +62,7 @@ class XmlaProviderService(ServiceBase):
         _returns=AnyXml,
         _body_style="bare",
         _out_header=Session,
-        _throws=InvalidCredentialsError)
+        _throws=InvalidCredentialsError,)
     def Discover(ctx, request):
         """
         The first principle function of xmla protocol.
@@ -85,7 +85,7 @@ class XmlaProviderService(ServiceBase):
             raise InvalidCredentialsError(
                 fault_string=
                 'You do not have permission to access this resource',
-                fault_object=None)
+                fault_object=None,)
             # TODO call (labster) login function or create login with token (according to labster db)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
@@ -116,26 +116,26 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_dbschema_tables_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEASURES":
-            return discover_tools.discover_mdschema_measures__response(request)
+            return discover_tools.discover_mdschema_measures_response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
             return discover_tools.discover_mdschema_dimensions_response(request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
-                request)
+                request,)
 
         # todo back here !!
         elif request.RequestType == "MDSCHEMA_LEVELS":
-            return discover_tools.discover_mdschema_levels__response(request)
+            return discover_tools.discover_mdschema_levels_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEASUREGROUPS":
             return discover_tools.discover_mdschema_measuresgroups_response(
-                request)
+                request,)
 
         elif request.RequestType == "MDSCHEMA_MEASUREGROUP_DIMENSIONS":
             return discover_tools.discover_mdschema_measuresgroups_dimensions_response(
-                request)
+                request,)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
             return discover_tools.discover_mdschema_properties_response(request)
@@ -149,7 +149,7 @@ class XmlaProviderService(ServiceBase):
         ExecuteRequest,
         _returns=AnyXml,
         _body_style="bare",
-        _out_header=Session)
+        _out_header=Session,)
     def Execute(ctx, request):
         """
         The second principle function of xmla protocol.
@@ -172,7 +172,7 @@ class XmlaProviderService(ServiceBase):
         else:
 
             XmlaProviderService.discover_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog)
+                request.Properties.PropertyList.Catalog,)
 
             xml = xmlwitch.Builder()
             executer = XmlaProviderService.discover_tools.executer
@@ -195,7 +195,7 @@ class XmlaProviderService(ServiceBase):
                         **{
                             'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance'
+                            'http://www.w3.org/2001/XMLSchema-instance',
                         }):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
@@ -205,15 +205,15 @@ class XmlaProviderService(ServiceBase):
                                 xml.CubeName('Sales')
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S'),
+                                        '%Y-%m-%dT%H:%M:%S',),
                                     xmlns=
-                                    "http://schemas.microsoft.com/analysisservices/2003/engine"
+                                    "http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S'),
+                                        '%Y-%m-%dT%H:%M:%S',),
                                     xmlns=
-                                    "http://schemas.microsoft.com/analysisservices/2003/engine"
+                                    "http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
 
                         with xml.AxesInfo:
@@ -234,7 +234,7 @@ application = Application(
     [XmlaProviderService],
     'urn:schemas-microsoft-com:xml-analysis',
     in_protocol=XmlaSoap11(validator='soft'),
-    out_protocol=XmlaSoap11(validator='soft'))
+    out_protocol=XmlaSoap11(validator='soft'),)
 
 # validator='soft' or nothing, this is important because spyne doesn't support encodingStyle until now !!!!
 
@@ -265,12 +265,15 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
     if write_on_file:
         home_directory = expanduser("~")
         if not os.path.isdir(
-                os.path.join(home_directory, 'olapy-data', 'logs')):
+                os.path.join(home_directory, 'olapy-data', 'logs'),):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=os.path.join(home_directory, 'olapy-data', 'logs',
-                                  'xmla.log'))
+            filename=os.path.join(
+                home_directory,
+                'olapy-data',
+                'logs',
+                'xmla.log',),)
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)

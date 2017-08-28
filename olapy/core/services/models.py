@@ -10,8 +10,17 @@ from spyne import ComplexModel, Integer, Unicode, XmlAttribute
 class Tuple(object):
     """Tuple description (used by spyne)."""
 
-    def __init__(self, Hierarchy, UName, Caption, LName, LNum, DisplayInfo,
-                 PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME, Value):
+    def __init__(
+            self,
+            Hierarchy,
+            UName,
+            Caption,
+            LName,
+            LNum,
+            DisplayInfo,
+            PARENT_UNIQUE_NAME,
+            HIERARCHY_UNIQUE_NAME,
+            Value,):
         self.hierarchy = Hierarchy
         self.uname = UName
         self.caption = Caption
@@ -58,7 +67,7 @@ class Property(ComplexModel):
         'EndRange': Unicode,
         'MDXSupport': Unicode,
         'ProviderName': Unicode,
-        'UserName': Unicode
+        'UserName': Unicode,
     }
 
 
@@ -79,7 +88,7 @@ class Restriction(ComplexModel):
         'SchemaName': Unicode,
         'HIERARCHY_VISIBILITY': Integer,
         'MEASURE_VISIBILITY': Integer,
-        'PROPERTY_TYPE': Integer
+        'PROPERTY_TYPE': Integer,
     }
 
 

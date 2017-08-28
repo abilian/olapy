@@ -77,7 +77,7 @@ def _load_tables_db(executer_instance):
     tables = {}
     db = MyDB(
         db_config_file_path=executer_instance.DATA_FOLDER,
-        db=executer_instance.cube)
+        db=executer_instance.cube,)
     inspector = inspect(db.engine)
 
     for table_name in inspector.get_table_names():
@@ -87,11 +87,11 @@ def _load_tables_db(executer_instance):
 
         # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
         results = db.engine.execution_options(stream_results=True).execute(
-            'SELECT * FROM "{0}"'.format(table_name))
+            'SELECT * FROM "{0}"'.format(table_name),)
         # Fetch all the results of the query
         value = pd.DataFrame(
             iter(results),
-            columns=results.keys())  # Pass results as an iterator
+            columns=results.keys(),)  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[
@@ -112,15 +112,17 @@ def _construct_star_schema_db(executer_instance):
     # load facts table
     with db.engine as connection:
         fusion = psql.read_sql_query(
-            'SELECT * FROM "{0}" '.format(executer_instance.facts), connection)
+            'SELECT * FROM "{0}" '.format(executer_instance.facts),
+            connection,)
 
         inspector = inspect(connection)
 
         for db_table_name in inspector.get_table_names():
             try:
                 fusion = fusion.merge(
-                    psql.read_sql_query("SELECT * FROM {0}".format(
-                        db_table_name[0]), connection))
+                    psql.read_sql_query(
+                        "SELECT * FROM {0}".format(db_table_name[0],),
+                        connection,),)
             except:
                 print('No common column')
                 pass

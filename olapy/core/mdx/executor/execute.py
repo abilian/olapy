@@ -24,8 +24,7 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
 class MdxEngine:
-    """
-    The principal class for executing a query.
+    """The main class for executing a query.
 
     :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
     :param cube_folder: parent cube folder name
@@ -48,14 +47,15 @@ class MdxEngine:
 
     # to show just config file's dimensions
 
-    def __init__(self,
-                 cube_name,
-                 client_type='excel',
-                 cubes_path=None,
-                 mdx_query=None,
-                 cube_folder=CUBE_FOLDER,
-                 sep=';',
-                 fact_table_name="Facts"):
+    def __init__(
+            self,
+            cube_name,
+            client_type='excel',
+            cubes_path=None,
+            mdx_query=None,
+            cube_folder=CUBE_FOLDER,
+            sep=';',
+            fact_table_name="Facts",):
 
         self.cube_folder = cube_folder
         self.cube = cube_name
@@ -80,7 +80,9 @@ class MdxEngine:
 
     @classmethod
     def get_cubes_names(cls):
-        """:return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)."""
+        """
+        :return: list cubes name that exist in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected).
+        """
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
 
@@ -119,7 +121,7 @@ class MdxEngine:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
             result = db.engine.execute(
-                'SELECT datname FROM pg_database WHERE datistemplate = false;')
+                'SELECT datname FROM pg_database WHERE datistemplate = false;',)
             available_tables = result.fetchall()
             # cursor.execute("""SELECT datname FROM pg_database
             # WHERE datistemplate = false;""")
@@ -177,13 +179,14 @@ class MdxEngine:
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
 
-        if self.client == 'excel' and config_file_parser.config_file_exist(
-                client_type=self.client
-        ) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client):
+        if self.client == 'excel' \
+                and config_file_parser.config_file_exist(
+                    client_type=self.client) \
+                and self.cube in config_file_parser.get_cubes_names(
+                    client_type=self.client):
+
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
-
                 # TODO working with cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     tables = _load_table_config_file(self, cubes)
@@ -215,27 +218,28 @@ class MdxEngine:
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
-                include=[np.number]).columns if col.lower()[-2:] != 'id'
+                include=[np.number],).columns if col.lower()[-2:] != 'id'
         ]
 
     def get_star_schema_dataframe(self):
         """
         Merge all DataFrames as star schema.
 
-        :param cube_name: cube name with which we want to generate a star schema model
         :return: star schema DataFrame
         """
         fusion = None
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
-                self.client) and self.cube in config_file_parser.get_cubes_names(
-                    client_type=self.client):
+                self.client,
+        ) and self.cube in config_file_parser.get_cubes_names(
+                client_type=self.client,):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(
-                            self, cubes)
+                            self,
+                            cubes,)
                     else:
                         fusion = _construct_star_schema_config_file(self, cubes)
 
@@ -267,17 +271,18 @@ class MdxEngine:
         :return: path to the cube
         """
         if MdxEngine.DATA_FOLDER is not None:
-            return os.path.join(MdxEngine.DATA_FOLDER, MdxEngine.CUBE_FOLDER,
-                                self.cube)
+            return os.path.join(
+                MdxEngine.DATA_FOLDER,
+                MdxEngine.CUBE_FOLDER,
+                self.cube,)
         return os.path.join(self.cube_path, self.cube)
 
     # TODO temporary function
     @staticmethod
     def get_tuples(query, start=None, stop=None):
-        """
-        Get all tuples in the mdx query.
+        """Get all tuples in the mdx query.
 
-        example::
+        Example::
 
 
             SELECT  {
@@ -317,10 +322,11 @@ class MdxEngine:
                 tup_att.replace('All ', '').replace('[', "").replace("]", "")
                 # todo fix .Members
                 for tup_att in tup[0].replace('.Members', '').replace(
-                    '.MEMBERS', '').split('].[') if tup_att
+                    '.MEMBERS',
+                    '',).split('].[') if tup_att
             ]
             for tup in re.compile(MdxEngine.regex).findall(
-                query.encode("utf-8", 'replace')[start:stop])
+                query.encode("utf-8", 'replace')[start:stop],)
             if len(tup[0].split('].[')) > 1
         ]
 
@@ -332,8 +338,7 @@ class MdxEngine:
 
     # TODO temporary function
     def decorticate_query(self, query):
-        """
-        Get all tuples that exists in the MDX Query by axes.
+        """Get all tuples that exists in the MDX Query by axes.
 
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
@@ -381,7 +386,7 @@ class MdxEngine:
             'all': tuples_on_mdx_query,
             'columns': on_columns,
             'rows': on_rows,
-            'where': on_where
+            'where': on_where,
         }
 
     @staticmethod
@@ -442,7 +447,8 @@ class MdxEngine:
                     tables_columns.update({
                         tupl[0]:
                         self.tables_loaded[tupl[0]].columns[:len(
-                            tupl[2:None if self.hierarchize_tuples() else -1])]
+                            tupl[2:None
+                                 if self.hierarchize_tuples() else -1],)],
                     })
 
             axes.update({axis: tables_columns})
@@ -637,14 +643,13 @@ class MdxEngine:
         """
 
         columns = 2 if self.hierarchize_tuples() else 3
-        if len(
-                tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        if len(tuple_as_list) == 3 \
+                and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[columns:])]
+                tuple_as_list[columns:],)]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -658,10 +663,9 @@ class MdxEngine:
         return uniquefy
 
     def execute_mdx(self):
-        """
-        Execute an MDX Query.
+        """Execute an MDX Query.
 
-        usage ::
+        Usage ::
 
             executer = MdxEngine('sales')
             executer.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
@@ -736,8 +740,10 @@ class MdxEngine:
                     start_df = df
 
                 df_to_fusion.append(
-                    self.execute_one_tuple(tupl, start_df,
-                                           columns_to_keep.values()))
+                    self.execute_one_tuple(
+                        tupl,
+                        start_df,
+                        columns_to_keep.values(),),)
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
@@ -758,11 +764,11 @@ class MdxEngine:
                 'result':
                 df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc':
-                tables_n_columns
+                tables_n_columns,
             }
 
         else:
             return {
                 'result': start_df[self.selected_measures].sum().to_frame().T,
-                'columns_desc': tables_n_columns
+                'columns_desc': tables_n_columns,
             }
