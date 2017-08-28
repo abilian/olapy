@@ -18,7 +18,7 @@ install_requires = [str(ir.req) for ir in _install_requires]
 
 setup(
     name='olapy',
-    version="0.4.0",
+    version="0.4.5",
     packages=find_packages(),
     author="Abilian SAS",
     author_email="contact@abilian.com",
@@ -54,5 +54,7 @@ if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
     zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
     zip_ref.close()
 
-if not os.path.isfile(os.path.join(home_directory, 'olapy-data','olapy-config.xml')):
-    copyfile('config/olapy-config.xml', os.path.join(home_directory, 'olapy-data','olapy-config.xml'))
+if not os.path.isfile(
+        os.path.join(home_directory, 'olapy-data', 'olapy-config.xml')):
+    copyfile('config/olapy-config.xml',
+             os.path.join(home_directory, 'olapy-data', 'olapy-config.xml'))
