@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from lxml import etree
 
-from .models import Cube, Dimension, Facts, Table, Dashboard
+from .models import Cube, Dashboard, Dimension, Facts, Table
 
 
 class ConfigParser:
@@ -262,8 +262,7 @@ class ConfigParser:
             home_directory = expanduser("~")
 
         if cube_path is None:
-            self.cube_path = os.path.join(home_directory, 'olapy-data',
-                                          'cubes')
+            self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
         else:
             self.cube_path = cube_path
 

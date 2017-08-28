@@ -2,15 +2,15 @@
 
 from __future__ import absolute_import, division, print_function
 
-import xmlwitch
+import imp
+import logging
 import os
 import sys
-import logging
-import imp
 from datetime import datetime
 from os.path import expanduser
 
-from spyne import AnyXml, Application, ServiceBase, rpc, Fault
+import xmlwitch
+from spyne import AnyXml, Application, Fault, ServiceBase, rpc
 from spyne.const.http import HTTP_200
 from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
@@ -18,14 +18,14 @@ from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
 from ..mdx.tools.config_file_parser import ConfigParser
-from ..services.models import DiscoverRequest
-from ..services.models import ExecuteRequest, Session
+from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaSoap11(Soap11):
+
     def create_in_document(self, ctx, charset=None):
         if isinstance(ctx.transport, HttpTransportContext):
             http_verb = ctx.transport.get_request_method()
@@ -117,8 +117,7 @@ class XmlaProviderService(ServiceBase):
             return discover_tools.discover_mdschema_measures__response(request)
 
         elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(
-                request)
+            return discover_tools.discover_mdschema_dimensions_response(request)
 
         elif request.RequestType == "MDSCHEMA_HIERARCHIES":
             return discover_tools.discover_mdschema_hierarchies_response(
@@ -137,8 +136,7 @@ class XmlaProviderService(ServiceBase):
                 request)
 
         elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(
-                request)
+            return discover_tools.discover_mdschema_properties_response(request)
 
         elif request.RequestType == "MDSCHEMA_MEMBERS":
             return discover_tools.discover_mdschema_members_response(request)

@@ -1,8 +1,10 @@
 from __future__ import absolute_import, division, print_function
 
-from ..tools.connection import MyDB
-import pandas.io.sql as psql
 import os
+
+import pandas.io.sql as psql
+
+from ..tools.connection import MyDB
 
 
 # split execution into three part (execute from config files,

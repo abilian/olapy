@@ -2,19 +2,19 @@
 
 from __future__ import absolute_import, division, print_function
 
-import uuid
-import xmlwitch
 import os
+import uuid
+
+import xmlwitch
 
 from ..mdx.executor.execute import MdxEngine
-from .xmla_discover_xsds import (
-    dbschema_catalogs_xsd, dbschema_tables_xsd, discover_datasources_xsd,
-    discover_literals_xsd, discover_preperties_xsd,
-    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd,
-    mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd,
-    mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd,
-    mdschema_measuresgroups_xsd, mdschema_members_xsd,
-    mdschema_properties_properties_xsd, mdschema_sets_xsd)
+from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
+    discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
+    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
+    mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd, \
+    mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd, \
+    mdschema_measuresgroups_xsd, mdschema_members_xsd, \
+    mdschema_properties_properties_xsd, mdschema_sets_xsd
 
 
 # TODO clean
@@ -61,8 +61,7 @@ class XmlaDiscoverTools():
                         'xmlns:EX':
                         'urn:schemas-microsoft-com:xml-analysis:exception',
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     }):
                 xml.write(discover_datasources_xsd)
                 with xml.row:
@@ -152,17 +151,17 @@ class XmlaDiscoverTools():
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ProviderVersion':
             return self._get_props(discover_preperties_xsd, 'ProviderVersion',
-                                   'ProviderVersion', 'string', 'Read',
-                                   'false', '0.02  08-Mar-2016 08:41:28 GMT')
+                                   'ProviderVersion', 'string', 'Read', 'false',
+                                   '0.02  08-Mar-2016 08:41:28 GMT')
 
         elif (request.Restrictions.RestrictionList.PropertyName ==
               'MdpropMdxSubqueries'):
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_catalogue(request.Properties.PropertyList.Catalog)
-            return self._get_props(
-                discover_preperties_xsd, 'MdpropMdxSubqueries',
-                'MdpropMdxSubqueries', 'int', 'Read', 'false', '15')
+            return self._get_props(discover_preperties_xsd,
+                                   'MdpropMdxSubqueries', 'MdpropMdxSubqueries',
+                                   'int', 'Read', 'false', '15')
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
 
@@ -245,8 +244,8 @@ class XmlaDiscoverTools():
                         'COORDINATE_TYPE', 'INVOCATION', 'CUBE_SOURCE'
                     ],
                     'restriction_types': [
-                        'string', 'string', 'string', 'string', 'int',
-                        'string', 'int', 'int', 'unsignedShort'
+                        'string', 'string', 'string', 'string', 'int', 'string',
+                        'int', 'int', 'unsignedShort'
                     ]
                 },
                 'RestrictionsMask': '511'
@@ -390,8 +389,7 @@ class XmlaDiscoverTools():
                     'restriction_names': [
                         'CATALOG_NAME', 'SCHEMA_NAME', 'CUBE_NAME',
                         'MEASURE_NAME', 'MEASURE_UNIQUE_NAME',
-                        'MEASUREGROUP_NAME', 'CUBE_SOURCE',
-                        'MEASURE_VISIBILITY'
+                        'MEASUREGROUP_NAME', 'CUBE_SOURCE', 'MEASURE_VISIBILITY'
                     ],
                     'restriction_types': [
                         'string', 'string', 'string', 'string', 'string',
@@ -537,8 +535,8 @@ class XmlaDiscoverTools():
             'SchemaGuid': 'C8B52229-5CF3-11CE-ADE5-00AA0044773D',
             'restrictions': {
                 'restriction_names': [
-                    'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME',
-                    'TABLE_TYPE', 'TABLE_OLAP_TYPE'
+                    'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME', 'TABLE_TYPE',
+                    'TABLE_OLAP_TYPE'
                 ],
                 'restriction_types':
                 ['string', 'string', 'string', 'string', 'string']
@@ -754,8 +752,7 @@ class XmlaDiscoverTools():
                     xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                     **{
                         'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi':
-                        'http://www.w3.org/2001/XMLSchema-instance'
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
                     }):
                 xml.write(dbschema_catalogs_xsd)
                 for catalogue in self.catalogues:
@@ -917,8 +914,7 @@ class XmlaDiscoverTools():
                     with xml.root(
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
-                                'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance'
                             }):

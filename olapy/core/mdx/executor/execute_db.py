@@ -1,9 +1,10 @@
 from __future__ import absolute_import, division, print_function
 
-from sqlalchemy import inspect
 import pandas as pd
-from ..tools.connection import MyDB
 import pandas.io.sql as psql
+from sqlalchemy import inspect
+
+from ..tools.connection import MyDB
 
 # split execution into three part (execute from config files,
 # execute csv files if they respect olapy's start schema model,

@@ -4,22 +4,21 @@ from __future__ import absolute_import, division, print_function
 
 import itertools
 import os
-import sys
 import re
+import sys
 from collections import OrderedDict
 from os.path import expanduser
 
 import numpy as np
 import pandas as pd
 
-from .execute_csv_files import _load_tables_csv_files, _construct_star_schema_csv_files
-from .execute_db import _load_tables_db, _construct_star_schema_db
-from .execute_config_file import (_load_table_config_file,
-                                  _construct_web_star_schema_config_file,
-                                  _construct_star_schema_config_file)
-
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
+from .execute_config_file import _construct_star_schema_config_file, \
+    _construct_web_star_schema_config_file, _load_table_config_file
+from .execute_csv_files import _construct_star_schema_csv_files, \
+    _load_tables_csv_files
+from .execute_db import _construct_star_schema_db, _load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
@@ -203,8 +202,7 @@ class MdxEngine:
 
         # if web, get measures from config file
         config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist(
-                'web'):
+        if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
 
                 # update facts name
@@ -240,8 +238,7 @@ class MdxEngine:
                         fusion = _construct_web_star_schema_config_file(self,
                                                                         cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(self,
-                                                                    cubes)
+                        fusion = _construct_star_schema_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -741,8 +738,7 @@ class MdxEngine:
                     self.execute_one_tuple(tupl, start_df,
                                            columns_to_keep.values()))
 
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

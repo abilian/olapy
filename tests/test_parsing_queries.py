@@ -1,7 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
 from olapy.core.mdx.executor.execute import MdxEngine
-from tests.queries import CUBE, query1, where, query2, query3, query4, query5, query6
+
+from .queries import CUBE, query1, query2, query3, query4, query5, \
+    query6, where
 
 executer = MdxEngine(CUBE)
 

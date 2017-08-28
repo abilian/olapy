@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, print_function
 
 import itertools
+import re
 from collections import OrderedDict
 
 import numpy as np
-import re
-
 import xmlwitch
+
 from six.moves import zip
 
 
@@ -177,10 +177,10 @@ class XmlaExecuteTools():
                     'rows']:
             # ['Geography','America']
             tuples = [
-                zip(*[[[key] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
-                      if key is not self.executer.facts])
+                zip(* [[[key] + list(row)
+                        for row in splited_df[key].itertuples(index=False)]
+                       for key in splited_df.keys()
+                       if key is not self.executer.facts])
             ]
 
             first_att = 2
@@ -189,10 +189,10 @@ class XmlaExecuteTools():
         else:
             # ['Geography','Amount','America']
             tuples = [
-                zip(*[[[key] + [mes] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
-                      if key is not self.executer.facts])
+                zip(* [[[key] + [mes] + list(row)
+                        for row in splited_df[key].itertuples(index=False)]
+                       for key in splited_df.keys()
+                       if key is not self.executer.facts])
                 for mes in self.executer.selected_measures
             ]
             first_att = 3
@@ -250,23 +250,22 @@ class XmlaExecuteTools():
                                                     tuple_without_minus_1[
                                                         first_att - 1:]
                                                 ])))
-                                    xml.Caption('{0}'.format(
-                                        tuple_without_minus_1[-1]))
+                                    xml.Caption(
+                                        '{0}'.format(tuple_without_minus_1[-1]))
                                     xml.LName('[{0}].[{0}].[{1}]'.format(
                                         tuple_without_minus_1[0], splited_df[
                                             tuple_without_minus_1[0]].columns[
                                                 len(tuple_without_minus_1) -
                                                 first_att]))
                                     xml.LNum('{0}'.format(
-                                        len(tuple_without_minus_1) -
-                                        first_att))
+                                        len(tuple_without_minus_1) - first_att))
                                     xml.DisplayInfo('131076')
 
                                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
                                     # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
                                     if 'Hierarchize' in self.executer.mdx_query:
-                                        if len(tuple_without_minus_1[
-                                                first_att - 1:]) > 1:
+                                        if len(tuple_without_minus_1[first_att -
+                                                                     1:]) > 1:
                                             xml.PARENT_UNIQUE_NAME(
                                                 '[{0}].[{0}].[{1}].{2}'.format(
                                                     tuple_without_minus_1[0],
@@ -540,25 +539,24 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.mdx_execution_result['columns_desc']['columns'].keys())
-             == 0) ^
+        if ((len(self.mdx_execution_result['columns_desc']['columns'].keys()) ==
+             0) ^
             (len(self.mdx_execution_result['columns_desc']['rows'].keys()) == 0
-             )) and self.executer.facts in self.mdx_execution_result[
-                 'columns_desc']['all'].keys():
+            )) and self.executer.facts in self.mdx_execution_result[
+                'columns_desc']['all'].keys():
             # iterate DataFrame horizontally
-            columns_loop = itertools.chain(*[
+            columns_loop = itertools.chain(* [
                 self.mdx_execution_result['result'][measure]
                 for measure in self.mdx_execution_result['result'].columns
             ])
 
         else:
             # iterate DataFrame vertically
-            columns_loop = itertools.chain(
-                *[
-                    tuple
-                    for tuple in self.mdx_execution_result['result']
-                    .itertuples(index=False)
-                ])
+            columns_loop = itertools.chain(* [
+                tuple
+                for tuple in self.mdx_execution_result['result']
+                .itertuples(index=False)
+            ])
 
         xml = xmlwitch.Builder()
         index = 0
@@ -867,13 +865,11 @@ class XmlaExecuteTools():
                     name="[Measures].[MEMBER_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
                 xml.Caption(
-                    name="[Measures].[MEMBER_CAPTION]",
-                    **{'type': 'xs:string'})
+                    name="[Measures].[MEMBER_CAPTION]", **{'type': 'xs:string'})
                 xml.LName(
                     name="[Measures].[LEVEL_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
-                xml.LNum(
-                    name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
+                xml.LNum(name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
                 xml.DisplayInfo(
                     name="[Measures].[DISPLAY_INFO]",
                     **{'type': 'xs:unsignedInt'})
@@ -986,9 +982,8 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('2')
 
                         # todo Hierarchize delete/change !!
-                        if len(
-                                self.executer.selected_measures
-                        ) <= 1 and 'ON 0' not in self.executer.mdx_query:
+                        if len(self.executer.selected_measures
+                              ) <= 1 and 'ON 0' not in self.executer.mdx_query:
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0]))

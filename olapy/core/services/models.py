@@ -109,7 +109,7 @@ class Propertielist(ComplexModel):
 class Command(ComplexModel):
     """Command description (used by spyne)."""
 
-    _type_info = {'Statement': Unicode, }
+    _type_info = {'Statement': Unicode,}
 
 
 class ExecuteRequest(ComplexModel):

@@ -11,6 +11,7 @@ from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
 from olapy.core.services.xmla import XmlaProviderService
+
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -50,8 +51,7 @@ class WSGIServer:
     Copy/pasted from pytest_localserver w/ slight changes.
     """
 
-    def __init__(self, host='127.0.0.1', port=8000, application=None,
-                 **kwargs):
+    def __init__(self, host='127.0.0.1', port=8000, application=None, **kwargs):
         self._server = make_server(host, port, application, **kwargs)
         self.server_address = self._server.server_address
 
