@@ -12,7 +12,6 @@ pytest
 pytest-cov
 tox
 xmla
+yapf
 
-# 0.16 doesn't give as good looking output as this version
-yapf==0.15.2
 

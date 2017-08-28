@@ -208,12 +208,14 @@ def test_query2(conn):
     mems.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[City].[America].[United States].[New York]',
+            UName=
+            '[Geography].[Geography].[City].[America].[United States].[New York]',
             Caption='New York',
             LName='[Geography].[Geography].[City]',
             LNum='2',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[America].[United States]',
+            PARENT_UNIQUE_NAME=
+            '[Geography].[Geography].[Continent].[America].[United States]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
     mems.append(
         Member(
@@ -252,7 +254,8 @@ def test_query2(conn):
             LName='[Geography].[Geography].[City]',
             LNum='2',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
+            PARENT_UNIQUE_NAME=
+            '[Geography].[Geography].[Continent].[Europe].[Spain]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
     mems.append(
         Member(
@@ -262,7 +265,8 @@ def test_query2(conn):
             LName='[Geography].[Geography].[City]',
             LNum='2',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
+            PARENT_UNIQUE_NAME=
+            '[Geography].[Geography].[Continent].[Europe].[Spain]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
     mems.append(
         Member(
@@ -323,21 +327,23 @@ def test_query3(conn):
             LName='[Geography].[Geography].[Continent]',
             LNum='0',
             DisplayInfo='131076',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'), Member(
-                _Hierarchy='[Product].[Product]',
-                UName='[Product].[Product].[Company].[Crazy Development]',
-                Caption='Crazy Development',
-                LName='[Product].[Product].[Company]',
-                LNum='0',
-                DisplayInfo='131076',
-                HIERARCHY_UNIQUE_NAME='[Product].[Product]'), Member(
-                    _Hierarchy='[Time].[Time]',
-                    UName='[Time].[Time].[Year].[2010]',
-                    Caption='2010',
-                    LName='[Time].[Time].[Year]',
-                    LNum='0',
-                    DisplayInfo='131076',
-                    HIERARCHY_UNIQUE_NAME='[Time].[Time]')
+            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
+        Member(
+            _Hierarchy='[Product].[Product]',
+            UName='[Product].[Product].[Company].[Crazy Development]',
+            Caption='Crazy Development',
+            LName='[Product].[Product].[Company]',
+            LNum='0',
+            DisplayInfo='131076',
+            HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
+        Member(
+            _Hierarchy='[Time].[Time]',
+            UName='[Time].[Time].[Year].[2010]',
+            Caption='2010',
+            LName='[Time].[Time].[Year]',
+            LNum='0',
+            DisplayInfo='131076',
+            HIERARCHY_UNIQUE_NAME='[Time].[Time]')
     ])
     mems.append([
         Member(
@@ -347,21 +353,23 @@ def test_query3(conn):
             LName='[Geography].[Geography].[Continent]',
             LNum='0',
             DisplayInfo='131076',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'), Member(
-                _Hierarchy='[Product].[Product]',
-                UName='[Product].[Product].[Company].[Crazy Development]',
-                Caption='Crazy Development',
-                LName='[Product].[Product].[Company]',
-                LNum='0',
-                DisplayInfo='131076',
-                HIERARCHY_UNIQUE_NAME='[Product].[Product]'), Member(
-                    _Hierarchy='[Time].[Time]',
-                    UName='[Time].[Time].[Year].[2010]',
-                    Caption='2010',
-                    LName='[Time].[Time].[Year]',
-                    LNum='0',
-                    DisplayInfo='131076',
-                    HIERARCHY_UNIQUE_NAME='[Time].[Time]')
+            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
+        Member(
+            _Hierarchy='[Product].[Product]',
+            UName='[Product].[Product].[Company].[Crazy Development]',
+            Caption='Crazy Development',
+            LName='[Product].[Product].[Company]',
+            LNum='0',
+            DisplayInfo='131076',
+            HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
+        Member(
+            _Hierarchy='[Time].[Time]',
+            UName='[Time].[Time].[Year].[2010]',
+            Caption='2010',
+            LName='[Time].[Time].[Year]',
+            LNum='0',
+            DisplayInfo='131076',
+            HIERARCHY_UNIQUE_NAME='[Time].[Time]')
     ])
 
     for idx, item in enumerate(columns):

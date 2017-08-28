@@ -2,8 +2,8 @@ from __future__ import absolute_import, division, print_function
 
 from olapy.core.mdx.executor.execute import MdxEngine
 
-from .queries import CUBE, query1, query2, query3, query4, query5, \
-    query6, where
+from .queries import CUBE, query1, query2, query3, query4, query5, query6, \
+    where
 
 executer = MdxEngine(CUBE)
 
@@ -85,11 +85,11 @@ def test_parsing_query5():
 
     assert query_parts['all'] == [[
         'Geography', 'Economy', 'Partnership', 'EU'
-    ], ['Geography', 'Economy', 'Partnership', 'None'], [
-        'Geography', 'Economy', 'Partnership', 'NAFTA'
-    ], ['Product', 'Prod', 'Company', 'Crazy Development'], [
-        'Product', 'Prod', 'Company', 'Company_test'
-    ], ['Product', 'Prod', 'Company', 'test_Development']]
+    ], ['Geography', 'Economy', 'Partnership',
+        'None'], ['Geography', 'Economy', 'Partnership', 'NAFTA'], [
+            'Product', 'Prod', 'Company', 'Crazy Development'
+        ], ['Product', 'Prod', 'Company',
+            'Company_test'], ['Product', 'Prod', 'Company', 'test_Development']]
 
     assert query_parts['rows'] == [[
         'Product', 'Prod', 'Company', 'Crazy Development'
@@ -107,11 +107,11 @@ def test_parsing_query5():
 
     assert query_parts['all'] == [[
         'Geography', 'Economy', 'Partnership', 'EU'
-    ], ['Geography', 'Economy', 'Partnership', 'None'], [
-        'Geography', 'Economy', 'Partnership', 'NAFTA'
-    ], ['Product', 'Prod', 'Company', 'Crazy Development'], [
-        'Product', 'Prod', 'Company', 'Company_test'
-    ], ['Product', 'Prod', 'Company', 'test_Development'],
+    ], ['Geography', 'Economy', 'Partnership',
+        'None'], ['Geography', 'Economy', 'Partnership', 'NAFTA'], [
+            'Product', 'Prod', 'Company', 'Crazy Development'
+        ], ['Product', 'Prod', 'Company',
+            'Company_test'], ['Product', 'Prod', 'Company', 'test_Development'],
                                   ['Time', 'Calendar', 'Day', 'May 12,2010']]
 
     assert query_parts['rows'] == [[

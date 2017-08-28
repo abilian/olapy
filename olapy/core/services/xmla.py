@@ -57,11 +57,12 @@ class XmlaProviderService(ServiceBase):
     discover_tools = XmlaDiscoverTools()
     sessio_id = discover_tools.session_id
 
-    @rpc(DiscoverRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session,
-         _throws=InvalidCredentialsError)
+    @rpc(
+        DiscoverRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session,
+        _throws=InvalidCredentialsError)
     def Discover(ctx, request):
         """
         The first principle function of xmla protocol.
@@ -78,11 +79,12 @@ class XmlaProviderService(ServiceBase):
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
         config_parser = ConfigParser(discover_tools.executer.cube_path)
-        if config_parser.xmla_authentication() and ctx.transport.req_env[
-                'QUERY_STRING'] != 'admin':
+        if config_parser.xmla_authentication(
+        ) and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
             raise InvalidCredentialsError(
-                fault_string='You do not have permission to access this resource',
+                fault_string=
+                'You do not have permission to access this resource',
                 fault_object=None)
             # TODO call (labster) login function or create login with token (according to labster db)
 
@@ -143,10 +145,11 @@ class XmlaProviderService(ServiceBase):
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
-    @rpc(ExecuteRequest,
-         _returns=AnyXml,
-         _body_style="bare",
-         _out_header=Session)
+    @rpc(
+        ExecuteRequest,
+        _returns=AnyXml,
+        _body_style="bare",
+        _out_header=Session)
     def Execute(ctx, request):
         """
         The second principle function of xmla protocol.
@@ -203,12 +206,14 @@ class XmlaProviderService(ServiceBase):
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
                                         '%Y-%m-%dT%H:%M:%S'),
-                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
+                                    xmlns=
+                                    "http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
                                         '%Y-%m-%dT%H:%M:%S'),
-                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine"
+                                    xmlns=
+                                    "http://schemas.microsoft.com/analysisservices/2003/engine"
                                 )
 
                         with xml.AxesInfo:

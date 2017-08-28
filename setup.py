@@ -13,7 +13,7 @@ from setuptools import find_packages, setup
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 session = PipSession()
-_install_requires = parse_requirements('requirements.txt', session=session)
+_install_requires = parse_requirements('requirements.in', session=session)
 install_requires = [str(ir.req) for ir in _install_requires]
 
 setup(

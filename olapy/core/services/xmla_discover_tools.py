@@ -468,8 +468,9 @@ class XmlaDiscoverTools():
                         with xml.row:
                             xml.SchemaName(resp_row['SchemaName'])
                             xml.SchemaGuid(resp_row['SchemaGuid'])
-                            for idx, restriction in enumerate(resp_row[
-                                    'restrictions']['restriction_names']):
+                            for idx, restriction in enumerate(
+                                    resp_row['restrictions'][
+                                        'restriction_names']):
                                 with xml.Restrictions:
                                     xml.Name(restriction)
                                     xml.Type(resp_row['restrictions'][
@@ -912,7 +913,8 @@ class XmlaDiscoverTools():
 
                 with xml['return']:
                     with xml.root(
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            xmlns=
+                            "urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
                                 'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                                 'xmlns:xsi':
@@ -929,8 +931,8 @@ class XmlaDiscoverTools():
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)
                                 xml.CUBE_NAME(self.selected_catalogue)
-                                xml.DIMENSION_UNIQUE_NAME('[' + table_name +
-                                                          ']')
+                                xml.DIMENSION_UNIQUE_NAME(
+                                    '[' + table_name + ']')
                                 xml.HIERARCHY_NAME(table_name)
                                 xml.HIERARCHY_UNIQUE_NAME(
                                     '[{0}].[{0}]'.format(table_name))
@@ -939,8 +941,8 @@ class XmlaDiscoverTools():
                                 xml.HIERARCHY_CARDINALITY('6')
                                 xml.DEFAULT_MEMBER(
                                     '[{0}].[{0}].[{1}].[{2}]'.format(
-                                        table_name, df.columns[
-                                            0], column_attribut))
+                                        table_name, df.columns[0],
+                                        column_attribut))
                                 xml.STRUCTURE('0')
                                 xml.IS_VIRTUAL('false')
                                 xml.IS_READWRITE('false')

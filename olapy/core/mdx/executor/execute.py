@@ -178,9 +178,9 @@ class MdxEngine:
         tables = {}
 
         if self.client == 'excel' and config_file_parser.config_file_exist(
-                client_type=self.
-                client) and self.cube in config_file_parser.get_cubes_names(
-                    client_type=self.client):
+                client_type=self.client
+        ) and self.cube in config_file_parser.get_cubes_names(
+                client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
 
@@ -228,15 +228,14 @@ class MdxEngine:
         fusion = None
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
-                self.
-                client) and self.cube in config_file_parser.get_cubes_names(
+                self.client) and self.cube in config_file_parser.get_cubes_names(
                     client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
                 if cubes.source == 'postgres':
                     if self.client == 'web':
-                        fusion = _construct_web_star_schema_config_file(self,
-                                                                        cubes)
+                        fusion = _construct_web_star_schema_config_file(
+                            self, cubes)
                     else:
                         fusion = _construct_star_schema_config_file(self, cubes)
 
@@ -441,8 +440,9 @@ class MdxEngine:
                         continue
                 else:
                     tables_columns.update({
-                        tupl[0]: self.tables_loaded[tupl[0]].columns[:len(tupl[
-                            2:None if self.hierarchize_tuples() else -1])]
+                        tupl[0]:
+                        self.tables_loaded[tupl[0]].columns[:len(
+                            tupl[2:None if self.hierarchize_tuples() else -1])]
                     })
 
             axes.update({axis: tables_columns})
@@ -637,8 +637,9 @@ class MdxEngine:
         """
 
         columns = 2 if self.hierarchize_tuples() else 3
-        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[
-                tuple_as_list[0]].columns:
+        if len(
+                tuple_as_list
+        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -756,7 +757,8 @@ class MdxEngine:
             return {
                 'result':
                 df.groupby(cols, sort=sort).sum()[self.selected_measures],
-                'columns_desc': tables_n_columns
+                'columns_desc':
+                tables_n_columns
             }
 
         else:
