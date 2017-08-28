@@ -40,6 +40,8 @@ lint-python:
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
 
+lint-py3k:
+	pylint --py3k *.py $(SRC) tests
 
 clean:
 	find . -name "*.pyc" -delete
