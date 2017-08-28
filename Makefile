@@ -63,9 +63,9 @@ tidy: clean
 	rm -rf .tox
 
 format:
-	isort -rc $(SRC) tests *.py
-	yapf --style google -r -i $(SRC) tests *.py
-	isort -rc $(SRC) tests *.py
+	isort -rc $(SRC) tests micro_bench *.py
+	yapf --style google -r -i $(SRC) tests micro_bench *.py
+	isort -rc $(SRC) tests micro_bench *.py
 
 update-deps:
 	pip-compile -U > /dev/null

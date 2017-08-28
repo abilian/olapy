@@ -1,10 +1,10 @@
-import string
 import os
+import shutil
+import string
 from os.path import expanduser
 
-import pandas as pd
 import numpy as np
-import shutil
+import pandas as pd
 
 from olapy.core.mdx.executor.execute import MdxEngine
 
@@ -23,13 +23,12 @@ class CubeGen:
     # We have to generate DataFrames and save them to csv format because XmlaProviderService and
     # MdxEngine classes use those files
 
-    def __init__(self, number_dimensions=1, rows_length=1000,
-                 columns_length=2):
+    def __init__(self, number_dimensions=1, rows_length=1000, columns_length=2):
         self.number_dimensions = number_dimensions
         self.rows_length = rows_length
         self.columns_length = columns_length
-        self.cube_path = os.path.join(expanduser('~'), 'olapy-data',
-                                      MdxEngine.CUBE_FOLDER)
+        self.cube_path = os.path.join(
+            expanduser('~'), 'olapy-data', MdxEngine.CUBE_FOLDER)
 
     def generate_cube(self, min_val=5, max_val=100):
         """
@@ -60,7 +59,7 @@ class CubeGen:
         tables['Facts'] = facts
         return tables
 
-    def generate_csv(self,tables):
+    def generate_csv(self, tables):
         """
         Generate csv files for the generated DataFrames.
         

@@ -63,8 +63,8 @@ def main():
         NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
         [table0].[table0].[table0A].[""" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
-            1]) + """]})))
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[1]
+    ) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS
         FROM [""" + CUBE_NAME + """]
@@ -78,12 +78,12 @@ def main():
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
 
     tup = "[table0].[table0].[table0A].[" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
-            0]) + "]"
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[0]
+    ) + "]"
     for d in range(REFINEMENT_LVL):
         tup += ",\n[table0].[table0].[table0A].[" + str(
-            XmlaProviderService.discover_tools.star_schema_dataframe.table0A[
-                d + 1]) + "]"
+            XmlaProviderService.discover_tools.star_schema_dataframe.
+            table0A[d + 1]) + "]"
 
     cmd = """
         SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
@@ -136,8 +136,9 @@ def main():
             "Query 1 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 1', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
-                conn, cmd, 'foodmart')
+            'Query 1',
+            mbench.bench(c2, cmd2, 'FoodMart'),
+            mbench.bench(conn, cmd, 'foodmart')
         ])
 
         cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
@@ -160,8 +161,9 @@ def main():
             "Query 2 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 2', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
-                conn, cmd, 'foodmart')
+            'Query 2',
+            mbench.bench(c2, cmd2, 'FoodMart'),
+            mbench.bench(conn, cmd, 'foodmart')
         ])
 
         cmd = """SELECT NON EMPTY CrossJoin(Hierarchize(AddCalculatedMembers({
@@ -185,8 +187,9 @@ def main():
             "Query 3 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 3', mbench.bench(c2, cmd2, 'FoodMart'), mbench.bench(
-                conn, cmd, 'foodmart')
+            'Query 3',
+            mbench.bench(c2, cmd2, 'FoodMart'),
+            mbench.bench(conn, cmd, 'foodmart')
         ])
 
         file.write(str(t) + "\n\n")
@@ -216,8 +219,9 @@ def main():
             "Query 1 :\n" + cmd +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 1', mbench.bench(conn, cmd, 'sales'), mbench.bench(
-                c2, cmd, 'Sales (Excel)')
+            'Query 1',
+            mbench.bench(conn, cmd, 'sales'),
+            mbench.bench(c2, cmd, 'Sales (Excel)')
         ])
 
         cmd = """SELECT
@@ -240,8 +244,9 @@ def main():
             "Query 2 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 2', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
-                c2, cmd, 'Sales (Excel)')
+            'Query 2',
+            mbench.bench(conn, cmd2, 'sales'),
+            mbench.bench(c2, cmd, 'Sales (Excel)')
         ])
 
         cmd = """SELECT
@@ -275,8 +280,9 @@ def main():
             "Query 3 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 3', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
-                c2, cmd, 'Sales (Excel)')
+            'Query 3',
+            mbench.bench(conn, cmd2, 'sales'),
+            mbench.bench(c2, cmd, 'Sales (Excel)')
         ])
 
         cmd = """SELECT
@@ -313,8 +319,9 @@ def main():
             "Query 4 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 4', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
-                c2, cmd, 'Sales (Excel)')
+            'Query 4',
+            mbench.bench(conn, cmd2, 'sales'),
+            mbench.bench(c2, cmd, 'Sales (Excel)')
         ])
 
         cmd = """SELECT
@@ -368,8 +375,9 @@ def main():
             "Query 5 :\n" + cmd2 +
             "\n----------------------------------------------------------\n\n")
         t.add_row([
-            'Query 5', mbench.bench(conn, cmd2, 'sales'), mbench.bench(
-                c2, cmd, 'Sales (Excel)')
+            'Query 5',
+            mbench.bench(conn, cmd2, 'sales'),
+            mbench.bench(c2, cmd, 'Sales (Excel)')
         ])
 
         file.write(str(t) + "\n\n")
@@ -417,7 +425,8 @@ XmlaProviderService().Execute(XmlaProviderService(),request)""",
 
     try:
         os.system(
-            'gprof2dot -f pstats __init__.py.profile | dot -Tpng -o profile.png')
+            'gprof2dot -f pstats __init__.py.profile | dot -Tpng -o profile.png'
+        )
     except:
         print('make sure gprof2dot and graphviz are installed')
 
