@@ -2,7 +2,7 @@ dependencies:
   cache_directories:
      - "~/.cache/"
   override:
-    - pip install -U pip tox
+    - pip install -U pip tox wheel
     # Just to fill up the cache (to speed up later builds)
     - pip install -q -r requirements.txt
 
