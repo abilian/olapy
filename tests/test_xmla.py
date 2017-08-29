@@ -177,8 +177,10 @@ def test_query2(conn):
     for cell in res.cellmap.viewitems():
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
-    mems = []
-    mems.append(
+    assert values == [768, 768, 768, 255, 4, 3, 2, 1, 248]
+
+    expected = []
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Continent].[America]',
@@ -187,7 +189,7 @@ def test_query2(conn):
             LNum='0',
             DisplayInfo='131076',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Country].[America].[United States]',
@@ -197,7 +199,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[America]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[City].[America].[United States].[New York]',
@@ -207,7 +209,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[America].[United States]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Continent].[Europe]',
@@ -216,7 +218,7 @@ def test_query2(conn):
             LNum='0',
             DisplayInfo='131076',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Country].[Europe].[France]',
@@ -226,7 +228,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Country].[Europe].[Spain]',
@@ -236,7 +238,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[City].[Europe].[Spain].[Barcelona]',
@@ -246,7 +248,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[City].[Europe].[Spain].[Madrid]',
@@ -256,7 +258,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    mems.append(
+    expected.append(
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Country].[Europe].[Switzerland]',
@@ -266,8 +268,7 @@ def test_query2(conn):
             DisplayInfo='131076',
             PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
-    assert [Member(**dict(co)) for co in columns] == mems
-    assert values == [768, 768, 768, 255, 4, 3, 2, 1, 248]
+    assert [Member(**dict(co)) for co in columns] == expected
 
 
 def test_query3(conn):
@@ -305,8 +306,8 @@ def test_query3(conn):
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
 
-    mems = []
-    mems.append([
+    expected = []
+    expected.append([
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Continent].[America]',
@@ -332,7 +333,7 @@ def test_query3(conn):
             DisplayInfo='131076',
             HIERARCHY_UNIQUE_NAME='[Time].[Time]')
     ])
-    mems.append([
+    expected.append([
         Member(
             _Hierarchy='[Geography].[Geography]',
             UName='[Geography].[Geography].[Continent].[Europe]',
@@ -360,7 +361,7 @@ def test_query3(conn):
     ])
 
     for idx, item in enumerate(columns):
-        assert [Member(**dict(co)) for co in item] == mems[idx]
+        assert [Member(**dict(co)) for co in item] == expected[idx]
     assert values == [768, 255]
 
 
@@ -420,11 +421,12 @@ def test_query4(conn):
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
 
-    strr = """"""
-    for idx, item in enumerate(columns):
-        strr += str(item)
-    assert strr == TEST_QUERY_AXIS0
     assert values == [
         768, 255, 4, 3, 248, 768, 255, 4, 3, 248, 576, 1304, 2, 925, 377, 576,
         1304, 2, 925, 377
     ]
+
+    strr = ""
+    for item in columns:
+        strr += str(item)
+    assert strr == TEST_QUERY_AXIS0
