@@ -102,8 +102,8 @@ class MdxEngine:
 
         olapy_data_location = os.path.join(home_directory, 'olapy-data')
 
-        # surrended with try, except and PASS so we continue getting cubes from different
-        # sources (db, csv...) without interruption
+        # surrended with try, except and pass so we continue getting cubes
+        # from different sources (db, csv...) without interruption
         cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
         try:
             MdxEngine.csv_files_cubes = [
@@ -117,8 +117,8 @@ class MdxEngine:
             pass
 
         # get postgres databases
-        # surrended with try, except and PASS so we continue getting cubes from different
-        # sources (db, csv...) without interruption
+        # surrounnded with try, except and pass so we continue getting cubes
+        # from different sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
@@ -158,23 +158,21 @@ class MdxEngine:
         return os.path.join(home_directory, self.cube_folder)
 
     def _get_tables_name(self):
-        """
-        Get all tables names.
+        """Get all tables names.
 
         :return: list tables names
         """
         return self.tables_loaded.keys()
 
     def hierarchize_tuples(self):
-        """
-        check if hierarchized mdx query
+        """Check if hierarchized mdx query.
+
         :return: True | False
         """
         return 'Hierarchize' in self.mdx_query
 
     def load_tables(self):
-        """
-        Load all tables { Table name : DataFrame } of the current cube instance.
+        """Load all tables { Table name : DataFrame } of the current cube instance.
 
         :return: dict with key as table name and DataFrame as value
         """
@@ -303,18 +301,19 @@ class MdxEngine:
 
                     FROM {sales}
 
-            it returns :
+        It returns ::
 
-                [
+            [
                 ['Geography','Geography','Continent'],
                 ['Geography','Geography','Continent','Europe'],
                 ['Product','Product','Company']
-                ]
+            ]
 
 
         :param query: mdx query
-        :param start: key-word in the query where we start (examples start = SELECT)
-        :param stop:  key-word in the query where we stop (examples start = ON ROWS)
+        :param start: keyword in the query where we start (examples start = SELECT)
+        :param stop:  keyword in the query where we stop (examples start = ON ROWS)
+
         :return:  nested list of tuples (see the example)
         """
 

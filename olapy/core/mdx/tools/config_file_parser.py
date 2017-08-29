@@ -269,7 +269,12 @@ class ConfigParser:
             self.cube_path = cube_path
 
         self.file_name = file_name
+        self.config_file_path = os.path.join(
+            self.cube_path, self.file_name,)
+
         self.web_config_file_name = web_config_file_name
+        self.web_config_file_path = os.path.join(
+            self.cube_path, self.web_config_file_name,)
 
     def config_file_exist(self, client_type):
         """
@@ -278,9 +283,8 @@ class ConfigParser:
         :return: True | False
         """
         if client_type == 'web':
-            return os.path.isfile(
-                os.path.join(self.cube_path, self.web_config_file_name),)
-        return os.path.isfile(os.path.join(self.cube_path, self.file_name))
+            return os.path.isfile(self.web_config_file_path)
+        return os.path.isfile(self.config_file_path)
 
     def xmla_authentication(self):
         """
@@ -312,14 +316,13 @@ class ConfigParser:
         :return: dict of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
         """
         if client_type == 'excel':
-            file_name = self.file_name
+            file_path = self.config_file_path
         elif client_type == 'web':
-            file_name = self.web_config_file_name
+            file_path = self.web_config_file_path
         else:
             raise ValueError("Unknown client_type: {}".format(client_type))
 
-        with open(os.path.join(self.cube_path, file_name)) as config_file:
-
+        with open(file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -328,16 +331,12 @@ class ConfigParser:
                     cube.find('name').text: cube.find('source').text
                     for cube in tree.xpath('/cubes/cube')
                 }
-            except BaseException:
-                print('missed name or source tags')
-                raise ValueError
+            except BaseException:  # pragma: no cover
+                raise ValueError('missed name or source tags')
 
     def _construct_cubes_excel(self):
         try:
-            with open(os.path.join(
-                    self.cube_path,
-                    self.file_name,)) as config_file:
-
+            with self.config_file_path as config_file:
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
 
@@ -384,12 +383,11 @@ class ConfigParser:
                 for xml_cube in tree.xpath('/cubes/cube')
             ]
         except BaseException:
-            print('Bad configuration in the configuration file')
-            raise
+            raise ValueError('Bad configuration in the configuration file')
 
     def construct_cubes(self, client_type='excel'):
-        """
-        Construct cube (with it dimensions) and facts from  the config file.
+        """Construct cube (with it dimensions) and facts from the config file.
+
         :param client_type: excel | web
         :return: list of Cubes instance
         """
@@ -401,14 +399,10 @@ class ConfigParser:
                 return self._construct_cubes_web()
 
         else:
-            print("Config file don't exist")
+            print("Config file doesn't exist")
 
     def _construct_cubes_web(self):
-
-        # try:
-        with open(os.path.join(
-                self.cube_path,
-                self.web_config_file_name,)) as config_file:
+        with open(self.web_config_file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -443,15 +437,9 @@ class ConfigParser:
                 facts=facts,
                 tables=tables,) for xml_cube in tree.xpath('/cubes/cube')
         ]
-        # except:
-        #     raise ('Bad configuration in the configuration file')
 
     def construct_web_dashboard(self):
-
-        # try:
-        with open(os.path.join(
-                self.cube_path,
-                self.web_config_file_name,)) as config_file:
+        with open(self.web_config_file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -473,5 +461,3 @@ class ConfigParser:
                 },)
             for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
         ]
-        # except:
-        #     raise ('Bad configuration in the configuration file')
