@@ -555,8 +555,8 @@ class XmlaExecuteTools():
 
         columns_desc = self.mdx_execution_result['columns_desc']
         if (
-            len(columns_desc['columns'].keys()) == 0
-            or len(columns_desc['rows'].keys()) == 0
+            len(columns_desc['columns'].keys()) == 0 or
+            len(columns_desc['rows'].keys()) == 0
         ) \
                 and self.executer.facts in columns_desc['all'].keys():
             # iterate DataFrame horizontally
@@ -999,8 +999,8 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('2')
 
                         # todo Hierarchize delete/change !!
-                        if len(self.executer.selected_measures,
-                               ) <= 1 and 'ON 0' not in self.executer.mdx_query:
+                        if len(self.executer.selected_measures) <= 1 \
+                                and 'ON 0' not in self.executer.mdx_query:
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0],))
