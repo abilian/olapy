@@ -20,7 +20,8 @@ def _load_tables_csv_files(executer_instance):
     for file in os.listdir(cube):
         # to remove file extension ".csv"
         table_name = os.path.splitext(file)[0]
-        value = pd.read_csv(os.path.join(cube, file), sep=executer_instance.sep)
+        value = pd.read_csv(os.path.join(cube, file),
+                            sep=executer_instance.sep)
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
@@ -46,7 +47,7 @@ def _construct_star_schema_csv_files(executer_instance):
                 pd.read_csv(
                     os.path.join(cube, file_name),
                     sep=executer_instance.sep,),)
-        except:
+        except BaseException:
             print('No common column')
             pass
 

@@ -34,9 +34,11 @@ lint: lint-python
 
 lint-python:
 	@echo "--> Linting Python files"
-	-flake8 $(SRC) tests
+	flake8 $(SRC) tests
+
 	@echo "Checking Py3k (basic) compatibility"
 	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
 
@@ -65,6 +67,7 @@ tidy: clean
 format:
 	isort -rc $(SRC) tests micro_bench *.py
 	yapf --style google -r -i $(SRC) tests micro_bench *.py
+	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench
 	isort -rc $(SRC) tests micro_bench *.py
 
 update-deps:

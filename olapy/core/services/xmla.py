@@ -82,10 +82,10 @@ class XmlaProviderService(ServiceBase):
                 and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
             raise InvalidCredentialsError(
-                fault_string=
-                'You do not have permission to access this resource',
+                fault_string='You do not have permission to access this resource',
                 fault_object=None,)
-            # TODO call (labster) login function or create login with token (according to labster db)
+            # TODO call (labster) login function or create login with token
+            # (according to labster db)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return discover_tools.discover_datasources_response()
@@ -202,14 +202,12 @@ class XmlaProviderService(ServiceBase):
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
                                         '%Y-%m-%dT%H:%M:%S',),
-                                    xmlns=
-                                    "http://schemas.microsoft.com/analysisservices/2003/engine",
+                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
                                         '%Y-%m-%dT%H:%M:%S',),
-                                    xmlns=
-                                    "http://schemas.microsoft.com/analysisservices/2003/engine",
+                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
 
                         with xml.AxesInfo:
@@ -232,7 +230,8 @@ application = Application(
     in_protocol=XmlaSoap11(validator='soft'),
     out_protocol=XmlaSoap11(validator='soft'),)
 
-# validator='soft' or nothing, this is important because spyne doesn't support encodingStyle until now !!!!
+# validator='soft' or nothing, this is important because spyne doesn't
+# support encodingStyle until now !!!!
 
 wsgi_application = WsgiApplication(application)
 

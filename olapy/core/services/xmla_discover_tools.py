@@ -675,7 +675,9 @@ class XmlaDiscoverTools():
 
             return str(xml)
 
-        if request.Restrictions.RestrictionList.SchemaName == "MDSCHEMA_HIERARCHIES" and request.Properties.PropertyList.Catalog is not None:
+        restriction_list = request.Restrictions.RestrictionList
+        if restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES" \
+                and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -713,7 +715,8 @@ class XmlaDiscoverTools():
 
             return generate_resp(rows)
 
-        if request.Restrictions.RestrictionList.SchemaName == 'MDSCHEMA_MEASURES' and request.Properties.PropertyList.Catalog is not None:
+        if restriction_list.SchemaName == 'MDSCHEMA_MEASURES' \
+                and request.Properties.PropertyList.Catalog is not None:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -1043,7 +1046,7 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_measures_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Properties.PropertyList.Catalog is not None:
+                request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -1078,8 +1081,8 @@ class XmlaDiscoverTools():
 
     def discover_mdschema_dimensions_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and\
-                        request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
-                        request.Properties.PropertyList.Catalog is not None:
+                request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue and \
+                request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             ord = 1
@@ -1134,17 +1137,20 @@ class XmlaDiscoverTools():
     def discover_mdschema_hierarchies_response(self, request):
 
         # Enumeration of hierarchies in all dimensions
-        if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and request.Properties.PropertyList.Catalog is not None:
+        restriction_list = request.Restrictions.RestrictionList
+
+        if restriction_list.CUBE_NAME == self.selected_catalogue \
+                and request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            if request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3 or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_catalogue:
+            if restriction_list.HIERARCHY_VISIBILITY == 3 \
+                    or restriction_list.CATALOG_NAME == self.selected_catalogue:
 
                 xml = xmlwitch.Builder()
 
                 with xml['return']:
                     with xml.root(
-                            xmlns=
-                            "urn:schemas-microsoft-com:xml-analysis:rowset",
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                             **{
                                 'xmlns:xsd':
                                 'http://www.w3.org/2001/XMLSchema',
@@ -1213,7 +1219,7 @@ class XmlaDiscoverTools():
     def discover_mdschema_levels_response(self, request):
         # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
-                        request.Properties.PropertyList.Catalog is not None:
+                request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 

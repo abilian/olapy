@@ -243,11 +243,10 @@ class ConfigParser:
 
     """
 
-    def __init__(
-            self,
-            cube_path=None,
-            file_name='cubes-config.xml',
-            web_config_file_name='web_cube_config.xml',):
+    def __init__(self,
+                 cube_path=None,
+                 file_name='cubes-config.xml',
+                 web_config_file_name='web_cube_config.xml'):
         """
 
         :param cube_path: path to cube (csv folders)
@@ -261,7 +260,8 @@ class ConfigParser:
             home_directory = expanduser("~")
 
         if cube_path is None:
-            self.cube_path = os.path.join(home_directory, 'olapy-data', 'cubes')
+            self.cube_path = os.path.join(
+                home_directory, 'olapy-data', 'cubes')
         else:
             self.cube_path = cube_path
 
@@ -298,7 +298,7 @@ class ConfigParser:
                 try:
                     return tree.xpath('/cubes/xmla_authentication')[
                         0].text == 'True'
-                except:
+                except BaseException:
                     return False
         else:
             return False
@@ -312,6 +312,8 @@ class ConfigParser:
             file_name = self.file_name
         elif client_type == 'web':
             file_name = self.web_config_file_name
+        else:
+            raise ValueError("Unknown client_type: {}".format(client_type))
 
         with open(os.path.join(self.cube_path, file_name)) as config_file:
 
@@ -323,7 +325,7 @@ class ConfigParser:
                     cube.find('name').text: cube.find('source').text
                     for cube in tree.xpath('/cubes/cube')
                 }
-            except:
+            except BaseException:
                 print('missed name or source tags')
                 raise ValueError
 
@@ -378,7 +380,7 @@ class ConfigParser:
                     dimensions=dimensions,)
                 for xml_cube in tree.xpath('/cubes/cube')
             ]
-        except:
+        except BaseException:
             print('Bad configuration in the configuration file')
             raise
 

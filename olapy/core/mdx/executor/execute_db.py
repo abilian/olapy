@@ -123,7 +123,7 @@ def _construct_star_schema_db(executer_instance):
                     psql.read_sql_query(
                         "SELECT * FROM {0}".format(db_table_name[0],),
                         connection,),)
-            except:
+            except BaseException:
                 print('No common column')
                 pass
 

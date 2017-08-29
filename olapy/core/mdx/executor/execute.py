@@ -26,7 +26,8 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 class MdxEngine:
     """The main class for executing a query.
 
-    :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
+    :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER
+        (example : home_directory/olapy-data/cubes/sales)
     :param cube_folder: parent cube folder name
     :param mdx_query: query to execute
     :param sep: separator in the csv files
@@ -81,7 +82,8 @@ class MdxEngine:
     @classmethod
     def get_cubes_names(cls):
         """
-        :return: list cubes name that exist in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected).
+        :return: list cubes name that exist in cubes folder
+            (under ~/olapy-data/cubes) and postgres database (if connected).
         """
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
@@ -185,7 +187,8 @@ class MdxEngine:
                 and self.cube in config_file_parser.get_cubes_names(
                     client_type=self.client):
 
-            # for web (config file) we need only star_schema_dataframes, not all tables
+            # for web (config file) we need only star_schema_dataframes, not
+            # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
                 if cubes.source == 'postgres':
@@ -241,7 +244,8 @@ class MdxEngine:
                             self,
                             cubes,)
                     else:
-                        fusion = _construct_star_schema_config_file(self, cubes)
+                        fusion = _construct_star_schema_config_file(
+                            self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -379,7 +383,7 @@ class MdxEngine:
                 start = 'FROM'
                 on_where = self.get_tuples(query, start)
 
-        except:
+        except BaseException:
             raise SyntaxError('Please check your MDX Query')
 
         return {
@@ -606,7 +610,8 @@ class MdxEngine:
                 Time -> Year,Month,Day
 
 
-        we have to use only dimension's columns of current dimension that exist in tuple_as_list and keep other dimensions columns
+        we have to use only dimension's columns of current dimension that exist
+        in tuple_as_list and keep other dimensions columns
 
         so if tuple_as_list = ['Geography','Geography','Continent']
 
@@ -708,7 +713,8 @@ class MdxEngine:
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
         # if we have tuples in axes
-        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
+        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
+        # ([Measures].[Amount])
         if tuples_on_mdx_query:
 
             df_to_fusion = []
@@ -717,11 +723,13 @@ class MdxEngine:
             for tupl in tuples_on_mdx_query:
                 # if we have measures in columns or rows axes like :
                 # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
-                # we use only used columns for dimension in that tuple and keep other dimension's columns
+                # we use only used columns for dimension in that tuple and keep
+                # other dimension's columns
                 self.update_columns_to_keep(tupl, columns_to_keep)
                 # a tuple with new dimension
                 if tupl[0] != table_name:
-                    # if we change dimension , we have to work on the exection's result on previous DataFrames
+                    # if we change dimension , we have to work on the
+                    # exection's result on previous DataFrames
 
                     # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
                     # solution 1 .astype(str) ( take a lot of time from execution)
@@ -745,7 +753,8 @@ class MdxEngine:
                         start_df,
                         columns_to_keep.values(),),)
 
-            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(itertools.chain.from_iterable(
+                columns_to_keep.values()))
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

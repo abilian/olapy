@@ -89,7 +89,8 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
             left_on=fact_key,
             right_on=dimension_and_key.split('.')[1],
             how='left',
-            # remove suffixe from dimension and keep the same column name for facts
+            # remove suffixe from dimension and keep the same column name for
+            # facts
             suffixes=('', '_y'),)
 
     # measures in config-file only
@@ -115,7 +116,7 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
             if table.columns:
                 tab = tab[table.columns]
 
-        except:
+        except BaseException:
             print("table columns doesn't exist")
             print('pass with all columns')
 
@@ -123,7 +124,7 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
             if table.new_names:
                 tab = tab.rename(columns=table.new_names)
 
-        except:
+        except BaseException:
             print("verify your old and new columns names")
             print('pass with no change')
 
@@ -178,7 +179,8 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
             left_on=fact_key,
             right_on=dimension_and_key.split('.')[1],
             how='left',
-            # remove suffixe from dimension and keep the same column name for facts
+            # remove suffixe from dimension and keep the same column name for
+            # facts
             suffixes=('', '_y'),)
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]

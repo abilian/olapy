@@ -251,7 +251,8 @@ class XmlaExecuteTools():
                                                 first_att - 1:]
                                         ]),))
                                     xml.Caption(
-                                        '{0}'.format(tuple_without_minus_1[-1]),
+                                        '{0}'.format(
+                                            tuple_without_minus_1[-1]),
                                     )
                                     xml.LName('[{0}].[{0}].[{1}]'.format(
                                         tuple_without_minus_1[0],
@@ -264,7 +265,8 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('131076')
 
                                     # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
-                                    # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
+                                    # todo delete change 'Hierarchize' in
+                                    # self.executer.mdx_query !!!!
                                     if 'Hierarchize' in self.executer.mdx_query:
                                         if len(tuple_without_minus_1[first_att -
                                                                      1:]) > 1:
@@ -284,7 +286,8 @@ class XmlaExecuteTools():
                                             '[{0}].[{0}]'.format(
                                                 tuple_without_minus_1[0],),)
 
-                            # todo delete change 'Hierarchize' in self.executer.mdx_query !!!!
+                            # todo delete change 'Hierarchize' in
+                            # self.executer.mdx_query !!!!
                             if 'ON 0' in self.executer.mdx_query:
                                 with xml.Member(Hierarchy="[Measures]"):
                                     xml.UName(
@@ -555,7 +558,8 @@ class XmlaExecuteTools():
         if (
             (len(self.mdx_execution_result['columns_desc']['columns'].keys()) ==
              0) ^
-            (len(self.mdx_execution_result['columns_desc']['rows'].keys()) == 0)
+            (len(
+                self.mdx_execution_result['columns_desc']['rows'].keys()) == 0)
         ) and self.executer.facts in self.mdx_execution_result['columns_desc']['all'].keys(
         ):
             # iterate DataFrame horizontally
@@ -879,7 +883,8 @@ class XmlaExecuteTools():
                 xml.LName(
                     name="[Measures].[LEVEL_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
-                xml.LNum(name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
+                xml.LNum(name="[Measures].[LEVEL_NUMBER]",
+                         **{'type': 'xs:int'})
                 xml.DisplayInfo(
                     name="[Measures].[DISPLAY_INFO]",
                     **{'type': 'xs:unsignedInt'})
@@ -998,7 +1003,7 @@ class XmlaExecuteTools():
 
                         # todo Hierarchize delete/change !!
                         if len(self.executer.selected_measures,
-                              ) <= 1 and 'ON 0' not in self.executer.mdx_query:
+                               ) <= 1 and 'ON 0' not in self.executer.mdx_query:
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0],))
