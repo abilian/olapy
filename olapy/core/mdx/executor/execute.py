@@ -183,9 +183,11 @@ class MdxEngine:
 
         if self.client == 'excel' \
                 and config_file_parser.config_file_exist(
-                    client_type=self.client) \
+                    client_type=self.client,
+                ) \
                 and self.cube in config_file_parser.get_cubes_names(
-                    client_type=self.client):
+                    client_type=self.client,
+                ):
 
             # for web (config file) we need only star_schema_dataframes, not
             # all tables
@@ -245,7 +247,8 @@ class MdxEngine:
                             cubes,)
                     else:
                         fusion = _construct_star_schema_config_file(
-                            self, cubes)
+                            self,
+                            cubes,)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
@@ -753,8 +756,8 @@ class MdxEngine:
                         start_df,
                         columns_to_keep.values(),),)
 
-            cols = list(itertools.chain.from_iterable(
-                columns_to_keep.values()))
+            cols = list(
+                itertools.chain.from_iterable(columns_to_keep.values(),),)
 
             # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
             # solution 1 .astype(str) ( take a lot of time from execution)

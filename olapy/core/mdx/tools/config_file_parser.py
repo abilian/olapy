@@ -243,10 +243,11 @@ class ConfigParser:
 
     """
 
-    def __init__(self,
-                 cube_path=None,
-                 file_name='cubes-config.xml',
-                 web_config_file_name='web_cube_config.xml'):
+    def __init__(
+            self,
+            cube_path=None,
+            file_name='cubes-config.xml',
+            web_config_file_name='web_cube_config.xml',):
         """
 
         :param cube_path: path to cube (csv folders)
@@ -261,7 +262,9 @@ class ConfigParser:
 
         if cube_path is None:
             self.cube_path = os.path.join(
-                home_directory, 'olapy-data', 'cubes')
+                home_directory,
+                'olapy-data',
+                'cubes',)
         else:
             self.cube_path = cube_path
 

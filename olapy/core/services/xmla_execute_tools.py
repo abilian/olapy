@@ -84,8 +84,8 @@ class XmlaExecuteTools():
         # todo change remove (temporary) !!!
         return [
             tup[0]
-            for tup in re.compile(
-                MdxEngine.regex).findall(self.executer.mdx_query,)
+            for tup in re.compile(MdxEngine.regex,).findall(
+                self.executer.mdx_query,)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
@@ -250,10 +250,8 @@ class XmlaExecuteTools():
                                             for i in tuple_without_minus_1[
                                                 first_att - 1:]
                                         ]),))
-                                    xml.Caption(
-                                        '{0}'.format(
-                                            tuple_without_minus_1[-1]),
-                                    )
+                                    xml.Caption('{0}'.format(
+                                        tuple_without_minus_1[-1],),)
                                     xml.LName('[{0}].[{0}].[{1}]'.format(
                                         tuple_without_minus_1[0],
                                         splited_df[tuple_without_minus_1[0]]
@@ -555,13 +553,12 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
+        columns_desc = self.mdx_execution_result['columns_desc']
         if (
-            (len(self.mdx_execution_result['columns_desc']['columns'].keys()) ==
-             0) ^
-            (len(
-                self.mdx_execution_result['columns_desc']['rows'].keys()) == 0)
-        ) and self.executer.facts in self.mdx_execution_result['columns_desc']['all'].keys(
-        ):
+            len(columns_desc['columns'].keys()) == 0
+            or len(columns_desc['rows'].keys()) == 0
+        ) \
+                and self.executer.facts in columns_desc['all'].keys():
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(* [
                 self.mdx_execution_result['result'][measure]
