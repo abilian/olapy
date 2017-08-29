@@ -1,91 +1,45 @@
-class Facts:
+import attr
+
+
+@attr.s
+class Facts(object):
     """Facts class used to encapsulate config file attributes."""
 
-    def __init__(self, **kwargs):
-        """
-        :param kwargs: {table_name : 'something',
-            keys :
-                {
-                    column_name : 'something',
-                    ref : 'something'
-                },
-            measures :
-                {
-                    name : 'something'
-                }
-
-            }
-
-        """
-        self.__dict__.update(kwargs)
-
-    def __str__(self):
-        return str(self.__dict__)
+    table_name = attr.ib()
+    keys = attr.ib()
+    measures = attr.ib()
 
 
-class Dimension:
+@attr.s
+class Dimension(object):
     """Dimension class used to encapsulate config file attributes."""
 
-    def __init__(self, **kwargs):
-        """
-        :param kwargs: {
-                        name : 'something',
-                        displayName : 'something',
-                        columns :
-                            { name : 'something' }
-                        }
-        """
-        self.__dict__.update(kwargs)
-
-    def __str__(self):
-        return str(self.__dict__)
+    name = attr.ib()
+    displayName = attr.ib()
+    columns = attr.ib()
 
 
-class Cube:
+@attr.s
+class Cube(object):
     """Cube class used to encapsulate config file attributes."""
 
-    def __init__(self, **kwargs):
-        """
-        :param kwargs: {
-                        name : 'something',
-                        source : 'something',
-                        }
-        """
-        self.__dict__.update(kwargs)
-
-    def __str__(self):
-        return str(self.__dict__)
+    name = attr.ib()
+    source = attr.ib()
 
 
-class Table:
+@attr.s
+class Table(object):
     """Column class used to encapsulate config file attributes for web client."""
 
-    def __init__(self, **kwargs):
-        """
-        :param kwargs: {
-                        table_name      : 'something',
-                        old_column_name : 'something',
-                        new_column_name : 'something'
-                        }
-        """
-        self.__dict__.update(kwargs)
-
-    def __str__(self):
-        return str(self.__dict__)
+    table_name = attr.ib()
+    old_column_name = attr.ib()
+    new_column_name = attr.ib()
 
 
-class Dashboard:
+@attr.s
+class Dashboard(object):
     """Column class used to encapsulate config file attributes for web client."""
 
-    def __init__(self, **kwargs):
-        """
-        :param kwargs: {
-                        table_name      : 'something',
-                        old_column_name : 'something',
-                        new_column_name : 'something'
-                        }
-        """
-        self.__dict__.update(kwargs)
-
-    def __str__(self):
-        return str(self.__dict__)
+    table_name = attr.ib()
+    old_column_name = attr.ib()
+    new_column_name = attr.ib()
