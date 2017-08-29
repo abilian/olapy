@@ -122,7 +122,6 @@ class XmlaExecuteTools():
                 +----------+---------+---------+
 
 
-        :param mdx_execution_result: MdxEngine.execute_mdx() result
         :return: dict with multiple DataFrame
         """
         # TODO new version with facts as splited df maybe
@@ -204,7 +203,6 @@ class XmlaExecuteTools():
             axis="Axis0",):
         """
 
-        :param mdx_execution_result:
         :param splited_df:
         :return:
         """
@@ -402,7 +400,6 @@ class XmlaExecuteTools():
         """
         Example of xs0::
 
-
              <Axis name="Axis0">
                 <Tuples>
                     <Tuple>
@@ -447,7 +444,6 @@ class XmlaExecuteTools():
                 </Tuples>
              </Axis>
 
-        :param mdx_execution_result: mdx_execute() result
         :return: xs0 xml as string
         """
         # TODO must be OPTIMIZED every time!!!!!
@@ -491,10 +487,6 @@ class XmlaExecuteTools():
 
     def _generate_cells_data_convert2formulas(self):
         """
-
-        :return:
-        """
-        """
         for each tuple:
         <Cell CellOrdinal="0">
             <Value>[Measures].[Amount]</Value>
@@ -536,7 +528,7 @@ class XmlaExecuteTools():
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
         """
-        Examle of CellData::
+        Example of CellData::
 
             <Cell CellOrdinal="0">
                 <Value xsi:type="xsi:long">768</Value>
@@ -546,7 +538,6 @@ class XmlaExecuteTools():
                 <Value xsi:type="xsi:long">255</Value>
             </Cell>
 
-        :param mdx_execution_result: mdx_execute() result
         :return: CellData as string
         """
 
@@ -634,7 +625,6 @@ class XmlaExecuteTools():
                 </AxisInfo>
             </AxesInfo>
 
-        :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
 
@@ -724,7 +714,6 @@ class XmlaExecuteTools():
                 </AxisInfo>
             </AxesInfo>
 
-        :param mdx_execution_result:
         :param mdx_query_axis:  columns or rows (columns by default)
         :param Axis: Axis0 or Axis1 (Axis0 by default)
         :return:
@@ -890,8 +879,6 @@ class XmlaExecuteTools():
 
     def generate_axes_info(self):
         """
-
-        :param mdx_execution_result: mdx_execute() result
         :return: AxisInfo as string
         """
 
@@ -939,7 +926,6 @@ class XmlaExecuteTools():
         """
         Example SlicerAxis::
 
-
             <Axis name="SlicerAxis">
                 <Tuples>
                     <Tuple>
@@ -961,7 +947,6 @@ class XmlaExecuteTools():
                 </Tuples>
             </Axis>
 
-        :param mdx_execution_result: mdx_execute() result
         :return: SlicerAxis as string
         """
         # not used dimensions
