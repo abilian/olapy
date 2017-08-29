@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+attrs==17.2.0
 lxml==3.6.0
 numpy==1.13.1             # via pandas
 pandas==0.20.3
