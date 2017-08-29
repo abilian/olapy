@@ -73,7 +73,7 @@ class WSGIServer:
         return '{0}://{1}:{2}'.format(proto, host, port)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def conn():
     print("spawning server")
     application = Application(
