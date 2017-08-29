@@ -22,7 +22,7 @@ def test_execution_query2():
     df = executer.execute_mdx()['result']
     test_df = pd.DataFrame({
         'Country': ['France', 'Spain', 'Switzerland', 'United States'],
-        'Amount': [4, 3, 248, 768]
+        'Amount': [4, 3, 248, 768],
     }).groupby(['Country']).sum()
 
     assert assert_frame_equal(df, test_df) is None
