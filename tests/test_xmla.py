@@ -18,13 +18,12 @@ PORT = 8230
 
 
 class Member(object):
-    """
-    encapsulating xs0 response attributes
-    """
+    "Encapsulates xs0 response attributes."
 
     def __init__(self, **kwargs):
         """
-        :param kwargs: [_Hierarchy,UName,Caption,LName,LNum,DisplayInfo,PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME]
+        :param kwargs: [_Hierarchy,UName,Caption,LName,LNum,DisplayInfo,
+            PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME]
         """
         self.__dict__.update(kwargs)
 
@@ -43,8 +42,7 @@ class Member(object):
 
 
 class WSGIServer:
-    """
-    HTTP server running a WSGI application in its own thread.
+    """HTTP server running a WSGI application in its own thread.
 
     Copy/pasted from pytest_localserver w/ slight changes.
     """
@@ -96,11 +94,11 @@ def test_connection(conn):
     assert len(conn.getCatalogs()) > 0
 
 
-def test_DISCOVER_PROPERTIES(conn):
+def test_discover_properties(conn):
     discover = conn.Discover(
         'DISCOVER_PROPERTIES',
         properties={'LocaleIdentifier': '1036'},
-        restrictions={'PropertyName': 'Catalog'})[0]
+        restrictions={'PropertyName': 'Catalog'},)[0]
     assert discover['PropertyName'] == "Catalog"
     assert discover['PropertyDescription'] == "Catalog"
     assert discover['PropertyType'] == "string"
@@ -109,12 +107,11 @@ def test_DISCOVER_PROPERTIES(conn):
     assert discover['Value'] == "olapy Unspecified Catalog"
 
 
-def test_MDSCHEMA_CUBES(conn):
+def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
         restrictions={'CUBE_NAME': 'sales'},
-        properties={'Catalog': 'sales'})[0]
-
+        properties={'Catalog': 'sales'},)[0]
     assert discover['CATALOG_NAME'] == "sales"
     assert discover['CUBE_NAME'] == "sales"
     assert discover['CUBE_TYPE'] == "CUBE"
