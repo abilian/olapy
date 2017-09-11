@@ -8,14 +8,14 @@ attrs==17.2.0
 lxml==3.6.0
 numpy==1.13.1             # via pandas
 pandas==0.20.3
-psutil==5.2.2
+psutil==5.3.1
 psycopg2==2.7.3.1
 pympler==0.5
 python-dateutil==2.6.1    # via pandas
 pytz==2017.2              # via pandas, spyne
 six==1.10.0               # via python-dateutil
 spyne==2.12.14
-sqlalchemy==1.1.13
+sqlalchemy==1.1.14
 treelib==1.4.0
 werkzeug==0.12.2
 xmlwitch==0.3

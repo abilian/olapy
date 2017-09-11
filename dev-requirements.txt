@@ -14,6 +14,7 @@ pylint
 mccabe
 flake8
 flake8-tidy-imports
+pre-commit
 
 # Formatting (update version explicitely when needed)
 isort==4.2.15
