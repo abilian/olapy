@@ -1,6 +1,6 @@
 #grako
 pandas<1
-lxml==3.6.0  #lxml 3.7 causes problems in windows
+lxml<4
 spyne<3
 treelib<2
 SQLAlchemy
