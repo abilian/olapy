@@ -87,60 +87,13 @@ class XmlaProviderService(ServiceBase):
             # TODO call (labster) login function or create login with token
             # (according to labster db)
 
+        method_name = request.RequestType.lower() + '_response'
+        method = getattr(discover_tools, method_name)
+
         if request.RequestType == "DISCOVER_DATASOURCES":
-            return discover_tools.discover_datasources_response()
+            return method()
+        return method(request)
 
-        elif request.RequestType == "DISCOVER_PROPERTIES":
-            return discover_tools.discover_properties_response(request)
-
-        elif request.RequestType == "DISCOVER_SCHEMA_ROWSETS":
-            return discover_tools.discover_schema_rowsets_response(request)
-
-        elif request.RequestType == "DISCOVER_LITERALS":
-            return discover_tools.discover_literals_response(request)
-
-        elif request.RequestType == "MDSCHEMA_SETS":
-            return discover_tools.discover_mdschema_sets_response(request)
-
-        elif request.RequestType == "MDSCHEMA_KPIS":
-            return discover_tools.discover_mdschema_kpis_response(request)
-
-        elif request.RequestType == "DBSCHEMA_CATALOGS":
-            return discover_tools.discover_dbschema_catalogs_response(request)
-
-        elif request.RequestType == "MDSCHEMA_CUBES":
-            return discover_tools.discover_mdschema_cubes_response(request)
-
-        elif request.RequestType == "DBSCHEMA_TABLES":
-            return discover_tools.discover_dbschema_tables_response(request)
-
-        elif request.RequestType == "MDSCHEMA_MEASURES":
-            return discover_tools.discover_mdschema_measures_response(request)
-
-        elif request.RequestType == "MDSCHEMA_DIMENSIONS":
-            return discover_tools.discover_mdschema_dimensions_response(request)
-
-        elif request.RequestType == "MDSCHEMA_HIERARCHIES":
-            return discover_tools.discover_mdschema_hierarchies_response(
-                request,)
-
-        # todo back here !!
-        elif request.RequestType == "MDSCHEMA_LEVELS":
-            return discover_tools.discover_mdschema_levels_response(request)
-
-        elif request.RequestType == "MDSCHEMA_MEASUREGROUPS":
-            return discover_tools.discover_mdschema_measuresgroups_response(
-                request,)
-
-        elif request.RequestType == "MDSCHEMA_MEASUREGROUP_DIMENSIONS":
-            return discover_tools.discover_mdschema_measuresgroups_dimensions_response(
-                request,)
-
-        elif request.RequestType == "MDSCHEMA_PROPERTIES":
-            return discover_tools.discover_mdschema_properties_response(request)
-
-        elif request.RequestType == "MDSCHEMA_MEMBERS":
-            return discover_tools.discover_mdschema_members_response(request)
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
