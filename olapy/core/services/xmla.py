@@ -94,7 +94,6 @@ class XmlaProviderService(ServiceBase):
             return method()
         return method(request)
 
-
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
     @rpc(
