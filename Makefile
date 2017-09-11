@@ -25,6 +25,8 @@ develop:
 	pip-sync requirements.txt
 	pip install -q -r requirements.txt -r dev-requirements.txt
 	pip install -e .
+	@echo "--> Activating pre-commit hook"
+	pre-commit install
 	@echo ""
 
 #
@@ -85,4 +87,3 @@ release:
 	git clone . /tmp/olapy
 	cd /tmp/olapy ; python setup.py sdist
 	cd /tmp/olapy ; python setup.py sdist upload
-

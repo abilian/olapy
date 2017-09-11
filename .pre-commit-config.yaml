@@ -1,0 +1,11 @@
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    sha: v0.9.3
+    hooks:
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: debug-statements
+    -   id: check-xml
+    -   id: check-yaml
+    -   id: check-json
+    -   id: check-ast
+    -   id: flake8
