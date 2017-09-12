@@ -228,8 +228,8 @@ class XmlaExecuteTools():
                                     xml.DisplayInfo('0')
                                     # todo work with properties in mdx query
                                     # todo temp
-                                    if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
-                                        xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                                    # if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                                    #     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
                                 if tupls[0][-1] in self.executer.measures:
                                     continue
@@ -312,8 +312,8 @@ class XmlaExecuteTools():
                             xml.DisplayInfo('0')
                             # todo work with properties in mdx query
                             # todo temp
-                            if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
-                                xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                            # if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                            #     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
 
@@ -750,11 +750,13 @@ class XmlaExecuteTools():
                             name="[Measures].[DISPLAY_INFO]",
                             **{'type': 'xs:unsignedInt'})
 
-                        # todo hieararchize
-                        if 'ON COLUMNS' in self.executer.mdx_query:
+                        # todo TEMP !!!!!
+                        if 'PARENT_UNIQUE_NAME' in self.executer.mdx_query:
                             xml.PARENT_UNIQUE_NAME(
                                 name="[Measures].[PARENT_UNIQUE_NAME]",
                                 **{'type': 'xs:string'})
+                        # todo TEMP !!!!!
+                        if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
                             xml.HIERARCHY_UNIQUE_NAME(
                                 name="[Measures].[HIERARCHY_UNIQUE_NAME]",
                                 **{'type': 'xs:string'})
