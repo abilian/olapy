@@ -196,6 +196,85 @@ class XmlaExecuteTools():
 
         return tuples, first_att
 
+    def tuples_2_xs0(self, tuples, splited_df, first_att, axis):
+        xml = xmlwitch.Builder()
+        with xml.Axis(name=axis):
+            with xml.Tuples:
+                for tupls in itertools.chain(*tuples):
+                    with xml.Tuple:
+                        if tupls[0][1] in self.executer.measures and len(
+                                self.executer.selected_measures, ) > 1:
+                            with xml.Member(Hierarchy="[Measures]"):
+                                xml.UName(
+                                    '[Measures].[{0}]'.format(tupls[0][1]), )
+                                xml.Caption('{0}'.format(tupls[0][1]))
+                                xml.LName('[Measures]')
+                                xml.LNum('0')
+                                xml.DisplayInfo('0')
+                                # todo work with properties in mdx query
+                                # todo temp
+                                if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+
+                            if tupls[0][-1] in self.executer.measures:
+                                continue
+
+                        for tupl in tupls:
+                            tuple_without_minus_1 = self.get_tuple_without_nan(
+                                tupl, )
+
+                            # todo ugly !!
+                            with xml.Member(Hierarchy="[{0}].[{0}]".format(
+                                    tuple_without_minus_1[0], )):
+                                xml.UName('[{0}].[{0}].[{1}].{2}'.format(
+                                    tuple_without_minus_1[0],
+                                    splited_df[tuple_without_minus_1[0]].columns[
+                                        len(tuple_without_minus_1) - first_att],
+                                    '.'.join(['[' + str(i) + ']' for i in tuple_without_minus_1[first_att - 1:]]), ))
+                                xml.Caption('{0}'.format(
+                                    tuple_without_minus_1[-1], ), )
+                                xml.LName('[{0}].[{0}].[{1}]'.format(
+                                    tuple_without_minus_1[0],
+                                    splited_df[tuple_without_minus_1[0]].columns[
+                                        len(tuple_without_minus_1) - first_att], ))
+                                xml.LNum('{0}'.format(
+                                    len(tuple_without_minus_1) - first_att,
+                                ))
+                                xml.DisplayInfo('131076')
+
+                                # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
+                                # todo delete change 'Hierarchize' in
+                                # self.executer.mdx_query !!!!
+                                if 'Hierarchize' in self.executer.mdx_query:
+                                    if len(tuple_without_minus_1[first_att - 1:]) > 1:
+                                        xml.PARENT_UNIQUE_NAME(
+                                            '[{0}].[{0}].[{1}].{2}'.format(
+                                                tuple_without_minus_1[0],
+                                                splited_df[
+                                                    tuple_without_minus_1[
+                                                        0]].columns[0],
+                                                '.'.join([
+                                                    '[' + str(i) + ']'
+                                                    for i in
+                                                    tuple_without_minus_1[first_att - 1:-1]
+                                                ]), ), )
+                                    xml.HIERARCHY_UNIQUE_NAME(
+                                        '[{0}].[{0}]'.format(
+                                            tuple_without_minus_1[0], ), )
+
+                        # todo delete change 'Hierarchize' in
+                        # self.executer.mdx_query !!!!
+                        if 'ON 0' in self.executer.mdx_query:
+                            with xml.Member(Hierarchy="[Measures]"):
+                                xml.UName(
+                                    '[Measures].[{0}]'.format(tupls[0][1]), )
+                                xml.Caption('{0}'.format(tupls[0][1]))
+                                xml.LName('[Measures]')
+                                xml.LNum('0')
+                                xml.DisplayInfo('0')
+                                # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+        return xml
+
     def generate_xs0_one_axis(
             self,
             splited_df,
@@ -213,91 +292,9 @@ class XmlaExecuteTools():
             splited_df,
             mdx_query_axis,)
         if tuples:
-            with xml.Axis(name=axis):
-                with xml.Tuples:
-                    for tupls in itertools.chain(*tuples):
-                        with xml.Tuple:
-                            if tupls[0][1] in self.executer.measures and len(
-                                    self.executer.selected_measures,) > 1:
-                                with xml.Member(Hierarchy="[Measures]"):
-                                    xml.UName(
-                                        '[Measures].[{0}]'.format(tupls[0][1]),)
-                                    xml.Caption('{0}'.format(tupls[0][1]))
-                                    xml.LName('[Measures]')
-                                    xml.LNum('0')
-                                    xml.DisplayInfo('0')
-                                    # todo work with properties in mdx query
-                                    # todo temp
-                                    # if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
-                                    #     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
-
-                                if tupls[0][-1] in self.executer.measures:
-                                    continue
-
-                            for tupl in tupls:
-                                tuple_without_minus_1 = self.get_tuple_without_nan(
-                                    tupl,)
-
-                                # todo ugly !!
-                                with xml.Member(Hierarchy="[{0}].[{0}]".format(
-                                        tuple_without_minus_1[0],)):
-                                    xml.UName('[{0}].[{0}].[{1}].{2}'.format(
-                                        tuple_without_minus_1[0],
-                                        splited_df[tuple_without_minus_1[0]]
-                                        .columns[len(tuple_without_minus_1) -
-                                                 first_att],
-                                        '.'.join([
-                                            '[' + str(i) + ']'
-                                            for i in tuple_without_minus_1[
-                                                first_att - 1:]
-                                        ]),))
-                                    xml.Caption('{0}'.format(
-                                        tuple_without_minus_1[-1],),)
-                                    xml.LName('[{0}].[{0}].[{1}]'.format(
-                                        tuple_without_minus_1[0],
-                                        splited_df[tuple_without_minus_1[0]]
-                                        .columns[len(tuple_without_minus_1) -
-                                                 first_att],))
-                                    xml.LNum('{0}'.format(
-                                        len(tuple_without_minus_1) - first_att,
-                                    ))
-                                    xml.DisplayInfo('131076')
-
-                                    # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
-                                    # todo delete change 'Hierarchize' in
-                                    # self.executer.mdx_query !!!!
-                                    if 'Hierarchize' in self.executer.mdx_query:
-                                        if len(tuple_without_minus_1[first_att -
-                                                                     1:]) > 1:
-                                            xml.PARENT_UNIQUE_NAME(
-                                                '[{0}].[{0}].[{1}].{2}'.format(
-                                                    tuple_without_minus_1[0],
-                                                    splited_df[
-                                                        tuple_without_minus_1[
-                                                            0]].columns[0],
-                                                    '.'.join([
-                                                        '[' + str(i) + ']'
-                                                        for i in
-                                                        tuple_without_minus_1[
-                                                            first_att - 1:-1]
-                                                    ]),),)
-                                        xml.HIERARCHY_UNIQUE_NAME(
-                                            '[{0}].[{0}]'.format(
-                                                tuple_without_minus_1[0],),)
-
-                            # todo delete change 'Hierarchize' in
-                            # self.executer.mdx_query !!!!
-                            if 'ON 0' in self.executer.mdx_query:
-                                with xml.Member(Hierarchy="[Measures]"):
-                                    xml.UName(
-                                        '[Measures].[{0}]'.format(tupls[0][1]),)
-                                    xml.Caption('{0}'.format(tupls[0][1]))
-                                    xml.LName('[Measures]')
-                                    xml.LNum('0')
-                                    xml.DisplayInfo('0')
-                                    # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
-
-                                # todo delete change 'Hierarchize'!!!!
+            # todo temp
+            xml = self.tuples_2_xs0(tuples, splited_df, first_att, axis)
+        # todo delete change 'Hierarchize'!!!!
         elif 'ON 0' in self.executer.mdx_query:
             with xml.Axis(name=axis):
                 with xml.Tuples:
