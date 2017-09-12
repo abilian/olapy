@@ -226,7 +226,10 @@ class XmlaExecuteTools():
                                     xml.LName('[Measures]')
                                     xml.LNum('0')
                                     xml.DisplayInfo('0')
-                                    # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                                    # todo work with properties in mdx query
+                                    # todo temp
+                                    if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                                        xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
                                 if tupls[0][-1] in self.executer.measures:
                                     continue
@@ -307,7 +310,10 @@ class XmlaExecuteTools():
                             xml.LName('[Measures]')
                             xml.LNum('0')
                             xml.DisplayInfo('0')
-                            # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                            # todo work with properties in mdx query
+                            # todo temp
+                            if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                                xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
 
