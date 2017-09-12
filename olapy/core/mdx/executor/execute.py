@@ -164,7 +164,7 @@ class MdxEngine:
         """
         return self.tables_loaded.keys()
 
-    def hierarchize_tuples(self):
+    def hierarchized_tuples(self):
         """Check if hierarchized mdx query.
 
         :return: True | False
@@ -452,9 +452,8 @@ class MdxEngine:
                 else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(
-                            tupl[2:None
-                                 if self.hierarchize_tuples() else -1],)],
+                            self.tables_loaded[tupl[0]].columns[:len(
+                                tupl[2:None if self.hierarchized_tuples() else -1], )],
                     })
 
             axes.update({axis: tables_columns})
@@ -649,7 +648,7 @@ class MdxEngine:
         :return: updated columns_to_keep
         """
 
-        columns = 2 if self.hierarchize_tuples() else 3
+        columns = 2 if self.hierarchized_tuples() else 3
         if len(tuple_as_list) == 3 \
                 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
@@ -706,7 +705,7 @@ class MdxEngine:
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
-        if not self.hierarchize_tuples():
+        if not self.hierarchized_tuples():
             # todo check !!!!!!!!!!
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             # todo check also !!!!!!!!!!
@@ -769,7 +768,7 @@ class MdxEngine:
             for next_df in df_to_fusion[1:]:
                 df = pd.concat(self.add_missed_column(df, next_df))
 
-            sort = self.hierarchize_tuples()
+            sort = self.hierarchized_tuples()
             # TODO margins=True for columns total !!!!!
             return {
                 'result':
