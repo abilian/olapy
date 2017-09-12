@@ -296,7 +296,7 @@ class XmlaExecuteTools():
             # todo temp
             xml = self.tuples_2_xs0(tuples, splited_df, first_att, axis)
         # todo delete change 'Hierarchize'!!!!
-        elif self.executer.execute_mdx()['columns_desc']['columns'].keys() == ['Facts']:
+        elif self.executer.execute_mdx()['columns_desc']['columns'].keys() == [self.executer.facts]:
             with xml.Axis(name=axis):
                 with xml.Tuples:
                     with xml.Tuple:
@@ -797,7 +797,7 @@ class XmlaExecuteTools():
 
                 # todo   Hierarchize to delete/ change ASAP / fusion with above
                 if not self.executer.hierarchized_tuples() and len(
-                        self.executer.execute_mdx()['columns_desc']['columns'].get("Facts", [1, 1])) == 1:
+                        self.executer.execute_mdx()['columns_desc']['columns'].get(self.executer.facts, [1, 1])) == 1:
                     with xml.HierarchyInfo(name='[Measures]'):
                         xml.UName(
                             name="[Measures].[MEMBER_UNIQUE_NAME]",
