@@ -226,7 +226,7 @@ class XmlaExecuteTools():
                                     xml.LName('[Measures]')
                                     xml.LNum('0')
                                     xml.DisplayInfo('0')
-                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                                    # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
                                 if tupls[0][-1] in self.executer.measures:
                                     continue
@@ -307,7 +307,7 @@ class XmlaExecuteTools():
                             xml.LName('[Measures]')
                             xml.LNum('0')
                             xml.DisplayInfo('0')
-                            xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                            # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
 
@@ -721,7 +721,6 @@ class XmlaExecuteTools():
         # todo AxisInfo name= without Hierarchize !!
         axis_tables = self.mdx_execution_result['columns_desc'][mdx_query_axis]
         xml = xmlwitch.Builder()
-
         # measure must be written at the top
         if axis_tables:
             with xml.AxisInfo(name=Axis):

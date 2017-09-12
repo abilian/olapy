@@ -147,7 +147,6 @@ class XmlaProviderService(ServiceBase):
                         }):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
-                        xml.write(xmla_tools.generate_cell_info())
                         with xml.CubeInfo:
                             with xml.Cube:
                                 xml.CubeName('Sales')
@@ -161,7 +160,7 @@ class XmlaProviderService(ServiceBase):
                                         '%Y-%m-%dT%H:%M:%S',),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
-
+                        xml.write(xmla_tools.generate_cell_info())
                         with xml.AxesInfo:
                             xml.write(xmla_tools.generate_axes_info())
                             xml.write(xmla_tools.generate_axes_info_slicer())
