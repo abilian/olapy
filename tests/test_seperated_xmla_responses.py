@@ -16,6 +16,12 @@ def test_slicer_axis_query11():
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
+                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                    xml.UName('[Geography].[Geography].[Continent].[America]')
+                    xml.Caption('America')
+                    xml.LName('[Geography].[Geography].[Continent]')
+                    xml.LNum('0')
+                    xml.DisplayInfo('2')
                 with xml.Member(Hierarchy="[Product].[Product]"):
                     xml.UName(
                         '[Product].[Product].[Company].[Crazy Development]')
@@ -29,12 +35,6 @@ def test_slicer_axis_query11():
                     xml.LName('[Time].[Time].[Year]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Continent].[America]')
-                    xml.Caption('America')
-                    xml.LName('[Geography].[Geography].[Continent]')
-                    xml.LNum('0')
-                    xml.DisplayInfo('2')
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName('[Measures].[Amount]')
                     xml.Caption('Amount')
@@ -43,9 +43,7 @@ def test_slicer_axis_query11():
                     xml.DisplayInfo('0')
 
     executor.mdx_query = query11
-
     xmla_tools = XmlaExecuteTools(executor, False)
-
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
@@ -59,6 +57,12 @@ def test_slicer_axis_query12():
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
+                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                    xml.UName('[Geography].[Geography].[Continent].[America]')
+                    xml.Caption('America')
+                    xml.LName('[Geography].[Geography].[Continent]')
+                    xml.LNum('0')
+                    xml.DisplayInfo('2')
                 with xml.Member(Hierarchy="[Product].[Product]"):
                     xml.UName(
                         '[Product].[Product].[Company].[Crazy Development]')
@@ -70,12 +74,6 @@ def test_slicer_axis_query12():
                     xml.UName('[Time].[Time].[Year].[2010]')
                     xml.Caption('2010')
                     xml.LName('[Time].[Time].[Year]')
-                    xml.LNum('0')
-                    xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Continent].[America]')
-                    xml.Caption('America')
-                    xml.LName('[Geography].[Geography].[Continent]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
