@@ -990,8 +990,9 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('2')
 
                         # todo Hierarchize delete/change !!
-                        if len(self.executer.selected_measures) <= 1 \
-                                and self.executer.execute_mdx()['columns_desc']['where']:
+                        if self.executer.selected_measures and (
+                            self.executer.hierarchized_tuples() or self.executer.facts in
+                                self.executer.execute_mdx()['columns_desc']['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0],))
