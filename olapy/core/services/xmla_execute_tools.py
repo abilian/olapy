@@ -641,11 +641,11 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
 
-        slicer_list = list(
+        slicer_list = sorted(list(
             set(all_dimensions_names) -
             set(table_name
                 for table_name in self.mdx_execution_result['columns_desc']
-                ['all']),)
+                ['all']),))
 
         # we have to write measures after dimensions ! (todo change xsd)
         if 'Measures' in slicer_list:
