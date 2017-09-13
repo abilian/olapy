@@ -214,6 +214,17 @@ query13 = """
 
 """
 
+query14 = """
+    SELECT
+    {[Measures].[Count],[Measures].[Amount]}
+    DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS ,
+    NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{[Geography].[Geography].[Continent].Members}},
+    {[Geography].[Geography].[Continent].[Europe]})))
+    DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS
+    FROM [sales] CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+"""
+
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
 
 # TODO queries without
