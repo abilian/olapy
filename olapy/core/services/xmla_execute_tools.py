@@ -284,7 +284,7 @@ class XmlaExecuteTools():
                         for tupl in group.split(','):
                             splited_tupl = tupl.strip(' \t\n').split('.')
                             if splited_tupl[0] == '[Measures]':
-                                hierarchy = '[Measures].[Measures]'
+                                hierarchy = '[Measures]'
                                 l_name = splited_tupl[0]
                                 lvl = 0
                                 displayinfo = '0'
@@ -316,7 +316,7 @@ class XmlaExecuteTools():
         # patch 4 select (...) (...) (...) from bla bla bla
         # todo it will be good if I find something else
         tuples_groups = re.findall(r'\(([^()]+)\)', self.executer.mdx_query)
-        if len(tuples_groups) >= 2:
+        if not self.executer.hierarchized_tuples() and len(tuples_groups) >= 2:
             return self._gen_xs0_grouped_tuples(axis, tuples_groups)
 
         xml = xmlwitch.Builder()
