@@ -275,6 +275,33 @@ class XmlaExecuteTools():
                                 # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
         return xml
 
+    def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
+        xml = xmlwitch.Builder()
+        with xml.Axis(name=axis):
+            with xml.Tuples:
+                for group in tuples_groups:
+                    with xml.Tuple:
+                        for tupl in group.split(','):
+                            splited_tupl = tupl.strip(' \t\n').split('.')
+                            if splited_tupl[0] == '[Measures]':
+                                hierarchy = '[Measures].[Measures]'
+                                l_name = splited_tupl[0]
+                                lvl = 0
+                                displayinfo = '0'
+                            else:
+                                hierarchy = '{0}.{0}'.format(splited_tupl[0])
+                                l_name = ".".join(splited_tupl[:3])
+                                lvl = len(splited_tupl[4:])
+                                displayinfo = '131076'
+
+                            with xml.Member(Hierarchy=hierarchy):
+                                xml.UName('{0}'.format(tupl.strip(' \t\n')))
+                                xml.Caption('{0}'.format(splited_tupl[-1].replace('[', '').replace(']', '')))
+                                xml.LName(l_name)
+                                xml.LNum(str(lvl))
+                                xml.DisplayInfo(displayinfo)
+        return str(xml)
+
     def generate_xs0_one_axis(
             self,
             splited_df,
@@ -285,6 +312,12 @@ class XmlaExecuteTools():
         :param splited_df:
         :return:
         """
+
+        # patch 4 select (...) (...) (...) from bla bla bla
+        # todo it will be good if I find something else
+        tuples_groups = re.findall(r'\(([^()]+)\)', self.executer.mdx_query)
+        if len(tuples_groups) >= 2:
+            return self._gen_xs0_grouped_tuples(axis, tuples_groups)
 
         xml = xmlwitch.Builder()
 
