@@ -160,8 +160,7 @@ class XmlaExecuteTools():
                 self.executer.facts,
         ]:
 
-            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][
-                    self.executer.facts]) == 1:
+            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
@@ -1024,8 +1023,8 @@ class XmlaExecuteTools():
 
                         # todo Hierarchize delete/change !!
                         if len(self.executer.selected_measures) <= 1 and (
-                                    self.executer.hierarchized_tuples() or self.executer.facts in
-                                    self.executer.execute_mdx()['columns_desc']['where']):
+                            self.executer.hierarchized_tuples() or self.executer.facts in
+                                self.executer.execute_mdx()['columns_desc']['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
                                     self.executer.measures[0], ))
