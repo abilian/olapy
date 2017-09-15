@@ -274,28 +274,47 @@ class XmlaExecuteTools():
                                 # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
         return xml
 
+    @staticmethod
+    def add_tuple_brackets(tupl):
+        if tupl[0] != '[':
+            tupl = '[' + tupl
+        if tupl[-1] != ']':
+            tupl = tupl + ']'
+        return tupl
+
+    def split_group(self, group):
+        splited_group = group.split('],[')
+        return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
+
+    @staticmethod
+    def split_tuple(tupl):
+        splited_tupl = tupl.strip(' \t\n').split('].[')
+        splited_tupl[0] = splited_tupl[0].replace('[', '')
+        splited_tupl[-1] = splited_tupl[-1].replace(']', '')
+        return splited_tupl
+
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
                 for group in tuples_groups:
                     with xml.Tuple:
-                        for tupl in group.split(','):
-                            splited_tupl = tupl.strip(' \t\n').split('.')
-                            if splited_tupl[0] == '[Measures]':
+                        for tupl in self.split_group(group):
+                            splited_tupl = self.split_tuple(tupl)
+                            if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
-                                l_name = splited_tupl[0]
+                                l_name = '[' + splited_tupl[0] + ']'
                                 lvl = 0
                                 displayinfo = '0'
                             else:
-                                hierarchy = '{0}.{0}'.format(splited_tupl[0])
-                                l_name = ".".join(splited_tupl[:3])
+                                hierarchy = '[{0}].[{0}]'.format(splited_tupl[0])
+                                l_name = "[0]".format('].['.join(splited_tupl[:3]))
                                 lvl = len(splited_tupl[4:])
                                 displayinfo = '131076'
 
                             with xml.Member(Hierarchy=hierarchy):
                                 xml.UName('{0}'.format(tupl.strip(' \t\n')))
-                                xml.Caption('{0}'.format(splited_tupl[-1].replace('[', '').replace(']', '')))
+                                xml.Caption('{0}'.format(splited_tupl[-1]))
                                 xml.LName(l_name)
                                 xml.LNum(str(lvl))
                                 xml.DisplayInfo(displayinfo)
