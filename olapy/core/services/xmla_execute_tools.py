@@ -674,11 +674,11 @@ class XmlaExecuteTools():
 
         xml = xmlwitch.Builder()
 
-        slicer_list = list(
+        slicer_list = sorted(list(
             set(all_dimensions_names) -
             set(table_name
                 for table_name in self.mdx_execution_result['columns_desc']
-                ['all']),)
+                ['all']),))
 
         # we have to write measures after dimensions ! (todo change xsd)
         if 'Measures' in slicer_list:
@@ -993,11 +993,11 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_slicer_convert2formulas()
 
-        unused_dimensions = list(
+        unused_dimensions = sorted(list(
             set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
                 table_name
                 for table_name in self.mdx_execution_result['columns_desc']
-                ['all']),)
+                ['all']),))
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
