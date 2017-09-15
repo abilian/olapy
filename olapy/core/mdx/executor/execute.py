@@ -336,11 +336,12 @@ class MdxEngine:
             if len(tup[0].split('].[')) > 1
         ]
 
-    def seperate_tuples(self, tuple):
-        tuples_as_list = tuple.split('].[')
-        tuples_as_list[0] = tuples_as_list[0].replace('[', '')
-        tuples_as_list[-1] = tuples_as_list[-1].replace(']', '')
-        return tuples_as_list
+    @staticmethod
+    def split_tuple(tupl):
+        splitted_tupl = tupl.strip(' \t\n').split('].[')
+        splitted_tupl[0] = splitted_tupl[0].replace('[', '')
+        splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
+        return splitted_tupl
 
     # TODO temporary function
     def decorticate_query(self, query):

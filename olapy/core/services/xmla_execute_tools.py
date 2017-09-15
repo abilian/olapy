@@ -286,13 +286,6 @@ class XmlaExecuteTools():
         splited_group = group.split('],[')
         return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
 
-    @staticmethod
-    def split_tuple(tupl):
-        splited_tupl = tupl.strip(' \t\n').split('].[')
-        splited_tupl[0] = splited_tupl[0].replace('[', '')
-        splited_tupl[-1] = splited_tupl[-1].replace(']', '')
-        return splited_tupl
-
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
@@ -300,7 +293,7 @@ class XmlaExecuteTools():
                 for group in tuples_groups:
                     with xml.Tuple:
                         for tupl in self.split_group(group):
-                            splited_tupl = self.split_tuple(tupl)
+                            splited_tupl = self.executer.split_tuple(tupl)
                             if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
                                 l_name = '[' + splited_tupl[0] + ']'
@@ -561,7 +554,7 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(self.executer.seperate_tuples(tupl)[-1])
+                xml.Value(self.executer.split_tuple(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')
