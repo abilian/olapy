@@ -84,8 +84,8 @@ class XmlaExecuteTools():
         # todo change remove (temporary) !!!
         return [
             tup[0]
-            for tup in re.compile(MdxEngine.regex,).findall(
-                self.executer.mdx_query,)
+            for tup in re.compile(MdxEngine.regex).findall(
+                self.executer.mdx_query)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
