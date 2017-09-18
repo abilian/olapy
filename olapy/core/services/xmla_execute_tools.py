@@ -592,7 +592,7 @@ class XmlaExecuteTools():
 
             new_df = new_df.append(df)
 
-        return new_df.groupby(self.mdx_execution_result['result'].index.names).sum()
+        return new_df.groupby(self.mdx_execution_result['result'].index.names, sort=False).sum()
 
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
