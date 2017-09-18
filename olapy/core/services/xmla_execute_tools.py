@@ -302,10 +302,9 @@ class XmlaExecuteTools():
                                 displayinfo = '0'
                             else:
                                 hierarchy = '[{0}].[{0}]'.format(splited_tupl[0])
-                                l_name = "[0]".format('].['.join(splited_tupl[:3]))
+                                l_name = "[{0}]".format('].['.join(splited_tupl[:3]))
                                 lvl = len(splited_tupl[4:])
                                 displayinfo = '131076'
-
                             with xml.Member(Hierarchy=hierarchy):
                                 xml.UName('{0}'.format(tupl.strip(' \t\n')))
                                 xml.Caption('{0}'.format(splited_tupl[-1]))
