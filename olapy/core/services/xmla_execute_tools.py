@@ -587,6 +587,8 @@ class XmlaExecuteTools():
             for tupl in self.split_group(group):
                 splitted_tupl = self.executer.split_tuple(tupl)
                 if splitted_tupl[0].upper() != 'MEASURES':
+                    if splitted_tupl[-1].isdigit():
+                        splitted_tupl[-1] = int(splitted_tupl[-1])
                     df = df[(df[self.executer.tables_loaded[splitted_tupl[0]].columns[len(splitted_tupl[4:])]]
                              == splitted_tupl[-1])]
 
