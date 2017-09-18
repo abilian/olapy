@@ -313,6 +313,12 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo(displayinfo)
         return str(xml)
 
+    def get_nested_select(self):
+        return re.findall(r'\(([^()]+)\)', self.executer.mdx_query)
+
+    def check_nested_select(self):
+        return not self.executer.hierarchized_tuples() and len(self.get_nested_select()) >= 2
+
     def generate_xs0_one_axis(
             self,
             splited_df,
@@ -326,9 +332,8 @@ class XmlaExecuteTools():
 
         # patch 4 select (...) (...) (...) from bla bla bla
         # todo it will be good if I find something else
-        tuples_groups = re.findall(r'\(([^()]+)\)', self.executer.mdx_query)
-        if not self.executer.hierarchized_tuples() and len(tuples_groups) >= 2:
-            return self._gen_xs0_grouped_tuples(axis, tuples_groups)
+        if self.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis, self.get_nested_select())
 
         xml = xmlwitch.Builder()
 
