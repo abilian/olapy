@@ -579,7 +579,7 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def _rearrange_df(self,tuple_group):
+    def _rearrange_df(self, tuple_group):
         # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result
         new_df = pd.DataFrame()
         for group in tuple_group:
@@ -592,10 +592,7 @@ class XmlaExecuteTools():
 
             new_df = new_df.append(df)
 
-        return new_df
-
-    def _gen_cells_grouped_tuples(self,tuples_groups):
-        df = self.executer.execute_mdx()['result'].reset_index()
+        return new_df.groupby(self.mdx_execution_result['result'].index.names).sum()
 
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
@@ -618,7 +615,7 @@ class XmlaExecuteTools():
 
         # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result !!!!!!!
         if self.check_nested_select():
-            self._gen_cells_grouped_tuples(self.get_nested_select())
+            self.mdx_execution_result['result'] = self._rearrange_df(self.get_nested_select())
 
         columns_desc = self.mdx_execution_result['columns_desc']
         if (
