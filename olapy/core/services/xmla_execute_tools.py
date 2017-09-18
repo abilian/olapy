@@ -5,6 +5,7 @@ import re
 from collections import OrderedDict
 
 import numpy as np
+import pandas as pd
 import xmlwitch
 
 from six.moves import zip
@@ -578,6 +579,24 @@ class XmlaExecuteTools():
 
         return str(xml)
 
+    def _rearrange_df(self,tuple_group):
+        # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result
+        new_df = pd.DataFrame()
+        for group in tuple_group:
+            df = self.executer.execute_mdx()['result'].reset_index()
+            for tupl in self.split_group(group):
+                splitted_tupl = self.executer.split_tuple(tupl)
+                if splitted_tupl[0].upper() != 'MEASURES':
+                    df = df[(df[self.executer.tables_loaded[splitted_tupl[0]].columns[len(splitted_tupl[4:])]]
+                             == splitted_tupl[-1])]
+
+            new_df = new_df.append(df)
+
+        return new_df
+
+    def _gen_cells_grouped_tuples(self,tuples_groups):
+        df = self.executer.execute_mdx()['result'].reset_index()
+
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
         """
@@ -596,6 +615,10 @@ class XmlaExecuteTools():
 
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
+
+        # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result !!!!!!!
+        if self.check_nested_select():
+            self._gen_cells_grouped_tuples(self.get_nested_select())
 
         columns_desc = self.mdx_execution_result['columns_desc']
         if (
