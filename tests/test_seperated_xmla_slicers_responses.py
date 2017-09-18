@@ -150,4 +150,3 @@ def test_slicer_axis_query14():
     xmla_tools = XmlaExecuteTools(executor, False)
 
     assert str(xml) == xmla_tools.generate_slicer_axis()
-

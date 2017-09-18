@@ -16,13 +16,17 @@ def test_xs0_axis_query15():
         with xml.Tuples:
             with xml.Tuple:
                 with xml.Member(Hierarchy="[Product].[Product]"):
-                    xml.UName('[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]')
+                    xml.UName(
+                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                    )
                     xml.Caption('Personal')
                     xml.LName('[Product].[Product].[Licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Country].[Europe].[Switzerland]')
+                    xml.UName(
+                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                    )
                     xml.Caption('Switzerland')
                     xml.LName('[Geography].[Geography].[Country]')
                     xml.LNum('1')
@@ -35,13 +39,17 @@ def test_xs0_axis_query15():
                     xml.DisplayInfo('0')
             with xml.Tuple:
                 with xml.Member(Hierarchy="[Product].[Product]"):
-                    xml.UName('[Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate]')
+                    xml.UName(
+                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate]'
+                    )
                     xml.Caption('Corporate')
                     xml.LName('[Product].[Product].[Licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Country].[Europe].[Switzerland]')
+                    xml.UName(
+                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                    )
                     xml.Caption('Switzerland')
                     xml.LName('[Geography].[Geography].[Country]')
                     xml.LNum('1')
@@ -54,13 +62,16 @@ def test_xs0_axis_query15():
                     xml.DisplayInfo('0')
             with xml.Tuple:
                 with xml.Member(Hierarchy="[Product].[Product]"):
-                    xml.UName('[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]')
+                    xml.UName(
+                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                    )
                     xml.Caption('Personal')
                     xml.LName('[Product].[Product].[Licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Country].[Europe].[Spain]')
+                    xml.UName(
+                        '[Geography].[Geography].[Country].[Europe].[Spain]')
                     xml.Caption('Spain')
                     xml.LName('[Geography].[Geography].[Country]')
                     xml.LNum('1')
@@ -73,13 +84,16 @@ def test_xs0_axis_query15():
                     xml.DisplayInfo('0')
             with xml.Tuple:
                 with xml.Member(Hierarchy="[Product].[Product]"):
-                    xml.UName('[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]')
+                    xml.UName(
+                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                    )
                     xml.Caption('Personal')
                     xml.LName('[Product].[Product].[Licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Country].[Europe].[France]')
+                    xml.UName(
+                        '[Geography].[Geography].[Country].[Europe].[France]')
                     xml.Caption('France')
                     xml.LName('[Geography].[Geography].[Country]')
                     xml.LNum('1')
@@ -92,13 +106,17 @@ def test_xs0_axis_query15():
                     xml.DisplayInfo('0')
             with xml.Tuple:
                 with xml.Member(Hierarchy="[Product].[Product]"):
-                    xml.UName('[Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership]')
+                    xml.UName(
+                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership]'
+                    )
                     xml.Caption('Partnership')
                     xml.LName('[Product].[Product].[Licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Country].[Europe].[Switzerland]')
+                    xml.UName(
+                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                    )
                     xml.Caption('Switzerland')
                     xml.LName('[Geography].[Geography].[Country]')
                     xml.LNum('1')
