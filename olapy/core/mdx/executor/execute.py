@@ -62,7 +62,7 @@ class MdxEngine:
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
-        self.mdx_query = mdx_query
+        self._mdx_query = mdx_query
         if cubes_path is None:
             self.cube_path = self._get_default_cube_directory()
         else:
@@ -78,6 +78,14 @@ class MdxEngine:
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
+
+    @property
+    def mdx_query(self):
+        return self._mdx_query
+
+    @mdx_query.setter
+    def mdx_query(self, value):
+        self._mdx_query = value.replace('\n', '').replace('\t', '')
 
     @classmethod
     def get_cubes_names(cls):

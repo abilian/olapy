@@ -284,22 +284,16 @@ class XmlaExecuteTools():
         return tupl
 
     def split_group(self, group):
-        splited_group = group.split('],[')
+        splited_group = group.replace('\n', '').replace('\t', '').split('],[')
         return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
 
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
-        print('_gen_xs0_grouped_tuples  ---***********  debutttttttttttttttttttttttttt')
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
                 for group in tuples_groups:
                     with xml.Tuple:
-                        print(group)
-                        print('groupgroup')
-                        print(self.split_group(group))
                         for tupl in self.split_group(group):
-                            print(tupl)
-                            print('.................')
                             splited_tupl = self.executer.split_tuple(tupl)
                             if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
@@ -311,7 +305,6 @@ class XmlaExecuteTools():
                                 l_name = "[{0}]".format('].['.join(splited_tupl[:3]))
                                 lvl = len(splited_tupl[4:])
                                 displayinfo = '131076'
-                            print('000000000000000000')
 
                             with xml.Member(Hierarchy=hierarchy):
                                 xml.UName('{0}'.format(tupl.strip(' \t\n')))
@@ -319,7 +312,6 @@ class XmlaExecuteTools():
                                 xml.LName(l_name)
                                 xml.LNum(str(lvl))
                                 xml.DisplayInfo(displayinfo)
-        print('finnnxx  -----  _gen_xs0_grouped_tuples')
         return str(xml)
 
     def get_nested_select(self):
@@ -341,9 +333,7 @@ class XmlaExecuteTools():
 
         # patch 4 select (...) (...) (...) from bla bla bla
         # todo it will be good if I find something else
-        print('checkkk debutt')
         if self.check_nested_select():
-            print("checkk yess")
             return self._gen_xs0_grouped_tuples(axis, self.get_nested_select())
 
         xml = xmlwitch.Builder()
@@ -628,9 +618,7 @@ class XmlaExecuteTools():
         # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result !!!!!!!
         # todo this take a very long time  !!
         if self.check_nested_select():
-            print('-------------------debuttt------------')
             self.mdx_execution_result['result'] = self._rearrange_df(self.get_nested_select())
-            print('*////// finnn //////********')
 
         columns_desc = self.mdx_execution_result['columns_desc']
         if (

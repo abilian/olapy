@@ -227,16 +227,16 @@ query14 = """
 
 query15 = """
 SELECT {
-([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],\
-[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),\
-([Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate],\
-[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),\
-([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],\
-[Geography].[Geography].[Country].[Europe].[Spain],[Measures].[Amount]),\
-([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],\
-[Geography].[Geography].[Country].[Europe].[France],[Measures].[Amount]),\
-([Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership],\
-[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount])}\
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[Spain],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[France],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount])}
  ON 0 FROM [sales] CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
