@@ -677,6 +677,61 @@ class MdxEngine:
 
         return uniquefy
 
+    def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
+        # get only used columns and dimensions for all query
+        start_df = self.load_star_schema_dataframe
+        df_to_fusion = []
+        table_name = tuples_on_mdx_query[0][0]
+        # in every tuple
+        for tupl in tuples_on_mdx_query:
+            # if we have measures in columns or rows axes like :
+            # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
+            # we use only used columns for dimension in that tuple and keep
+            # other dimension's columns
+            self.update_columns_to_keep(tupl, columns_to_keep)
+            # a tuple with new dimension
+            if tupl[0] != table_name:
+                # if we change dimension , we have to work on the
+                # exection's result on previous DataFrames
+
+                # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
+                # solution 1 .astype(str) ( take a lot of time from execution)
+                # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
+                # solution 3 a['ccc'] = -1
+                # solution 4 finding something with merge
+
+                # fix 3 test
+                df = df_to_fusion[0]
+                for next_df in df_to_fusion[1:]:
+                    df = pd.concat(self.add_missed_column(df, next_df))
+                # df = pd.concat(df_to_fusion)
+
+                table_name = tupl[0]
+                df_to_fusion = []
+                start_df = df
+
+            df_to_fusion.append(
+                self.execute_one_tuple(
+                    tupl,
+                    start_df,
+                    columns_to_keep.values(), ), )
+
+        return df_to_fusion
+
+    def fusion_dataframes(self, df_to_fusion):
+        # fix 3 test
+
+        # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
+        # solution 1 .astype(str) ( take a lot of time from execution)
+        # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
+        # solution 3 a['ccc'] = -1 (the best)
+        # solution 4 finding something with merge
+
+        df = df_to_fusion[0]
+        for next_df in df_to_fusion[1:]:
+            df = pd.concat(self.add_missed_column(df, next_df))
+        return df
+
     def execute_mdx(self):
         """Execute an MDX Query.
 
@@ -701,8 +756,6 @@ class MdxEngine:
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
-        # get only used columns and dimensions for all query
-        start_df = self.load_star_schema_dataframe
         tables_n_columns = self.get_tables_and_columns(query_axes)
 
         columns_to_keep = OrderedDict(
@@ -725,69 +778,27 @@ class MdxEngine:
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
         # ([Measures].[Amount])
+
+        # todo inject here select ()()() test
         if tuples_on_mdx_query:
 
-            df_to_fusion = []
-            table_name = tuples_on_mdx_query[0][0]
-            # in every tuple
-            for tupl in tuples_on_mdx_query:
-                # if we have measures in columns or rows axes like :
-                # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
-                # we use only used columns for dimension in that tuple and keep
-                # other dimension's columns
-                self.update_columns_to_keep(tupl, columns_to_keep)
-                # a tuple with new dimension
-                if tupl[0] != table_name:
-                    # if we change dimension , we have to work on the
-                    # exection's result on previous DataFrames
+            df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
 
-                    # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-                    # solution 1 .astype(str) ( take a lot of time from execution)
-                    # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-                    # solution 3 a['ccc'] = -1
-                    # solution 4 finding something with merge
+            df = self.fusion_dataframes(df_to_fusion)
 
-                    # fix 3 test
-                    df = df_to_fusion[0]
-                    for next_df in df_to_fusion[1:]:
-                        df = pd.concat(self.add_missed_column(df, next_df))
-                    # df = pd.concat(df_to_fusion)
-
-                    table_name = tupl[0]
-                    df_to_fusion = []
-                    start_df = df
-
-                df_to_fusion.append(
-                    self.execute_one_tuple(
-                        tupl,
-                        start_df,
-                        columns_to_keep.values(),),)
-
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values(),),)
-
-            # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-            # solution 1 .astype(str) ( take a lot of time from execution)
-            # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-            # solution 3 a['ccc'] = -1 (the best)
-            # solution 4 finding something with merge
-
-            # fix 3 test
-            df = df_to_fusion[0]
-            for next_df in df_to_fusion[1:]:
-                df = pd.concat(self.add_missed_column(df, next_df))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             sort = self.hierarchized_tuples()
             # TODO margins=True for columns total !!!!!
             return {
                 'result':
-                df.groupby(cols, sort=sort).sum()[self.selected_measures],
+                    df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc':
-                tables_n_columns,
+                    tables_n_columns,
             }
 
         else:
             return {
-                'result': start_df[self.selected_measures].sum().to_frame().T,
+                'result': self.load_star_schema_dataframe[self.selected_measures].sum().to_frame().T,
                 'columns_desc': tables_n_columns,
             }
