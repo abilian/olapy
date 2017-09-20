@@ -23,7 +23,7 @@ from .execute_db import _construct_star_schema_db, _load_tables_db
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
-class MdxEngine:
+class MdxEngine(object):
     """The main class for executing a query.
 
     :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER
@@ -732,6 +732,35 @@ class MdxEngine:
             df = pd.concat(self.add_missed_column(df, next_df))
         return df
 
+    @staticmethod
+    def add_tuple_brackets(tupl):
+        if tupl[0] != '[':
+            tupl = '[' + tupl
+        if tupl[-1] != ']':
+            tupl = tupl + ']'
+        return tupl
+
+    def split_group(self, group):
+        splited_group = group.replace('\n', '').replace('\t', '').split('],[')
+        return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
+
+    def get_nested_select(self):
+        return re.findall(r'\(([^()]+)\)', self.mdx_query)
+
+    def check_nested_select(self):
+        return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
+
+    def nested_tuples_to_dataframes(self):
+        dfs = []
+        grouped_tuples = self.get_nested_select()
+        for tuple_groupe in grouped_tuples:
+            # todo execture_one_tuple ??
+            # dfs.append(self.execute_one_tuple(tuple_groupe, Dataframe_in, columns_to_keep))
+            for tuple in self.split_group(tuple_groupe):
+                print(tuple)
+
+
+
     def execute_mdx(self):
         """Execute an MDX Query.
 
@@ -781,6 +810,9 @@ class MdxEngine:
 
         # todo inject here select ()()() test
         if tuples_on_mdx_query:
+
+            if self.check_nested_select():
+                self.nested_tuples_to_dataframes()
 
             df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
 
