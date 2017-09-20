@@ -751,15 +751,13 @@ class MdxEngine(object):
         return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self):
-        dfs = []
+        # dfs = []
         grouped_tuples = self.get_nested_select()
         for tuple_groupe in grouped_tuples:
             # todo execture_one_tuple ??
             # dfs.append(self.execute_one_tuple(tuple_groupe, Dataframe_in, columns_to_keep))
             for tuple in self.split_group(tuple_groupe):
                 print(tuple)
-
-
 
     def execute_mdx(self):
         """Execute an MDX Query.
