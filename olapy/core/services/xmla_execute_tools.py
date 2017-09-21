@@ -615,11 +615,6 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result !!!!!!!
-        # todo this take a very long time  !!
-        if self.check_nested_select():
-            self.mdx_execution_result['result'] = self._rearrange_df(self.get_nested_select())
-
         columns_desc = self.mdx_execution_result['columns_desc']
         if (
             len(columns_desc['columns'].keys()) == 0 or

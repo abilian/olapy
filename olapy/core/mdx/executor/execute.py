@@ -523,7 +523,6 @@ class MdxEngine(object):
                 df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
                          == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
-
         return df[cols + self.selected_measures]
 
     @staticmethod
@@ -734,6 +733,7 @@ class MdxEngine(object):
 
     @staticmethod
     def add_tuple_brackets(tupl):
+        tupl = tupl.strip()
         if tupl[0] != '[':
             tupl = '[' + tupl
         if tupl[-1] != ']':
@@ -741,7 +741,7 @@ class MdxEngine(object):
         return tupl
 
     def split_group(self, group):
-        splited_group = group.replace('\n', '').replace('\t', '').split('],[')
+        splited_group = group.replace('\n', '').replace('\t', '').split('],')
         return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
 
     def get_nested_select(self):
@@ -750,14 +750,25 @@ class MdxEngine(object):
     def check_nested_select(self):
         return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
 
-    def nested_tuples_to_dataframes(self):
-        # dfs = []
+    def nested_tuples_to_dataframes(self, columns_to_keep):
+        dfs = []
+
         grouped_tuples = self.get_nested_select()
         for tuple_groupe in grouped_tuples:
             # todo execture_one_tuple ??
             # dfs.append(self.execute_one_tuple(tuple_groupe, Dataframe_in, columns_to_keep))
+
+            transformed_tuple_groups = []
             for tuple in self.split_group(tuple_groupe):
-                print(tuple)
+                tuple = tuple.split('].[')
+                tuple[0] = tuple[0].replace('[', '')
+                tuple[-1] = tuple[-1].replace(']', '')
+                if tuple[0].upper() != 'MEASURES':
+                    transformed_tuple_groups.append(tuple)
+            # todo remive 0 !!!
+            dfs.append(self.tuples_to_dataframes(transformed_tuple_groups, columns_to_keep)[0])
+
+        return dfs
 
     def execute_mdx(self):
         """Execute an MDX Query.
@@ -810,9 +821,10 @@ class MdxEngine(object):
         if tuples_on_mdx_query:
 
             if self.check_nested_select():
-                self.nested_tuples_to_dataframes()
+                df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
 
-            df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
+            else:
+                df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
 
             df = self.fusion_dataframes(df_to_fusion)
 
