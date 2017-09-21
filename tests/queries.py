@@ -29,8 +29,8 @@ query4 = """
 query5 = """
 SELECT
     Hierarchize({[Geography].[Economy].[Partnership].[EU],
-        [Geography].[Economy].[Partnership].[None],
-        [Geography].[Economy].[Partnership].[NAFTA]}) ON COLUMNS,
+    [Geography].[Economy].[Partnership].[None],
+    [Geography].[Economy].[Partnership].[NAFTA]}) ON COLUMNS,
     {[Product].[Prod].[Company].[Crazy Development],
     [Product].[Prod].[Company].[Company_test],
     [Product].[Prod].[Company].[test_Development]} ON ROWS
