@@ -752,12 +752,8 @@ class MdxEngine(object):
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         dfs = []
-
         grouped_tuples = self.get_nested_select()
         for tuple_groupe in grouped_tuples:
-            # todo execture_one_tuple ??
-            # dfs.append(self.execute_one_tuple(tuple_groupe, Dataframe_in, columns_to_keep))
-
             transformed_tuple_groups = []
             for tuple in self.split_group(tuple_groupe):
                 tuple = tuple.split('].[')
@@ -765,7 +761,7 @@ class MdxEngine(object):
                 tuple[-1] = tuple[-1].replace(']', '')
                 if tuple[0].upper() != 'MEASURES':
                     transformed_tuple_groups.append(tuple)
-            # todo remive 0 !!!
+
             dfs.append(self.tuples_to_dataframes(transformed_tuple_groups, columns_to_keep)[0])
 
         return dfs
@@ -822,7 +818,6 @@ class MdxEngine(object):
 
             if self.check_nested_select():
                 df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
-
             else:
                 df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
 

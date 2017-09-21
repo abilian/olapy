@@ -5,7 +5,6 @@ import re
 from collections import OrderedDict
 
 import numpy as np
-import pandas as pd
 import xmlwitch
 
 from six.moves import zip
@@ -275,25 +274,13 @@ class XmlaExecuteTools():
                                 # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
         return xml
 
-    @staticmethod
-    def add_tuple_brackets(tupl):
-        if tupl[0] != '[':
-            tupl = '[' + tupl
-        if tupl[-1] != ']':
-            tupl = tupl + ']'
-        return tupl
-
-    def split_group(self, group):
-        splited_group = group.replace('\n', '').replace('\t', '').split('],[')
-        return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
-
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
                 for group in tuples_groups:
                     with xml.Tuple:
-                        for tupl in self.split_group(group):
+                        for tupl in self.executer.split_group(group):
                             splited_tupl = self.executer.split_tuple(tupl)
                             if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
@@ -314,12 +301,6 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo(displayinfo)
         return str(xml)
 
-    def get_nested_select(self):
-        return re.findall(r'\(([^()]+)\)', self.executer.mdx_query)
-
-    def check_nested_select(self):
-        return not self.executer.hierarchized_tuples() and len(self.get_nested_select()) >= 2
-
     def generate_xs0_one_axis(
             self,
             splited_df,
@@ -333,8 +314,8 @@ class XmlaExecuteTools():
 
         # patch 4 select (...) (...) (...) from bla bla bla
         # todo it will be good if I find something else
-        if self.check_nested_select():
-            return self._gen_xs0_grouped_tuples(axis, self.get_nested_select())
+        if self.executer.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis, self.executer.get_nested_select())
 
         xml = xmlwitch.Builder()
 
@@ -579,23 +560,6 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def _rearrange_df(self, tuple_group):
-        # TODO DELETE ASAP ! fix execute_mdx() directly get the desired result
-        new_df = pd.DataFrame()
-        for group in tuple_group:
-            df = self.executer.execute_mdx()['result'].reset_index()
-            for tupl in self.split_group(group):
-                splitted_tupl = self.executer.split_tuple(tupl)
-                if splitted_tupl[0].upper() != 'MEASURES':
-                    if splitted_tupl[-1].isdigit():
-                        splitted_tupl[-1] = int(splitted_tupl[-1])
-                    df = df[(df[self.executer.tables_loaded[splitted_tupl[0]].columns[len(splitted_tupl[4:])]]
-                             == splitted_tupl[-1])]
-
-            new_df = new_df.append(df)
-
-        return new_df.groupby(self.mdx_execution_result['result'].index.names, sort=False).sum()
-
     # TODO maybe fusion with generate xs0 for less iteration
     def generate_cell_data(self):
         """
@@ -645,6 +609,7 @@ class XmlaExecuteTools():
                 xml.Value(str(value), **{'xsi:type': 'xsi:long'})
 
             index += 1
+
         return str(xml)
 
     def _generate_axes_info_sliver_convert2formulas(self):
