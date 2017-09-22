@@ -29,8 +29,8 @@ query4 = """
 query5 = """
 SELECT
     Hierarchize({[Geography].[Economy].[Partnership].[EU],
-        [Geography].[Economy].[Partnership].[None],
-        [Geography].[Economy].[Partnership].[NAFTA]}) ON COLUMNS,
+    [Geography].[Economy].[Partnership].[None],
+    [Geography].[Economy].[Partnership].[NAFTA]}) ON COLUMNS,
     {[Product].[Prod].[Company].[Crazy Development],
     [Product].[Prod].[Company].[Company_test],
     [Product].[Prod].[Company].[test_Development]} ON ROWS
@@ -225,6 +225,19 @@ query14 = """
 
 """
 
-where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
+query15 = """
+SELECT {
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[Spain],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Personal],
+[Geography].[Geography].[Country].[Europe].[France],[Measures].[Amount]),
+([Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership],
+[Geography].[Geography].[Country].[Europe].[Switzerland],[Measures].[Amount])}
+ ON 0 FROM [sales] CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+"""
 
-# TODO queries without
+where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"

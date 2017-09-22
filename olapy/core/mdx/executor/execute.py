@@ -23,7 +23,7 @@ from .execute_db import _construct_star_schema_db, _load_tables_db
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
-class MdxEngine:
+class MdxEngine(object):
     """The main class for executing a query.
 
     :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER
@@ -35,7 +35,7 @@ class MdxEngine:
 
     # french characters
     # or use new regex 2017.02.08
-    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
+    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
             "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     # DATA_FOLDER useful for olapy web (flask instance_path)
@@ -62,7 +62,7 @@ class MdxEngine:
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
-        self.mdx_query = mdx_query
+        self._mdx_query = mdx_query
         if cubes_path is None:
             self.cube_path = self._get_default_cube_directory()
         else:
@@ -78,6 +78,14 @@ class MdxEngine:
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
+
+    @property
+    def mdx_query(self):
+        return self._mdx_query
+
+    @mdx_query.setter
+    def mdx_query(self, value):
+        self._mdx_query = value.replace('\n', '').replace('\t', '')
 
     @classmethod
     def get_cubes_names(cls):
@@ -336,11 +344,12 @@ class MdxEngine:
             if len(tup[0].split('].[')) > 1
         ]
 
-    def seperate_tuples(self, tuple):
-        tuples_as_list = tuple.split('].[')
-        tuples_as_list[0] = tuples_as_list[0].replace('[', '')
-        tuples_as_list[-1] = tuples_as_list[-1].replace(']', '')
-        return tuples_as_list
+    @staticmethod
+    def split_tuple(tupl):
+        splitted_tupl = tupl.strip(' \t\n').split('].[')
+        splitted_tupl[0] = splitted_tupl[0].replace('[', '')
+        splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
+        return splitted_tupl
 
     # TODO temporary function
     def decorticate_query(self, query):
@@ -514,7 +523,6 @@ class MdxEngine:
                 df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
                          == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
-
         return df[cols + self.selected_measures]
 
     @staticmethod
@@ -668,6 +676,96 @@ class MdxEngine:
 
         return uniquefy
 
+    def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
+        # get only used columns and dimensions for all query
+        start_df = self.load_star_schema_dataframe
+        df_to_fusion = []
+        table_name = tuples_on_mdx_query[0][0]
+        # in every tuple
+        for tupl in tuples_on_mdx_query:
+            # if we have measures in columns or rows axes like :
+            # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
+            # we use only used columns for dimension in that tuple and keep
+            # other dimension's columns
+            self.update_columns_to_keep(tupl, columns_to_keep)
+            # a tuple with new dimension
+            if tupl[0] != table_name:
+                # if we change dimension , we have to work on the
+                # exection's result on previous DataFrames
+
+                # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
+                # solution 1 .astype(str) ( take a lot of time from execution)
+                # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
+                # solution 3 a['ccc'] = -1
+                # solution 4 finding something with merge
+
+                # fix 3 test
+                df = df_to_fusion[0]
+                for next_df in df_to_fusion[1:]:
+                    df = pd.concat(self.add_missed_column(df, next_df))
+                # df = pd.concat(df_to_fusion)
+
+                table_name = tupl[0]
+                df_to_fusion = []
+                start_df = df
+
+            df_to_fusion.append(
+                self.execute_one_tuple(
+                    tupl,
+                    start_df,
+                    columns_to_keep.values(), ), )
+
+        return df_to_fusion
+
+    def fusion_dataframes(self, df_to_fusion):
+        # fix 3 test
+
+        # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
+        # solution 1 .astype(str) ( take a lot of time from execution)
+        # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
+        # solution 3 a['ccc'] = -1 (the best)
+        # solution 4 finding something with merge
+
+        df = df_to_fusion[0]
+        for next_df in df_to_fusion[1:]:
+            df = pd.concat(self.add_missed_column(df, next_df))
+        return df
+
+    @staticmethod
+    def add_tuple_brackets(tupl):
+        tupl = tupl.strip()
+        if tupl[0] != '[':
+            tupl = '[' + tupl
+        if tupl[-1] != ']':
+            tupl = tupl + ']'
+        return tupl
+
+    def split_group(self, group):
+        splited_group = group.replace('\n', '').replace('\t', '').split('],')
+        return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
+
+    def get_nested_select(self):
+        return re.findall(r'\(([^()]+)\)', self.mdx_query)
+
+    def check_nested_select(self):
+        return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
+
+    def nested_tuples_to_dataframes(self, columns_to_keep):
+        dfs = []
+        grouped_tuples = self.get_nested_select()
+        for tuple_groupe in grouped_tuples:
+            transformed_tuple_groups = []
+            for tuple in self.split_group(tuple_groupe):
+                tuple = tuple.split('].[')
+                tuple[0] = tuple[0].replace('[', '')
+                tuple[-1] = tuple[-1].replace(']', '')
+                if tuple[0].upper() != 'MEASURES':
+                    transformed_tuple_groups.append(tuple)
+
+            dfs.append(self.tuples_to_dataframes(transformed_tuple_groups, columns_to_keep)[0])
+
+        return dfs
+
     def execute_mdx(self):
         """Execute an MDX Query.
 
@@ -692,8 +790,6 @@ class MdxEngine:
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
-        # get only used columns and dimensions for all query
-        start_df = self.load_star_schema_dataframe
         tables_n_columns = self.get_tables_and_columns(query_axes)
 
         columns_to_keep = OrderedDict(
@@ -716,69 +812,30 @@ class MdxEngine:
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
         # ([Measures].[Amount])
+
+        # todo inject here select ()()() test
         if tuples_on_mdx_query:
 
-            df_to_fusion = []
-            table_name = tuples_on_mdx_query[0][0]
-            # in every tuple
-            for tupl in tuples_on_mdx_query:
-                # if we have measures in columns or rows axes like :
-                # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
-                # we use only used columns for dimension in that tuple and keep
-                # other dimension's columns
-                self.update_columns_to_keep(tupl, columns_to_keep)
-                # a tuple with new dimension
-                if tupl[0] != table_name:
-                    # if we change dimension , we have to work on the
-                    # exection's result on previous DataFrames
+            if self.check_nested_select():
+                df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
+            else:
+                df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
 
-                    # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-                    # solution 1 .astype(str) ( take a lot of time from execution)
-                    # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-                    # solution 3 a['ccc'] = -1
-                    # solution 4 finding something with merge
+            df = self.fusion_dataframes(df_to_fusion)
 
-                    # fix 3 test
-                    df = df_to_fusion[0]
-                    for next_df in df_to_fusion[1:]:
-                        df = pd.concat(self.add_missed_column(df, next_df))
-                    # df = pd.concat(df_to_fusion)
-
-                    table_name = tupl[0]
-                    df_to_fusion = []
-                    start_df = df
-
-                df_to_fusion.append(
-                    self.execute_one_tuple(
-                        tupl,
-                        start_df,
-                        columns_to_keep.values(),),)
-
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values(),),)
-
-            # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-            # solution 1 .astype(str) ( take a lot of time from execution)
-            # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-            # solution 3 a['ccc'] = -1 (the best)
-            # solution 4 finding something with merge
-
-            # fix 3 test
-            df = df_to_fusion[0]
-            for next_df in df_to_fusion[1:]:
-                df = pd.concat(self.add_missed_column(df, next_df))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             sort = self.hierarchized_tuples()
             # TODO margins=True for columns total !!!!!
             return {
                 'result':
-                df.groupby(cols, sort=sort).sum()[self.selected_measures],
+                    df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc':
-                tables_n_columns,
+                    tables_n_columns,
             }
 
         else:
             return {
-                'result': start_df[self.selected_measures].sum().to_frame().T,
+                'result': self.load_star_schema_dataframe[self.selected_measures].sum().to_frame().T,
                 'columns_desc': tables_n_columns,
             }

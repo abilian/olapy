@@ -1,6 +1,6 @@
 #grako
 pandas<1
-lxml<4
+lxml
 spyne<3
 treelib<2
 SQLAlchemy

@@ -1434,7 +1434,7 @@ class XmlaDiscoverTools():
                 request.Properties.PropertyList.Catalog is not None and \
                 request.Restrictions.RestrictionList.TREE_OP == 8:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            separed_tuple = self.executer.seperate_tuples(
+            separed_tuple = self.executer.split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,)
             joined = ".".join(separed_tuple[:-1])
             # exple

@@ -84,8 +84,8 @@ class XmlaExecuteTools():
         # todo change remove (temporary) !!!
         return [
             tup[0]
-            for tup in re.compile(MdxEngine.regex,).findall(
-                self.executer.mdx_query,)
+            for tup in re.compile(MdxEngine.regex).findall(
+                self.executer.mdx_query)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
@@ -160,8 +160,7 @@ class XmlaExecuteTools():
                 self.executer.facts,
         ]:
 
-            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][
-                    self.executer.facts]) == 1:
+            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][self.executer.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
@@ -275,6 +274,33 @@ class XmlaExecuteTools():
                                 # xml.HIERARCHY_UNIQUE_NAME('[Measures]')
         return xml
 
+    def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
+        xml = xmlwitch.Builder()
+        with xml.Axis(name=axis):
+            with xml.Tuples:
+                for group in tuples_groups:
+                    with xml.Tuple:
+                        for tupl in self.executer.split_group(group):
+                            splited_tupl = self.executer.split_tuple(tupl)
+                            if splited_tupl[0].upper() == 'MEASURES':
+                                hierarchy = '[Measures]'
+                                l_name = '[' + splited_tupl[0] + ']'
+                                lvl = 0
+                                displayinfo = '0'
+                            else:
+                                hierarchy = '[{0}].[{0}]'.format(splited_tupl[0])
+                                l_name = "[{0}]".format('].['.join(splited_tupl[:3]))
+                                lvl = len(splited_tupl[4:])
+                                displayinfo = '131076'
+
+                            with xml.Member(Hierarchy=hierarchy):
+                                xml.UName('{0}'.format(tupl.strip(' \t\n')))
+                                xml.Caption('{0}'.format(splited_tupl[-1]))
+                                xml.LName(l_name)
+                                xml.LNum(str(lvl))
+                                xml.DisplayInfo(displayinfo)
+        return str(xml)
+
     def generate_xs0_one_axis(
             self,
             splited_df,
@@ -285,6 +311,11 @@ class XmlaExecuteTools():
         :param splited_df:
         :return:
         """
+
+        # patch 4 select (...) (...) (...) from bla bla bla
+        # todo it will be good if I find something else
+        if self.executer.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis, self.executer.get_nested_select())
 
         xml = xmlwitch.Builder()
 
@@ -510,7 +541,7 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(self.executer.seperate_tuples(tupl)[-1])
+                xml.Value(self.executer.split_tuple(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')
@@ -578,6 +609,7 @@ class XmlaExecuteTools():
                 xml.Value(str(value), **{'xsi:type': 'xsi:long'})
 
             index += 1
+
         return str(xml)
 
     def _generate_axes_info_sliver_convert2formulas(self):
@@ -995,9 +1027,9 @@ class XmlaExecuteTools():
                                 self.executer.execute_mdx()['columns_desc']['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
-                                    self.executer.measures[0],))
+                                    self.executer.measures[0], ))
                                 xml.Caption(
-                                    '{0}'.format(self.executer.measures[0]),)
+                                    '{0}'.format(self.executer.measures[0]), )
                                 xml.LName('[Measures]')
                                 xml.LNum('0')
                                 xml.DisplayInfo('0')
