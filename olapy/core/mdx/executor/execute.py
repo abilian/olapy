@@ -667,8 +667,13 @@ class MdxEngine(object):
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
-    # todo to check
-    def _uniquefy_tuples(self, tuples):
+    @staticmethod
+    def _uniquefy_tuples(tuples):
+        """
+        Remove redundant tuples.
+        :param tuples: list of string of tuples.
+        :return: list of string of unique tuples.
+        """
         uniquefy = []
         for tup in tuples:
             if tup not in uniquefy:
@@ -677,6 +682,12 @@ class MdxEngine(object):
         return uniquefy
 
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
+        """
+        Construct DataFrame of many groups mdx query.
+        :param tuples_on_mdx_query: list of string of tuples.
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+        :return: Pandas DataFrame.
+        """
         # get only used columns and dimensions for all query
         start_df = self.load_star_schema_dataframe
         df_to_fusion = []
@@ -718,6 +729,11 @@ class MdxEngine(object):
         return df_to_fusion
 
     def fusion_dataframes(self, df_to_fusion):
+        """
+        Concat chunks of DataFrames.
+        :param df_to_fusion: List of Pandas DataFrame.
+        :return: Pandas DataFrame.
+        """
         # fix 3 test
 
         # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
@@ -733,6 +749,13 @@ class MdxEngine(object):
 
     @staticmethod
     def add_tuple_brackets(tupl):
+        """
+        After splitting tuple (with splited_group), you got some tuple like aa].[bb].[cc].[dd
+        so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
+
+        :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
+        :return: [aa].[bb].[cc].[dd].
+        """
         tupl = tupl.strip()
         if tupl[0] != '[':
             tupl = '[' + tupl
@@ -741,16 +764,56 @@ class MdxEngine(object):
         return tupl
 
     def split_group(self, group):
+        """
+        Split group of tuples example '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
+        :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
+        :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
+        """
         splited_group = group.replace('\n', '').replace('\t', '').split('],')
         return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
 
     def get_nested_select(self):
+        """
+        Get tuples groups in query like :
+
+                Select {
+                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount]),
+
+                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount])
+                    }
+
+        :return: All groups as list of strings : example:
+
+
+                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount]',
+
+                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount]'
+
+        """
         return re.findall(r'\(([^()]+)\)', self.mdx_query)
 
     def check_nested_select(self):
+        """
+        Check if the MDX Query contains Hierarchize word and contains many tuples groups.
+
+        :return: True | False
+        """
         return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
+        """
+        Construct DataFrame of many groups mdx query.
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+        :return: Pandas DataFrame.
+        """
         dfs = []
         grouped_tuples = self.get_nested_select()
         for tuple_groupe in grouped_tuples:
@@ -813,7 +876,6 @@ class MdxEngine(object):
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
         # ([Measures].[Amount])
 
-        # todo inject here select ()()() test
         if tuples_on_mdx_query:
 
             if self.check_nested_select():
