@@ -770,7 +770,7 @@ class MdxEngine(object):
         :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
         """
         splited_group = group.replace('\n', '').replace('\t', '').split('],')
-        return map(lambda tupl: self.add_tuple_brackets(tupl), splited_group)
+        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
 
     def get_nested_select(self):
         """
