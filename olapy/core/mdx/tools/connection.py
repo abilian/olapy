@@ -20,7 +20,6 @@ class MyDB(object):
         password = db_credentials['password']
         host = db_credentials['host']
         port = db_credentials['port']
-        # mysql+mysqldb://scott:tiger@localhost/foo
         eng, con_db = self._get_init_table(self.sgbd)
 
         if db is None:
