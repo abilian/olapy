@@ -130,14 +130,13 @@ class MdxEngine(object):
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
-            result = db.engine.execute(
-                'SELECT datname FROM pg_database WHERE datistemplate = false;',)
-            available_tables = result.fetchall()
-            # cursor.execute("""SELECT datname FROM pg_database
-            # WHERE datistemplate = false;""")
 
+            all_db_query = cls._gett_all_databeses_query(db.sgbd)
+            result = db.engine.execute(all_db_query)
+            available_tables = result.fetchall()
             MdxEngine.postgres_db_cubes = [
-                database[0] for database in available_tables
+                database[0] for database in available_tables if
+                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
 
         except Exception:
@@ -164,6 +163,13 @@ class MdxEngine(object):
             home_directory = os.path.join(home_directory, 'olapy-data')
 
         return os.path.join(home_directory, self.cube_folder)
+
+    @classmethod
+    def _gett_all_databeses_query(cls,sgbd):
+        if sgbd.upper() == 'POSTGRES':
+            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+        elif sgbd.upper() == 'MYSQL':
+            return 'SHOW DATABASES'
 
     def _get_tables_name(self):
         """Get all tables names.

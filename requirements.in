@@ -5,6 +5,8 @@ spyne<3
 treelib<2
 SQLAlchemy
 psycopg2
+pymysql
+mysql-python
 xmlwitch
 attrs
 

@@ -20,10 +20,9 @@ def _load_table_config_file(executer_instance, cube_obj):
     tables = {}
     # just one facts table right now
     executer_instance.facts = cube_obj.facts[0].table_name
-
     db = MyDB(
         db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube,)
+        db=executer_instance.cube)
 
     for dimension in cube_obj.dimensions:
 
