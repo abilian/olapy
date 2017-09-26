@@ -280,7 +280,7 @@ class ConfigParser:
 
     def _construct_cubes_excel(self):
         try:
-            with self.config_file_path as config_file:
+            with open(self.config_file_path) as config_file:
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
 
@@ -296,11 +296,6 @@ class ConfigParser:
                             for mes in xml_facts.findall('measures/name')
                         ],) for xml_facts in tree.xpath('/cubes/cube/facts')
                 ]
-
-                # keys = {
-                #            key.text: key.attrib['ref']
-                #            for key in xml_facts.findall('keys/column_name')
-                #        },
 
                 dimensions = [
                     Dimension(

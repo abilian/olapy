@@ -26,6 +26,8 @@ class Cube(object):
 
     name = attr.ib()
     source = attr.ib()
+    facts = attr.ib()
+    dimensions = attr.ib()
 
 
 @attr.s
