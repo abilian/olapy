@@ -165,7 +165,7 @@ class MdxEngine(object):
         return os.path.join(home_directory, self.cube_folder)
 
     @classmethod
-    def _gett_all_databeses_query(cls,sgbd):
+    def _gett_all_databeses_query(cls, sgbd):
         if sgbd.upper() == 'POSTGRES':
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
         elif sgbd.upper() == 'MYSQL':
