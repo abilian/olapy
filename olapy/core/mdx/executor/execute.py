@@ -56,7 +56,7 @@ class MdxEngine(object):
             mdx_query=None,
             cube_folder=CUBE_FOLDER,
             sep=';',
-            fact_table_name="Facts",):
+            fact_table_name="Facts"):
 
         self.cube_folder = cube_folder
         self.cube = cube_name
@@ -165,7 +165,7 @@ class MdxEngine(object):
         return os.path.join(home_directory, self.cube_folder)
 
     @classmethod
-    def _gett_all_databeses_query(cls,sgbd):
+    def _gett_all_databeses_query(cls, sgbd):
         if sgbd.upper() == 'POSTGRES':
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
         elif sgbd.upper() == 'MYSQL':
@@ -221,6 +221,7 @@ class MdxEngine(object):
         # col.lower()[-2:] != 'id' to ignore any id column
 
         # if web, get measures from config file
+
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
@@ -231,6 +232,10 @@ class MdxEngine(object):
                 # if measures are specified in the config file
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
+
+        elif self.client == 'excel' and config_file_parser.config_file_exist('excel') and self.cube == config_file_parser.get_cubes_names('excel').keys()[0]:
+            print(self.tables_loaded.keys())
+            self.facts = config_file_parser.get_facts_table_name('excel')
 
         return [
             col

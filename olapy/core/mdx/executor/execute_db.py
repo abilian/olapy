@@ -87,7 +87,7 @@ def _load_tables_db(executer_instance):
 
         # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
         results = db.engine.execution_options(stream_results=True).execute(
-            'SELECT * FROM "{0}"'.format(table_name),)
+            'SELECT * FROM {0}'.format(table_name),)
         # Fetch all the results of the query
         value = pd.DataFrame(
             iter(results),
