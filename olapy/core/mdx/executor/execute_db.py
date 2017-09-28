@@ -110,21 +110,17 @@ def _construct_star_schema_db(executer_instance):
     """
     db = MyDB(db=executer_instance.cube)
     # load facts table
-    with db.engine as connection:
-        fusion = psql.read_sql_query(
-            'SELECT * FROM "{0}" '.format(executer_instance.facts),
-            connection,)
+    fusion = psql.read_sql_query(
+        'SELECT * FROM {0}'.format(executer_instance.facts), db.engine)
 
-        inspector = inspect(connection)
+    inspector = inspect(db.engine)
 
-        for db_table_name in inspector.get_table_names():
-            try:
-                fusion = fusion.merge(
-                    psql.read_sql_query(
-                        "SELECT * FROM {0}".format(db_table_name[0],),
-                        connection,),)
-            except BaseException:
-                print('No common column')
-                pass
+    for db_table_name in inspector.get_table_names():
+        try:
+            fusion = fusion.merge(
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name[0]), db.engine))
+        except BaseException:
+            print('No common column')
+            pass
 
     return fusion
