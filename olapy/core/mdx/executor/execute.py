@@ -232,9 +232,6 @@ class MdxEngine(object):
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
 
-        # elif self.client == 'excel' and config_file_parser.config_file_exist('excel') and self.cube == config_file_parser.get_cubes_names('excel').keys()[0]:
-        #     self.facts = config_file_parser.get_facts_table_name('excel')
-
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(

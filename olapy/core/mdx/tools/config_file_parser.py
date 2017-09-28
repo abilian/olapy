@@ -343,7 +343,6 @@ class ConfigParser:
             except BaseException:  # pragma: no cover
                 raise ValueError('missed name or source tags')
 
-
     def construct_cubes(self, client_type='excel'):
         """Construct cube (with it dimensions) and facts from the config file.
 
