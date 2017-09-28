@@ -205,7 +205,7 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL']:
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
@@ -221,7 +221,6 @@ class MdxEngine(object):
         # col.lower()[-2:] != 'id' to ignore any id column
 
         # if web, get measures from config file
-
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
@@ -233,9 +232,8 @@ class MdxEngine(object):
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
 
-        elif self.client == 'excel' and config_file_parser.config_file_exist('excel') and self.cube == config_file_parser.get_cubes_names('excel').keys()[0]:
-            print(self.tables_loaded.keys())
-            self.facts = config_file_parser.get_facts_table_name('excel')
+        # elif self.client == 'excel' and config_file_parser.config_file_exist('excel') and self.cube == config_file_parser.get_cubes_names('excel').keys()[0]:
+        #     self.facts = config_file_parser.get_facts_table_name('excel')
 
         return [
             col
@@ -257,7 +255,7 @@ class MdxEngine(object):
                 client_type=self.client,):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL']:
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(
                             self,
