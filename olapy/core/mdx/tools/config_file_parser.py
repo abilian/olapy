@@ -325,24 +325,6 @@ class ConfigParser:
         except BaseException:
             raise ValueError('Bad configuration in the configuration file')
 
-    def get_facts_table_name(self, client_type):
-
-        if client_type == 'excel':
-            file_path = self.config_file_path
-        elif client_type == 'web':
-            file_path = self.web_config_file_path
-        else:
-            raise ValueError("Unknown client_type: {}".format(client_type))
-
-        with open(file_path) as config_file:
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
-
-            try:
-                return tree.xpath('/cubes/cube/facts/table_name')[0].text
-            except BaseException:  # pragma: no cover
-                raise ValueError('missed name or source tags')
-
     def construct_cubes(self, client_type='excel'):
         """Construct cube (with it dimensions) and facts from the config file.
 
