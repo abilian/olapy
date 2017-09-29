@@ -23,6 +23,7 @@ from .execute_db import _construct_star_schema_db, _load_tables_db
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 # COMPATIBLE_DATA_BASES = ['MYSQL','POSTGRES','MSSQL']
 
+
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -209,7 +210,7 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL','MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
@@ -251,19 +252,14 @@ class MdxEngine(object):
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 self.client,
-        ) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client,):
+        ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL','MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
                     if self.client == 'web':
-                        fusion = _construct_web_star_schema_config_file(
-                            self,
-                            cubes,)
+                        fusion = _construct_web_star_schema_config_file(self, cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(
-                            self,
-                            cubes,)
+                        fusion = _construct_star_schema_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)

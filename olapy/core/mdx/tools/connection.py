@@ -52,7 +52,7 @@ class MyDB(object):
                 # TODO  other drivers !!!
 
                 self.engine = create_engine(
-                    'mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db),encoding='utf-8')
+                    'mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db), encoding='utf-8')
                 # self.engine = create_engine('mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db))
             else:
                 # and then we connect to the user db

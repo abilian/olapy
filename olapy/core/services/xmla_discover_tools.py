@@ -149,7 +149,7 @@ class XmlaDiscoverTools():
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog.replace('[','').replace(']',''))
+                self.change_catalogue(request.Properties.PropertyList.Catalog.replace('[', '').replace(']', ''))
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"

@@ -110,7 +110,7 @@ def _construct_star_schema_db(executer_instance):
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
-        if not isinstance(db_table_name,str):
+        if not isinstance(db_table_name, str):
             db_table_name = db_table_name[0]
         try:
             fusion = fusion.merge(
