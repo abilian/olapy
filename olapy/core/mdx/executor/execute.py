@@ -349,8 +349,11 @@ class MdxEngine(object):
                     '',).split('].[') if tup_att
             ]
             for tup in re.compile(MdxEngine.regex).findall(
-                query.encode("utf-8", 'replace')[start:stop],)
+                query[start:stop], )
             if len(tup[0].split('].[')) > 1
+            # for tup in re.compile(MdxEngine.regex).findall(
+            #     query.encode("utf-8", 'replace')[start:stop],)
+            # if len(tup[0].split('].[')) > 1
         ]
 
     @staticmethod
