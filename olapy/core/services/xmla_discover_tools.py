@@ -940,7 +940,7 @@ class XmlaDiscoverTools():
 
             return str(xml)
 
-    def discover_mdschema_sets_response(self, request):
+    def mdschema_sets_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
                 and request.Properties.PropertyList.Catalog is not None:
 
