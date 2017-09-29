@@ -77,17 +77,12 @@ def _load_tables_db(executer_instance):
     tables = {}
     db = MyDB(
         db_config_file_path=executer_instance.DATA_FOLDER,
-        db=executer_instance.cube,)
+        db=executer_instance.cube)
     inspector = inspect(db.engine)
 
     for table_name in inspector.get_table_names():
 
-        # value = psql.read_sql_query(
-        #     'SELECT * FROM "{0}"'.format(table_name), db.engine)
-
-        # results = db.engine.execute('SELECT * FROM "{0}"'.format(table_name))
-        results = db.engine.execution_options(stream_results=True).execute(
-            'SELECT * FROM {0}'.format(table_name),)
+        results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM {0}'.format(table_name))
         # Fetch all the results of the query
         value = pd.DataFrame(
             iter(results),
@@ -112,13 +107,14 @@ def _construct_star_schema_db(executer_instance):
     # load facts table
     fusion = psql.read_sql_query(
         'SELECT * FROM {0}'.format(executer_instance.facts), db.engine)
-
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
+        if not isinstance(db_table_name,str):
+            db_table_name = db_table_name[0]
         try:
             fusion = fusion.merge(
-                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name[0]), db.engine))
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
             print('No common column')
             pass

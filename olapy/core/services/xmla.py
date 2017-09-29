@@ -203,11 +203,7 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
         sys.setdefaultencoding('UTF8')
     except:
         pass
-
-    imp.reload(sys)
-    # reload(sys)  # Reload is a hack
-    sys.setdefaultencoding('UTF8')
-
+        
     from wsgiref.simple_server import make_server
 
     # log to the console
