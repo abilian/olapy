@@ -6,6 +6,7 @@ treelib<2
 SQLAlchemy
 psycopg2
 pymysql
+pyodbc
 mysql-python
 xmlwitch
 attrs
