@@ -56,7 +56,7 @@ class MdxEngine(object):
             mdx_query=None,
             cube_folder=CUBE_FOLDER,
             sep=';',
-            fact_table_name="Facts",):
+            fact_table_name="Facts"):
 
         self.cube_folder = cube_folder
         self.cube = cube_name
@@ -130,14 +130,13 @@ class MdxEngine(object):
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
-            result = db.engine.execute(
-                'SELECT datname FROM pg_database WHERE datistemplate = false;',)
-            available_tables = result.fetchall()
-            # cursor.execute("""SELECT datname FROM pg_database
-            # WHERE datistemplate = false;""")
 
+            all_db_query = cls._gett_all_databeses_query(db.sgbd)
+            result = db.engine.execute(all_db_query)
+            available_tables = result.fetchall()
             MdxEngine.postgres_db_cubes = [
-                database[0] for database in available_tables
+                database[0] for database in available_tables if
+                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
 
         except Exception:
@@ -164,6 +163,13 @@ class MdxEngine(object):
             home_directory = os.path.join(home_directory, 'olapy-data')
 
         return os.path.join(home_directory, self.cube_folder)
+
+    @classmethod
+    def _gett_all_databeses_query(cls, sgbd):
+        if sgbd.upper() == 'POSTGRES':
+            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+        elif sgbd.upper() == 'MYSQL':
+            return 'SHOW DATABASES'
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -199,7 +205,7 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL']:
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
@@ -246,7 +252,7 @@ class MdxEngine(object):
                 client_type=self.client,):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL']:
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(
                             self,

@@ -15,37 +15,57 @@ class MyDB(object):
         # TODO temporary
         db_config = DbConfigParser(config_path=db_config_file_path)
         db_credentials = db_config.get_db_credentials()[0]
+        self.sgbd = db_credentials['sgbd']
         username = db_credentials['user_name']
         password = db_credentials['password']
         host = db_credentials['host']
         port = db_credentials['port']
+        eng, con_db = self._get_init_table(self.sgbd)
 
         if db is None:
             # first i want to show all databases to user (in excel)
             # self.engine = pg.connect("user={0} password={1} host='{2}'".
             #                              format(username, password, host))
             self.engine = create_engine(
-                'postgresql+psycopg2://{0}:{1}@{3}:{4}/{2}'.format(
+                '{0}+{1}://{2}:{3}@{4}:{5}{6}'.format(
+                    self.sgbd,
+                    eng,
                     username,
                     password,
-                    'postgres',
                     host,
-                    port,),
+                    port,
+                    con_db,),
                 encoding='utf-8',)
 
         else:
             # and then we connect to the user db
             self.engine = create_engine(
-                'postgresql+psycopg2://{0}:{1}@{3}:{4}/{2}'.format(
+                '{0}+{1}://{2}:{3}@{4}:{5}/{6}'.format(
+                    self.sgbd,
+                    eng,
                     username,
                     password,
-                    db,
                     host,
-                    port,),
+                    port,
+                    db),
                 encoding='utf-8',)
             # self.connection = pg.connect(
             #     "user={0} password={1} dbname='{2}' host='{3}'".format(
             #         username, password, db, host))
+
+    @staticmethod
+    def _get_init_table(sgbd):
+        if sgbd.upper() == 'POSTGRES':
+            con_db = '/postgres'
+            engine = 'psycopg2'
+        elif sgbd.upper() == 'MYSQL':
+            con_db = ''
+            engine = 'mysqldb'
+        else:
+            con_db = ''
+            engine = ''
+
+        return engine, con_db
 
     def __del__(self):
         if hasattr(self, 'connection'):
