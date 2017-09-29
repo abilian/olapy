@@ -13,6 +13,7 @@ psutil==5.3.1
 psycopg2==2.7.3.1
 pympler==0.5
 pymysql==0.7.11
+#pyodbc==4.0.17
 python-dateutil==2.6.1    # via pandas
 pytz==2017.2              # via pandas, spyne
 six==1.11.0               # via python-dateutil

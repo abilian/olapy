@@ -6,7 +6,7 @@ treelib<2
 SQLAlchemy
 psycopg2
 pymysql
-pyodbc
+#pyodbc #need some packages to be installed
 mysql-python
 xmlwitch
 attrs
