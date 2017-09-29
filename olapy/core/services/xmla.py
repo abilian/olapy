@@ -197,6 +197,12 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
 
     :return: server instance
     """
+    try:
+        imp.reload(sys)
+        # reload(sys)  # Reload is a hack
+        sys.setdefaultencoding('UTF8')
+    except:
+        pass
 
     imp.reload(sys)
     # reload(sys)  # Reload is a hack
