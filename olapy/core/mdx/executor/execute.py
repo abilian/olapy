@@ -266,7 +266,6 @@ class MdxEngine(object):
 
         elif self.cube in self.from_db_cubes:
             fusion = _construct_star_schema_db(self)
-
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
         ]]
