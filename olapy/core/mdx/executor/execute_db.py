@@ -112,11 +112,11 @@ def _construct_star_schema_db(executer_instance):
     for db_table_name in inspector.get_table_names():
         if hasattr(db_table_name, '__iter__'):
             db_table_name = db_table_name[0]
-        try:
-            fusion = fusion.merge(
-                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
-        except BaseException:
-            print('No common column')
-            pass
+        # try:
+        fusion = fusion.merge(
+            psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
+        # except BaseException:
+        #     print('No common column')
+        #     pass
 
     return fusion
