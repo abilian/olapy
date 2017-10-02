@@ -54,6 +54,8 @@ class MyDB(object):
                         con_db,),
                     encoding='utf-8',)
 
+        #         engine = create_engine('oracle://scott:tiger@127.0.0.1:1521/sidname')
+
         else:
 
             if self.sgbd.upper() == 'MSSQL':
@@ -81,7 +83,7 @@ class MyDB(object):
     @staticmethod
     def _get_init_table(sgbd):
         if sgbd.upper() == 'POSTGRES':
-            con_db = '/postgres'
+            con_db = 'postgres'
             engine = 'psycopg2'
         elif sgbd.upper() == 'MYSQL':
             con_db = ''
@@ -89,6 +91,9 @@ class MyDB(object):
         elif sgbd.upper() == 'MSSQL':
             con_db = 'msdb'
             engine = 'pyodbc'
+        elif sgbd.upper() == 'ORACLE':
+            con_db = ''
+            engine = 'cx_oracle'
         else:
             con_db = ''
             engine = ''

@@ -21,8 +21,6 @@ from .execute_csv_files import _construct_star_schema_csv_files, \
 from .execute_db import _construct_star_schema_db, _load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
-# COMPATIBLE_DATA_BASES = ['MYSQL','POSTGRES','MSSQL']
-
 
 class MdxEngine(object):
     """The main class for executing a query.
@@ -130,8 +128,6 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
-            # TODO this work only with postgres
-
             all_db_query = cls._gett_all_databeses_query(db.sgbd)
             result = db.engine.execute(all_db_query)
             available_tables = result.fetchall()
@@ -175,6 +171,9 @@ class MdxEngine(object):
             # return 'SHOW DATABASES where DATABASES not in 'mysql', 'information_schema', 'performance_schema', 'sys''
         elif sgbd.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
+        elif sgbd.upper() == 'ORACLE':
+            # TODO TEST this
+            return "SELECT NAME FROM V$DATABASE;"
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -210,7 +209,7 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
@@ -255,7 +254,7 @@ class MdxEngine(object):
         ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(self, cubes)
                     else:
