@@ -45,7 +45,7 @@ class MdxEngine(object):
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
-    postgres_db_cubes = []
+    from_db_cubes = []
 
     # to show just config file's dimensions
 
@@ -135,7 +135,7 @@ class MdxEngine(object):
             all_db_query = cls._gett_all_databeses_query(db.sgbd)
             result = db.engine.execute(all_db_query)
             available_tables = result.fetchall()
-            MdxEngine.postgres_db_cubes = [
+            MdxEngine.from_db_cubes = [
                 database[0] for database in available_tables if
                 database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
@@ -146,7 +146,7 @@ class MdxEngine(object):
             print('no database connexion')
             pass
 
-        return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
+        return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     def _get_default_cube_directory(self):
 
@@ -216,7 +216,7 @@ class MdxEngine(object):
         elif self.cube in self.csv_files_cubes:
             tables = _load_tables_csv_files(self)
 
-        elif self.cube in self.postgres_db_cubes:
+        elif self.cube in self.from_db_cubes:
             tables = _load_tables_db(self)
 
         return tables
@@ -264,7 +264,7 @@ class MdxEngine(object):
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
 
-        elif self.cube in self.postgres_db_cubes:
+        elif self.cube in self.from_db_cubes:
             fusion = _construct_star_schema_db(self)
 
         return fusion[[
