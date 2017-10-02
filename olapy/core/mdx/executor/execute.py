@@ -22,6 +22,7 @@ from .execute_db import _construct_star_schema_db, _load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
+
 class MdxEngine(object):
     """The main class for executing a query.
 
