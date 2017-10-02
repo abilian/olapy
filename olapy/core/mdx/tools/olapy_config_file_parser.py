@@ -46,6 +46,7 @@ class DbConfigParser:
             return [
                 {
                     'sgbd': db.find('sgbd').text,
+                    'driver': db.find('driver').text if db.find('sgbd').text.upper() == 'MSSQL' else None,
                     'user_name': db.find('user_name').text,
                     'password': db.find('password').text,
                     'host': db.find('host').text,

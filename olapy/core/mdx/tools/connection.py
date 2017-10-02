@@ -27,7 +27,15 @@ class MyDB(object):
             # todo directly in the conf file
             if self.sgbd.upper() == 'MSSQL':
                 # TODO  other drivers !!!
-                self.engine = create_engine('mssql+pyodbc://(local)/msdb?driver=SQL+Server+Native+Client+11.0')
+                driver = db_credentials['driver']
+                if 'LOCALHOST' in username.upper() or not username:
+                    self.engine = create_engine(
+                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(driver.replace(' ', '+')))
+                else:
+                    self.engine = create_engine(
+                        'mssql+pyodbc://{0}:{1}@{2}/msdb?driver={3}'.format(username, password, host,
+                                                                            driver.replace(' ', '+')))
+
             else:
 
                 # first i want to show all databases to user (in excel)

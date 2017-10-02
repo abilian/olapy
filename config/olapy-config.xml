@@ -11,6 +11,15 @@
         <port>5432</port>
         <!--<port>3306</port> mysql default-->
 
+
+        <!-- ********  FOR SQL SERVER CONFIG LIKE THIS ************ -->
+
+        <!-- <sgbd>mssql</sgbd> -->
+        <!-- <user_name>localhost</user_name> -->
+        <!-- <password>root</password> -->
+        <!-- <host>localhost</host> -->
+        <!-- <driver>SQL Server Native Client 11.0</driver> -->
+
     </database>
 
 
