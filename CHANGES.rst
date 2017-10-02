@@ -1,13 +1,8 @@
 Changelog for Olapy
 ===================
 
-0.5.0 (207-10-02)
+0.4.7 (207-10-02)
 -----------------
-
-TODO
-
-0.4.7 (2017-08-29)
-------------------
 
 - many fixes in Convert to formulas (Beta)
 - Mdx queries execution enhancement
