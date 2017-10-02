@@ -17,7 +17,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     mdschema_properties_properties_xsd, mdschema_sets_xsd
 
 
-# TODO clean
+# TODO MDSCHEMA_SETS with sql server !!!!
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
@@ -149,7 +149,7 @@ class XmlaDiscoverTools():
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
+                self.change_catalogue(request.Properties.PropertyList.Catalog.replace('[', '').replace(']', ''))
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"
@@ -940,7 +940,7 @@ class XmlaDiscoverTools():
 
             return str(xml)
 
-    def discover_mdschema_sets_response(self, request):
+    def mdschema_sets_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue \
                 and request.Properties.PropertyList.Catalog is not None:
 

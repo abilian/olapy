@@ -4,11 +4,22 @@
 
     <database>
         
-        <!--<sgbd>postgres</sgbd>-->
+        <sgbd>postgres</sgbd> <!--OR <sgbd>mysql</sgbd> -->
         <user_name>postgres</user_name>
         <password>root</password>
         <host>localhost</host>
         <port>5432</port>
+        <!--<port>3306</port> mysql default-->
+
+
+        <!-- ********  FOR SQL SERVER CONFIG LIKE THIS ************ -->
+
+        <!-- <sgbd>mssql</sgbd> -->
+        <!-- <driver>SQL Server Native Client 11.0</driver> -->
+        <!-- <user_name>localhost</user_name> -->
+        <!-- 'password and host' leave them blank if username localhost-->
+        <!-- <password>root</password> -->
+        <!-- <host>localhost</host> -->
 
     </database>
 

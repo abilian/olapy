@@ -5,6 +5,9 @@ spyne<3
 treelib<2
 SQLAlchemy
 psycopg2
+pymysql
+#pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
+mysql-python
 xmlwitch
 attrs
 

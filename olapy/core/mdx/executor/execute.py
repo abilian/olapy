@@ -21,6 +21,7 @@ from .execute_csv_files import _construct_star_schema_csv_files, \
 from .execute_db import _construct_star_schema_db, _load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
+# COMPATIBLE_DATA_BASES = ['MYSQL','POSTGRES','MSSQL']
 
 
 class MdxEngine(object):
@@ -44,7 +45,7 @@ class MdxEngine(object):
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
-    postgres_db_cubes = []
+    from_db_cubes = []
 
     # to show just config file's dimensions
 
@@ -56,7 +57,7 @@ class MdxEngine(object):
             mdx_query=None,
             cube_folder=CUBE_FOLDER,
             sep=';',
-            fact_table_name="Facts",):
+            fact_table_name="Facts"):
 
         self.cube_folder = cube_folder
         self.cube = cube_name
@@ -125,19 +126,18 @@ class MdxEngine(object):
             pass
 
         # get postgres databases
-        # surrounnded with try, except and pass so we continue getting cubes
+        # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
             # TODO this work only with postgres
-            result = db.engine.execute(
-                'SELECT datname FROM pg_database WHERE datistemplate = false;',)
-            available_tables = result.fetchall()
-            # cursor.execute("""SELECT datname FROM pg_database
-            # WHERE datistemplate = false;""")
 
-            MdxEngine.postgres_db_cubes = [
-                database[0] for database in available_tables
+            all_db_query = cls._gett_all_databeses_query(db.sgbd)
+            result = db.engine.execute(all_db_query)
+            available_tables = result.fetchall()
+            MdxEngine.from_db_cubes = [
+                database[0] for database in available_tables if
+                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
 
         except Exception:
@@ -146,7 +146,7 @@ class MdxEngine(object):
             print('no database connexion')
             pass
 
-        return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
+        return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     def _get_default_cube_directory(self):
 
@@ -164,6 +164,17 @@ class MdxEngine(object):
             home_directory = os.path.join(home_directory, 'olapy-data')
 
         return os.path.join(home_directory, self.cube_folder)
+
+    @classmethod
+    def _gett_all_databeses_query(cls, sgbd):
+        if sgbd.upper() == 'POSTGRES':
+            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+        elif sgbd.upper() == 'MYSQL':
+            return 'SHOW DATABASES'
+            # todo
+            # return 'SHOW DATABASES where DATABASES not in 'mysql', 'information_schema', 'performance_schema', 'sys''
+        elif sgbd.upper() == 'MSSQL':
+            return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -184,9 +195,9 @@ class MdxEngine(object):
 
         :return: dict with key as table name and DataFrame as value
         """
+
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-
         if self.client == 'excel' \
                 and config_file_parser.config_file_exist(
                     client_type=self.client,
@@ -199,13 +210,13 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             tables = _load_tables_csv_files(self)
 
-        elif self.cube in self.postgres_db_cubes:
+        elif self.cube in self.from_db_cubes:
             tables = _load_tables_db(self)
 
         return tables
@@ -225,7 +236,6 @@ class MdxEngine(object):
                 # if measures are specified in the config file
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
-
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
@@ -242,24 +252,19 @@ class MdxEngine(object):
         config_file_parser = ConfigParser(self.cube_path)
         if config_file_parser.config_file_exist(
                 self.client,
-        ) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client,):
+        ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source == 'postgres':
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
                     if self.client == 'web':
-                        fusion = _construct_web_star_schema_config_file(
-                            self,
-                            cubes,)
+                        fusion = _construct_web_star_schema_config_file(self, cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(
-                            self,
-                            cubes,)
+                        fusion = _construct_star_schema_config_file(self, cubes)
 
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
 
-        elif self.cube in self.postgres_db_cubes:
+        elif self.cube in self.from_db_cubes:
             fusion = _construct_star_schema_db(self)
 
         return fusion[[
@@ -340,8 +345,11 @@ class MdxEngine(object):
                     '',).split('].[') if tup_att
             ]
             for tup in re.compile(MdxEngine.regex).findall(
-                query.encode("utf-8", 'replace')[start:stop],)
+                query[start:stop], )
             if len(tup[0].split('].[')) > 1
+            # for tup in re.compile(MdxEngine.regex).findall(
+            #     query.encode("utf-8", 'replace')[start:stop],)
+            # if len(tup[0].split('].[')) > 1
         ]
 
     @staticmethod
