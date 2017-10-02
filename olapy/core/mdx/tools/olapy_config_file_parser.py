@@ -46,10 +46,12 @@ class DbConfigParser:
             return [
                 {
                     'sgbd': db.find('sgbd').text,
-                    'driver': db.find('driver').text if db.find('sgbd').text.upper() == 'MSSQL' else None,
+                    'driver': db.find('driver').text if db.find(
+                        'sgbd').text.upper() == 'MSSQL' else 'SQL Server Native Client 11.0',
                     'user_name': db.find('user_name').text,
-                    'password': db.find('password').text,
-                    'host': db.find('host').text,
+                    'password': db.find('password').text if 'LOCALHOST' not in db.find(
+                        'user_name').text.upper() else '',
+                    'host': db.find('host').text if 'LOCALHOST' not in db.find('user_name').text.upper() else '',
                     'port': db.find('port').text,
                 } for db in tree.xpath('/olapy/database')
             ]
