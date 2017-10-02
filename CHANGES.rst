@@ -1,6 +1,11 @@
 Changelog for Olapy
 ===================
 
+0.5.0 (207-10-02)
+-----------------
+
+TODO
+
 0.4.7 (2017-08-29)
 ------------------
 
@@ -12,7 +17,6 @@ Changelog for Olapy
 ------------------
 
 - Big code reformat / clean up.
-
 
 0.4.5 (2017-08-28)
 ------------------
@@ -26,4 +30,3 @@ Changelog for Olapy
 
 - Use xmlwitch to generate XML content.
 - User sqlalchemy core to access database.
-
