@@ -129,13 +129,17 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
-            all_db_query = cls._gett_all_databeses_query(db.sgbd)
-            result = db.engine.execute(all_db_query)
-            available_tables = result.fetchall()
-            MdxEngine.from_db_cubes = [
-                database[0] for database in available_tables if
-                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-            ]
+            if db.sgbd.upper() == 'ORACLE':
+                # You can think of a mysql "database" as a schema/user in Oracle.
+                MdxEngine.from_db_cubes = [db.username]
+            else:
+                all_db_query = cls._gett_all_databeses_query(db.sgbd)
+                result = db.engine.execute(all_db_query)
+                available_tables = result.fetchall()
+                MdxEngine.from_db_cubes = [
+                    database[0] for database in available_tables if
+                    database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+                ]
 
         except Exception:
             type, value, traceback = sys.exc_info()
@@ -174,7 +178,8 @@ class MdxEngine(object):
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
         elif sgbd.upper() == 'ORACLE':
             # TODO TEST this
-            return "SELECT NAME FROM V$DATABASE;"
+            return 'select username from dba_users;'
+            # return "SELECT NAME FROM V$DATABASE;"
 
     def _get_tables_name(self):
         """Get all tables names.

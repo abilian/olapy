@@ -1,9 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
-# import psycopg2 as pg
 from sqlalchemy import create_engine
-
-# postgres connection
 from .olapy_config_file_parser import DbConfigParser
 
 
@@ -16,11 +13,11 @@ class MyDB(object):
         db_config = DbConfigParser(config_path=db_config_file_path)
         db_credentials = db_config.get_db_credentials()[0]
         self.sgbd = db_credentials['sgbd']
-        username = db_credentials['user_name']
-        password = db_credentials['password']
-        host = db_credentials['host']
-        port = db_credentials['port']
-        eng, con_db = self._get_init_table(self.sgbd)
+        self.username = db_credentials['user_name']
+        self.password = db_credentials['password']
+        self.host = db_credentials['host']
+        self.port = db_credentials['port']
+        self.eng, self.con_db = self._get_init_table(self.sgbd)
 
         if db is None:
 
@@ -28,14 +25,14 @@ class MyDB(object):
             if self.sgbd.upper() == 'MSSQL':
                 # TODO  other drivers !!!
                 driver = db_credentials['driver']
-                if 'LOCALHOST' in username.upper() or not username:
+                if 'LOCALHOST' in self.username.upper() or not self.username:
                     self.engine = create_engine(
                         'mssql+pyodbc://(local)/msdb?driver={0}'.format(driver.replace(' ', '+')))
                 else:
                     self.engine = create_engine(
-                        'mssql+pyodbc://{0}:{1}@{2}/msdb?driver={3}'.format(username, password, host,
+                        'mssql+pyodbc://{0}:{1}@{2}/msdb?driver={3}'.format(self.username, self.password, self.host,
                                                                             driver.replace(' ', '+')))
-
+            #  select distinct username from dba_users where username not in ('DIP','XS$NULL','MDSYS');
             else:
 
                 # first i want to show all databases to user (in excel)
@@ -46,12 +43,12 @@ class MyDB(object):
                 self.engine = create_engine(
                     '{0}+{1}://{2}:{3}@{4}:{5}{6}'.format(
                         self.sgbd,
-                        eng,
-                        username,
-                        password,
-                        host,
-                        port,
-                        con_db,),
+                        self.eng,
+                        self.username,
+                        self.password,
+                        self.host,
+                        self.port,
+                        self.con_db,),
                     encoding='utf-8',)
 
         #         engine = create_engine('oracle://scott:tiger@127.0.0.1:1521/sidname')
@@ -69,11 +66,11 @@ class MyDB(object):
                 self.engine = create_engine(
                     '{0}+{1}://{2}:{3}@{4}:{5}/{6}'.format(
                         self.sgbd,
-                        eng,
-                        username,
-                        password,
-                        host,
-                        port,
+                        self.eng,
+                        self.username,
+                        self.password,
+                        self.host,
+                        self.port,
                         db),
                     encoding='utf-8',)
                 # self.connection = pg.connect(
