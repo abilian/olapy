@@ -218,11 +218,11 @@ class MdxEngine(object):
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     tables = _load_table_config_file(self, cubes)
 
-        elif self.cube in self.csv_files_cubes:
-            tables = _load_tables_csv_files(self)
-
         elif self.cube in self.from_db_cubes:
             tables = _load_tables_db(self)
+
+        elif self.cube in self.csv_files_cubes:
+            tables = _load_tables_csv_files(self)
 
         return tables
 
@@ -266,11 +266,11 @@ class MdxEngine(object):
                     else:
                         fusion = _construct_star_schema_config_file(self, cubes)
 
-        elif self.cube in self.csv_files_cubes:
-            fusion = _construct_star_schema_csv_files(self)
-
         elif self.cube in self.from_db_cubes:
             fusion = _construct_star_schema_db(self)
+
+        elif self.cube in self.csv_files_cubes:
+            fusion = _construct_star_schema_csv_files(self)
 
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
