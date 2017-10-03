@@ -114,11 +114,11 @@ def _construct_star_schema_db(executer_instance):
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
-        if isinstance(db_table_name,Iterable) and not isinstance(db_table_name, str) :
+        if isinstance(db_table_name, Iterable) and not isinstance(db_table_name, str):
             db_table_name = db_table_name[0]
         # try except is important
         try:
-        # get_table_names() with oracle , all tables names are lowercase
+            # get_table_names() with oracle , all tables names are lowercase
             fusion = fusion.merge(
                 psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
