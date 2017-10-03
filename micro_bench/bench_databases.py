@@ -8,11 +8,12 @@ from olapy.core.services.xmla import XmlaProviderService
 from spyne import Application
 from prettytable import PrettyTable
 
+from tests.queries import query9, query7, query6, query1
 from tests.test_xmla import WSGIServer
 
 HOST = "127.0.0.1"
 PORT = 8230
-CUBE_NAME = 'sales'
+CUBE_NAME = 'test1'
 
 def main():
 
@@ -37,22 +38,15 @@ def main():
     provider = xmla.XMLAProvider()
     conn = provider.connect(location=server.url)
 
-    t = PrettyTable(['Query', 'olapy execution time'])
+    t = PrettyTable(['Query', 'MYSQL - olapy execution time'])
 
-    cmd = """
-               SELECT
-               FROM [""" + CUBE_NAME + """]
-               WHERE ([Measures].[Amount])
-               CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-
-    file.write(
-        "Query 1 :\n" + cmd +
-        "\n----------------------------------------------------------\n\n")
-    t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
+    for idx, query in enumerate([query1, query6, query7, query9]):
+        file.write(
+            "Query 1 :\n" + query +
+            "\n----------------------------------------------------------\n\n")
+        t.add_row(['Query' + str(idx + 1), mbench.bench(conn, query, CUBE_NAME)])
 
     file.write(str(t) + "\n\n")
-
-
 
 
 if __name__ == '__main__':
