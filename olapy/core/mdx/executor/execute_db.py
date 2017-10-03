@@ -82,6 +82,9 @@ def _load_tables_db(executer_instance):
     inspector = inspect(db.engine)
 
     for table_name in inspector.get_table_names():
+        if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
+            # fix for oracle
+            table_name = table_name.title()
 
         results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM {0}'.format(table_name))
         # Fetch all the results of the query
@@ -90,7 +93,7 @@ def _load_tables_db(executer_instance):
             columns=results.keys(),)  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-        tables[table_name.title()] = value[[
+        tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
 
@@ -117,7 +120,7 @@ def _construct_star_schema_db(executer_instance):
         try:
         # get_table_names() with oracle , all tables names are lowercase
             fusion = fusion.merge(
-                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name.title()), db.engine))
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
             print('No common column')
             pass
