@@ -7,7 +7,7 @@ import os
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from micro_bench import MicBench
-from tests.test_xmla_notox import WSGIServer
+from tests.test_xmla import WSGIServer
 from olap.xmla import xmla
 from olapy.core.services.xmla import XmlaProviderService
 from cube_generator import CubeGen, CUBE_NAME
