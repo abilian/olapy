@@ -15,6 +15,7 @@ HOST = "127.0.0.1"
 PORT = 8230
 CUBE_NAME = 'test1'
 
+
 def main():
 
     mbench = MicBench()
@@ -44,7 +45,9 @@ def main():
         file.write(
             "Query 1 :\n" + query +
             "\n----------------------------------------------------------\n\n")
-        t.add_row(['Query' + str(idx + 1), mbench.bench(conn, query, CUBE_NAME)])
+        t.add_row(
+            ['Query' + str(idx + 1),
+             mbench.bench(conn, query, CUBE_NAME)])
 
     file.write(str(t) + "\n\n")
 
