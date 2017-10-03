@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import pandas as pd
 import pandas.io.sql as psql
+from collections import Iterable
 from sqlalchemy import inspect
 
 from ..tools.connection import MyDB
@@ -89,7 +90,7 @@ def _load_tables_db(executer_instance):
             columns=results.keys(),)  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-        tables[table_name] = value[[
+        tables[table_name.title()] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
 
@@ -110,13 +111,15 @@ def _construct_star_schema_db(executer_instance):
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
-        if hasattr(db_table_name, '__iter__'):
+        if isinstance(db_table_name,Iterable) and not isinstance(db_table_name, str) :
             db_table_name = db_table_name[0]
-        # try:
-        fusion = fusion.merge(
-            psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
-        # except BaseException:
-        #     print('No common column')
-        #     pass
+        # try except is important
+        try:
+        # get_table_names() with oracle , all tables names are lowercase
+            fusion = fusion.merge(
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name.title()), db.engine))
+        except BaseException:
+            print('No common column')
+            pass
 
     return fusion

@@ -71,7 +71,7 @@ class MyDB(object):
                         self.password,
                         self.host,
                         self.port,
-                        db),
+                        '' if self.sgbd.upper() == 'ORACLE' else db),
                     encoding='utf-8',)
                 # self.connection = pg.connect(
                 #     "user={0} password={1} dbname='{2}' host='{3}'".format(
