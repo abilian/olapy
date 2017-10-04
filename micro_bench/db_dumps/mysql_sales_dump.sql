@@ -37,7 +37,7 @@ CREATE TABLE `Facts` (
 
 LOCK TABLES `Facts` WRITE;
 /*!40000 ALTER TABLE `Facts` DISABLE KEYS */;
-INSERT INTO `Facts` VALUES ('May 12,2010','Madrid','Personal',1,84),('May 13,2010','Barcelona','Personal',2,841),('May 14,2010','Paris','Personal',4,2),('May 15,2010','Lausanne','Personal',8,231),('May 16,2010','Lausanne','Corporate',16,4),('May 17,2010','Lausanne','Partnership',32,65),('May 18,2010','Zurich','Partnership',64,64),('May 19,2010','Geneva','Corporate',128,13),('May 20,2010','New York','Corporate',256,12),('May 21,2010','New York','Corporate',512,564);
+INSERT INTO `Facts` VALUES ('May 12,2010','Madrid','Personal',1,84),('May 13,2010','Barcelona','Personal',2,841),('May 14,2010','Paris','Personal',4,2),('May 15,2010','Lausanne','Personal',8,231),('May 16,2010','Lausanne','Corporate',16,4),('May 17,2010','Lausanne','Partnership',32,65),('May 18,2010','Zurich','Partnership',64,64),('May 19,2010','Geneva','Corporate',128,13),('May 20,2010','New York','Corporate',256,12),('May 21,2010','New York','Corporate',512,564),('America','Quebec','Canada',NULL,NULL),('America','Toronto','Canada',NULL,NULL),('America','Los Angeles','United States',NULL,NULL),('America','New York','United States',NULL,NULL),('America','San Francisco','United States',NULL,NULL),('America','Mexico','Mexico',NULL,NULL),('America','Caracas','Venezuela',NULL,NULL),('Europe','Paris','France',NULL,NULL),('Europe','Barcelona','Spain',NULL,NULL),('Europe','Madrid','Spain',NULL,NULL),('Europe','Valencia','Spain',NULL,NULL),('Europe','Geneva','Switzerland',NULL,NULL),('Europe','Lausanne','Switzerland',NULL,NULL),('Europe','Zurich','Switzerland',NULL,NULL);
 /*!40000 ALTER TABLE `Facts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -123,4 +123,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-10-03 17:46:25
+-- Dump completed on 2017-10-03 17:16:34
