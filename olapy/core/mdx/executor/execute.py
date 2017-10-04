@@ -231,6 +231,7 @@ class MdxEngine(object):
         # col.lower()[-2:] != 'id' to ignore any id column
 
         # if web, get measures from config file
+        # from databses , all tables names are lowercase
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
@@ -862,7 +863,6 @@ class MdxEngine(object):
 
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
-
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -888,7 +888,6 @@ class MdxEngine(object):
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
         # ([Measures].[Amount])
-
         if tuples_on_mdx_query:
 
             if self.check_nested_select():

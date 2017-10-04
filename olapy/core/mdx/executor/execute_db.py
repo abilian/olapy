@@ -81,6 +81,11 @@ def _load_tables_db(executer_instance):
         db=executer_instance.cube)
     inspector = inspect(db.engine)
 
+    # fix all postgres table  names are lowercase
+    # load_tables is executed before construct_star_schema
+    if db.sgbd.upper() == 'POSTGRES':
+        executer_instance.facts = executer_instance.facts.lower()
+
     for table_name in inspector.get_table_names():
         if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             # fix for oracle
@@ -109,6 +114,7 @@ def _construct_star_schema_db(executer_instance):
     """
     db = MyDB(db=executer_instance.cube)
     # load facts table
+
     fusion = psql.read_sql_query(
         'SELECT * FROM {0}'.format(executer_instance.facts), db.engine)
     inspector = inspect(db.engine)
