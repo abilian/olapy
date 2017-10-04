@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this config file will be deleted ASAP -->
+<olapy>
+
+    <database>
+
+        <sgbd>mysql</sgbd>
+        <user_name>root</user_name>
+        <password>toor</password>
+        <host>localhost</host>
+        <port>3306</port>
+
+    </database>
+
+
+</olapy>
