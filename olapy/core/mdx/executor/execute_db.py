@@ -119,13 +119,11 @@ def _construct_star_schema_db(executer_instance):
         except:
             if isinstance(db_table_name, Iterable):
                 db_table_name = db_table_name[0]
-        # try except is important
         try:
-            # get_table_names() with oracle , all tables names are lowercase
             fusion = fusion.merge(
                 psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
-            print('No common column')
+            print('No common column between {0} and {1}'.format(executer_instance.facts, db_table_name))
             pass
 
     return fusion
