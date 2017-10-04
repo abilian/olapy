@@ -60,13 +60,13 @@ class MyDB(object):
             else:
                 # and then we connect to the user db
                 self.engine = create_engine('{0}://{1}:{2}@{3}:{4}/{5}'.format(
-                        self.eng,
-                        self.username,
-                        self.password,
-                        self.host,
-                        self.port,
-                        '' if self.sgbd.upper() == 'ORACLE' else db),
-                    encoding='utf-8',)
+                    self.eng,
+                    self.username,
+                    self.password,
+                    self.host,
+                    self.port,
+                    '' if self.sgbd.upper() == 'ORACLE' else db),
+                    encoding='utf-8')
                 # self.connection = pg.connect(
                 #     "user={0} password={1} dbname='{2}' host='{3}'".format(
                 #         username, password, db, host))
