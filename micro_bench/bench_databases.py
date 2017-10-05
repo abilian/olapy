@@ -121,7 +121,7 @@ def main():
         except:
             type, value, traceback = sys.exc_info()
             print('Error opening %s' % (value))
-            print("Can't connect to the database")
+            print("Can't connect to {0} database".format(sgbd))
             pass
     server.stop()
 
