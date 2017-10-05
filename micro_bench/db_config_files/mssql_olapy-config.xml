@@ -7,7 +7,7 @@
          <sgbd>mssql</sgbd>
          <driver>SQL Server Native Client 11.0</driver>
          <user_name>localhost</user_name>
-         'password and host' leave them blank if username localhost
+         #'password and host' leave them blank if username localhost
          <password>root</password>
          <host>localhost</host>
          <port>1433</port>
