@@ -30,8 +30,8 @@ class MyDB(object):
                         'mssql+pyodbc://(local)/msdb?driver={0}'.format(driver.replace(' ', '+')))
                 else:
                     self.engine = create_engine(
-                        'mssql+pyodbc://{0}:{1}@{2}/msdb?driver={3}'.format(self.username, self.password, self.host,
-                                                                            driver.replace(' ', '+')))
+                        'mssql+pyodbc://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(self.username, self.password, self.host,
+                                                                                self.port, driver.replace(' ', '+')))
             #  select distinct username from dba_users where username not in ('DIP','XS$NULL','MDSYS');
             else:
 
