@@ -13,6 +13,7 @@ from olapy.core.services.xmla import XmlaProviderService
 from spyne import Application
 from prettytable import PrettyTable
 
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 from queries_4_db import query9, query7, query6, query1
 from tests.test_xmla import WSGIServer
 
@@ -46,6 +47,23 @@ def fix_query_lowercase_db(query):
                     'Geography', 'geography').replace('Continent', 'continent')
 
 
+def backup_config_file():
+    olapy_dir = get_olapy_dir()
+    if os.path.isfile(os.path.join(olapy_dir, 'olapy-config.xml')):
+        os.rename(
+            os.path.join(olapy_dir, 'olapy-config.xml'),
+            os.path.join(olapy_dir, 'backup_olapy-config.xml'))
+
+
+def restore_config_file():
+    olapy_dir = get_olapy_dir()
+    if os.path.isfile(os.path.join(olapy_dir, 'backup_olapy-config.xml')):
+        os.rename(
+            os.path.join(olapy_dir, 'backup_olapy-config.xml'),
+            os.path.join(olapy_dir, 'olapy-config.xml'))
+        os.remove(os.path.join(olapy_dir, 'backup_olapy-config.xml'))
+
+
 def main():
     file = open('DATABASES_bench_result' +
                 str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
@@ -58,11 +76,15 @@ def main():
             "Query {0} :\n".format(str(idx + 1)) + query +
             "\n----------------------------------------------------------\n\n")
 
-    olapy_dir = get_olapy_dir()
-    if os.path.isfile(os.path.join(olapy_dir, 'olapy-config.xml')):
-        os.rename(
-            os.path.join(olapy_dir, 'olapy-config.xml'),
-            os.path.join(olapy_dir, 'backup_olapy-config.xml'))
+    application = Application(
+        [XmlaProviderService],
+        'urn:schemas-microsoft-com:xml-analysis',
+        in_protocol=Soap11(validator='soft'),
+        out_protocol=Soap11(validator='soft'))
+    wsgi_application = WsgiApplication(application)
+    server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
+
+    server.start()
 
     for config_file in os.listdir(
             os.path.join(os.getcwd(), 'db_config_files')):
@@ -72,15 +94,8 @@ def main():
         try:
             copy_2_olapy_dir(config_file)
 
-            application = Application(
-                [XmlaProviderService],
-                'urn:schemas-microsoft-com:xml-analysis',
-                in_protocol=Soap11(validator='soft'),
-                out_protocol=Soap11(validator='soft'))
-            wsgi_application = WsgiApplication(application)
-            server = WSGIServer(
-                application=wsgi_application, host=HOST, port=PORT)
-            server.start()
+            # to refresh cubes from database
+            XmlaProviderService.discover_tools = XmlaDiscoverTools()
 
             provider = xmla.XMLAProvider()
             conn = provider.connect(location=server.url)
@@ -100,13 +115,13 @@ def main():
                     str(mbench.bench(conn, query, CUBE_NAME))
                 ])
 
-            server.stop()
             file.write(str(t) + "\n\n")
         except:
             type, value, traceback = sys.exc_info()
             print('Error opening %s' % (value))
             print("Can't connect to the database")
             pass
+    server.stop()
 
 
 if __name__ == '__main__':
