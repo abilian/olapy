@@ -32,21 +32,18 @@ def get_olapy_dir():
 
 def copy_2_olapy_dir(config_file):
     olapy_dir = get_olapy_dir()
-    shutil.copy(os.path.join(os.getcwd(), 'db_config_files', config_file), os.path.join(olapy_dir, 'olapy-config.xml'))
+    shutil.copy(
+        os.path.join(os.getcwd(), 'db_config_files', config_file),
+        os.path.join(olapy_dir, 'olapy-config.xml'))
 
-# def fix_query_for_postges(query):
-#     # for postgress
-#     query.replace('Amount', 'amount')
-#     query.replace('Time', 'time')
-#     query.replace('Year', 'year')
-#     query.replace('Quarter', 'quarter')
-#     query.replace('Month', 'month')
-#     query.replace('Product','product')
-#     query.replace('Company', 'company')
-#     query.replace('Day', 'day')
-#     query.replace('Geography', 'geography')
-#     query.replace('Continent', 'continent')
 
+def fix_query_lowercase_db(query):
+    # for postgres table names and columns are lowercase
+    return query.replace('Amount', 'amount').replace('Time', 'time').replace(
+        'Year', 'year').replace('Quarter', 'quarter').replace(
+            'Month', 'month').replace('Product', 'product').replace(
+                'Company', 'company').replace('Day', 'day').replace(
+                    'Geography', 'geography').replace('Continent', 'continent')
 
 
 def main():
@@ -56,13 +53,22 @@ def main():
     file.write("Benchmarks are made with cpu :\n")
     file.write(cpuinfo.get_cpu_info()['brand'] + "\n\n")
 
+    for idx, query in enumerate([query1, query6, query7, query9]):
+        file.write(
+            "Query {0} :\n".format(str(idx + 1)) + query +
+            "\n----------------------------------------------------------\n\n")
+
     olapy_dir = get_olapy_dir()
     if os.path.isfile(os.path.join(olapy_dir, 'olapy-config.xml')):
-        os.rename(os.path.join(olapy_dir, 'olapy-config.xml'), os.path.join(olapy_dir, 'backup_olapy-config.xml'))
+        os.rename(
+            os.path.join(olapy_dir, 'olapy-config.xml'),
+            os.path.join(olapy_dir, 'backup_olapy-config.xml'))
 
-    for config_file in os.listdir(os.path.join(os.getcwd(), 'db_config_files')):
+    for config_file in os.listdir(
+            os.path.join(os.getcwd(), 'db_config_files')):
 
         sgbd = str(config_file.split('_')[0])
+
         try:
             copy_2_olapy_dir(config_file)
 
@@ -72,7 +78,8 @@ def main():
                 in_protocol=Soap11(validator='soft'),
                 out_protocol=Soap11(validator='soft'))
             wsgi_application = WsgiApplication(application)
-            server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
+            server = WSGIServer(
+                application=wsgi_application, host=HOST, port=PORT)
             server.start()
 
             provider = xmla.XMLAProvider()
@@ -81,15 +88,17 @@ def main():
             mbench = MicBench()
             XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
 
-            t = PrettyTable(['Query', '{0} - olapy execution time'.format(sgbd)])
+            t = PrettyTable(
+                ['Query', '{0} - olapy execution time'.format(sgbd)])
 
             for idx, query in enumerate([query1, query6, query7, query9]):
-                file.write(
-                    "Query {0} :\n".format(str(idx + 1)) + query +
-                    "\n----------------------------------------------------------\n\n")
 
-            for idx, query in enumerate([query1, query6, query7, query9]):
-                t.add_row(['Query' + str(idx + 1), str(mbench.bench(conn, query, CUBE_NAME))])
+                if sgbd.upper() == 'POSTGRES':
+                    query = fix_query_lowercase_db(query)
+                t.add_row([
+                    'Query' + str(idx + 1),
+                    str(mbench.bench(conn, query, CUBE_NAME))
+                ])
 
             server.stop()
             file.write(str(t) + "\n\n")
@@ -98,7 +107,6 @@ def main():
             print('Error opening %s' % (value))
             print("Can't connect to the database")
             pass
-
 
 
 if __name__ == '__main__':
