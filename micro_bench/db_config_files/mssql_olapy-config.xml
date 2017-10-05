@@ -10,6 +10,7 @@
          'password and host' leave them blank if username localhost
          <password>root</password>
          <host>localhost</host>
+         <port>1433</port>
 
     </database>
 
