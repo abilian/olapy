@@ -8,13 +8,15 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from olap.xmla import xmla
 import datetime
+
+from tests.queries import query1, query6, query7, query9
+
 from micro_bench import MicBench
 from olapy.core.services.xmla import XmlaProviderService
 from spyne import Application
 from prettytable import PrettyTable
 
 from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
-from queries_4_db import query9, query7, query6, query1
 from tests.test_xmla import WSGIServer
 
 HOST = "127.0.0.1"
@@ -108,7 +110,7 @@ def main():
 
             for idx, query in enumerate([query1, query6, query7, query9]):
 
-                if sgbd.upper() == 'POSTGRES':
+                if sgbd.upper() in ['POSTGRES', 'ORACLE']:
                     query = fix_query_lowercase_db(query)
                 t.add_row([
                     'Query' + str(idx + 1),
