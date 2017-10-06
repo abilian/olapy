@@ -848,9 +848,9 @@ class MdxEngine(object):
 
         Usage ::
 
-            executer = MdxEngine('sales')
-            executer.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
-            executer.execute_mdx()
+            executor = MdxEngine('sales')
+            executor.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
+            executor.execute_mdx()
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
 

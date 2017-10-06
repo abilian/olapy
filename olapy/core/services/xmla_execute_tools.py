@@ -13,13 +13,13 @@ from six.moves import zip
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
 
-    def __init__(self, executer, convert2formulas=False):
-        self.executer = executer
+    def __init__(self, executor, convert2formulas=False):
+        self.executor = executor
         self.convert2formulas = convert2formulas
         if convert2formulas:
             self.mdx_execution_result = self._execute_convert_formulas_query()
         else:
-            self.mdx_execution_result = executer.execute_mdx()
+            self.mdx_execution_result = executor.execute_mdx()
 
     def _execute_convert_formulas_query(self):
         """
@@ -85,7 +85,7 @@ class XmlaExecuteTools():
         return [
             tup[0]
             for tup in re.compile(MdxEngine.regex).findall(
-                self.executer.mdx_query)
+                self.executor.mdx_query)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
@@ -157,16 +157,16 @@ class XmlaExecuteTools():
         first_att = None
 
         if self.mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
-                self.executer.facts,
+                self.executor.facts,
         ]:
 
-            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][self.executer.facts]) == 1:
+            if len(self.mdx_execution_result['columns_desc'][mdx_query_axis][self.executor.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
                 # ['Facts', 'Amount', 'Amount']
-                tuples = [[[[self.executer.facts] + [mes] + [mes]]]
-                          for mes in self.executer.selected_measures]
+                tuples = [[[[self.executor.facts] + [mes] + [mes]]]
+                          for mes in self.executor.selected_measures]
                 first_att = 3
 
         # query with on columns and on rows (without measure)
@@ -176,7 +176,7 @@ class XmlaExecuteTools():
                 zip(* [[[key] + list(row)
                         for row in splited_df[key].itertuples(index=False)]
                        for key in splited_df.keys()
-                       if key is not self.executer.facts]),
+                       if key is not self.executor.facts]),
             ]
 
             first_att = 2
@@ -188,8 +188,8 @@ class XmlaExecuteTools():
                 zip(* [[[key] + [mes] + list(row)
                         for row in splited_df[key].itertuples(index=False)]
                        for key in splited_df.keys()
-                       if key is not self.executer.facts])
-                for mes in self.executer.selected_measures
+                       if key is not self.executor.facts])
+                for mes in self.executor.selected_measures
             ]
             first_att = 3
 
@@ -201,8 +201,8 @@ class XmlaExecuteTools():
             with xml.Tuples:
                 for tupls in itertools.chain(*tuples):
                     with xml.Tuple:
-                        if tupls[0][1] in self.executer.measures and len(
-                                self.executer.selected_measures, ) > 1:
+                        if tupls[0][1] in self.executor.measures and len(
+                                self.executor.selected_measures, ) > 1:
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName(
                                     '[Measures].[{0}]'.format(tupls[0][1]), )
@@ -212,10 +212,10 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('0')
                                 # todo work with properties in mdx query
                                 # todo temp
-                                if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                                if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
                                     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
-                            if tupls[0][-1] in self.executer.measures:
+                            if tupls[0][-1] in self.executor.measures:
                                 continue
 
                         for tupl in tupls:
@@ -243,8 +243,8 @@ class XmlaExecuteTools():
 
                                 # PARENT_UNIQUE_NAME must be before HIERARCHY_UNIQUE_NAME (todo change it in xsd)
                                 # todo delete change 'Hierarchize' in
-                                # self.executer.mdx_query !!!!
-                                if self.executer.hierarchized_tuples():
+                                # self.executor.mdx_query !!!!
+                                if self.executor.hierarchized_tuples():
                                     if len(tuple_without_minus_1[first_att - 1:]) > 1:
                                         xml.PARENT_UNIQUE_NAME(
                                             '[{0}].[{0}].[{1}].{2}'.format(
@@ -262,8 +262,8 @@ class XmlaExecuteTools():
                                             tuple_without_minus_1[0], ), )
 
                         # todo delete change 'Hierarchize' in
-                        # self.executer.mdx_query !!!!
-                        if not self.executer.hierarchized_tuples():
+                        # self.executor.mdx_query !!!!
+                        if not self.executor.hierarchized_tuples():
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName(
                                     '[Measures].[{0}]'.format(tupls[0][1]), )
@@ -280,8 +280,8 @@ class XmlaExecuteTools():
             with xml.Tuples:
                 for group in tuples_groups:
                     with xml.Tuple:
-                        for tupl in self.executer.split_group(group):
-                            splited_tupl = self.executer.split_tuple(tupl)
+                        for tupl in self.executor.split_group(group):
+                            splited_tupl = self.executor.split_tuple(tupl)
                             if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
                                 l_name = '[' + splited_tupl[0] + ']'
@@ -314,8 +314,8 @@ class XmlaExecuteTools():
 
         # patch 4 select (...) (...) (...) from bla bla bla
         # todo it will be good if I find something else
-        if self.executer.check_nested_select():
-            return self._gen_xs0_grouped_tuples(axis, self.executer.get_nested_select())
+        if self.executor.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis, self.executor.get_nested_select())
 
         xml = xmlwitch.Builder()
 
@@ -327,21 +327,21 @@ class XmlaExecuteTools():
             # todo temp
             xml = self.tuples_2_xs0(tuples, splited_df, first_att, axis)
         # todo delete change 'Hierarchize'!!!!
-        elif self.executer.execute_mdx()['columns_desc']['columns'].keys() == [self.executer.facts]:
+        elif self.executor.execute_mdx()['columns_desc']['columns'].keys() == [self.executor.facts]:
             with xml.Axis(name=axis):
                 with xml.Tuples:
                     with xml.Tuple:
                         with xml.Member(Hierarchy="[Measures]"):
                             xml.UName('[Measures].[{0}]'.format(
-                                self.executer.selected_measures[0],))
+                                self.executor.selected_measures[0],))
                             xml.Caption('{0}'.format(
-                                self.executer.selected_measures[0],))
+                                self.executor.selected_measures[0],))
                             xml.LName('[Measures]')
                             xml.LNum('0')
                             xml.DisplayInfo('0')
                             # todo work with properties in mdx query
                             # todo temp
-                            # if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                            # if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
                             #     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
         return str(xml)
@@ -405,23 +405,23 @@ class XmlaExecuteTools():
         with xml.Axis(name="SlicerAxis"):
             with xml.Tuples:
                 with xml.Tuple:
-                    for dim_diff in self.executer.get_all_tables_names(
+                    for dim_diff in self.executor.get_all_tables_names(
                             ignore_fact=True,):
 
-                        column_attribut = self.executer.tables_loaded[
+                        column_attribut = self.executor.tables_loaded[
                             dim_diff].iloc[0][0]
 
                         with xml.Member(
                                 Hierarchy="[{0}].[{0}]".format(dim_diff),):
                             xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(
                                 dim_diff,
-                                self.executer.tables_loaded[dim_diff]
+                                self.executor.tables_loaded[dim_diff]
                                 .columns[0],
                                 column_attribut,))
                             xml.Caption(str(column_attribut))
                             xml.LName('[{0}].[{0}].[{1}]'.format(
                                 dim_diff,
-                                self.executer.tables_loaded[dim_diff]
+                                self.executor.tables_loaded[dim_diff]
                                 .columns[0],))
                             xml.LNum('0')
                             xml.DisplayInfo('2')
@@ -541,7 +541,7 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(self.executer.split_tuple(tupl)[-1])
+                xml.Value(self.executor.split_tuple(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')
@@ -550,7 +550,7 @@ class XmlaExecuteTools():
             else:
                 value = '{0}.{0}.[{1}]'.format(
                     tupl2list[0],
-                    self.executer.tables_loaded[tupl2list[0].replace(
+                    self.executor.tables_loaded[tupl2list[0].replace(
                         '[',
                         '',).replace(']', '')].columns[len(tupl2list[4:])],)
 
@@ -584,7 +584,7 @@ class XmlaExecuteTools():
             len(columns_desc['columns'].keys()) == 0 or
             len(columns_desc['rows'].keys()) == 0
         ) \
-                and self.executer.facts in columns_desc['all'].keys():
+                and self.executor.facts in columns_desc['all'].keys():
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(* [
                 self.mdx_execution_result['result'][measure]
@@ -615,7 +615,7 @@ class XmlaExecuteTools():
     def _generate_axes_info_sliver_convert2formulas(self):
         xml = xmlwitch.Builder()
         with xml.AxisInfo(name='SlicerAxis'):
-            for dim in self.executer.get_all_tables_names(ignore_fact=True):
+            for dim in self.executor.get_all_tables_names(ignore_fact=True):
                 to_write = "[{0}].[{0}]".format(dim)
                 with xml.HierarchyInfo(name=to_write):
                     xml.UName(
@@ -667,7 +667,7 @@ class XmlaExecuteTools():
         if self.convert2formulas:
             return self._generate_axes_info_sliver_convert2formulas()
 
-        all_dimensions_names = self.executer.get_all_tables_names(
+        all_dimensions_names = self.executor.get_all_tables_names(
             ignore_fact=True,)
         all_dimensions_names.append('Measures')
 
@@ -693,10 +693,10 @@ class XmlaExecuteTools():
 
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
-                        if self.executer.facts in self.mdx_execution_result['columns_desc']['all'] and (
+                        if self.executor.facts in self.mdx_execution_result['columns_desc']['all'] and (
                                 len(self.mdx_execution_result['columns_desc']
-                                    ['all'][self.executer.facts]) > 1
-                        ) or (not self.executer.hierarchized_tuples() and not self.
+                                    ['all'][self.executor.facts]) > 1
+                        ) or (not self.executor.hierarchized_tuples() and not self.
                               mdx_execution_result['columns_desc']['where']):
                             continue
 
@@ -761,8 +761,8 @@ class XmlaExecuteTools():
         if axis_tables:
             with xml.AxisInfo(name=Axis):
                 # many measures , then write this on the top
-                if self.executer.facts in axis_tables.keys(
-                ) and len(axis_tables[self.executer.facts]) > 1:
+                if self.executor.facts in axis_tables.keys(
+                ) and len(axis_tables[self.executor.facts]) > 1:
                     with xml.HierarchyInfo(name='[Measures]'):
                         xml.UName(
                             name="[Measures].[MEMBER_UNIQUE_NAME]",
@@ -781,18 +781,18 @@ class XmlaExecuteTools():
                             **{'type': 'xs:unsignedInt'})
 
                         # todo TEMP !!!!!
-                        if 'PARENT_UNIQUE_NAME' in self.executer.mdx_query:
+                        if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
                             xml.PARENT_UNIQUE_NAME(
                                 name="[Measures].[PARENT_UNIQUE_NAME]",
                                 **{'type': 'xs:string'})
                         # todo TEMP !!!!!
-                        if 'HIERARCHY_UNIQUE_NAME' in self.executer.mdx_query:
+                        if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
                             xml.HIERARCHY_UNIQUE_NAME(
                                 name="[Measures].[HIERARCHY_UNIQUE_NAME]",
                                 **{'type': 'xs:string'})
 
                 for table_name in axis_tables:
-                    if table_name != self.executer.facts:
+                    if table_name != self.executor.facts:
 
                         with xml.HierarchyInfo(
                                 name='[{0}].[{0}]'.format(table_name),):
@@ -817,7 +817,7 @@ class XmlaExecuteTools():
                                     table_name,),
                                 **{'type': 'xs:unsignedInt'})
 
-                            if 'Hierarchize' in self.executer.mdx_query:
+                            if 'Hierarchize' in self.executor.mdx_query:
                                 xml.PARENT_UNIQUE_NAME(
                                     name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".
                                     format(table_name),
@@ -828,8 +828,8 @@ class XmlaExecuteTools():
                                     **{'type': 'xs:string'})
 
                 # todo   Hierarchize to delete/ change ASAP / fusion with above
-                if not self.executer.hierarchized_tuples() and len(
-                        self.executer.execute_mdx()['columns_desc']['columns'].get(self.executer.facts, [1, 1])) == 1:
+                if not self.executor.hierarchized_tuples() and len(
+                        self.executor.execute_mdx()['columns_desc']['columns'].get(self.executor.facts, [1, 1])) == 1:
                     with xml.HierarchyInfo(name='[Measures]'):
                         xml.UName(
                             name="[Measures].[MEMBER_UNIQUE_NAME]",
@@ -993,7 +993,7 @@ class XmlaExecuteTools():
             return self._generate_slicer_convert2formulas()
 
         unused_dimensions = sorted(list(
-            set(self.executer.get_all_tables_names(ignore_fact=True)) - set(
+            set(self.executor.get_all_tables_names(ignore_fact=True)) - set(
                 table_name
                 for table_name in self.mdx_execution_result['columns_desc']
                 ['all']),))
@@ -1003,33 +1003,33 @@ class XmlaExecuteTools():
                 with xml.Tuples:
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
-                            column_attribut = self.executer.tables_loaded[
+                            column_attribut = self.executor.tables_loaded[
                                 dim_diff].iloc[0][0]
 
                             with xml.Member(
                                     Hierarchy="[{0}].[{0}]".format(dim_diff),):
                                 xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(
                                     dim_diff,
-                                    self.executer.tables_loaded[dim_diff]
+                                    self.executor.tables_loaded[dim_diff]
                                     .columns[0],
                                     column_attribut,))
                                 xml.Caption(str(column_attribut))
                                 xml.LName('[{0}].[{0}].[{1}]'.format(
                                     dim_diff,
-                                    self.executer.tables_loaded[dim_diff]
+                                    self.executor.tables_loaded[dim_diff]
                                     .columns[0],))
                                 xml.LNum('0')
                                 xml.DisplayInfo('2')
 
                         # todo Hierarchize delete/change !!
-                        if len(self.executer.selected_measures) <= 1 and (
-                            self.executer.hierarchized_tuples() or self.executer.facts in
-                                self.executer.execute_mdx()['columns_desc']['where']):
+                        if len(self.executor.selected_measures) <= 1 and (
+                            self.executor.hierarchized_tuples() or self.executor.facts in
+                                self.executor.execute_mdx()['columns_desc']['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(
-                                    self.executer.measures[0], ))
+                                    self.executor.measures[0], ))
                                 xml.Caption(
-                                    '{0}'.format(self.executer.measures[0]), )
+                                    '{0}'.format(self.executor.measures[0]), )
                                 xml.LName('[Measures]')
                                 xml.LNum('0')
                                 xml.DisplayInfo('0')

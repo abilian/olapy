@@ -26,9 +26,9 @@ class XmlaDiscoverTools():
         # todo bug double catalogue to fix
         self.catalogues = MdxEngine.get_cubes_names()
         self.selected_catalogue = self.catalogues[0]
-        self.executer = MdxEngine(self.selected_catalogue)
-        self.star_schema_dataframe = self.executer.load_star_schema_dataframe[[
-            col for col in self.executer.load_star_schema_dataframe.columns
+        self.executor = MdxEngine(self.selected_catalogue)
+        self.star_schema_dataframe = self.executor.load_star_schema_dataframe[[
+            col for col in self.executor.load_star_schema_dataframe.columns
             if col[-3:] != "_id"
         ]]
         self.session_id = uuid.uuid1()
@@ -43,11 +43,11 @@ class XmlaDiscoverTools():
         """
         if self.selected_catalogue != new_catalogue:
             self.selected_catalogue = new_catalogue
-            self.executer = MdxEngine(new_catalogue)
-            self.star_schema_dataframe = self.executer.load_star_schema_dataframe[
+            self.executor = MdxEngine(new_catalogue)
+            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[
                 [
                     col
-                    for col in self.executer.load_star_schema_dataframe.columns
+                    for col in self.executor.load_star_schema_dataframe.columns
                     if col[-3:] != "_id"
                 ]]
 
@@ -1061,7 +1061,7 @@ class XmlaDiscoverTools():
                             'http://www.w3.org/2001/XMLSchema-instance',
                         }):
                     xml.write(mdschema_measures_xsd)
-                    for mes in self.executer.measures:
+                    for mes in self.executor.measures:
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.CUBE_NAME(self.selected_catalogue)
@@ -1097,7 +1097,7 @@ class XmlaDiscoverTools():
                             'http://www.w3.org/2001/XMLSchema-instance',
                         }):
                     xml.write(mdschema_dimensions_xsd)
-                    for tables in self.executer.get_all_tables_names(
+                    for tables in self.executor.get_all_tables_names(
                             ignore_fact=True,):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
@@ -1158,9 +1158,9 @@ class XmlaDiscoverTools():
                                 'http://www.w3.org/2001/XMLSchema-instance',
                             }):
                         xml.write(mdschema_hierarchies_xsd)
-                        for table_name, df in self.executer.tables_loaded.items(
+                        for table_name, df in self.executor.tables_loaded.items(
                         ):
-                            if table_name == self.executer.facts:
+                            if table_name == self.executor.facts:
                                 continue
 
                             column_attribut = df.iloc[0][0]
@@ -1202,7 +1202,7 @@ class XmlaDiscoverTools():
                             xml.DIMENSION_TYPE('2')
                             xml.HIERARCHY_CARDINALITY('0')
                             xml.DEFAULT_MEMBER('[Measures].[{0}]'.format(
-                                self.executer.measures[0],))
+                                self.executor.measures[0],))
                             xml.STRUCTURE('0')
                             xml.IS_VIRTUAL('false')
                             xml.IS_READWRITE('false')
@@ -1235,10 +1235,10 @@ class XmlaDiscoverTools():
                         }):
 
                     xml.write(mdschema_levels_xsd)
-                    for tables in self.executer.get_all_tables_names(
+                    for tables in self.executor.get_all_tables_names(
                             ignore_fact=True,):
                         l_nb = 0
-                        for col in self.executer.tables_loaded[tables].columns:
+                        for col in self.executor.tables_loaded[tables].columns:
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_catalogue)
@@ -1325,7 +1325,7 @@ class XmlaDiscoverTools():
                             'http://www.w3.org/2001/XMLSchema-instance',
                         }):
                     xml.write(mdschema_measuresgroups_dimensions_xsd)
-                    for tables in self.executer.get_all_tables_names(
+                    for tables in self.executor.get_all_tables_names(
                             ignore_fact=True,):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
@@ -1434,7 +1434,7 @@ class XmlaDiscoverTools():
                 request.Properties.PropertyList.Catalog is not None and \
                 request.Restrictions.RestrictionList.TREE_OP == 8:
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            separed_tuple = self.executer.split_tuple(
+            separed_tuple = self.executor.split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,)
             joined = ".".join(separed_tuple[:-1])
             # exple

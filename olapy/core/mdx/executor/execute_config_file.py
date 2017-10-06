@@ -10,7 +10,7 @@ from ..tools.connection import MyDB
 # split execution into three part (execute from config files,
 # execute csv files if they respect olapy's start schema model,
 # and execute data base tables if they respect olapy's start schema model)
-def _load_table_config_file(executer_instance, cube_obj):
+def _load_table_config_file(executor_instance, cube_obj):
     """
     Load tables from config file.
 
@@ -19,10 +19,10 @@ def _load_table_config_file(executer_instance, cube_obj):
     """
     tables = {}
     # just one facts table right now
-    executer_instance.facts = cube_obj.facts[0].table_name
+    executor_instance.facts = cube_obj.facts[0].table_name
     db = MyDB(
-        db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube)
+        db_config_file_path=os.path.dirname(executor_instance.cube_path),
+        db=executor_instance.cube)
 
     for dimension in cube_obj.dimensions:
 
@@ -52,21 +52,21 @@ def _load_table_config_file(executer_instance, cube_obj):
 
 
 # excel client
-def _construct_star_schema_config_file(executer_instance, cubes_obj):
+def _construct_star_schema_config_file(executor_instance, cubes_obj):
     """Construct star schema DataFrame from configuration file for excel client.
 
     :param cube_name:  cube name (or database name)
     :param cubes_obj: cubes object
     :return: star schema DataFrame
     """
-    executer_instance.facts = cubes_obj.facts[0].table_name
+    executor_instance.facts = cubes_obj.facts[0].table_name
     db = MyDB(
-        db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube,)
+        db_config_file_path=os.path.dirname(executor_instance.cube_path),
+        db=executor_instance.cube,)
     # load facts table
 
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts),
+        "SELECT * FROM {0}".format(executor_instance.facts),
         db.engine,)
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
@@ -94,7 +94,7 @@ def _construct_star_schema_config_file(executer_instance, cubes_obj):
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
-        executer_instance.measures = cubes_obj.facts[0].measures
+        executor_instance.measures = cubes_obj.facts[0].measures
 
     return fusion
 
@@ -134,7 +134,7 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
 
 
 # web client
-def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
+def _construct_web_star_schema_config_file(executor_instance, cubes_obj):
     """Construct star schema DataFrame from configuration file for web client.
 
     :param cube_name:  cube name (or database name)
@@ -142,14 +142,14 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
     :return: star schema DataFrame
     """
 
-    executer_instance.facts = cubes_obj.facts[0].table_name
+    executor_instance.facts = cubes_obj.facts[0].table_name
     db = MyDB(
-        db_config_file_path=os.path.dirname(executer_instance.cube_path),
-        db=executer_instance.cube,)
+        db_config_file_path=os.path.dirname(executor_instance.cube_path),
+        db=executor_instance.cube,)
 
     # load facts table
     fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executer_instance.facts),
+        "SELECT * FROM {0}".format(executor_instance.facts),
         db.engine,)
 
     all_columns, tables = _get_columns_n_tables(cubes_obj.tables, db.engine)
@@ -160,7 +160,7 @@ def _construct_web_star_schema_config_file(executer_instance, cubes_obj):
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
-        executer_instance.measures = cubes_obj.facts[0].measures
+        executor_instance.measures = cubes_obj.facts[0].measures
         all_columns += cubes_obj.facts[0].measures
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():

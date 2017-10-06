@@ -77,7 +77,7 @@ class XmlaProviderService(ServiceBase):
         discover_tools = XmlaProviderService.discover_tools
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
 
-        config_parser = ConfigParser(discover_tools.executer.cube_path)
+        config_parser = ConfigParser(discover_tools.executor.cube_path)
         if config_parser.xmla_authentication() \
                 and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 
@@ -124,8 +124,8 @@ class XmlaProviderService(ServiceBase):
                 request.Properties.PropertyList.Catalog,)
 
             xml = xmlwitch.Builder()
-            executer = XmlaProviderService.discover_tools.executer
-            executer.mdx_query = request.Command.Statement
+            executor = XmlaProviderService.discover_tools.executor
+            executor.mdx_query = request.Command.Statement
 
             # todo Hierarchize
             if all(key in request.Command.Statement
@@ -135,7 +135,7 @@ class XmlaProviderService(ServiceBase):
             else:
                 convert2formulas = False
 
-            xmla_tools = XmlaExecuteTools(executer, convert2formulas)
+            xmla_tools = XmlaExecuteTools(executor, convert2formulas)
 
             with xml['return']:
                 with xml.root(

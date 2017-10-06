@@ -69,7 +69,7 @@ from ..tools.connection import MyDB
 # TODO try pandas.read_sql_table and pandas.read_sql
 
 
-def _load_tables_db(executer_instance):
+def _load_tables_db(executor_instance):
     """
     Load tables from database.
 
@@ -77,14 +77,14 @@ def _load_tables_db(executer_instance):
     """
     tables = {}
     db = MyDB(
-        db_config_file_path=executer_instance.DATA_FOLDER,
-        db=executer_instance.cube)
+        db_config_file_path=executor_instance.DATA_FOLDER,
+        db=executor_instance.cube)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.sgbd.upper() == 'POSTGRES':
-        executer_instance.facts = executer_instance.facts.lower()
+        executor_instance.facts = executor_instance.facts.lower()
 
     for table_name in inspector.get_table_names():
         if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
@@ -105,18 +105,18 @@ def _load_tables_db(executer_instance):
     return tables
 
 
-def _construct_star_schema_db(executer_instance):
+def _construct_star_schema_db(executor_instance):
     """
     Construct star schema DataFrame from database.
 
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-    db = MyDB(db=executer_instance.cube)
+    db = MyDB(db=executor_instance.cube)
     # load facts table
 
     fusion = psql.read_sql_query(
-        'SELECT * FROM {0}'.format(executer_instance.facts), db.engine)
+        'SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
@@ -129,7 +129,7 @@ def _construct_star_schema_db(executer_instance):
             fusion = fusion.merge(
                 psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
-            print('No common column between {0} and {1}'.format(executer_instance.facts, db_table_name))
+            print('No common column between {0} and {1}'.format(executor_instance.facts, db_table_name))
             pass
 
     return fusion
