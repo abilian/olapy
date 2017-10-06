@@ -21,7 +21,6 @@ from .execute_csv_files import _construct_star_schema_csv_files, \
 from .execute_db import _construct_star_schema_db, _load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
-# COMPATIBLE_DATA_BASES = ['MYSQL','POSTGRES','MSSQL']
 
 
 class MdxEngine(object):
@@ -130,15 +129,17 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         try:
             db = MyDB(db_config_file_path=olapy_data_location)
-            # TODO this work only with postgres
-
-            all_db_query = cls._gett_all_databeses_query(db.sgbd)
-            result = db.engine.execute(all_db_query)
-            available_tables = result.fetchall()
-            MdxEngine.from_db_cubes = [
-                database[0] for database in available_tables if
-                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-            ]
+            if db.sgbd.upper() == 'ORACLE':
+                # You can think of a mysql "database" as a schema/user in Oracle.
+                MdxEngine.from_db_cubes = [db.username]
+            else:
+                all_db_query = cls._gett_all_databeses_query(db.sgbd)
+                result = db.engine.execute(all_db_query)
+                available_tables = result.fetchall()
+                MdxEngine.from_db_cubes = [
+                    database[0] for database in available_tables if
+                    database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+                ]
 
         except Exception:
             type, value, traceback = sys.exc_info()
@@ -175,6 +176,10 @@ class MdxEngine(object):
             # return 'SHOW DATABASES where DATABASES not in 'mysql', 'information_schema', 'performance_schema', 'sys''
         elif sgbd.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
+        elif sgbd.upper() == 'ORACLE':
+            # TODO TEST this
+            return 'select username from dba_users;'
+            # return "SELECT NAME FROM V$DATABASE;"
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -210,14 +215,14 @@ class MdxEngine(object):
             # all tables
             for cubes in config_file_parser.construct_cubes():
                 # TODO working with cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     tables = _load_table_config_file(self, cubes)
-
-        elif self.cube in self.csv_files_cubes:
-            tables = _load_tables_csv_files(self)
 
         elif self.cube in self.from_db_cubes:
             tables = _load_tables_db(self)
+
+        elif self.cube in self.csv_files_cubes:
+            tables = _load_tables_csv_files(self)
 
         return tables
 
@@ -226,6 +231,7 @@ class MdxEngine(object):
         # col.lower()[-2:] != 'id' to ignore any id column
 
         # if web, get measures from config file
+        # from databses , all tables names are lowercase
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
@@ -255,17 +261,18 @@ class MdxEngine(object):
         ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
                 # TODO cubes.source == 'csv'
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(self, cubes)
                     else:
                         fusion = _construct_star_schema_config_file(self, cubes)
 
+        elif self.cube in self.from_db_cubes:
+            fusion = _construct_star_schema_db(self)
+
         elif self.cube in self.csv_files_cubes:
             fusion = _construct_star_schema_csv_files(self)
 
-        elif self.cube in self.from_db_cubes:
-            fusion = _construct_star_schema_db(self)
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
         ]]
@@ -856,7 +863,6 @@ class MdxEngine(object):
 
         # use measures that exists on where or insides axes
         query_axes = self.decorticate_query(self.mdx_query)
-
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -882,7 +888,6 @@ class MdxEngine(object):
         # if we have tuples in axes
         # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
         # ([Measures].[Amount])
-
         if tuples_on_mdx_query:
 
             if self.check_nested_select():

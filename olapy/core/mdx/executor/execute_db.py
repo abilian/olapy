@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import pandas as pd
 import pandas.io.sql as psql
+from collections import Iterable
 from sqlalchemy import inspect
 
 from ..tools.connection import MyDB
@@ -80,7 +81,15 @@ def _load_tables_db(executer_instance):
         db=executer_instance.cube)
     inspector = inspect(db.engine)
 
+    # fix all postgres table  names are lowercase
+    # load_tables is executed before construct_star_schema
+    if db.sgbd.upper() == 'POSTGRES':
+        executer_instance.facts = executer_instance.facts.lower()
+
     for table_name in inspector.get_table_names():
+        if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
+            # fix for oracle
+            table_name = table_name.title()
 
         results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM {0}'.format(table_name))
         # Fetch all the results of the query
@@ -105,18 +114,22 @@ def _construct_star_schema_db(executer_instance):
     """
     db = MyDB(db=executer_instance.cube)
     # load facts table
+
     fusion = psql.read_sql_query(
         'SELECT * FROM {0}'.format(executer_instance.facts), db.engine)
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
-        if hasattr(db_table_name, '__iter__'):
-            db_table_name = db_table_name[0]
-        # try:
-        fusion = fusion.merge(
-            psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
-        # except BaseException:
-        #     print('No common column')
-        #     pass
+        try:
+            db_table_name = str(db_table_name)
+        except:
+            if isinstance(db_table_name, Iterable):
+                db_table_name = db_table_name[0]
+        try:
+            fusion = fusion.merge(
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
+        except BaseException:
+            print('No common column between {0} and {1}'.format(executer_instance.facts, db_table_name))
+            pass
 
     return fusion

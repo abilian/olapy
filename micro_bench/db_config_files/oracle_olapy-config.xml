@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this config file will be deleted ASAP -->
+<olapy>
+
+    <database>
+
+        <sgbd>oracle</sgbd> -->
+        <user_name>hr</user_name>
+        <password>hr</password>
+        <host>localhost</host>
+        <port>1521</port>
+
+    </database>
+
+
+</olapy>
