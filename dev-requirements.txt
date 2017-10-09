@@ -6,7 +6,7 @@ pip-tools
 py-cpuinfo
 pytest
 pytest-cov
-xmla
+-e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
 
 # linting
 mastool
