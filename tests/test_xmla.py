@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
 import threading
-
 import pytest
 from olap.xmla import xmla
 from spyne import Application
@@ -171,7 +170,7 @@ def test_query2(conn):
     res = conn.Execute(cmd, Catalog="sales")
     columns = []
     values = []
-    for cell in res.cellmap.viewitems():
+    for cell in res.cellmap.items():
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
     assert values == [768, 768, 768, 255, 4, 3, 2, 1, 248]
@@ -299,7 +298,7 @@ def test_query3(conn):
     res = conn.Execute(cmd, Catalog="sales")
     columns = []
     values = []
-    for cell in res.cellmap.viewitems():
+    for cell in res.cellmap.items():
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
 
@@ -414,7 +413,7 @@ def test_query4(conn):
     res = conn.Execute(cmd, Catalog="sales")
     columns = []
     values = []
-    for cell in res.cellmap.viewitems():
+    for cell in res.cellmap.items():
         columns.append(res.getAxisTuple('Axis0')[cell[0]])
         values.append(cell[1]['Value'])
 
