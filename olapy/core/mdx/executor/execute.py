@@ -64,7 +64,7 @@ class MdxEngine(object):
         self.facts = fact_table_name
         self._mdx_query = mdx_query
         if cubes_path is None:
-            self.cube_path = self._get_default_cube_directory()
+            self.cube_path = os.path.join(self._get_default_cube_directory(), self.cube_folder)
         else:
             self.cube_path = cubes_path
 
@@ -149,7 +149,8 @@ class MdxEngine(object):
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
-    def _get_default_cube_directory(self):
+    @staticmethod
+    def _get_default_cube_directory():
 
         # toxworkdir does not expanduser properly under tox
         if 'OLAPY_PATH' in os.environ:
@@ -164,7 +165,7 @@ class MdxEngine(object):
         if 'olapy-data' not in home_directory:
             home_directory = os.path.join(home_directory, 'olapy-data')
 
-        return os.path.join(home_directory, self.cube_folder)
+        return home_directory
 
     @classmethod
     def _gett_all_databeses_query(cls, sgbd):
