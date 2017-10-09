@@ -3,20 +3,18 @@ from bonobo.commands.run import get_default_services
 
 from olapy.core.mdx.executor.execute import MdxEngine
 
-class ETL(object):
 
-    def __init__(self,source_type):
+class ETL(object):
+    def __init__(self, source_type):
         self.source_type = source_type
         self.cube_path = MdxEngine._get_default_cube_directory()
         self.seperator = self._get_default_seperator()
 
     def _get_default_seperator(self):
-        if self.source_type.upper() in ['CSV','FILE']:
+        if self.source_type.upper() in ['CSV', 'FILE']:
             return ','
 
-
-
-    def transform(self,line):
+    def transform(self, line):
         """
 
         :param table_type: facts | dimension
@@ -45,18 +43,16 @@ class ETL(object):
         return bonobo.CsvWriter('coffeeshops.csv')
         # return  bonobo.JsonWriter('coffeeshops.json', fs='fs.output', ioformat='arg0')
 
+
 etl = ETL('file')
 
-
 if __name__ == '__main__':
-
     graph = bonobo.Graph(
         # etl.extract('coffeeshops.txt'),
         bonobo.CsvReader('coffeeshops.txt'),
-        # etl.transform,
+        etl.transform,
         # bonobo.CsvWriter('coffeeshops.csv')
-        etl.load()
-    )
+        etl.load())
 
     def get_services():
         return {
