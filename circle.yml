@@ -9,3 +9,4 @@ dependencies:
 test:
   override:
     - tox
+    - pyenv local 2.7.11 3.6.2
