@@ -20,6 +20,7 @@ class ETL(object):
                  source_type,
                  facts_table,
                  facts_ids,
+                 seperator = None,
                  target_cube='etl_cube',
                  **kwargs):
         """
@@ -29,7 +30,7 @@ class ETL(object):
         """
         self.source_type = source_type
         self.cube_path = MdxEngine._get_default_cube_directory()
-        self.seperator = self._get_default_seperator()
+        self.seperator = self._get_default_seperator() if not seperator else seperator
         self.target_cube = target_cube
         self.olapy_cube_path = os.path.join(MdxEngine._get_default_cube_directory(),MdxEngine.CUBE_FOLDER)
         # pass some data to transform without bonobo shitty configuration
