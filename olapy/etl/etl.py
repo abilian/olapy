@@ -31,14 +31,7 @@ class ETL(object):
         self.cube_path = MdxEngine._get_default_cube_directory()
         self.seperator = self._get_default_seperator()
         self.target_cube = target_cube
-        self.olapy_cube_path = os.path.join(
-            MdxEngine._get_default_cube_directory())
-        if not os.path.isdir(
-                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
-                             self.target_cube)):
-            os.makedirs(
-                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
-                             self.target_cube))
+        self.olapy_cube_path = os.path.join(MdxEngine._get_default_cube_directory(),MdxEngine.CUBE_FOLDER)
         # pass some data to transform without bonobo shitty configuration
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
@@ -87,13 +80,17 @@ class ETL(object):
         """
         return getattr(bonobo, self.source_type.title() + "Reader")(file)
 
-    def load(self, target='csv'):
-        self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
+    def load(self,table_name, target='csv'):
 
+        if not os.path.isdir(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube)):
+            os.makedirs(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube))
+
+        self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
         # todo target postgres, mysql ....
         if target.upper() == 'CSV':
             # todo headers if there is not headers
-            return bonobo.CsvWriter('coffeeshops.csv', ioformat='arg0')
+            # os.chdir(self.target_cube)
+            return bonobo.CsvWriter(table_name+'-out.csv', ioformat='arg0')
 
 
 if __name__ == '__main__':
@@ -101,7 +98,7 @@ if __name__ == '__main__':
     # with extension
     dims_infos = {
         # 'dimension': ['col_id'],
-        'Geography.txt': ['geokey']
+        'Geography': ['geokey']
     }
 
     facts_ids = ['col1', 'col2', 'col3']
@@ -116,9 +113,9 @@ if __name__ == '__main__':
         etl.current_dim_id_column = dims_infos[table]
 
         graph = bonobo.Graph(
-            etl.extract(table),
+            etl.extract(table + '.txt'),
             # transform,
             etl.transform,
-            etl.load())
+            etl.load(table))
 
         bonobo.run(graph)
