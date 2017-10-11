@@ -5,7 +5,6 @@ import os
 
 from olapy.core.mdx.executor.execute import MdxEngine
 
-
 # class Transform(Configurable):
 #     headers =  Option(list)
 #     def call(self, line):
@@ -17,7 +16,12 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 
 class ETL(object):
-    def __init__(self, source_type, facts_table, facts_ids, target_cube='etl_cube', **kwargs):
+    def __init__(self,
+                 source_type,
+                 facts_table,
+                 facts_ids,
+                 target_cube='etl_cube',
+                 **kwargs):
         """
 
         :param source_type: csv | file | pickle
@@ -27,9 +31,14 @@ class ETL(object):
         self.cube_path = MdxEngine._get_default_cube_directory()
         self.seperator = self._get_default_seperator()
         self.target_cube = target_cube
-        self.olapy_cube_path = os.path.join(MdxEngine._get_default_cube_directory())
-        if not os.path.isdir(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube)):
-            os.makedirs(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube))
+        self.olapy_cube_path = os.path.join(
+            MdxEngine._get_default_cube_directory())
+        if not os.path.isdir(
+                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
+                             self.target_cube)):
+            os.makedirs(
+                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
+                             self.target_cube))
         # pass some data to transform without bonobo shitty configuration
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
@@ -92,11 +101,16 @@ if __name__ == '__main__':
     # with extension
     dims_infos = {
         # 'dimension': ['col_id'],
-        'Geography.txt': ['geokey']}
+        'Geography.txt': ['geokey']
+    }
 
     facts_ids = ['col1', 'col2', 'col3']
 
-    etl = ETL(source_type='file', facts_table='facts', facts_ids=facts_ids, **dims_infos)
+    etl = ETL(
+        source_type='file',
+        facts_table='facts',
+        facts_ids=facts_ids,
+        **dims_infos)
     for table in dims_infos.keys():
         # transform = Transform(dims_infos[table])
         etl.current_dim_id_column = dims_infos[table]
