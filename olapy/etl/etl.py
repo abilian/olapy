@@ -59,9 +59,11 @@ class ETL(object):
 
         else:
             if self.dim_headers:
-                splited = line.split(self.seperator, maxsplit=len(self.dim_headers))
+                columns = self.dim_headers
             else:
-                splited = line.split(self.seperator, maxsplit=len(self.current_dim_id_column))
+                columns = self.current_dim_id_column
+
+            splited = line.split(self.seperator, maxsplit=len(columns))
 
             for idx, head in enumerate(self.dim_headers):
                 transformed.update({head: splited[idx]})
@@ -87,6 +89,7 @@ class ETL(object):
 
 if __name__ == '__main__':
 
+    # with extension
     dims_infos = {
         # 'dimension': ['col_id'],
         'Geography.txt': ['geokey']}
@@ -97,8 +100,9 @@ if __name__ == '__main__':
     for table in dims_infos.keys():
         # transform = Transform(dims_infos[table])
         etl.current_dim_id_column = dims_infos[table]
+
         graph = bonobo.Graph(
-            etl.extract(table + '.txt'),
+            etl.extract(table),
             # transform,
             etl.transform,
             etl.load())
