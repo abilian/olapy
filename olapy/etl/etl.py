@@ -20,7 +20,7 @@ class ETL(object):
                  source_type,
                  facts_table,
                  facts_ids,
-                 seperator = None,
+                 seperator=None,
                  target_cube='etl_cube',
                  **kwargs):
         """
@@ -30,9 +30,11 @@ class ETL(object):
         """
         self.source_type = source_type
         self.cube_path = MdxEngine._get_default_cube_directory()
-        self.seperator = self._get_default_seperator() if not seperator else seperator
+        self.seperator = self._get_default_seperator(
+        ) if not seperator else seperator
         self.target_cube = target_cube
-        self.olapy_cube_path = os.path.join(MdxEngine._get_default_cube_directory(),MdxEngine.CUBE_FOLDER)
+        self.olapy_cube_path = os.path.join(
+            MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
         # pass some data to transform without bonobo shitty configuration
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
@@ -81,17 +83,24 @@ class ETL(object):
         """
         return getattr(bonobo, self.source_type.title() + "Reader")(file)
 
-    def load(self,table_name, target='csv'):
+    def load(self, table_name, target='csv'):
 
-        if not os.path.isdir(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube)):
-            os.makedirs(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube))
+        if not os.path.isdir(
+                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
+                             self.target_cube)):
+            os.makedirs(
+                os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
+                             self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
         # todo target postgres, mysql ....
         if target.upper() == 'CSV':
             # todo headers if there is not headers
             # os.chdir(self.target_cube)
-            return bonobo.CsvWriter(table_name+'-out.csv', ioformat='arg0')
+            return bonobo.CsvWriter(
+                '/home/mouadh/olapy-data/cubes/etl_cube/' + table_name +
+                '-out.csv',
+                ioformat='arg0')
 
 
 if __name__ == '__main__':
