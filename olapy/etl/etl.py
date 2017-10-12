@@ -23,7 +23,7 @@ class ETL(object):
                  source_type,
                  facts_table,
                  facts_ids,
-                 seperator=None,
+                 separator=None,
                  target_cube='etl_cube',
                  **kwargs):
         """
@@ -35,7 +35,7 @@ class ETL(object):
         self.facts_table = facts_table
         self.cube_path = MdxEngine._get_default_cube_directory()
         self.seperator = self._get_default_seperator(
-        ) if not seperator else seperator
+        ) if not separator else separator
         self.target_cube = target_cube
         self.olapy_cube_path = os.path.join(
             MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
@@ -96,7 +96,7 @@ class ETL(object):
             if table_name == self.facts_table:
                 table_name = 'Facts'
             return bonobo.CsvWriter(
-                'etl_generated/' + table_name + '.csv', ioformat='arg0')
+                os.path.join(GEN_FOLDER, table_name + '.csv'), ioformat='arg0')
 
     def copy_2_olapy_dir(self):
         if not os.path.isdir(
@@ -112,6 +112,12 @@ class ETL(object):
             copyfile(
                 os.path.join(GEN_FOLDER, file),
                 os.path.join(self.target_cube, file))
+
+    def get_source_extension(self):
+        if self.source_type.upper() == 'FILE':
+            return '.txt'
+        elif self.source_type.upper() == 'CSV':
+            return '.csv'
 
 
 if __name__ == '__main__':
@@ -129,6 +135,7 @@ if __name__ == '__main__':
         facts_table='sales_facts',
         facts_ids=facts_ids,
         **dims_infos)
+
     for table in list(dims_infos.keys()) + [etl.facts_table]:
         # transform = Transform(dims_infos[table])
         etl.dim_first_row_headers = True
@@ -138,7 +145,7 @@ if __name__ == '__main__':
             etl.current_dim_id_column = dims_infos[table]
 
         graph = bonobo.Graph(
-            etl.extract(table + '.txt'),
+            etl.extract(table + etl.get_source_extension()),
             # transform,
             etl.transform,
             etl.load(table))
