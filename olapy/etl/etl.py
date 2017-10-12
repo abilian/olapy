@@ -60,7 +60,7 @@ class ETL(object):
             self.dim_headers = splited
             self.dim_first_row_headers = False
             for idx, column_header in enumerate(splited):
-                if column_header == self.current_dim_id_column[0] and '_id' not in column_header[-3:]:
+                if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
                     splited[idx] = column_header + '_id'
 
         else:
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         'Geography': ['geokey']
     }
 
-    facts_ids = ['col1', 'col2', 'col3']
+    facts_ids = ['geokey', 'Day', 'City', 'Licence']
 
     etl = ETL(
         source_type='file',
@@ -118,8 +118,11 @@ if __name__ == '__main__':
         **dims_infos)
     for table in list(dims_infos.keys()) + [etl.facts_table]:
         # transform = Transform(dims_infos[table])
-        etl.current_dim_id_column = dims_infos[
-            table] if table != etl.facts_table else etl.facts_table
+        etl.dim_first_row_headers = True
+        if table == etl.facts_table:
+            etl.current_dim_id_column = facts_ids
+        else:
+            etl.current_dim_id_column = dims_infos[table]
 
         graph = bonobo.Graph(
             etl.extract(table + '.txt'),
