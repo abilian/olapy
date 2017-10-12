@@ -1,0 +1,4 @@
+geokey,Day,City,Licence,Amount,Count
+1,May 12,2010,Madrid,Personal,1,84
+2,May 13,2010,Barcelona,Personal,2,841
+3,May 14,2010,Paris,Personal,4,2
