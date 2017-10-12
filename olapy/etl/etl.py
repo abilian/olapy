@@ -29,6 +29,7 @@ class ETL(object):
         :param headers:
         """
         self.source_type = source_type
+        self.facts_table = facts_table
         self.cube_path = MdxEngine._get_default_cube_directory()
         self.seperator = self._get_default_seperator(
         ) if not seperator else seperator
@@ -64,11 +65,11 @@ class ETL(object):
 
         else:
             if self.dim_headers:
-                columns = self.dim_headers
+                splited = line.split(
+                    self.seperator, maxsplit=len(self.dim_headers))
             else:
-                columns = self.current_dim_id_column
-
-            splited = line.split(self.seperator, maxsplit=len(columns))
+                # columns = self.current_dim_id_column
+                splited = line.split(self.seperator)
 
             for idx, head in enumerate(self.dim_headers):
                 transformed.update({head: splited[idx]})
@@ -97,10 +98,7 @@ class ETL(object):
         if target.upper() == 'CSV':
             # todo headers if there is not headers
             # os.chdir(self.target_cube)
-            return bonobo.CsvWriter(
-                '/home/mouadh/olapy-data/cubes/etl_cube/' + table_name +
-                '-out.csv',
-                ioformat='arg0')
+            return bonobo.CsvWriter(table_name + '-out.csv', ioformat='arg0')
 
 
 if __name__ == '__main__':
@@ -115,12 +113,13 @@ if __name__ == '__main__':
 
     etl = ETL(
         source_type='file',
-        facts_table='facts',
+        facts_table='sales_facts',
         facts_ids=facts_ids,
         **dims_infos)
-    for table in dims_infos.keys():
+    for table in list(dims_infos.keys()) + [etl.facts_table]:
         # transform = Transform(dims_infos[table])
-        etl.current_dim_id_column = dims_infos[table]
+        etl.current_dim_id_column = dims_infos[
+            table] if table != etl.facts_table else etl.facts_table
 
         graph = bonobo.Graph(
             etl.extract(table + '.txt'),
