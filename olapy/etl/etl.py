@@ -1,5 +1,6 @@
 import bonobo
 import os
+from shutil import copyfile
 
 # from bonobo.config import Configurable, Option
 
@@ -13,6 +14,8 @@ from olapy.core.mdx.executor.execute import MdxEngine
 #         for idx, head in enumerate(self.headers):
 #             transformed.update({head: splited[idx]})
 #         return transformed
+
+GEN_FOLDER = 'etl_generated'
 
 
 class ETL(object):
@@ -86,6 +89,16 @@ class ETL(object):
 
     def load(self, table_name, target='csv'):
 
+        # todo target postgres, mysql ....
+        if target.upper() == 'CSV':
+            # todo headers if there is not headers
+            # os.chdir(self.target_cube)
+            if table_name == self.facts_table:
+                table_name = 'Facts'
+            return bonobo.CsvWriter(
+                'etl_generated/' + table_name + '.csv', ioformat='arg0')
+
+    def copy_2_olapy_dir(self):
         if not os.path.isdir(
                 os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER,
                              self.target_cube)):
@@ -94,11 +107,11 @@ class ETL(object):
                              self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
-        # todo target postgres, mysql ....
-        if target.upper() == 'CSV':
-            # todo headers if there is not headers
-            # os.chdir(self.target_cube)
-            return bonobo.CsvWriter(table_name + '-out.csv', ioformat='arg0')
+
+        for file in os.listdir(GEN_FOLDER):
+            copyfile(
+                os.path.join(GEN_FOLDER, file),
+                os.path.join(self.target_cube, file))
 
 
 if __name__ == '__main__':
@@ -131,3 +144,6 @@ if __name__ == '__main__':
             etl.load(table))
 
         bonobo.run(graph)
+
+    # temp ( bonobo can't export (save) to path (bonobo bug)
+    etl.copy_2_olapy_dir()
