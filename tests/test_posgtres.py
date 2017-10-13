@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function
-
+from sqlalchemy import Table, Column, Integer, String
 import os
 import pandas as pd
 import pytest
+import sqlalchemy
 from pandas.util.testing import assert_frame_equal
 
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
@@ -27,6 +28,58 @@ def test_conf_file_change():
             </database>
         </olapy>
         """)
+
+
+@pytest.fixture(scope='function')
+def connect(user, password, db, host='localhost', port=5432):
+    '''Returns a connection and a metadata object'''
+    # We connect with the help of the PostgreSQL URL
+    # postgresql://federer:grandestslam@localhost:5432/tennis
+    url = 'postgresql://{}:{}@{}:{}/{}'
+    url = url.format(user, password, host, port, db)
+
+    # The return value of create_engine() is our connection object
+    return sqlalchemy.create_engine(url, client_encoding='utf8')
+
+
+def create_tables(connect):
+    con = connect('postgres', 'root', 'sales_postgres')
+
+    statement = """
+    CREATE TABLE IF NOT EXISTS facts (
+    day text,
+    city text,
+    licence text,
+    amount integer,
+    count integer);    
+    """
+    con.execute(statement)
+
+    statement = """
+    CREATE TABLE IF NOT EXISTS geography (
+    continent text,
+    country text,
+    city text);
+    """
+    con.execute(statement)
+
+    statement = """
+    CREATE TABLE IF NOT EXISTS product (
+    company text,
+    article text,
+    licence text);
+    """
+    con.execute(statement)
+
+    statement = """
+    CREATE TABLE IF NOT EXISTS "time" (
+    year integer,
+    quarter text,
+    month text,
+    day text
+    );
+    """
+    con.execute(statement)
 
 
 @pytest.fixture(scope='module')
