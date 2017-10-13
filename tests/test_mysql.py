@@ -1,24 +1,43 @@
 from __future__ import absolute_import, division, print_function
 
+import os
 import pandas as pd
+import pytest
 from pandas.util.testing import assert_frame_equal
-
-from olapy.core.mdx.executor.execute import MdxEngine
 
 from .queries import query1, query3, query6, query7, query8, query9, \
     query10
 
 CUBE = 'sales_mysql'
 
-executor = MdxEngine(CUBE)
+def test_conf_file_change():
+    from olapy.core.mdx.executor.execute import MdxEngine
+    with open(os.path.join(MdxEngine._get_default_cube_directory(),'olapy-config.xml'), "w") as f:
+        f.write("""<!-- this config file will be deleted ASAP -->
+        <olapy>
+            <database>
+                <sgbd>mysql</sgbd>
+                <user_name>root</user_name>
+                <password>toor</password>
+                <host>localhost</host>
+                <port>3306</port>
+            </database>
+        </olapy>
+        """)
 
 
-def test_execution_query1():
+@pytest.fixture(scope='module')
+def executor():
+    from olapy.core.mdx.executor.execute import MdxEngine
+    return MdxEngine(CUBE)
+
+
+def test_execution_query1(executor):
     executor.mdx_query = query1
     assert executor.execute_mdx()['result']['Amount'][0] == 1023
 
 
-def test_execution_query2():
+def test_execution_query2(executor):
     executor.mdx_query = query3
 
     df = executor.execute_mdx()['result']
@@ -30,7 +49,7 @@ def test_execution_query2():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query6():
+def test_execution_query6(executor):
     executor.mdx_query = query6
 
     df = executor.execute_mdx()['result']
@@ -60,7 +79,7 @@ def test_execution_query6():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query7():
+def test_execution_query7(executor):
     executor.mdx_query = query7
 
     df = executor.execute_mdx()['result']
@@ -101,7 +120,7 @@ def test_execution_query7():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query8():
+def test_execution_query8(executor):
     executor.mdx_query = query8
 
     df = executor.execute_mdx()['result']
@@ -115,7 +134,7 @@ def test_execution_query8():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query9():
+def test_execution_query9(executor):
     executor.mdx_query = query9
 
     df = executor.execute_mdx()['result']
@@ -150,7 +169,7 @@ def test_execution_query9():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query10():
+def test_execution_query10(executor):
     executor.mdx_query = query10
 
     df = executor.execute_mdx()['result']

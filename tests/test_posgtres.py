@@ -1,17 +1,38 @@
 from __future__ import absolute_import, division, print_function
 
+import os
 import pandas as pd
+import pytest
 from pandas.util.testing import assert_frame_equal
 
-from olapy.core.mdx.executor.execute import MdxEngine
+
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'
 
-executor = MdxEngine(CUBE)
+def test_conf_file_change():
+    from olapy.core.mdx.executor.execute import MdxEngine
+    with open(os.path.join(MdxEngine._get_default_cube_directory(),'olapy-config.xml'), "w") as f:
+        f.write("""
+        <!-- this config file will be deleted ASAP -->
+        <olapy>
+            <database>
+                <sgbd>postgres</sgbd>
+                <user_name>postgres</user_name>
+                <password>root</password>
+                <host>localhost</host>
+                <port>5432</port>
+            </database>
+        </olapy>
+        """)
 
 
-def test_execution_query1():
+@pytest.fixture(scope='module')
+def executor():
+    from olapy.core.mdx.executor.execute import MdxEngine
+    return MdxEngine(CUBE)
+
+def test_execution_query1(executor):
     executor.mdx_query = query_posgres1
 
     df = executor.execute_mdx()['result']
@@ -23,7 +44,7 @@ def test_execution_query1():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query2():
+def test_execution_query2(executor):
     executor.mdx_query = query_posgres2
 
     df = executor.execute_mdx()['result']
@@ -54,7 +75,7 @@ def test_execution_query2():
 
 
 
-def test_execution_query10():
+def test_execution_query10(executor):
     executor.mdx_query = query_postgres3
 
     df = executor.execute_mdx()['result']
@@ -87,4 +108,3 @@ def test_execution_query10():
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
-
