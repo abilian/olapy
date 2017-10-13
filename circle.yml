@@ -1,3 +1,14 @@
+machine:
+  services:
+    - postgresql
+
+  pre:
+    # Create a new test database.
+    - sudo -u postgres psql -p 5433 -c "create database sales_postgres;"
+
+  environment:
+    POSTGRES_URI: postgres://postgres:root@localhost/sales_postgres
+
 dependencies:
   cache_directories:
      - "~/.cache/"
