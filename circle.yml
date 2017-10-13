@@ -7,7 +7,7 @@ machine:
     - sudo -u postgres psql -p 5433 -c "create database sales_postgres;"
 
   environment:
-    POSTGRES_URI: postgres://postgres:root@localhost/sales_postgres
+    POSTGRES_URI: postgres://ubuntu:@localhost/sales_postgres
 
 dependencies:
   cache_directories:

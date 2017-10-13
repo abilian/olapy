@@ -43,7 +43,7 @@ def connect(user, password, db, host='localhost', port=5432):
 
 
 def create_tables(connect):
-    con = connect('postgres', 'root', 'sales_postgres')
+    con = connect('postgres', '', 'sales_postgres')
 
     statement = """
     CREATE TABLE IF NOT EXISTS facts (
