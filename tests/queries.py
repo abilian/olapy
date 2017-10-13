@@ -241,3 +241,62 @@ SELECT {
 """
 
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
+
+
+query_posgres1 = """
+    SELECT
+    Hierarchize(non empty {[geography].[geography].[country].Members}) ON COLUMNS,
+    Hierarchize({[Measures].[amount]}) ON ROWS
+    FROM [sales_postgres]
+"""
+query_posgres2 = """
+    SELECT NON EMPTY
+    Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownMember({{
+    [time].[time].[year].Members}}, {
+    [time].[time].[year].[2010]})}}, {
+    [time].[time].[quarter].[2010].[Q2 2010]})}}, {
+    [time].[time].[month].[2010].[Q2 2010].[May 2010]}))) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+    ON COLUMNS
+    FROM [sales_postgres]
+    WHERE ([Measures].[amount])
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
+
+
+query_postgres3 = """
+    SELECT {(
+    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count]),
+
+    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
+    [geography].[geography].[continent].[Europe],
+    [Measures].[count])}
+
+    ON 0
+    FROM [sales_postgres]
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+"""
