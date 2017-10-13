@@ -10,9 +10,12 @@ from .queries import query1, query3, query6, query7, query8, query9, \
 
 CUBE = 'sales_mysql'
 
+
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
-    with open(os.path.join(MdxEngine._get_default_cube_directory(),'olapy-config.xml'), "w") as f:
+    with open(
+            os.path.join(MdxEngine._get_default_cube_directory(),
+                         'olapy-config.xml'), "w") as f:
         f.write("""<!-- this config file will be deleted ASAP -->
         <olapy>
             <database>

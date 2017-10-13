@@ -5,14 +5,16 @@ import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
 
-
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'
 
+
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
-    with open(os.path.join(MdxEngine._get_default_cube_directory(),'olapy-config.xml'), "w") as f:
+    with open(
+            os.path.join(MdxEngine._get_default_cube_directory(),
+                         'olapy-config.xml'), "w") as f:
         f.write("""
         <!-- this config file will be deleted ASAP -->
         <olapy>
@@ -31,6 +33,7 @@ def test_conf_file_change():
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     return MdxEngine(CUBE)
+
 
 def test_execution_query1(executor):
     executor.mdx_query = query_posgres1
@@ -72,7 +75,6 @@ def test_execution_query2(executor):
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
     assert assert_frame_equal(df, test_df) is None
-
 
 
 def test_execution_query10(executor):
