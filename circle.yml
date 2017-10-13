@@ -4,7 +4,7 @@ machine:
 
   pre:
     # Create a new test database.
-    - sudo -u postgres psql -p 5433 -c "create database sales_postgres;"
+    - sudo -u ubuntu psql -p 5433 -c "create database sales_postgres;"
 
   environment:
     POSTGRES_URI: postgres://ubuntu:@localhost/sales_postgres
