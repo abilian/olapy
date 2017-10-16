@@ -22,7 +22,7 @@ def test_conf_file_change():
             <database>
                 <sgbd>postgres</sgbd>
                 <user_name>postgres</user_name>
-                <password>root</password>
+                <password></password>
                 <host>localhost</host>
                 <port>5432</port>
             </database>
