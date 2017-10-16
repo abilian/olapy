@@ -89,9 +89,9 @@ def test_create_tables(connect):
     INSERT INTO geography (continent, country, city) VALUES
     ('America','Canada','Quebec'),
     ('America','Canada','Toronto'),
-    ('America','United','States Los Angeles'),
-    ('America','United','States New York'),
-    ('America','United','States San Francisco'),
+    ('America','United States','Los Angeles'),
+    ('America','United States','New York'),
+    ('America','United States','San Francisco'),
     ('America','Mexico','Mexico'),
     ('America','Venezuela','Caracas'),
     ('Europe','France','Paris'),
