@@ -5,7 +5,7 @@ import pytest
 import sqlalchemy
 from pandas.util.testing import assert_frame_equal
 
-from tests.postgres_utils import test_create_tables, test_drop_tables
+from tests.postgres_utils import create_insert, drop_tables
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'
@@ -48,7 +48,8 @@ def connect(user=USER_NAME,
 
 
 # create tables in the postgres database
-test_create_tables(connect)
+def test_create_tables(connect):
+    create_insert(connect)
 
 
 @pytest.fixture(scope='module')
@@ -135,4 +136,5 @@ def test_execution_query10(executor):
 
 
 # drop created tables from postgres database
-test_drop_tables(connect)
+def test_drop_tables(connect):
+    drop_tables(connect)

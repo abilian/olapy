@@ -1,5 +1,5 @@
 
-def test_create_tables(connect):
+def create_insert(con):
 
     statement = """
     CREATE TABLE IF NOT EXISTS facts (
@@ -9,7 +9,7 @@ def test_create_tables(connect):
     amount integer,
     count integer);
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     INSERT INTO facts (day, city, licence, amount, count) VALUES
@@ -24,7 +24,7 @@ def test_create_tables(connect):
     ('May 20,2010','New York','Corporate',256,12),
     ('May 21,2010','New York','Corporate',512,564);"""
 
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS geography (
@@ -32,7 +32,7 @@ def test_create_tables(connect):
     country text,
     city text);
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     INSERT INTO geography (continent, country, city) VALUES
@@ -51,7 +51,7 @@ def test_create_tables(connect):
     ('Europe','Switzerland','Lausanne'),
     ('Europe','Switzerland','Zurich');"""
 
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS product (
@@ -59,7 +59,7 @@ def test_create_tables(connect):
     article text,
     licence text);
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
         INSERT INTO product (company, article, licence) VALUES
@@ -68,7 +68,7 @@ def test_create_tables(connect):
         ('Crazy Development','olapy','Personal'),
         ('Crazy Development','olapy','Startup');"""
 
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS "time" (
@@ -78,7 +78,7 @@ def test_create_tables(connect):
     day text
     );
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """INSERT INTO time (year, quarter, month, day) VALUES
         (2010, 'Q1 2010', 'January 2010', 'January 1,2010'),
@@ -812,27 +812,27 @@ def test_create_tables(connect):
         (2011, 'Q4 2011', 'December 2011', 'December 30,2011'),
         (2011, 'Q4 2011', 'December 2011', 'December 31,2011');"""
 
-    connect.execute(statement)
+    con.execute(statement)
 
 
-def test_drop_tables(connect):
+def drop_tables(con):
 
     statement = """
     DROP TABLE facts;
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     DROP TABLE geography;
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     DROP TABLE product;
     """
-    connect.execute(statement)
+    con.execute(statement)
 
     statement = """
     DROP TABLE "time";
     """
-    connect.execute(statement)
+    con.execute(statement)
