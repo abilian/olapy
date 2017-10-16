@@ -1,20 +1,13 @@
 machine:
-
   environment:
-    # Add the Postgres 9.6 binaries to the path.
-    PATH: /usr/lib/postgresql/9.6/bin/:$PATH
+    NODE_ENV: test
+  services:
+    - postgresql
 
-  pre:
-    # Start Postgres 9.6 since the default is 9.5.
-    - sudo service postgresql stop
-#    - sudo mv /usr/lib/postgresql-9.6/9.6 /usr/lib/postgresql/9.6
-#    - sudo mv /etc/postgresql-9.6/9.6 /etc/postgresql/9.6
-    - sudo service postgresql start 9.6
-
-    # Add a password to the `ubuntu` user, since Postgres is configured to
-    # always ask for a password, and without out it will fail.
-    - sudo -u postgres psql -p 5433 -c "create user ubuntu with password 'ubuntu';"
-    - sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
-
-    # Create a new test database.
-    - sudo -u postgres psql -p 5433 -c "create database test;"
+database:
+  override:
+    - createdb test
+    - echo "CREATE ROLE api WITH UNENCRYPTED PASSWORD 'password';" | psql -U postgres
+    - echo "ALTER ROLE api WITH LOGIN;" | psql -U postgres
+    - echo "GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA test.public TO api;" | psql -U postgres
+    - echo "GRANT CREATE, CONNECT ON DATABASE test TO api;" | psql -U postgres
