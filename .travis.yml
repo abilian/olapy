@@ -10,12 +10,13 @@ install:
   - pip install -U pip setuptools tox wheel
 
 script:
-  - tox
+#  - tox
+  - make lint
 
-notifications:
-  slack:
-    rooms:
-      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
-    on_success: change
-    on_failure: always
+#notifications:
+#  slack:
+#    rooms:
+#      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
+#    on_success: change
+#    on_failure: always
 
