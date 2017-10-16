@@ -28,6 +28,11 @@ def test_conf_file_change():
             </database>
         </olapy>
         """)
+    with open(os.path.join(MdxEngine._get_default_cube_directory(),
+                         'olapy-config.xml'), "r") as f:
+        print (f.read())
+        print('------------------------')
+        f.close()
 
 
 @pytest.fixture(scope='function')
@@ -43,7 +48,7 @@ def connect(user, password, db, host='localhost', port=5432):
 
 
 def create_tables(connect):
-    con = connect('postgres', '', 'sales_postgres')
+    con = connect(user='postgres', password='', db='sales_postgres')
 
     statement = """
     CREATE TABLE IF NOT EXISTS facts (

@@ -146,7 +146,8 @@ class MdxEngine(object):
             print('Error opening %s' % (value))
             print('no database connexion')
             pass
-
+        print('from databases !!')
+        print(MdxEngine.from_db_cubes)
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @staticmethod
