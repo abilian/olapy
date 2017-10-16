@@ -17,7 +17,8 @@ machine:
     - sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
 
     # Create a new test database.
-    - sudo -u postgres psql -p 5433 -c "create database test;"
+    - psql -c 'create database sales_postgres;' -U postgres
+#    - sudo -u postgres psql -p 5433 -c "create database test;"
 
 dependencies:
   cache_directories:

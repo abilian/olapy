@@ -9,8 +9,8 @@ python:
 install:
   - pip install -U pip setuptools tox wheel
 
-script:
-  - tox
+#script:
+#  - tox
 
 notifications:
   slack:
