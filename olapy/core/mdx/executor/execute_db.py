@@ -79,6 +79,7 @@ def _load_tables_db(executor_instance):
     db = MyDB(
         db_config_file_path=executor_instance.DATA_FOLDER,
         db=executor_instance.cube)
+    print(db)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
@@ -87,6 +88,7 @@ def _load_tables_db(executor_instance):
         executor_instance.facts = executor_instance.facts.lower()
 
     for table_name in inspector.get_table_names():
+        print(table_name)
         if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             # fix for oracle
             table_name = table_name.title()
