@@ -9,8 +9,9 @@ python:
 install:
   - pip install -U pip setuptools tox wheel
 
-#script:
+script:
 #  - tox
+  pytest tests/test_mdx_engine.py
 
 notifications:
   slack:

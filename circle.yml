@@ -13,8 +13,8 @@ machine:
 
     # Add a password to the `ubuntu` user, since Postgres is configured to
     # always ask for a password, and without out it will fail.
-    - sudo -u postgres psql -p 5433 -c "create user ubuntu with password 'ubuntu';"
-    - sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
+#    - sudo -u postgres psql -p 5433 -c "create user ubuntu with password 'ubuntu';"
+#    - sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
 
     # Create a new test database.
     - psql -c 'create database sales_postgres;' -U postgres
