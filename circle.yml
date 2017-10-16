@@ -8,7 +8,3 @@ machine:
 database:
   override:
     - createdb sales_postgres
-#    - echo "CREATE ROLE api WITH UNENCRYPTED PASSWORD 'password';" | psql -U postgres
-#    - echo "ALTER ROLE api WITH LOGIN;" | psql -U postgres
-#    - echo "GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA test.public TO api;" | psql -U postgres
-#    - echo "GRANT CREATE, CONNECT ON DATABASE test TO api;" | psql -U postgres
