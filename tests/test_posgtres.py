@@ -9,7 +9,9 @@ from pandas.util.testing import assert_frame_equal
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'
-
+USER_NAME = 'postgres'
+PASSWORD = None
+DB = 'sales_postgres'
 
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -36,10 +38,11 @@ def test_conf_file_change():
 
 
 @pytest.fixture(scope='function')
-def connect(user, password, db, host='localhost', port=5432):
+def connect(user=USER_NAME, password=PASSWORD, db=DB, host='localhost', port=5432):
     '''Returns a connection and a metadata object'''
     # We connect with the help of the PostgreSQL URL
     # postgresql://federer:grandestslam@localhost:5432/tennis
+    # url = 'postgresql://{}:{}@{}:{}/{}
     url = 'postgresql://{}:{}@{}:{}/{}'
     url = url.format(user, password, host, port, db)
 
@@ -47,8 +50,7 @@ def connect(user, password, db, host='localhost', port=5432):
     return sqlalchemy.create_engine(url, client_encoding='utf8')
 
 
-def create_tables(connect):
-    con = connect(user='postgres', password='', db='sales_postgres')
+def test_create_tables(connect):
 
     statement = """
     CREATE TABLE IF NOT EXISTS facts (
@@ -58,7 +60,7 @@ def create_tables(connect):
     amount integer,
     count integer);
     """
-    con.execute(statement)
+    connect.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS geography (
@@ -66,7 +68,7 @@ def create_tables(connect):
     country text,
     city text);
     """
-    con.execute(statement)
+    connect.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS product (
@@ -74,7 +76,7 @@ def create_tables(connect):
     article text,
     licence text);
     """
-    con.execute(statement)
+    connect.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS "time" (
@@ -84,7 +86,15 @@ def create_tables(connect):
     day text
     );
     """
-    con.execute(statement)
+    connect.execute(statement)
+
+    from sqlalchemy import inspect
+    inspector = inspect(connect)
+    for table_name in inspector.get_table_names():
+        print(table_name)
+        print('////////////////////////////')
+
+
 
 
 @pytest.fixture(scope='module')
