@@ -1,5 +1,4 @@
 from __future__ import absolute_import, division, print_function
-from sqlalchemy import Table, Column, Integer, String
 import os
 import pandas as pd
 import pytest
@@ -12,6 +11,7 @@ CUBE = 'sales_postgres'
 USER_NAME = 'postgres'
 PASSWORD = None
 DB = 'sales_postgres'
+
 
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -30,15 +30,20 @@ def test_conf_file_change():
             </database>
         </olapy>
         """)
-    with open(os.path.join(MdxEngine._get_default_cube_directory(),
+    with open(
+            os.path.join(MdxEngine._get_default_cube_directory(),
                          'olapy-config.xml'), "r") as f:
-        print (f.read())
+        print(f.read())
         print('------------------------')
         f.close()
 
 
 @pytest.fixture(scope='function')
-def connect(user=USER_NAME, password=PASSWORD, db=DB, host='localhost', port=5432):
+def connect(user=USER_NAME,
+            password=PASSWORD,
+            db=DB,
+            host='localhost',
+            port=5432):
     '''Returns a connection and a metadata object'''
     # We connect with the help of the PostgreSQL URL
     # postgresql://federer:grandestslam@localhost:5432/tennis
@@ -872,8 +877,6 @@ def test_create_tables(connect):
         print('////////////////////////////')
 
 
-
-
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -964,18 +967,15 @@ def test_drop_tables(connect):
     """
     connect.execute(statement)
 
-
     statement = """
     DROP TABLE geography;
     """
     connect.execute(statement)
 
-
     statement = """
     DROP TABLE product;
     """
     connect.execute(statement)
-
 
     statement = """
     DROP TABLE "time";
