@@ -30,6 +30,7 @@ def test_conf_file_change():
         </olapy>
         """)
 
+
 @pytest.fixture(scope='function')
 def connect(user=USER_NAME,
             password=PASSWORD,
@@ -45,8 +46,10 @@ def connect(user=USER_NAME,
     # The return value of create_engine() is our connection object
     return sqlalchemy.create_engine(url, client_encoding='utf8')
 
+
 # create tables in the postgres database
 test_create_tables(connect)
+
 
 @pytest.fixture(scope='module')
 def executor():
@@ -129,6 +132,7 @@ def test_execution_query10(executor):
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 # drop created tables from postgres database
 test_drop_tables(connect)
