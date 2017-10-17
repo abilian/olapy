@@ -13,7 +13,11 @@ machine:
 database:
   override:
     - createdb sales_postgres
-    - mysql -u ubuntu -e "create database sales_mysql"
+    - echo "CREATE USER IF NOT EXISTS 'root_circle'@'localhost' IDENTIFIED BY 'toor'" | mysql -u root
+    - echo "GRANT ALL PRIVILEGES ON *.* TO 'root_circle'@'localhost' WITH GRANT OPTION" | mysql -u root
+    - echo "FLUSH PRIVILEGES" | mysql -u root
+    - echo "CREATE DATABASE IF NOT EXISTS sales_mysql" | mysql -u root
+#    - mysql -u ubuntu -e "create database sales_mysql"
 
 dependencies:
   cache_directories:
