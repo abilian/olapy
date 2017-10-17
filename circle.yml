@@ -2,6 +2,8 @@ machine:
   environment:
     NODE_ENV: test
     POSTGRES_URI: postgres://ubuntu:@localhost/circle_test
+    MYSQL_USER: ubuntu
+    MYSQL_PASSWORD: ''
   post:
     - pyenv global 2.7.11 3.6.2
   services:
