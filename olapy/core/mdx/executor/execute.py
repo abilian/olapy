@@ -146,8 +146,6 @@ class MdxEngine(object):
             print('Error opening %s' % (value))
             print('no database connexion')
             pass
-        print('from databases !!')
-        print(MdxEngine.from_db_cubes)
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @staticmethod
@@ -221,8 +219,6 @@ class MdxEngine(object):
                     tables = _load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
-            print('000000000000000000000000000000')
-            print(_load_tables_db(self))
             tables = _load_tables_db(self)
 
         elif self.cube in self.csv_files_cubes:
