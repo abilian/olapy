@@ -11,8 +11,8 @@ from .queries import query1, query3, query6, query7, query8, query9, \
     query10
 
 CUBE = 'sales_mysql'
-USER_NAME = 'ubuntu'
-PASSWORD = None
+USER_NAME = 'root_circle'
+PASSWORD = 'toor'
 DB = 'sales_mysql'
 
 
@@ -25,8 +25,8 @@ def test_conf_file_change():
         <olapy>
             <database>
                 <sgbd>mysql</sgbd>
-                <user_name>ubuntu</user_name>
-                <password></password>
+                <user_name>root_circle</user_name>
+                <password>toor</password>
                 <host>localhost</host>
                 <port>3306</port>
             </database>
