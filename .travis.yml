@@ -10,8 +10,27 @@ install:
   - pip install -U pip setuptools tox wheel
 
 script:
-#  - tox
-  - make lint
+  - tox
+
+services:
+  - mysql
+  - postgresql
+
+test:
+  adapter: mysql2
+  database: sales_mysql
+  username: root_circle
+  encoding: utf8
+
+test:
+  adapter: postgresql
+  database: sales_postgres
+
+before_install:
+  - psql -c 'create database sales_postgres;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_mysql;'
+
+#  - make lint
 
 #notifications:
 #  slack:
