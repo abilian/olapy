@@ -6,10 +6,12 @@ machine:
     - pyenv global 2.7.11 3.6.2
   services:
     - postgresql
+    - mysql
 
 database:
   override:
     - createdb sales_postgres
+    - mysql -u ubuntu -e "create database sales_mysql"
 
 dependencies:
   cache_directories:
