@@ -37,7 +37,7 @@ def connect(user=USER_NAME,
             db=DB,
             host='localhost',
             port=5432):
-    '''Returns a connection and a metadata object'''
+    """Returns a connection and a metadata object"""
     # We connect with the help of the PostgreSQL URL
     # postgresql://federer:grandestslam@localhost:5432/tennis
     url = 'postgresql://{}:{}@{}:{}/{}'

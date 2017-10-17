@@ -71,11 +71,11 @@ def create_insert(con):
     con.execute(statement)
 
     statement = """
-    CREATE TABLE IF NOT EXISTS "Time" (
-    Year integer,
-    Quarter text,
-    Month text,
-    Day text
+      CREATE TABLE `Time` (
+      `Year` int(11) DEFAULT NULL,
+      `Quarter` text,
+      `Month` text,
+      `Day` text
     );
     """
     con.execute(statement)
@@ -833,6 +833,6 @@ def drop_tables(con):
     con.execute(statement)
 
     statement = """
-    DROP TABLE "Time";
+    DROP TABLE Time;
     """
     con.execute(statement)
