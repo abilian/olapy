@@ -12,7 +12,7 @@ from .queries import query1, query3, query6, query7, query8, query9, \
 
 CUBE = 'sales_mysql'
 USER_NAME = 'root'
-PASSWORD = 'toor'
+PASSWORD = None
 DB = 'sales_mysql'
 
 
@@ -26,7 +26,7 @@ def test_conf_file_change():
             <database>
                 <sgbd>mysql</sgbd>
                 <user_name>root</user_name>
-                <password>toor</password>
+                <password></password>
                 <host>localhost</host>
                 <port>3306</port>
             </database>
