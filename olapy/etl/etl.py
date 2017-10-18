@@ -101,8 +101,8 @@ class ETL(object):
                 os.path.join(GEN_FOLDER, table_name + '.csv'), ioformat='arg0')
 
     def copy_2_olapy_dir(self):
-        if not os.path.isdir(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube)):
-            os.makedirs(os.path.join(self.olapy_cube_path, MdxEngine.CUBE_FOLDER, self.target_cube))
+        if not os.path.isdir(os.path.join(self.olapy_cube_path, self.target_cube)):
+            os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
 
