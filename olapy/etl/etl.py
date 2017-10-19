@@ -33,8 +33,8 @@ class ETL(object):
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
         if os.listdir(GEN_FOLDER):
-            for file in GEN_FOLDER:
-                os.remove(file)
+            for file in os.listdir(GEN_FOLDER):
+                os.remove(os.path.join(GEN_FOLDER, file))
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
