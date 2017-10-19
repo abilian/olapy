@@ -32,7 +32,7 @@ class ETL(object):
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
-        if not os.listdir(GEN_FOLDER):
+        if os.listdir(GEN_FOLDER):
             for file in GEN_FOLDER:
                 os.remove(file)
 
