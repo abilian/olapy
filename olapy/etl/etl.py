@@ -3,18 +3,7 @@ import bonobo
 import os
 from shutil import copyfile
 
-# from bonobo.config import Configurable, Option
-
 from olapy.core.mdx.executor.execute import MdxEngine
-
-# class Transform(Configurable):
-#     headers =  Option(list)
-#     def call(self, line):
-#         transformed = {}
-#         splited = line.split(',', maxsplit=len(self.headers))
-#         for idx, head in enumerate(self.headers):
-#             transformed.update({head: splited[idx]})
-#         return transformed
 
 GEN_FOLDER = 'etl_generated'
 
@@ -23,10 +12,8 @@ class ETL(object):
     def __init__(self,
                  source_type,
                  facts_table,
-                 facts_ids,
                  separator=None,
-                 target_cube='etl_cube',
-                 **kwargs):
+                 target_cube='etl_cube'):
         """
 
         :param source_type: csv | file | pickle
@@ -35,8 +22,7 @@ class ETL(object):
         self.source_type = source_type
         self.facts_table = facts_table
         self.cube_path = MdxEngine._get_default_cube_directory()
-        self.seperator = self._get_default_seperator(
-        ) if not separator else separator
+        self.seperator = self._get_default_seperator() if not separator else separator
         self.target_cube = target_cube
         self.olapy_cube_path = os.path.join(
             MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)

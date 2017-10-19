@@ -14,13 +14,11 @@ if __name__ == '__main__':
     facts_ids = ['geokey', 'Day', 'City', 'Licence']
 
     etl = ETL(
-        source_type='csv',
-        facts_table='sales_facts',
-        facts_ids=facts_ids,
-        **dims_infos)
+        source_type='file',
+        facts_table='sales_facts')
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
-        # transform = Transform(dims_infos[table])
+        # for each new file
         etl.dim_first_row_headers = True
         if table == etl.facts_table:
             etl.current_dim_id_column = facts_ids
