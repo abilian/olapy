@@ -46,6 +46,9 @@ class ETL(object):
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
+        if not os.listdir(GEN_FOLDER) == []:
+            for file in GEN_FOLDER:
+                os.remove(file)
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
