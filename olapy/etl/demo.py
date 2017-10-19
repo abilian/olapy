@@ -5,7 +5,6 @@ from olapy.etl.etl import ETL
 
 if __name__ == '__main__':
 
-    # with extension
     dims_infos = {
         # 'dimension': ['col_id'],
         'Geography': ['geography_key'],
@@ -14,8 +13,10 @@ if __name__ == '__main__':
 
     facts_ids = ['geography_key', 'product_key']
 
+    # source_type -> file : .txt files in input
+    # source_type -> csv : .csv files in input
     etl = ETL(
-        source_type='file',
+        source_type='csv',
         facts_table='sales_facts')
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
