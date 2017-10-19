@@ -1,4 +1,4 @@
-geokey,Continent,Country,City
+geography_key,Continent,Country,City
 1,America,Canada,Quebec
 2,America,Canada,Toronto
 3,America,United States,Los Angeles

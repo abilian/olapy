@@ -8,10 +8,11 @@ if __name__ == '__main__':
     # with extension
     dims_infos = {
         # 'dimension': ['col_id'],
-        'Geography': ['geokey']
+        'Geography': ['geography_key'],
+        'Product': ['product_key']
     }
 
-    facts_ids = ['geokey', 'Day', 'City', 'Licence']
+    facts_ids = ['geography_key', 'product_key']
 
     etl = ETL(
         source_type='file',
