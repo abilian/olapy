@@ -65,15 +65,29 @@ class ETL(object):
         :param table_type: facts | dimension
         :return:
         """
-
+        # fix
+        line = line[0]
         transformed = {}
 
         if self.dim_first_row_headers:
-            self.dim_headers = self.add_id_prefix(line)
+            # split headers
+            splited = line.split(self.seperator)
+            self.dim_headers = splited
             self.dim_first_row_headers = False
+            for idx, column_header in enumerate(splited):
+                if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
+                    splited[idx] = column_header + '_id'
 
-        for idx, head in enumerate(self.dim_headers):
-            transformed.update({head: line[idx]})
+        else:
+            if self.dim_headers:
+                splited = line.split(
+                    self.seperator, maxsplit=len(self.dim_headers))
+            else:
+                # columns = self.current_dim_id_column
+                splited = line.split(self.seperator)
+
+            for idx, head in enumerate(self.dim_headers):
+                transformed.update({head: splited[idx]})
 
         return transformed
 
@@ -150,7 +164,7 @@ if __name__ == '__main__':
     facts_ids = ['geokey', 'Day', 'City', 'Licence']
 
     etl = ETL(
-        source_type='file',
+        source_type='csv',
         facts_table='sales_facts',
         facts_ids=facts_ids,
         **dims_infos)
