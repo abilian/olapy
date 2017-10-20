@@ -17,8 +17,11 @@ class ETL(object):
                  target_cube='etl_cube'):
         """
 
-        :param source_type: csv | file | pickle
-        :param headers:
+        :param source_type: file | csv
+        :param facts_table: facts table name
+        :param source_folder: your csv|txt files path
+        :param separator: file separator (, ; : ...)
+        :param target_cube: generated file path
         """
         self.source_type = source_type
         self.facts_table = facts_table
@@ -41,14 +44,6 @@ class ETL(object):
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
             return ','
-
-    def add_id_prefix(self, header):
-        headers = []
-        for column_header in header:
-            if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
-                column_header = column_header + '_id'
-            headers.append(column_header)
-        return headers
 
     def transform_file(self, line):
         """
@@ -105,7 +100,7 @@ class ETL(object):
     def extract(self, file, delimiter=';'):
         """
 
-        :param file: file | csv | json | pickle
+        :param file: file | csv
         :return:
         """
         # todo clean this
@@ -114,18 +109,24 @@ class ETL(object):
         elif self.source_type.upper() == 'CSV':
             return getattr(bonobo, self.source_type.title() + "Reader")(file, **{'delimiter': delimiter})
 
-    def load(self, table_name, target='csv'):
+    def load(self, table_name):
+        """
 
-        # todo target postgres, mysql ....
-        if target.upper() == 'CSV':
-            # todo headers if there is not headers
-            # os.chdir(self.target_cube)
-            if table_name == self.facts_table:
-                table_name = 'Facts'
-            return bonobo.CsvWriter(
-                os.path.join(GEN_FOLDER, table_name + '.csv'), ioformat='arg0')
+        :param table_name: table name to generate
+        :return: generated table into olapy dir
+        """
+
+        # todo target postgres, mysql .... (bonobo still alpha and buggy)
+        if table_name == self.facts_table:
+            table_name = 'Facts'
+        return bonobo.CsvWriter(
+            os.path.join(GEN_FOLDER, table_name + '.csv'), ioformat='arg0')
 
     def copy_2_olapy_dir(self):
+        """
+        bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
+        :return:
+        """
         if not os.path.isdir(
                 os.path.join(self.olapy_cube_path, self.target_cube)):
             os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
@@ -138,6 +139,10 @@ class ETL(object):
                 os.path.join(self.target_cube, file))
 
     def get_source_extension(self):
+        """
+        get source file extension
+        :return: .txt | .csv
+        """
         if self.source_type.upper() == 'FILE':
             return '.txt'
         elif self.source_type.upper() == 'CSV':
@@ -153,8 +158,8 @@ def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos
                                              }
     :param facts_table: facts table name
     :param facts_ids: example : facts_ids = ['geography_key', 'product_key']
-    :param source_folder: where to get your files
-    :param source_type: file : .txt files in input || csv : .csv files in input
+    :param source_folder: from where you get your files
+    :param source_type: file -> .txt files in input || csv -> .csv files in input
     :return: generate files to olapy dir
     """
 
