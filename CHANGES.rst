@@ -1,6 +1,14 @@
 Changelog for Olapy
 ===================
 
+0.5.0 ()
+-----------------
+
+- Work with different DataBases (Oracle, Mysql, Postgres, SQL Server)
+- Add ETL (Alpha)
+- Work wit python 3.6
+- Bugs fixes
+
 0.4.7 (207-10-02)
 -----------------
 
