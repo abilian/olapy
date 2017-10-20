@@ -10,8 +10,9 @@ attrs
 #databases_connectors
 #pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
 #cx_oracle
-#mysql-python
-#pymysql
+#mysql-python # don't work in py3
+mysqlclient
+pymysql
 psycopg2
 
 # Test

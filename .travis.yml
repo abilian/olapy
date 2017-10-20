@@ -5,12 +5,34 @@ language: python
 cache: pip
 python:
   - "2.7"
+  - "3.6"
 
 install:
   - pip install -U pip setuptools tox wheel
 
 script:
   - tox
+
+services:
+  - mysql
+  - postgresql
+
+test:
+  adapter: mysql2
+  database: sales_mysql
+  username: root_db
+  password: toor
+  encoding: utf8
+
+test:
+  adapter: postgresql
+  database: sales_postgres
+
+before_install:
+  - psql -c 'create database sales_postgres;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_mysql;'
+  - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
+  - mysql -u root -e "GRANT ALL ON sales_mysql.* TO 'root_db'@'localhost';"
 
 notifications:
   slack:
