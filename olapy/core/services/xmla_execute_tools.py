@@ -155,8 +155,8 @@ class XmlaExecuteTools():
     def _generate_tuples_xs0(self, splited_df, mdx_query_axis):
 
         first_att = None
-
-        if self.mdx_execution_result['columns_desc'][mdx_query_axis].keys() == [
+        # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
+        if list(self.mdx_execution_result['columns_desc'][mdx_query_axis].keys()) == [
                 self.executor.facts,
         ]:
 
@@ -322,7 +322,6 @@ class XmlaExecuteTools():
         tuples, first_att = self._generate_tuples_xs0(
             splited_df,
             mdx_query_axis,)
-
         if tuples:
             # todo temp
             xml = self.tuples_2_xs0(tuples, splited_df, first_att, axis)
@@ -343,7 +342,6 @@ class XmlaExecuteTools():
                             # todo temp
                             # if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
                             #     xml.HIERARCHY_UNIQUE_NAME('[Measures]')
-
         return str(xml)
 
     def _generate_xs0_convert2formulas(self):

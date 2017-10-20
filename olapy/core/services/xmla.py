@@ -171,7 +171,6 @@ class XmlaProviderService(ServiceBase):
 
                     with xml.CellData:
                         xml.write(xmla_tools.generate_cell_data())
-
             return str(xml)
 
 
