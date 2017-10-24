@@ -29,15 +29,12 @@ DB_CONFIG_DEFAULTS = {
 DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
 
 
-def create_db_engine(options='client_encoding=utf8'):
+def create_db_engine():
     config = defaultdict(**DB_CONFIG_DEFAULTS)
     dsn = DSN_TEMPLATE.format(**config)
 
-    if options and DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
-        dsn += '?' + options
-
-    print('Creating database engine: ' + dsn)
-
+    if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
+        dsn += '?client_encoding=utf8'
     return create_engine(dsn)
 
 
