@@ -66,7 +66,6 @@ class ETL(object):
         :param table_type: facts | dimension
         :return:
         """
-        # fix
         line = line[0]
         transformed = {}
 
@@ -120,13 +119,12 @@ class ETL(object):
         :param file: file | csv | json | pickle
         :return:
         """
-        if self.source_type.upper() == 'FILE':
+        if self.source_type.upper() == 'DB':
+            return Select('SELECT * from {};'.format(file))
+        elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
             kwargs.pop('delimiter', None)
-        elif self.source_type.upper() == 'DB':
-            return Select('SELECT * from {};'.format(file))
-        else:
-            return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
+        return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
 
     def load(self, table_name, target='csv'):
 
@@ -200,11 +198,9 @@ def run_olapy_etl(dims_infos,
             etl.current_dim_id_column = facts_ids
         else:
             etl.current_dim_id_column = dims_infos[table]
-
         graph = bonobo.Graph(
             etl.extract(extraction_source, delimiter=in_delimiter),
             etl.transform, etl.load(table))
-
         bonobo.run(graph, services=etl.services)
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
