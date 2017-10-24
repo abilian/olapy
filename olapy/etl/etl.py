@@ -5,7 +5,10 @@ from bonobo_sqlalchemy import Select
 
 from olapy.core.mdx.executor.execute import MdxEngine
 
-import bonobo, dotenv, logging, os
+import bonobo
+import dotenv
+import logging
+import os
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -14,7 +17,6 @@ GEN_FOLDER = 'etl_generated'
 
 
 class ETL(object):
-
     def __init__(self,
                  source_type,
                  facts_table,
@@ -29,7 +31,8 @@ class ETL(object):
         self.source_type = source_type
         self.facts_table = facts_table
         self.cube_path = MdxEngine._get_default_cube_directory()
-        self.seperator = self._get_default_seperator() if not separator else separator
+        self.seperator = self._get_default_seperator(
+        ) if not separator else separator
         self.target_cube = target_cube
         self.source_folder = source_folder
         self.olapy_cube_path = os.path.join(
@@ -109,8 +112,6 @@ class ETL(object):
         else:
             return args if args else kwargs
 
-
-
     def extract(self, file, delimiter=';'):
         """
 
@@ -121,7 +122,11 @@ class ETL(object):
         if self.source_type.upper() == 'FILE':
             return getattr(bonobo, self.source_type.title() + "Reader")(file)
         elif self.source_type.upper() == 'CSV':
-            return getattr(bonobo, self.source_type.title() + "Reader")(file, **{'delimiter': delimiter})
+            return getattr(bonobo,
+                           self.source_type.title() + "Reader")(file, **{
+                               'delimiter':
+                               delimiter
+                           })
         elif self.source_type.upper() == 'DB':
             return Select('SELECT * from {};'.format(file))
 
@@ -156,7 +161,14 @@ class ETL(object):
         elif self.source_type.upper() == 'DB':
             return ''
 
-def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos', source_type='csv', in_delimiter=',',**kwargs):
+
+def run_olapy_etl(dims_infos,
+                  facts_table,
+                  facts_ids,
+                  source_folder='input_demos',
+                  source_type='csv',
+                  in_delimiter=',',
+                  **kwargs):
     """
 
     :param dims_infos: example : dims_infos = {
@@ -170,7 +182,6 @@ def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos
     :return: generate files to olapy dir
     """
 
-
     # source_type -> file : .txt files in input
     # source_type -> csv : .csv files in input
     etl = ETL(
@@ -180,7 +191,8 @@ def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
         if etl.source_type.upper() != 'DB':
-            extraction_source = os.path.join(etl.source_folder, table + etl.get_source_extension())
+            extraction_source = os.path.join(
+                etl.source_folder, table + etl.get_source_extension())
         else:
             extraction_source = table
 
@@ -195,8 +207,7 @@ def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos
             etl.extract(extraction_source, delimiter=in_delimiter),
             etl.transform, etl.load(table))
 
-        bonobo.run(graph,**kwargs)
-
+        bonobo.run(graph, **kwargs)
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
