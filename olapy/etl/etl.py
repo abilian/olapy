@@ -114,20 +114,20 @@ class ETL(object):
         else:
             return args if args else kwargs
 
-    def extract(self, file, delimiter=';'):
+    def extract(self, file, **kwargs):
         """
 
         :param file: file | csv | json | pickle
         :return:
         """
-        # todo clean this
         if self.source_type.upper() == 'FILE':
-            return getattr(bonobo, self.source_type.title() + "Reader")(file)
-        elif self.source_type.upper() == 'CSV':
-            return getattr(bonobo,
-                           self.source_type.title() + "Reader")(file, **{'delimiter': delimiter})
+            # delimiter not used with files
+            kwargs.pop('delimiter', None)
         elif self.source_type.upper() == 'DB':
             return Select('SELECT * from {};'.format(file))
+        else:
+            return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
+
 
     def load(self, table_name, target='csv'):
 
