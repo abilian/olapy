@@ -4,6 +4,7 @@ from shutil import copyfile
 from bonobo_sqlalchemy import Select
 
 from olapy.core.mdx.executor.execute import MdxEngine
+from bonobo.commands.run import get_default_services
 
 import bonobo
 import dotenv
@@ -45,6 +46,7 @@ class ETL(object):
         if os.listdir(GEN_FOLDER):
             for file in os.listdir(GEN_FOLDER):
                 os.remove(os.path.join(GEN_FOLDER, file))
+        self.services = get_default_services(__file__)
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
@@ -123,10 +125,7 @@ class ETL(object):
             return getattr(bonobo, self.source_type.title() + "Reader")(file)
         elif self.source_type.upper() == 'CSV':
             return getattr(bonobo,
-                           self.source_type.title() + "Reader")(file, **{
-                               'delimiter':
-                               delimiter
-                           })
+                           self.source_type.title() + "Reader")(file, **{'delimiter': delimiter})
         elif self.source_type.upper() == 'DB':
             return Select('SELECT * from {};'.format(file))
 
@@ -207,7 +206,7 @@ def run_olapy_etl(dims_infos,
             etl.extract(extraction_source, delimiter=in_delimiter),
             etl.transform, etl.load(table))
 
-        bonobo.run(graph, **kwargs)
+        bonobo.run(graph, services=etl.services)
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()

@@ -15,12 +15,8 @@ if __name__ == '__main__':
 
     facts_ids = ['geography_key', 'product_key']
 
-    from bonobo.commands.run import get_default_services
-
-    services = get_default_services(__file__)
     run_olapy_etl(
         source_type='db',
         dims_infos=dims_infos,
         facts_table='sales_facts',
-        facts_ids=facts_ids,
-        services=services)
+        facts_ids=facts_ids)
