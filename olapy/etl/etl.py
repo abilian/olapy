@@ -128,7 +128,6 @@ class ETL(object):
         else:
             return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
 
-
     def load(self, table_name, target='csv'):
 
         # todo target postgres, mysql ....
