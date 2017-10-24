@@ -21,3 +21,8 @@ werkzeug
 #psutil
 #pympler
 
+#ETL
+bonobo
+bonobo-sqlalchemy
+awesome-slugify
+python-dotenv

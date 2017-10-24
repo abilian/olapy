@@ -122,7 +122,7 @@ def _construct_star_schema_db(executor_instance):
     for db_table_name in inspector.get_table_names():
         try:
             db_table_name = str(db_table_name)
-        except:
+        except Exception:
             if isinstance(db_table_name, Iterable):
                 db_table_name = db_table_name[0]
         try:

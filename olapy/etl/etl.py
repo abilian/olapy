@@ -1,9 +1,18 @@
 from __future__ import absolute_import, division, print_function
-import bonobo
-import os
 from shutil import copyfile
 
+from bonobo_sqlalchemy import Select
+
 from olapy.core.mdx.executor.execute import MdxEngine
+from bonobo.commands.run import get_default_services
+
+import bonobo
+import dotenv
+import logging
+import os
+
+dotenv.load_dotenv(dotenv.find_dotenv())
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 GEN_FOLDER = 'etl_generated'
 
@@ -26,12 +35,12 @@ class ETL(object):
         self.source_type = source_type
         self.facts_table = facts_table
         self.cube_path = MdxEngine._get_default_cube_directory()
-        self.seperator = self._get_default_seperator() if not separator else separator
+        self.seperator = self._get_default_seperator(
+        ) if not separator else separator
         self.target_cube = target_cube
         self.source_folder = source_folder
         self.olapy_cube_path = os.path.join(
             MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
-        # pass some data to transform without bonobo shitty configuration
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
@@ -40,6 +49,7 @@ class ETL(object):
         if os.listdir(GEN_FOLDER):
             for file in os.listdir(GEN_FOLDER):
                 os.remove(os.path.join(GEN_FOLDER, file))
+        self.services = get_default_services(__file__)
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
@@ -51,7 +61,6 @@ class ETL(object):
         :param table_type: facts | dimension
         :return:
         """
-        # fix
         line = line[0]
         transformed = {}
 
@@ -96,18 +105,21 @@ class ETL(object):
 
         elif self.source_type.upper() == 'CSV':
             return self.transform_csv(kwargs)
+        else:
+            return args if args else kwargs
 
-    def extract(self, file, delimiter=';'):
+    def extract(self, file, **kwargs):
         """
 
         :param file: file | csv
         :return:
         """
-        # todo clean this
-        if self.source_type.upper() == 'FILE':
-            return getattr(bonobo, self.source_type.title() + "Reader")(file)
-        elif self.source_type.upper() == 'CSV':
-            return getattr(bonobo, self.source_type.title() + "Reader")(file, **{'delimiter': delimiter})
+        if self.source_type.upper() == 'DB':
+            return Select('SELECT * from {};'.format(file))
+        elif self.source_type.upper() == 'FILE':
+            # delimiter not used with files
+            kwargs.pop('delimiter', None)
+        return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
 
     def load(self, table_name):
         """
@@ -147,9 +159,17 @@ class ETL(object):
             return '.txt'
         elif self.source_type.upper() == 'CSV':
             return '.csv'
+        elif self.source_type.upper() == 'DB':
+            return ''
 
 
-def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos', source_type='csv', in_delimiter=','):
+def run_olapy_etl(dims_infos,
+                  facts_table,
+                  facts_ids,
+                  source_folder='input_demos',
+                  source_type='csv',
+                  in_delimiter=',',
+                  **kwargs):
     """
 
     :param dims_infos: example : dims_infos = {
@@ -171,18 +191,22 @@ def run_olapy_etl(dims_infos, facts_table, facts_ids, source_folder='input_demos
         source_folder=source_folder)
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
+        if etl.source_type.upper() != 'DB':
+            extraction_source = os.path.join(
+                etl.source_folder, table + etl.get_source_extension())
+        else:
+            extraction_source = table
+
         # for each new file
         etl.dim_first_row_headers = True
         if table == etl.facts_table:
             etl.current_dim_id_column = facts_ids
         else:
             etl.current_dim_id_column = dims_infos[table]
-
         graph = bonobo.Graph(
-            etl.extract(os.path.join(etl.source_folder, table + etl.get_source_extension()), delimiter=in_delimiter),
+            etl.extract(extraction_source, delimiter=in_delimiter),
             etl.transform, etl.load(table))
-
-        bonobo.run(graph)
+        bonobo.run(graph, services=etl.services)
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
