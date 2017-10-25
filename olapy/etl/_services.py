@@ -4,8 +4,9 @@ import yaml
 
 try:
     config = yaml.load(open('db_config', 'r'))
-except FileExistsError:
-    raise FileExistsError()
+except OSError:
+    print('db_config file not found')
+    raise OSError()
 
 DB_CONFIG_DEFAULTS = {
     # for sql server 'driver':mssql+pyodbc or mssql+pymssql
