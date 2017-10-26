@@ -1,20 +1,24 @@
 from collections import defaultdict
 from sqlalchemy import create_engine
-import yaml
+# import yaml
 
-try:
-    config = yaml.load(open('db_config', 'r'))
-except OSError:
-    print('db_config file not found')
-    raise OSError()
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 
+db_config = DbConfigParser()
+config = db_config.get_db_credentials()
+# try:
+#     config = yaml.load(open('db_config', 'r'))
+# except OSError:
+#     print('db_config file not found')
+#     raise OSError()
+print(config)
 DB_CONFIG_DEFAULTS = {
     # for sql server 'driver':mssql+pyodbc or mssql+pymssql
     'driver': config['driver'],
     'host': config['host'],
     'port': config['port'],
     'name': config['db_name'],
-    'user': config['user'],
+    'user': config['user_name'],
     'pass': config['password'],
 }
 

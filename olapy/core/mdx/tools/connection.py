@@ -11,7 +11,7 @@ class MyDB(object):
 
         # TODO temporary
         db_config = DbConfigParser(config_path=db_config_file_path)
-        db_credentials = db_config.get_db_credentials()[0]
+        db_credentials = db_config.get_db_credentials()
         self.sgbd = db_credentials['sgbd']
         self.username = db_credentials['user_name']
         self.password = db_credentials['password']
@@ -24,14 +24,14 @@ class MyDB(object):
             # todo directly in the conf file
             if self.sgbd.upper() == 'MSSQL':
                 # TODO  other drivers !!!
-                driver = db_credentials['driver']
+                sql_server_driver = db_credentials['sql_server_driver']
                 if 'LOCALHOST' in self.username.upper() or not self.username:
                     self.engine = create_engine(
-                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(driver.replace(' ', '+')))
+                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(sql_server_driver.replace(' ', '+')))
                 else:
                     self.engine = create_engine(
                         'mssql+pyodbc://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(self.username, self.password, self.host,
-                                                                                self.port, driver.replace(' ', '+')))
+                                                                                self.port, sql_server_driver.replace(' ', '+')))
             #  select distinct username from dba_users where username not in ('DIP','XS$NULL','MDSYS');
             else:
 

@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import os
 
+import yaml
 from lxml import etree
 
 
@@ -9,7 +10,7 @@ class DbConfigParser:
 
     # TODO one config file (I will try to merge dimensions between them in web
     # part)
-    def __init__(self, config_path=None, file_name='olapy-config.xml'):
+    def __init__(self, config_path=None, file_name='olapy-config'):
         """
 
         :param cube_path: path to cube (csv folders)
@@ -37,21 +38,20 @@ class DbConfigParser:
 
         :return: list of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
         """
-
         with open(os.path.join(self.cube_path, self.file_name)) as config_file:
+            try:
+                config = yaml.load(config_file)
+                return {
+                    'sgbd': config['sgbd'],
+                    'driver': config['driver'] if config[
+                                                      'sgbd'].upper() != 'MSSQL' else 'SQL Server Native Client 11.0',
+                    'user_name': config['user'],
+                    'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
+                    'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
+                    'port': config['port'],
+                    'db_name': config['db_name'] if 'db_name' in config.keys() else ''
+                }
 
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
-
-            return [
-                {
-                    'sgbd': db.find('sgbd').text,
-                    'driver': db.find('driver').text if db.find(
-                        'sgbd').text.upper() == 'MSSQL' else 'SQL Server Native Client 11.0',
-                    'user_name': db.find('user_name').text,
-                    'password': db.find('password').text if 'LOCALHOST' not in db.find(
-                        'user_name').text.upper() else '',
-                    'host': db.find('host').text if 'LOCALHOST' not in db.find('user_name').text.upper() else '',
-                    'port': db.find('port').text,
-                } for db in tree.xpath('/olapy/database')
-            ]
+            except OSError:
+                print('olapy db_config not valid')
+                # raise OSError()
