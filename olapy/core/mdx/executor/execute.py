@@ -8,6 +8,7 @@ import re
 import sys
 from collections import OrderedDict
 from os.path import expanduser
+from traceback import print_tb
 
 import numpy as np
 import pandas as pd
@@ -143,7 +144,9 @@ class MdxEngine(object):
 
         except Exception:
             type, value, traceback = sys.exc_info()
-            print('Error opening %s' % (value))
+            print(type)
+            print(value)
+            print_tb(traceback)
             print('no database connexion')
             pass
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
