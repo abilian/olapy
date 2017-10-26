@@ -11,4 +11,6 @@ password : root
 
 ######### for ETL #####
 db_name : tutorial
+drive : postgres        #mysql | postgres
+--------- IMPORTANT ---------
 # for sql server 'driver':mssql+pyodbc or mssql+pymssql
