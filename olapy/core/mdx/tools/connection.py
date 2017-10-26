@@ -24,14 +24,17 @@ class MyDB(object):
             # todo directly in the conf file
             if self.sgbd.upper() == 'MSSQL':
                 # TODO  other drivers !!!
-                sql_server_driver = db_credentials['sql_server_driver']
                 if 'LOCALHOST' in self.username.upper() or not self.username:
                     self.engine = create_engine(
-                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(sql_server_driver.replace(' ', '+')))
+                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(
+                            db_credentials['sql_server_driver'].replace(
+                                ' ', '+')))
                 else:
                     self.engine = create_engine(
-                        'mssql+pyodbc://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(self.username, self.password, self.host,
-                                                                                self.port, sql_server_driver.replace(' ', '+')))
+                        'mssql+pyodbc://{0}:{1}@{2}:{3}/msdb?driver={4}'.
+                        format(self.username, self.password, self.host,
+                               self.port, db_credentials[
+                                   'sql_server_driver'].replace(' ', '+')))
             #  select distinct username from dba_users where username not in ('DIP','XS$NULL','MDSYS');
             else:
 
@@ -45,7 +48,7 @@ class MyDB(object):
                         self.password,
                         self.host,
                         self.port,
-                        self.con_db,),
+                        self.con_db, ),
                     encoding='utf-8')
 
         #         engine = create_engine('oracle://scott:tiger@127.0.0.1:1521/sidname')
@@ -55,17 +58,18 @@ class MyDB(object):
                 # TODO  other drivers !!!
 
                 self.engine = create_engine(
-                    'mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db), encoding='utf-8')
+                    'mssql+pyodbc://(local)/{0}?driver={1}'.format(
+                        db, db_credentials['sql_server_driver'].replace(
+                            ' ', '+')),
+                    encoding='utf-8')
                 # self.engine = create_engine('mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db))
             else:
                 # and then we connect to the user db
-                self.engine = create_engine('{0}://{1}:{2}@{3}:{4}/{5}'.format(
-                    self.eng,
-                    self.username,
-                    self.password,
-                    self.host,
-                    self.port,
-                    '' if self.sgbd.upper() == 'ORACLE' else db),
+                self.engine = create_engine(
+                    '{0}://{1}:{2}@{3}:{4}/{5}'.format(
+                        self.eng, self.username, self.password, self.host,
+                        self.port, ''
+                        if self.sgbd.upper() == 'ORACLE' else db),
                     encoding='utf-8')
                 # self.connection = pg.connect(
                 #     "user={0} password={1} dbname='{2}' host='{3}'".format(

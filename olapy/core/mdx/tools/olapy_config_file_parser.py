@@ -3,11 +3,9 @@ from __future__ import absolute_import, division, print_function
 import os
 
 import yaml
-from lxml import etree
 
 
 class DbConfigParser:
-
     # TODO one config file (I will try to merge dimensions between them in web
     # part)
     def __init__(self, config_path=None, file_name='olapy-config'):
