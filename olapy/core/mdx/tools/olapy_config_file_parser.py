@@ -41,7 +41,6 @@ class DbConfigParser:
                 config = yaml.load(config_file)
                 return {
                     'sgbd': config['sgbd'],
-                    'driver': config['driver'] if config['sgbd'].upper() != 'MSSQL' else 'SQL Server Native Client 11.0',
                     'user_name': config['user'],
                     'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
                     'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
