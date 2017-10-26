@@ -1,0 +1,15 @@
+
+sgbd : postgres         # mysql | oracle | mssql | oracle
+driver : postgres
+host : localhost
+port : 5432             # 3306 default for mysql || 1521 default for ORACLE
+user : postgres
+password : root
+#if sql server sgbd add this
+#sql_server_driver : SQL Server Native Client 11.0
+
+
+
+######### for ETL #####
+db_name : tutorial
+# for sql server 'driver':mssql+pyodbc or mssql+pymssql

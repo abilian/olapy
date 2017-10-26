@@ -28,10 +28,6 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=install_requires,
     include_package_data=False,
-    # cmdclass={
-    #     'develop': PostDevelopCommand,
-    #     'install': PostInstallCommand,
-    # },
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
@@ -56,6 +52,6 @@ if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
     zip_ref.close()
 
 if not os.path.isfile(
-        os.path.join(home_directory, 'olapy-data', 'olapy-config.xml')):
-    copyfile('config/olapy-config.xml',
-             os.path.join(home_directory, 'olapy-data', 'olapy-config.xml'))
+        os.path.join(home_directory, 'olapy-data', 'olapy-config')):
+    copyfile('config/olapy-config',
+             os.path.join(home_directory, 'olapy-data', 'olapy-config'))
