@@ -1,6 +1,5 @@
 
 sgbd : postgres         # mysql | oracle | mssql | oracle
-driver : postgres
 host : localhost
 port : 5432             # 3306 default for mysql || 1521 default for ORACLE
 user : postgres

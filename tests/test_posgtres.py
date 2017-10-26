@@ -16,18 +16,13 @@ DB = 'sales_postgres'
 
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
-    with open(os.path.join(MdxEngine._get_default_cube_directory(), 'olapy-config.xml'), "w") as f:
+    with open(os.path.join(MdxEngine._get_default_cube_directory(), 'olapy-config'), "w") as f:
         f.write("""
-        <!-- this config file will be deleted ASAP -->
-        <olapy>
-            <database>
-                <sgbd>postgres</sgbd>
-                <user_name>postgres</user_name>
-                <password>root</password>
-                <host>localhost</host>
-                <port>5432</port>
-            </database>
-        </olapy>
+        sgbd : postgres
+        host : localhost
+        port : 5432
+        user : postgres
+        password : root
         """)
 
 

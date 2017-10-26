@@ -20,17 +20,13 @@ def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
     with open(
             os.path.join(MdxEngine._get_default_cube_directory(),
-                         'olapy-config.xml'), "w") as f:
-        f.write("""<!-- this config file will be deleted ASAP -->
-        <olapy>
-            <database>
-                <sgbd>mysql</sgbd>
-                <user_name>root_db</user_name>
-                <password>toor</password>
-                <host>localhost</host>
-                <port>3306</port>
-            </database>
-        </olapy>
+                         'olapy-config'), "w") as f:
+        f.write("""
+        sgbd : mysql
+        host : localhost
+        port : 3306
+        user : root_db
+        password : toor
         """)
 
 
