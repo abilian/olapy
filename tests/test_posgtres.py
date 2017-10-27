@@ -23,6 +23,7 @@ def test_conf_file_change():
         port : 5432
         user : postgres
         password : root
+        driver : postgres
         """)
 
 

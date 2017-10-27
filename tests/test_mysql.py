@@ -27,6 +27,7 @@ def test_conf_file_change():
         port : 3306
         user : root_db
         password : toor
+        driver : mysql
         """)
 
 
