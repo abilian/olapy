@@ -3,7 +3,7 @@ from shutil import copyfile
 
 import shutil
 from bonobo_sqlalchemy import Select
-
+from distutils.dir_util import copy_tree
 from olapy.core.mdx.executor.execute import MdxEngine
 from bonobo.commands.run import get_default_services
 
@@ -16,13 +16,14 @@ dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 GEN_FOLDER = 'etl_generated'
+INPUT_DIR = 'input_dir'
 
 
 class ETL(object):
     def __init__(self,
                  source_type,
                  facts_table,
-                 source_folder='input_demos',
+                 source_folder=INPUT_DIR,
                  separator=None,
                  target_cube='etl_cube'):
         """
@@ -39,7 +40,17 @@ class ETL(object):
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
-        self.source_folder = source_folder
+        if source_folder != INPUT_DIR:
+            # #1 fix bonobo read from file path
+            if not os.path.exists(INPUT_DIR):
+                os.mkdir(INPUT_DIR)
+            current_dir = os.path.dirname(os.path.realpath(__file__))
+            for file in os.listdir(INPUT_DIR):
+                os.remove(os.path.join(current_dir, INPUT_DIR, file))
+            copy_tree(source_folder, os.path.join(current_dir, INPUT_DIR))
+            self.source_folder = INPUT_DIR
+        else:
+            self.source_folder = source_folder
         self.olapy_cube_path = os.path.join(
             MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
         self.current_dim_id_column = None
@@ -163,7 +174,7 @@ class ETL(object):
 def run_olapy_etl(dims_infos,
                   facts_table,
                   facts_ids,
-                  source_folder='input_demos',
+                  source_folder= INPUT_DIR,
                   source_type='csv',
                   in_delimiter=',',
                   **kwargs):
