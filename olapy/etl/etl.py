@@ -174,7 +174,7 @@ class ETL(object):
 def run_olapy_etl(dims_infos,
                   facts_table,
                   facts_ids,
-                  source_folder= INPUT_DIR,
+                  source_folder=INPUT_DIR,
                   source_type='csv',
                   in_delimiter=',',
                   **kwargs):
