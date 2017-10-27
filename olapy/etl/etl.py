@@ -44,13 +44,12 @@ class ETL(object):
             # #1 fix bonobo read from file path
             if not os.path.exists(INPUT_DIR):
                 os.mkdir(INPUT_DIR)
-            current_dir = os.path.dirname(os.path.realpath(__file__))
             for file in os.listdir(INPUT_DIR):
-                os.remove(os.path.join(current_dir, INPUT_DIR, file))
-            copy_tree(source_folder, os.path.join(current_dir, INPUT_DIR))
+                os.remove(os.path.join(INPUT_DIR, file))
+            copy_tree(source_folder, os.path.join(INPUT_DIR))
             self.source_folder = INPUT_DIR
         else:
-            self.source_folder = source_folder
+            self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
             MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
         self.current_dim_id_column = None
