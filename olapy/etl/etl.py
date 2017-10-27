@@ -40,7 +40,7 @@ class ETL(object):
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
-        if source_folder != INPUT_DIR:
+        if source_folder != INPUT_DIR and source_type.upper() != 'DB':
             # #1 fix bonobo read from file path
             if not os.path.exists(INPUT_DIR):
                 os.mkdir(INPUT_DIR)
