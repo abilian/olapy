@@ -45,7 +45,8 @@ class DbConfigParser:
                     'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
                     'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
                     'port': config['port'],
-                    'db_name': config['db_name'] if 'db_name' in config.keys() else ''
+                    'db_name': config['db_name'] if 'db_name' in config.keys() else '',
+                    'driver': config['driver'] if 'driver' in config.keys() else ''
                 }
 
             except OSError:

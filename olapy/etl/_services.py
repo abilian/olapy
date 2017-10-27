@@ -6,7 +6,6 @@ from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 db_config = DbConfigParser()
 config = db_config.get_db_credentials()
 
-
 DB_CONFIG_DEFAULTS = {
     'driver': config['driver'],
     'host': config['host'],
