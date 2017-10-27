@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 from shutil import copyfile
 
+import shutil
 from bonobo_sqlalchemy import Select
 
 from olapy.core.mdx.executor.execute import MdxEngine
@@ -46,9 +47,6 @@ class ETL(object):
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
-        if os.listdir(GEN_FOLDER):
-            for file in os.listdir(GEN_FOLDER):
-                os.remove(os.path.join(GEN_FOLDER, file))
         self.services = get_default_services(__file__)
 
     def _get_default_seperator(self):
@@ -209,3 +207,5 @@ def run_olapy_etl(dims_infos,
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
+    if os.path.isdir(GEN_FOLDER):
+        shutil.rmtree(GEN_FOLDER)
