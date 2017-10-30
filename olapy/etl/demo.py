@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 from olapy.etl.etl import run_olapy_etl
 
 if __name__ == '__main__':
