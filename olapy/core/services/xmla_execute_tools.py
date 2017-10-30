@@ -188,7 +188,7 @@ class XmlaExecuteTools():
 
         return tuples, first_att
 
-    def _gen_measures_xs0(self,xml,tupls):
+    def _gen_measures_xs0(self, xml, tupls):
         with xml.Member(Hierarchy="[Measures]"):
             xml.UName(
                 '[Measures].[{0}]'.format(tupls[0][1]), )
@@ -208,7 +208,7 @@ class XmlaExecuteTools():
                     with xml.Tuple:
                         if tupls[0][1] in self.executor.measures and len(
                                 self.executor.selected_measures, ) > 1:
-                            self._gen_measures_xs0(xml,tupls)
+                            self._gen_measures_xs0(xml, tupls)
 
                             if tupls[0][-1] in self.executor.measures:
                                 continue
