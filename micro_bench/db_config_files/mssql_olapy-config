@@ -1,0 +1,8 @@
+sgbd : mssql
+sql_server_driver : SQL Server Native Client 11.0
+port : 1433
+user : localhost
+
+#'password and host', you can leave them blank if username localhost
+host : localhost
+password : root

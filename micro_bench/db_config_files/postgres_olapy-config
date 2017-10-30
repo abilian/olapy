@@ -1,0 +1,5 @@
+sgbd : postgres
+port : 5432
+user : postgres
+host : localhost
+password : root
