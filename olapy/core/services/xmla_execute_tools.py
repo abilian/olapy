@@ -188,6 +188,17 @@ class XmlaExecuteTools():
 
         return tuples, first_att
 
+    def _gen_measures_xs0(self,xml,tupls):
+        with xml.Member(Hierarchy="[Measures]"):
+            xml.UName(
+                '[Measures].[{0}]'.format(tupls[0][1]), )
+            xml.Caption('{0}'.format(tupls[0][1]))
+            xml.LName('[Measures]')
+            xml.LNum('0')
+            xml.DisplayInfo('0')
+            if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
+                xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+
     def tuples_2_xs0(self, tuples, splited_df, first_att, axis):
         # todo ugly !!!!
         xml = xmlwitch.Builder()
@@ -197,15 +208,7 @@ class XmlaExecuteTools():
                     with xml.Tuple:
                         if tupls[0][1] in self.executor.measures and len(
                                 self.executor.selected_measures, ) > 1:
-                            with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(
-                                    '[Measures].[{0}]'.format(tupls[0][1]), )
-                                xml.Caption('{0}'.format(tupls[0][1]))
-                                xml.LName('[Measures]')
-                                xml.LNum('0')
-                                xml.DisplayInfo('0')
-                                if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
-                                    xml.HIERARCHY_UNIQUE_NAME('[Measures]')
+                            self._gen_measures_xs0(xml,tupls)
 
                             if tupls[0][-1] in self.executor.measures:
                                 continue
@@ -232,33 +235,20 @@ class XmlaExecuteTools():
                                 ))
                                 xml.DisplayInfo('131076')
 
-                                # 'Hierarchize'
-                                if self.executor.hierarchized_tuples():
-                                    if len(tuple_without_minus_1[first_att - 1:]) > 1:
-                                        xml.PARENT_UNIQUE_NAME(
-                                            '[{0}].[{0}].[{1}].{2}'.format(
-                                                tuple_without_minus_1[0],
-                                                splited_df[
-                                                    tuple_without_minus_1[
-                                                        0]].columns[0],
-                                                '.'.join([
-                                                    '[' + str(i) + ']'
-                                                    for i in
-                                                    tuple_without_minus_1[first_att - 1:-1]
-                                                ]), ), )
-                                    xml.HIERARCHY_UNIQUE_NAME(
-                                        '[{0}].[{0}]'.format(
-                                            tuple_without_minus_1[0], ), )
+                                if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query.upper():
+                                    xml.PARENT_UNIQUE_NAME(
+                                        '[{0}].[{0}].[{1}].{2}'.format(
+                                            tuple_without_minus_1[0],
+                                            splited_df[tuple_without_minus_1[0]].columns[0],
+                                            '.'.join(
+                                                ['[' + str(i) + ']' for i in tuple_without_minus_1[first_att - 1:-1]
+                                                 ])))
+                                if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query.upper():
+                                    xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
 
                         # Hierarchize'
                         if not self.executor.hierarchized_tuples():
-                            with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(
-                                    '[Measures].[{0}]'.format(tupls[0][1]), )
-                                xml.Caption('{0}'.format(tupls[0][1]))
-                                xml.LName('[Measures]')
-                                xml.LNum('0')
-                                xml.DisplayInfo('0')
+                            self._gen_measures_xs0(xml, tupls)
         return xml
 
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
