@@ -83,9 +83,7 @@ class XmlaProviderService(ServiceBase):
 
             raise InvalidCredentialsError(
                 fault_string='You do not have permission to access this resource',
-                fault_object=None,)
-            # TODO call (labster) login function or create login with token
-            # (according to labster db)
+                fault_object=None)
 
         method_name = request.RequestType.lower() + '_response'
         method = getattr(discover_tools, method_name)
@@ -127,7 +125,7 @@ class XmlaProviderService(ServiceBase):
             executor = XmlaProviderService.discover_tools.executor
             executor.mdx_query = request.Command.Statement
 
-            # todo Hierarchize
+            # Hierarchize
             if all(key in request.Command.Statement
                    for key in
                    ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
@@ -208,7 +206,6 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
-    # TODO FIX it with os
     if write_on_file:
         home_directory = expanduser("~")
         if not os.path.isdir(

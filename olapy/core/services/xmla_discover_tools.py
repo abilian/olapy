@@ -17,13 +17,11 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     mdschema_properties_properties_xsd, mdschema_sets_xsd
 
 
-# TODO MDSCHEMA_SETS with sql server !!!!
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
     def __init__(self):
         # right now the catalogue_name and cube name are the same
-        # todo bug double catalogue to fix
         self.catalogues = MdxEngine.get_cubes_names()
         self.selected_catalogue = self.catalogues[0]
         self.executor = MdxEngine(self.selected_catalogue)
@@ -222,7 +220,6 @@ class XmlaDiscoverTools():
 
         return self._get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
-    # todo check here 4 convert 2 formulas
     def discover_schema_rowsets_response(self, request):
 
         rows = [
@@ -1217,7 +1214,6 @@ class XmlaDiscoverTools():
                 return str(xml)
 
     def mdschema_levels_response(self, request):
-        # TODO fix levels in the same table (with xml file maybe) !!!!!!!!!
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
                 request.Properties.PropertyList.Catalog is not None:
 

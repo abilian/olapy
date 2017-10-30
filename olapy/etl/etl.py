@@ -135,7 +135,6 @@ class ETL(object):
         :param table_name: table name to generate
         :return: generated table into olapy dir
         """
-        # todo target postgres, mysql .... (bonobo still alpha and buggy)
         if table_name == self.facts_table:
             table_name = 'Facts'
         return bonobo.CsvWriter(

@@ -24,7 +24,6 @@ setup(
     author_email="contact@abilian.com",
     description="OLAP Engine",
     url='https://github.com/abilian/olapy',
-    # TODO fix tox problem with path
     long_description=open('README.rst').read(),
     install_requires=install_requires,
     include_package_data=False,

@@ -78,18 +78,12 @@ def _construct_star_schema_config_file(executor_instance, cubes_obj):
             if dimension_and_key.split('.')[0] == dimension.name:
                 df.rename(columns=dimension.columns, inplace=True)
 
-        # todo test with this
-        # fusion = fusion.merge(
-        #     df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
-
-        # TODO CHOSE BETWEEN THOSES DF
         fusion = fusion.merge(
             df,
             left_on=fact_key,
             right_on=dimension_and_key.split('.')[1],
             how='left',
-            # remove suffixe from dimension and keep the same column name for
-            # facts
+            # remove suffixe from dimension and keep the same column name for facts
             suffixes=('', '_y'),)
 
     # measures in config-file only
@@ -110,7 +104,6 @@ def _get_columns_n_tables(tables_cubes_obj, connector):
             "SELECT * FROM {0}".format(table.name),
             connector,)
 
-        # todo verify this
         try:
             if table.columns:
                 tab = tab[table.columns]
@@ -172,14 +165,12 @@ def _construct_web_star_schema_config_file(executor_instance, cubes_obj):
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
                 db.engine,)
 
-        # TODO check merge (how)
         fusion = fusion.merge(
             df,
             left_on=fact_key,
             right_on=dimension_and_key.split('.')[1],
             how='left',
-            # remove suffixe from dimension and keep the same column name for
-            # facts
+            # remove suffixe from dimension and keep the same column name for facts
             suffixes=('', '_y'),)
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]

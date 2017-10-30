@@ -175,14 +175,10 @@ class MdxEngine(object):
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
         elif sgbd.upper() == 'MYSQL':
             return 'SHOW DATABASES'
-            # todo
-            # return 'SHOW DATABASES where DATABASES not in 'mysql', 'information_schema', 'performance_schema', 'sys''
         elif sgbd.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
         elif sgbd.upper() == 'ORACLE':
-            # TODO TEST this
             return 'select username from dba_users;'
-            # return "SELECT NAME FROM V$DATABASE;"
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -214,10 +210,8 @@ class MdxEngine(object):
                     client_type=self.client,
                 ):
 
-            # for web (config file) we need only star_schema_dataframes, not
-            # all tables
+            # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
-                # TODO working with cubes.source == 'csv'
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     tables = _load_table_config_file(self, cubes)
 
@@ -263,7 +257,6 @@ class MdxEngine(object):
                 self.client,
         ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
             for cubes in config_file_parser.construct_cubes(self.client):
-                # TODO cubes.source == 'csv'
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     if self.client == 'web':
                         fusion = _construct_web_star_schema_config_file(self, cubes)
@@ -304,7 +297,6 @@ class MdxEngine(object):
                 self.cube,)
         return os.path.join(self.cube_path, self.cube)
 
-    # TODO temporary function
     @staticmethod
     def get_tuples(query, start=None, stop=None):
         """Get all tuples in the mdx query.
@@ -348,7 +340,6 @@ class MdxEngine(object):
         return [
             [
                 tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                # todo fix .Members
                 for tup_att in tup[0].replace('.Members', '').replace(
                     '.MEMBERS',
                     '',).split('].[') if tup_att
@@ -368,7 +359,6 @@ class MdxEngine(object):
         splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
         return splitted_tupl
 
-    # TODO temporary function
     def decorticate_query(self, query):
         """Get all tuples that exists in the MDX Query by axes.
 
@@ -443,13 +433,14 @@ class MdxEngine(object):
         return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
-        # TODO update docstring
         """
         Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
 
         :param tuple_as_list: list of tuples
 
-            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
+            example : [ '[Measures].[Amount]',
+                        '[Product].[Product].[Crazy Development]',
+                        '[Geography].[Geography].[Continent]' ]
 
         :return: dimension and columns dict
 
@@ -461,7 +452,6 @@ class MdxEngine(object):
             }
         """
         axes = {}
-        # TODO optimize
         for axis, tuples in tuple_as_list.items():
             measures = []
             tables_columns = OrderedDict()
@@ -721,17 +711,9 @@ class MdxEngine(object):
                 # if we change dimension , we have to work on the
                 # exection's result on previous DataFrames
 
-                # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-                # solution 1 .astype(str) ( take a lot of time from execution)
-                # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-                # solution 3 a['ccc'] = -1
-                # solution 4 finding something with merge
-
-                # fix 3 test
                 df = df_to_fusion[0]
                 for next_df in df_to_fusion[1:]:
                     df = pd.concat(self.add_missed_column(df, next_df))
-                # df = pd.concat(df_to_fusion)
 
                 table_name = tupl[0]
                 df_to_fusion = []
@@ -751,13 +733,6 @@ class MdxEngine(object):
         :param df_to_fusion: List of Pandas DataFrame.
         :return: Pandas DataFrame.
         """
-        # fix 3 test
-
-        # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-        # solution 1 .astype(str) ( take a lot of time from execution)
-        # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-        # solution 3 a['ccc'] = -1 (the best)
-        # solution 4 finding something with merge
 
         df = df_to_fusion[0]
         for next_df in df_to_fusion[1:]:
@@ -881,16 +856,11 @@ class MdxEngine(object):
         ]
 
         if not self.hierarchized_tuples():
-            # todo check !!!!!!!!!!
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
-            # todo check also !!!!!!!!!!
-            # some query tuples are not grouped together
-            # todo avoid this every time (slow execution)
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
         # if we have tuples in axes
-        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE
-        # ([Measures].[Amount])
+        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
 
             if self.check_nested_select():
@@ -903,7 +873,7 @@ class MdxEngine(object):
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             sort = self.hierarchized_tuples()
-            # TODO margins=True for columns total !!!!!
+            # margins=True for columns total !!!!!
             return {
                 'result':
                     df.groupby(cols, sort=sort).sum()[self.selected_measures],

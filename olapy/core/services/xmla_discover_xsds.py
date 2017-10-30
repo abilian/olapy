@@ -1,4 +1,3 @@
-# TODO clean (or fusion)
 discover_datasources_xsd = """
 <xsd:schema elementFormDefault="qualified"
     targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
