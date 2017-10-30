@@ -9,7 +9,6 @@ class MyDB(object):
 
     def __init__(self, db_config_file_path=None, db=None):
 
-        # TODO temporary
         db_config = DbConfigParser(config_path=db_config_file_path)
         db_credentials = db_config.get_db_credentials()
         self.sgbd = db_credentials['sgbd']
@@ -20,27 +19,11 @@ class MyDB(object):
         self.eng, self.con_db = self._get_init_table(self.sgbd)
 
         if db is None:
-
-            # todo directly in the conf file
             if self.sgbd.upper() == 'MSSQL':
-                # TODO  other drivers !!!
-                if 'LOCALHOST' in self.username.upper() or not self.username:
-                    self.engine = create_engine(
-                        'mssql+pyodbc://(local)/msdb?driver={0}'.format(
-                            db_credentials['sql_server_driver'].replace(
-                                ' ', '+')))
-                else:
-                    self.engine = create_engine(
-                        'mssql+pyodbc://{0}:{1}@{2}:{3}/msdb?driver={4}'.
-                        format(self.username, self.password, self.host,
-                               self.port, db_credentials[
-                                   'sql_server_driver'].replace(' ', '+')))
-            #  select distinct username from dba_users where username not in ('DIP','XS$NULL','MDSYS');
-            else:
+                self.engine = self._connect_to_mssql(db_credentials['sql_server_driver'].replace(' ', '+'))
 
-                # first i want to show all databases to user (in excel)
-                # self.engine = pg.connect("user={0} password={1} host='{2}'".
-                #                              format(username, password, host))
+            else:
+                # Show all databases to user (in excel)
                 self.engine = create_engine(
                     '{0}://{1}:{2}@{3}:{4}{5}'.format(
                         self.eng,
@@ -51,29 +34,35 @@ class MyDB(object):
                         self.con_db, ),
                     encoding='utf-8')
 
-        #         engine = create_engine('oracle://scott:tiger@127.0.0.1:1521/sidname')
-
         else:
             if self.sgbd.upper() == 'MSSQL':
-                # TODO  other drivers !!!
-
-                self.engine = create_engine(
-                    'mssql+pyodbc://(local)/{0}?driver={1}'.format(
-                        db, db_credentials['sql_server_driver'].replace(
-                            ' ', '+')),
-                    encoding='utf-8')
-                # self.engine = create_engine('mssql+pyodbc://(local)/{0}?driver=SQL+Server+Native+Client+11.0'.format(db))
+                self.engine = self._connect_to_mssql(db=db,
+                                                     sql_server_driver=db_credentials['sql_server_driver'].replace(' ',
+                                                                                                                   '+'))
             else:
                 # and then we connect to the user db
                 self.engine = create_engine(
                     '{0}://{1}:{2}@{3}:{4}/{5}'.format(
                         self.eng, self.username, self.password, self.host,
-                        self.port, ''
-                        if self.sgbd.upper() == 'ORACLE' else db),
+                        self.port,
+                        '' if self.sgbd.upper() == 'ORACLE' else db),
                     encoding='utf-8')
-                # self.connection = pg.connect(
-                #     "user={0} password={1} dbname='{2}' host='{3}'".format(
-                #         username, password, db, host))
+
+    def _connect_to_mssql(self, sql_server_driver, driver='mssql+pyodbc', db=None):
+        # todo recheck + clean
+        if db is not None:
+            return create_engine(driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver), encoding='utf-8')
+
+        if 'LOCALHOST' in self.username.upper() or not self.username:
+            return create_engine(
+                driver + '://(local)/msdb?driver={0}'.format(sql_server_driver))
+        else:
+            return create_engine(
+                driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(self.username,
+                                                                     self.password,
+                                                                     self.host,
+                                                                     self.port,
+                                                                     sql_server_driver))
 
     @staticmethod
     def _get_init_table(sgbd):
