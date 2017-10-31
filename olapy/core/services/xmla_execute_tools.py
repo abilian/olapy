@@ -686,6 +686,34 @@ class XmlaExecuteTools():
 
         return str(xml)
 
+    def _gen_measures_one_axis_info(self,xml):
+        with xml.HierarchyInfo(name='[Measures]'):
+            xml.UName(
+                name="[Measures].[MEMBER_UNIQUE_NAME]",
+                **{'type': 'xs:string'})
+            xml.Caption(
+                name="[Measures].[MEMBER_CAPTION]",
+                **{'type': 'xs:string'})
+            xml.LName(
+                name="[Measures].[LEVEL_UNIQUE_NAME]",
+                **{'type': 'xs:string'})
+            xml.LNum(
+                name="[Measures].[LEVEL_NUMBER]",
+                **{'type': 'xs:int'})
+            xml.DisplayInfo(
+                name="[Measures].[DISPLAY_INFO]",
+                **{'type': 'xs:unsignedInt'})
+            if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
+                xml.PARENT_UNIQUE_NAME(
+                    name="[Measures].[PARENT_UNIQUE_NAME]",
+                    **{'type': 'xs:string'})
+            if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
+                xml.HIERARCHY_UNIQUE_NAME(
+                    name="[Measures].[HIERARCHY_UNIQUE_NAME]",
+                    **{'type': 'xs:string'})
+        return xml
+
+
     def generate_one_axis_info(self, mdx_query_axis='columns', Axis='Axis0'):
         """
         Example AxisInfo::
@@ -726,30 +754,7 @@ class XmlaExecuteTools():
             with xml.AxisInfo(name=Axis):
                 # many measures , then write this on the top
                 if self.executor.facts in axis_tables.keys() and len(axis_tables[self.executor.facts]) > 1:
-                    with xml.HierarchyInfo(name='[Measures]'):
-                        xml.UName(
-                            name="[Measures].[MEMBER_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.Caption(
-                            name="[Measures].[MEMBER_CAPTION]",
-                            **{'type': 'xs:string'})
-                        xml.LName(
-                            name="[Measures].[LEVEL_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.LNum(
-                            name="[Measures].[LEVEL_NUMBER]",
-                            **{'type': 'xs:int'})
-                        xml.DisplayInfo(
-                            name="[Measures].[DISPLAY_INFO]",
-                            **{'type': 'xs:unsignedInt'})
-                        if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
-                            xml.PARENT_UNIQUE_NAME(
-                                name="[Measures].[PARENT_UNIQUE_NAME]",
-                                **{'type': 'xs:string'})
-                        if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
-                            xml.HIERARCHY_UNIQUE_NAME(
-                                name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                                **{'type': 'xs:string'})
+                    self._gen_measures_one_axis_info(xml)
 
                 for table_name in axis_tables:
                     if table_name != self.executor.facts:
@@ -789,22 +794,7 @@ class XmlaExecuteTools():
                 # Hierarchize
                 if not self.executor.hierarchized_tuples() and len(
                         self.executor.execute_mdx()['columns_desc']['columns'].get(self.executor.facts, [1, 1])) == 1:
-                    with xml.HierarchyInfo(name='[Measures]'):
-                        xml.UName(
-                            name="[Measures].[MEMBER_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.Caption(
-                            name="[Measures].[MEMBER_CAPTION]",
-                            **{'type': 'xs:string'})
-                        xml.LName(
-                            name="[Measures].[LEVEL_UNIQUE_NAME]",
-                            **{'type': 'xs:string'})
-                        xml.LNum(
-                            name="[Measures].[LEVEL_NUMBER]",
-                            **{'type': 'xs:int'})
-                        xml.DisplayInfo(
-                            name="[Measures].[DISPLAY_INFO]",
-                            **{'type': 'xs:unsignedInt'})
+                    self._gen_measures_one_axis_info(xml)
 
         return str(xml)
 
