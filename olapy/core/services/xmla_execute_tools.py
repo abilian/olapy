@@ -593,10 +593,9 @@ class XmlaExecuteTools():
 
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
-                        if self.executor.facts in self.columns_desc['all'] and (
-                                    len(self.columns_desc['all'][self.executor.facts]) > 1) or (
-                                    not self.executor.hierarchized_tuples() and not
-                                self.mdx_execution_result['columns_desc']['where']):
+                        if self.executor.facts in self.columns_desc['all'] and (len(
+                                self.columns_desc['all'][self.executor.facts]) > 1) or (
+                                    not self.executor.hierarchized_tuples() and not self.columns_desc['where']):
                             continue
 
                         else:
@@ -842,7 +841,7 @@ class XmlaExecuteTools():
 
                         # Hierarchize
                         if len(self.executor.selected_measures) <= 1 and (
-                            self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
+                                self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(self.executor.measures[0]))
                                 xml.Caption('{0}'.format(self.executor.measures[0]))
