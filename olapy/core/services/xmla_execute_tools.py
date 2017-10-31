@@ -20,7 +20,6 @@ class XmlaExecuteTools():
             self.mdx_execution_result = self._execute_convert_formulas_query()
         else:
             self.mdx_execution_result = executor.execute_mdx()
-
         if isinstance(self.mdx_execution_result, dict):
             self.columns_desc = self.mdx_execution_result.get('columns_desc')
 
@@ -842,7 +841,7 @@ class XmlaExecuteTools():
 
                         # Hierarchize
                         if len(self.executor.selected_measures) <= 1 and (
-                            self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
+                                self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(self.executor.measures[0]))
                                 xml.Caption('{0}'.format(self.executor.measures[0]))
