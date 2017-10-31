@@ -39,6 +39,9 @@ class Member(object):
     def __hash__(self):
         return hash(tuple(sorted(self.__dict__.items())))
 
+    def __repr__(self):
+        return str(self.__dict__)
+
 
 class WSGIServer:
     """HTTP server running a WSGI application in its own thread.
@@ -178,92 +181,94 @@ def test_query2(conn):
     expected = []
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Continent].[America]',
-            Caption='America',
-            LName='[Geography].[Geography].[Continent]',
-            LNum='0',
-            DisplayInfo='131076',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Continent].[America]",
+            Caption="America",
+            LName="[Geography].[Geography].[Continent]",
+            LNum="0",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Country].[America].[United States]',
-            Caption='United States',
-            LName='[Geography].[Geography].[Country]',
-            LNum='1',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[America]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Country].[America].[United States]",
+            Caption="United States",
+            LName="[Geography].[Geography].[Country]",
+            LNum="1",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[America]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[City].[America].[United States].[New York]',
-            Caption='New York',
-            LName='[Geography].[Geography].[City]',
-            LNum='2',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[America].[United States]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[City].[America].[United States].[New York]",
+            Caption="New York",
+            LName="[Geography].[Geography].[City]",
+            LNum="2",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[America].[United States]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Continent].[Europe]',
-            Caption='Europe',
-            LName='[Geography].[Geography].[Continent]',
-            LNum='0',
-            DisplayInfo='131076',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Continent].[Europe]",
+            Caption="Europe",
+            LName="[Geography].[Geography].[Continent]",
+            LNum="0",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Country].[Europe].[France]',
-            Caption='France',
-            LName='[Geography].[Geography].[Country]',
-            LNum='1',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Country].[Europe].[France]",
+            Caption="France",
+            LName="[Geography].[Geography].[Country]",
+            LNum="1",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Country].[Europe].[Spain]',
-            Caption='Spain',
-            LName='[Geography].[Geography].[Country]',
-            LNum='1',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Country].[Europe].[Spain]",
+            Caption="Spain",
+            LName="[Geography].[Geography].[Country]",
+            LNum="1",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[City].[Europe].[Spain].[Barcelona]',
-            Caption='Barcelona',
-            LName='[Geography].[Geography].[City]',
-            LNum='2',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[City].[Europe].[Spain].[Barcelona]",
+            Caption="Barcelona",
+            LName="[Geography].[Geography].[City]",
+            LNum="2",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe].[Spain]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[City].[Europe].[Spain].[Madrid]',
-            Caption='Madrid',
-            LName='[Geography].[Geography].[City]',
-            LNum='2',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe].[Spain]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[City].[Europe].[Spain].[Madrid]",
+            Caption="Madrid",
+            LName="[Geography].[Geography].[City]",
+            LNum="2",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe].[Spain]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     expected.append(
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Country].[Europe].[Switzerland]',
-            Caption='Switzerland',
-            LName='[Geography].[Geography].[Country]',
-            LNum='1',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent].[Europe]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'))
+            _Hierarchy="[Geography].[Geography]",
+            UName="[Geography].[Geography].[Country].[Europe].[Switzerland]",
+            Caption="Switzerland",
+            LName="[Geography].[Geography].[Country]",
+            LNum="1",
+            DisplayInfo="131076",
+            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
     assert [Member(**dict(co)) for co in columns] == expected
 
 
@@ -311,6 +316,7 @@ def test_query3(conn):
             LName='[Geography].[Geography].[Continent]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
         Member(
             _Hierarchy='[Product].[Product]',
@@ -319,6 +325,7 @@ def test_query3(conn):
             LName='[Product].[Product].[Company]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Product].[Product].[Company]',
             HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
         Member(
             _Hierarchy='[Time].[Time]',
@@ -327,6 +334,7 @@ def test_query3(conn):
             LName='[Time].[Time].[Year]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Time].[Time].[Year]',
             HIERARCHY_UNIQUE_NAME='[Time].[Time]')
     ])
     expected.append([
@@ -337,6 +345,7 @@ def test_query3(conn):
             LName='[Geography].[Geography].[Continent]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent]',
             HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
         Member(
             _Hierarchy='[Product].[Product]',
@@ -345,6 +354,7 @@ def test_query3(conn):
             LName='[Product].[Product].[Company]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Product].[Product].[Company]',
             HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
         Member(
             _Hierarchy='[Time].[Time]',
@@ -353,6 +363,7 @@ def test_query3(conn):
             LName='[Time].[Time].[Year]',
             LNum='0',
             DisplayInfo='131076',
+            PARENT_UNIQUE_NAME='[Time].[Time].[Year]',
             HIERARCHY_UNIQUE_NAME='[Time].[Time]')
     ])
 
@@ -410,6 +421,7 @@ def test_query4(conn):
     FROM [sales]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
+
     res = conn.Execute(cmd, Catalog="sales")
     columns = []
     values = []
