@@ -686,7 +686,7 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-    def _gen_measures_one_axis_info(self,xml):
+    def _gen_measures_one_axis_info(self, xml):
         with xml.HierarchyInfo(name='[Measures]'):
             xml.UName(
                 name="[Measures].[MEMBER_UNIQUE_NAME]",
@@ -712,7 +712,6 @@ class XmlaExecuteTools():
                     name="[Measures].[HIERARCHY_UNIQUE_NAME]",
                     **{'type': 'xs:string'})
         return xml
-
 
     def generate_one_axis_info(self, mdx_query_axis='columns', Axis='Axis0'):
         """
