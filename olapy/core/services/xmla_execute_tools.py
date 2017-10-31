@@ -20,7 +20,9 @@ class XmlaExecuteTools():
             self.mdx_execution_result = self._execute_convert_formulas_query()
         else:
             self.mdx_execution_result = executor.execute_mdx()
-        self.columns_desc = self.mdx_execution_result.get('columns_desc')
+
+        if isinstance(self.mdx_execution_result, dict):
+            self.columns_desc = self.mdx_execution_result.get('columns_desc')
 
     def _execute_convert_formulas_query(self):
         """
@@ -430,7 +432,6 @@ class XmlaExecuteTools():
             return self._generate_axes_convert2formulas()
 
         dfs = self.split_dataframe()
-
         if self.columns_desc['rows'] and self.columns_desc['columns']:
             return """
             {0}
@@ -594,8 +595,8 @@ class XmlaExecuteTools():
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
                         if self.executor.facts in self.columns_desc['all'] and (len(
-                                self.columns_desc['all'][self.executor.facts]) > 1) or (
-                                    not self.executor.hierarchized_tuples() and not self.columns_desc['where']):
+                            self.columns_desc['all'][self.executor.facts]) > 1) or (
+                                not self.executor.hierarchized_tuples() and not self.columns_desc['where']):
                             continue
 
                         else:
@@ -834,14 +835,14 @@ class XmlaExecuteTools():
                                 xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(
                                     dim_diff, self.executor.tables_loaded[dim_diff].columns[0], column_attribut))
                                 xml.Caption(str(column_attribut))
-                                xml.LName('[{0}].[{0}].[{1}]'.format(dim_diff,
-                                                                     self.executor.tables_loaded[dim_diff].columns[0]))
+                                xml.LName('[{0}].[{0}].[{1}]'.format(
+                                    dim_diff, self.executor.tables_loaded[dim_diff].columns[0]))
                                 xml.LNum('0')
                                 xml.DisplayInfo('2')
 
                         # Hierarchize
                         if len(self.executor.selected_measures) <= 1 and (
-                                self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
+                            self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(self.executor.measures[0]))
                                 xml.Caption('{0}'.format(self.executor.measures[0]))
