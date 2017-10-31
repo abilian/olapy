@@ -236,13 +236,15 @@ class XmlaExecuteTools():
                                 xml.DisplayInfo('131076')
 
                                 if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query.upper():
+                                    parent = '.'.join(
+                                        map(lambda x: '[' + str(x) + ']', tuple_without_minus_1[first_att - 1:-1]))
+                                    if parent:
+                                        parent = '.' + parent
                                     xml.PARENT_UNIQUE_NAME(
-                                        '[{0}].[{0}].[{1}].{2}'.format(
+                                        '[{0}].[{0}].[{1}]{2}'.format(
                                             tuple_without_minus_1[0],
                                             splited_df[tuple_without_minus_1[0]].columns[0],
-                                            '.'.join(
-                                                ['[' + str(i) + ']' for i in tuple_without_minus_1[first_att - 1:-1]
-                                                 ])))
+                                            parent))
                                 if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query.upper():
                                     xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
 
