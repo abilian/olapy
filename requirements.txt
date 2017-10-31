@@ -28,7 +28,7 @@ pymysql==0.7.11
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.6.1    # via pandas
 python-dotenv==0.7.1
-pytz==2017.2              # via fs, pandas, spyne
+pytz==2017.3              # via fs, pandas, spyne
 pyyaml==3.12
 regex==2017.9.23          # via awesome-slugify
 requests==2.18.4          # via bonobo
