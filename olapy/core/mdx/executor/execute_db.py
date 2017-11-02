@@ -8,7 +8,7 @@ from sqlalchemy import inspect
 from ..tools.connection import MyDB
 
 
-def _load_tables_db(executor_instance):
+def load_tables_db(executor_instance):
     """
     Load tables from database.
 
@@ -44,7 +44,7 @@ def _load_tables_db(executor_instance):
     return tables
 
 
-def _construct_star_schema_db(executor_instance):
+def construct_star_schema_db(executor_instance):
     """
     Construct star schema DataFrame from database.
 

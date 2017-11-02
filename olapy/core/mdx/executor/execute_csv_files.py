@@ -9,7 +9,7 @@ import pandas as pd
 # and execute data base tables if they respect olapy's start schema model)
 
 
-def _load_tables_csv_files(executor_instance):
+def load_tables_csv_files(executor_instance):
     """
     Load tables from csv files.
 
@@ -30,7 +30,7 @@ def _load_tables_csv_files(executor_instance):
     return tables
 
 
-def _construct_star_schema_csv_files(executor_instance):
+def construct_star_schema_csv_files(executor_instance):
     """
     Construct star schema DataFrame from csv files.
 

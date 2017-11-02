@@ -15,11 +15,11 @@ import pandas as pd
 
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
-from .execute_config_file import _construct_star_schema_config_file, \
-    _construct_web_star_schema_config_file, _load_table_config_file
-from .execute_csv_files import _construct_star_schema_csv_files, \
-    _load_tables_csv_files
-from .execute_db import _construct_star_schema_db, _load_tables_db
+from .execute_config_file import construct_star_schema_config_file, \
+    construct_web_star_schema_config_file, load_table_config_file
+from .execute_csv_files import construct_star_schema_csv_files, \
+    load_tables_csv_files
+from .execute_db import construct_star_schema_db, load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
@@ -211,13 +211,13 @@ class MdxEngine(object):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
-                    tables = _load_table_config_file(self, cubes)
+                    tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
-            tables = _load_tables_db(self)
+            tables = load_tables_db(self)
 
         elif self.cube in self.csv_files_cubes:
-            tables = _load_tables_csv_files(self)
+            tables = load_tables_csv_files(self)
 
         return tables
 
@@ -257,15 +257,15 @@ class MdxEngine(object):
             for cubes in config_file_parser.construct_cubes(self.client):
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     if self.client == 'web':
-                        fusion = _construct_web_star_schema_config_file(self, cubes)
+                        fusion = construct_web_star_schema_config_file(self, cubes)
                     else:
-                        fusion = _construct_star_schema_config_file(self, cubes)
+                        fusion = construct_star_schema_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
-            fusion = _construct_star_schema_db(self)
+            fusion = construct_star_schema_db(self)
 
         elif self.cube in self.csv_files_cubes:
-            fusion = _construct_star_schema_csv_files(self)
+            fusion = construct_star_schema_csv_files(self)
 
         return fusion[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
