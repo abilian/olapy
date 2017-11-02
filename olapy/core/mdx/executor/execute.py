@@ -47,8 +47,6 @@ class MdxEngine(object):
     csv_files_cubes = []
     from_db_cubes = []
 
-    # to show just config file's dimensions
-
     def __init__(
             self,
             cube_name,
@@ -97,7 +95,7 @@ class MdxEngine(object):
         # get csv files folders (cubes)
         # toxworkdir does not expanduser properly under tox
 
-        # surrended with try, except and PASS so we continue getting cubes from different
+        # surrounded with try, except and PASS so we continue getting cubes from different
         # sources (db, csv...) without interruption
 
         if 'OLAPY_PATH' in os.environ:
@@ -171,6 +169,11 @@ class MdxEngine(object):
 
     @classmethod
     def _gett_all_databeses_query(cls, sgbd):
+        """
+
+        :param sgbd: postgres | mysql | oracle | mssql
+        :return: all databases in the sgbd
+        """
         if sgbd.upper() == 'POSTGRES':
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
         elif sgbd.upper() == 'MYSQL':
@@ -202,13 +205,8 @@ class MdxEngine(object):
 
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.client == 'excel' \
-                and config_file_parser.config_file_exist(
-                    client_type=self.client,
-                ) \
-                and self.cube in config_file_parser.get_cubes_names(
-                    client_type=self.client,
-                ):
+        if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client) \
+                and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
 
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
@@ -225,10 +223,9 @@ class MdxEngine(object):
 
     def get_measures(self):
         """:return: all numerical columns in facts table."""
-        # col.lower()[-2:] != 'id' to ignore any id column
 
         # if web, get measures from config file
-        # from databses , all tables names are lowercase
+        # from postgres and oracle databases , all tables names are lowercase
         config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and config_file_parser.config_file_exist('web'):
             for cubes in config_file_parser.construct_cubes(self.client):
@@ -239,6 +236,8 @@ class MdxEngine(object):
                 # if measures are specified in the config file
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
+
+        # col.lower()[-2:] != 'id' to ignore any id column
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
@@ -246,8 +245,7 @@ class MdxEngine(object):
         ]
 
     def get_star_schema_dataframe(self):
-        """
-        Merge all DataFrames as star schema.
+        """Merge all DataFrames as star schema.
 
         :return: star schema DataFrame
         """
@@ -340,9 +338,7 @@ class MdxEngine(object):
         return [
             [
                 tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                for tup_att in tup[0].replace('.Members', '').replace(
-                    '.MEMBERS',
-                    '',).split('].[') if tup_att
+                for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '', ).split('].[') if tup_att
             ]
             for tup in re.compile(MdxEngine.regex).findall(
                 query[start:stop], )
@@ -354,6 +350,15 @@ class MdxEngine(object):
 
     @staticmethod
     def split_tuple(tupl):
+        """
+        Split Tuple (String) into items.
+
+            example : input : '[Geography].[Geography].[Continent].[Europe]'
+                      output : ['Geography','Geography','Continent','Europe']
+
+        :param tupl: MDX Tuple as String
+        :return: Tuple items in list
+        """
         splitted_tupl = tupl.strip(' \t\n').split('].[')
         splitted_tupl[0] = splitted_tupl[0].replace('[', '')
         splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
@@ -413,16 +418,15 @@ class MdxEngine(object):
 
     @staticmethod
     def change_measures(tuples_on_mdx):
-        """
-        Set measures to which exists in the query.
+        """Set measures to which exists in the query.
 
-        :param tuples_on_mdx: list of tuples:
+        :param tuples_on_mdx: List of tuples:
 
 
             example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
 
 
-        :return: measures column's names
+        :return: measures column's names (Amount)
         """
 
         list_measures = []
@@ -433,8 +437,7 @@ class MdxEngine(object):
         return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
-        """
-        Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
+        """Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
 
         :param tuple_as_list: list of tuples
 
@@ -596,7 +599,7 @@ class MdxEngine(object):
         +-------------+--------------+---------+
 
 
-        :return: two DataFrames with same columns
+        :return: Two DataFrames with same columns
         """
         df_with_less_columns = dataframe1
         df_with_more_columns = dataframe2
@@ -794,7 +797,7 @@ class MdxEngine(object):
 
     def check_nested_select(self):
         """
-        Check if the MDX Query contains Hierarchize word and contains many tuples groups.
+        Check if the MDX Query is Hierarchized and contains many tuples groups.
 
         :return: True | False
         """
@@ -802,7 +805,7 @@ class MdxEngine(object):
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
-        Construct DataFrame of many groups mdx query.
+        Construct DataFrame of many groups.
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
         :return: Pandas DataFrame.
         """
