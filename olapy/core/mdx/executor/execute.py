@@ -240,6 +240,16 @@ class MdxEngine(object):
                 include=[np.number],).columns if col.lower()[-2:] != 'id'
         ]
 
+    def _construct_star_schema_from_config(self, config_file_parser):
+        fusion = None
+        for cubes in config_file_parser.construct_cubes(self.client):
+            if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
+                if self.client == 'web':
+                    fusion = construct_web_star_schema_config_file(self, cubes)
+                else:
+                    fusion = construct_star_schema_config_file(self, cubes)
+        return fusion
+
     def get_star_schema_dataframe(self):
         """Merge all DataFrames as star schema.
 
@@ -247,15 +257,9 @@ class MdxEngine(object):
         """
         fusion = None
         config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(
-                self.client,
-        ) and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
-            for cubes in config_file_parser.construct_cubes(self.client):
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
-                    if self.client == 'web':
-                        fusion = construct_web_star_schema_config_file(self, cubes)
-                    else:
-                        fusion = construct_star_schema_config_file(self, cubes)
+        if config_file_parser.config_file_exist(self.client) and self.cube in config_file_parser.get_cubes_names(
+                client_type=self.client):
+            fusion = self._construct_star_schema_from_config(config_file_parser)
 
         elif self.cube in self.from_db_cubes:
             fusion = construct_star_schema_db(self)
