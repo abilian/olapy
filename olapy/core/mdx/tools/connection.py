@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from sqlalchemy import create_engine
 from .olapy_config_file_parser import DbConfigParser
