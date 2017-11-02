@@ -610,7 +610,18 @@ class XmlaExecuteTools():
 
         return str(xml)
 
-
+    def _gen_measures_one_axis_info(self, xml):
+        with xml.HierarchyInfo(name='[Measures]'):
+            xml.UName(name="[Measures].[MEMBER_UNIQUE_NAME]", **{'type': 'xs:string'})
+            xml.Caption(name="[Measures].[MEMBER_CAPTION]", **{'type': 'xs:string'})
+            xml.LName(name="[Measures].[LEVEL_UNIQUE_NAME]", **{'type': 'xs:string'})
+            xml.LNum(name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
+            xml.DisplayInfo(name="[Measures].[DISPLAY_INFO]", **{'type': 'xs:unsignedInt'})
+            if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
+                xml.PARENT_UNIQUE_NAME(name="[Measures].[PARENT_UNIQUE_NAME]", **{'type': 'xs:string'})
+            if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
+                xml.HIERARCHY_UNIQUE_NAME(name="[Measures].[HIERARCHY_UNIQUE_NAME]", **{'type': 'xs:string'})
+        return xml
 
     def generate_one_axis_info(self, mdx_query_axis='columns', Axis='Axis0'):
         """
@@ -644,25 +655,38 @@ class XmlaExecuteTools():
         :param Axis: Axis0 or Axis1 (Axis0 by default)
         :return:
         """
-
+        # Hierarchize !!
+        axis_tables = self.columns_desc[mdx_query_axis]
         xml = xmlwitch.Builder()
-        if self.columns_desc[mdx_query_axis]:
+        # measure must be written at the top
+        if axis_tables:
             with xml.AxisInfo(name=Axis):
-                for axis_table in self.columns_desc[mdx_query_axis]:
-                    if axis_table == self.executor.facts:
-                        to_write = '[Measures]'
-                    else:
-                        to_write = '[{0}].[{0}]'.format(axis_table)
-                    with xml.HierarchyInfo(name=to_write):
-                        xml.UName(name=to_write + ".[MEMBER_UNIQUE_NAME]", **{'type': 'xs:string'})
-                        xml.Caption(name=to_write + ".[MEMBER_CAPTION]", **{'type': 'xs:string'})
-                        xml.LName(name=to_write + ".[LEVEL_UNIQUE_NAME]", **{'type': 'xs:string'})
-                        xml.LNum(name=to_write + ".[LEVEL_NUMBER]", **{'type': 'xs:int'})
-                        xml.DisplayInfo(name=to_write + ".[DISPLAY_INFO]", **{'type': 'xs:unsignedInt'})
-                        if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
-                            xml.PARENT_UNIQUE_NAME(name=to_write + ".[PARENT_UNIQUE_NAME]", **{'type': 'xs:string'})
-                        if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
-                            xml.HIERARCHY_UNIQUE_NAME(name=to_write + ".[HIERARCHY_UNIQUE_NAME]", **{'type': 'xs:string'})
+                # many measures , then write this on the top
+                if self.executor.facts in axis_tables.keys() and len(axis_tables[self.executor.facts]) > 1:
+                    self._gen_measures_one_axis_info(xml)
+
+                for table_name in axis_tables:
+                    if table_name != self.executor.facts:
+                        with xml.HierarchyInfo(name='[{0}].[{0}]'.format(table_name)):
+                            xml.UName(name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(table_name),
+                                      **{'type': 'xs:string'})
+                            xml.Caption(name="[{0}].[{0}].[MEMBER_CAPTION]".format(table_name), **{'type': 'xs:string'})
+                            xml.LName(name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(table_name),
+                                      **{'type': 'xs:string'})
+                            xml.LNum(name="[{0}].[{0}].[LEVEL_NUMBER]".format(table_name), **{'type': 'xs:int'})
+                            xml.DisplayInfo(name="[{0}].[{0}].[DISPLAY_INFO]".format(table_name),
+                                            **{'type': 'xs:unsignedInt'})
+
+                            if 'Hierarchize' in self.executor.mdx_query:
+                                xml.PARENT_UNIQUE_NAME(name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(table_name),
+                                                       **{'type': 'xs:string'})
+                                xml.HIERARCHY_UNIQUE_NAME(name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".format(table_name),
+                                                          **{'type': 'xs:string'})
+
+                # Hierarchize
+                if not self.executor.hierarchized_tuples() and len(
+                        self.columns_desc['columns'].get(self.executor.facts, [1, 1])) == 1:
+                    self._gen_measures_one_axis_info(xml)
 
         return str(xml)
 
