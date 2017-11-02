@@ -1,23 +1,22 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import datetime
+import shutil
+import sys
 from os.path import expanduser
 
-import shutil
-
-import sys
 from cpuinfo import cpuinfo, os
+from olap.xmla import xmla
+from prettytable import PrettyTable
+from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
-from olap.xmla import xmla
-import datetime
-
 from tests.queries import query1, query6, query7, query9
+from tests.test_xmla import WSGIServer
 
 from micro_bench import MicBench
 from olapy.core.services.xmla import XmlaProviderService
-from spyne import Application
-from prettytable import PrettyTable
-
 from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
-from tests.test_xmla import WSGIServer
 
 HOST = "127.0.0.1"
 PORT = 8230
@@ -43,10 +42,11 @@ def copy_2_olapy_dir(config_file):
 def fix_query_lowercase_db(query):
     # for postgres table names and columns are lowercase
     return query.replace('Amount', 'amount').replace('Time', 'time').replace(
-        'Year', 'year').replace('Quarter', 'quarter').replace(
-            'Month', 'month').replace('Product', 'product').replace(
-                'Company', 'company').replace('Day', 'day').replace(
-                    'Geography', 'geography').replace('Continent', 'continent')
+        'Year',
+        'year').replace('Quarter', 'quarter').replace('Month', 'month').replace(
+            'Product', 'product').replace('Company', 'company').replace(
+                'Day', 'day').replace('Geography', 'geography').replace(
+                    'Continent', 'continent')
 
 
 def backup_config_file():
@@ -88,8 +88,7 @@ def main():
 
     server.start()
 
-    for config_file in os.listdir(
-            os.path.join(os.getcwd(), 'db_config_files')):
+    for config_file in os.listdir(os.path.join(os.getcwd(), 'db_config_files')):
 
         sgbd = str(config_file.split('_')[0])
 

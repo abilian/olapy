@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 query1 = """
     SELECT
     Hierarchize({[Measures].[Amount]}) ON COLUMNS
@@ -16,7 +18,6 @@ query6 = """
     WHERE ([Measures].[Amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
-
 
 query7 = """
     SELECT {(
@@ -63,8 +64,6 @@ query7 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 
     """
-
-
 
 query9 = """
     SELECT
