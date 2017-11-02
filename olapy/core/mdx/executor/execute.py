@@ -87,43 +87,12 @@ class MdxEngine(object):
         self._mdx_query = value.replace('\n', '').replace('\t', '')
 
     @classmethod
-    def get_cubes_names(cls):
+    def _get_db_cubes_names(cls, olapy_data_location):
         """
-        :return: list cubes name that exist in cubes folder
-            (under ~/olapy-data/cubes) and postgres database (if connected).
+        Get databases cubes names
+        :param olapy_data_location:
+        :return:
         """
-        # get csv files folders (cubes)
-        # toxworkdir does not expanduser properly under tox
-
-        # surrounded with try, except and PASS so we continue getting cubes from different
-        # sources (db, csv...) without interruption
-
-        if 'OLAPY_PATH' in os.environ:
-            home_directory = os.environ.get('OLAPY_PATH')
-        elif cls.DATA_FOLDER is not None:
-            home_directory = os.path.dirname(cls.DATA_FOLDER)
-        elif RUNNING_TOX:
-            home_directory = os.environ.get('HOME_DIR')
-        else:
-            home_directory = expanduser("~")
-
-        olapy_data_location = os.path.join(home_directory, 'olapy-data')
-
-        # surrended with try, except and pass so we continue getting cubes
-        # from different sources (db, csv...) without interruption
-        cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
-        try:
-            MdxEngine.csv_files_cubes = [
-                file for file in os.listdir(cubes_location)
-                if os.path.isdir(os.path.join(cubes_location, file))
-            ]
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            print('Error opening %s' % (value))
-            print('no csv folders')
-            pass
-
-        # get postgres databases
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         try:
@@ -147,6 +116,33 @@ class MdxEngine(object):
             print_tb(traceback)
             print('no database connexion')
             pass
+
+    @staticmethod
+    def _get_csv_cubes_names(cubes_location):
+        try:
+            MdxEngine.csv_files_cubes = [
+                file for file in os.listdir(cubes_location)
+                if os.path.isdir(os.path.join(cubes_location, file))
+            ]
+        except Exception:
+            type, value, traceback = sys.exc_info()
+            print('Error opening %s' % (value))
+            print('no csv folders')
+            pass
+
+    @classmethod
+    def get_cubes_names(cls):
+        """
+        :return: list cubes name that exist in cubes folder
+            (under ~/olapy-data/cubes) and postgres database (if connected).
+        """
+
+        olapy_data_location = MdxEngine._get_default_cube_directory()
+        cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
+
+        MdxEngine._get_csv_cubes_names(cubes_location)
+        MdxEngine._get_db_cubes_names(olapy_data_location)
+
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @staticmethod
