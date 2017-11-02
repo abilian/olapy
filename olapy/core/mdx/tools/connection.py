@@ -25,9 +25,7 @@ class MyDB(object):
                 # Show all databases to user (in excel)
                 self.engine = create_engine(
                     '{0}://{1}:{2}@{3}:{4}{5}'.format(self.eng, self.username, self.password, self.host, self.port,
-                                                      self.con_db),
-                    # encoding='utf-8'
-                )
+                                                      self.con_db), encoding='utf-8')
 
         else:
             if self.sgbd.upper() == 'MSSQL':
@@ -41,8 +39,7 @@ class MyDB(object):
                         self.eng, self.username, self.password, self.host,
                         self.port,
                         '' if self.sgbd.upper() == 'ORACLE' else db),
-                    # encoding='utf-8'
-                )
+                    encoding='utf-8')
 
     def _connect_to_mssql(self, sql_server_driver, driver='mssql+pyodbc', db=None):
         # todo recheck + clean
