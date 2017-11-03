@@ -50,6 +50,7 @@ def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
                                                                                   db_credentials['port'],
                                                                                   sql_server_driver))
 
+
 def _construct_engine(db, db_credentials):
     eng, con_db = _get_init_table(db_credentials['sgbd'])
     if db is None:
@@ -61,8 +62,7 @@ def _construct_engine(db, db_credentials):
                 '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
                                                   db_credentials['host'],
                                                   db_credentials['port'],
-                                                  con_db), encoding='utf-8'
-            )
+                                                  con_db), encoding='utf-8')
 
     else:
         if db_credentials['sgbd'].upper() == 'MSSQL':
