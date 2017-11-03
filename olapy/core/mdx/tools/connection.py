@@ -10,7 +10,7 @@ from .olapy_config_file_parser import DbConfigParser
 def _get_dbms_from_conn_string(conn_string):
     con_s = conn_string.split(':')
     if '+' in con_s[0]:
-        return con_s[0].split('+')
+        return con_s[0].split('+')[0]
     else:
         return con_s[0]
 
