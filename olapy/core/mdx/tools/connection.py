@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 from sqlalchemy import create_engine
 from .olapy_config_file_parser import DbConfigParser
@@ -8,7 +8,6 @@ class MyDB(object):
     """Connect to sql database (postgres only right now)."""
 
     def __init__(self, db_config_file_path=None, db=None):
-
         db_config = DbConfigParser(config_path=db_config_file_path)
         db_credentials = db_config.get_db_credentials()
         self.sgbd = db_credentials['sgbd']
@@ -26,7 +25,7 @@ class MyDB(object):
                 self.engine = create_engine(
                     '{0}://{1}:{2}@{3}:{4}{5}'.format(self.eng, self.username, self.password, self.host, self.port,
                                                       self.con_db),
-                    # encoding='utf-8'
+                    encoding='utf-8'
                 )
 
         else:
@@ -41,14 +40,14 @@ class MyDB(object):
                         self.eng, self.username, self.password, self.host,
                         self.port,
                         '' if self.sgbd.upper() == 'ORACLE' else db),
-                    # encoding='utf-8'
+                    encoding='utf-8'
                 )
 
     def _connect_to_mssql(self, sql_server_driver, driver='mssql+pyodbc', db=None):
         # todo recheck + clean
         if db is not None:
             return create_engine(driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver),
-                                 # encoding='utf-8'
+                                 encoding='utf-8'
                                  )
 
         if 'LOCALHOST' in self.username.upper() or not self.username:
