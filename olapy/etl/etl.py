@@ -20,6 +20,10 @@ INPUT_DIR = 'input_dir'
 
 
 class ETL(object):
+    """
+    Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
+    that data, and then load it into olapy working directory
+    """
     def __init__(self,
                  source_type,
                  facts_table,
@@ -28,7 +32,8 @@ class ETL(object):
                  target_cube='etl_cube'):
         """
 
-        :param source_type: file | csv
+        :param source_type: file | csv | db (if db , make sure that you put database connection credentials in the
+        /home/user/olapy-data/olapy-config file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
         :param separator: file separator (, ; : ...)
@@ -36,7 +41,7 @@ class ETL(object):
         """
         self.source_type = source_type
         self.facts_table = facts_table
-        self.cube_path = MdxEngine._get_default_cube_directory()
+        self.cube_path = MdxEngine.get_default_cube_directory()
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
@@ -51,7 +56,7 @@ class ETL(object):
         else:
             self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
-            MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
+            MdxEngine.get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
