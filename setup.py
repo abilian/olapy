@@ -38,8 +38,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'olapy = olapy.core.services.xmla:start_server',
-            'olapy_etl = olapy.etl.etl:run_olapy_etl'
+            'olapy = olapy.__main__:cli'
         ]
     },
 )

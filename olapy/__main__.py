@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
 import sys
 
-from core.services.xmla import start_server
+import click
+from olapy.core.services.xmla import start_server
 
 
 def main(arg):
@@ -21,6 +21,13 @@ def main(arg):
     else:
         start_server(write_on_file=True)
 
+
+@click.group()
+def cli():
+    pass
+
+
+cli.add_command(start_server)
 
 if __name__ == "__main__":
     main(sys.argv)
