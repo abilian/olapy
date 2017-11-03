@@ -9,6 +9,7 @@ import sys
 from datetime import datetime
 from os.path import expanduser
 
+import click
 import xmlwitch
 from spyne import AnyXml, Application, Fault, ServiceBase, rpc
 from spyne.const.http import HTTP_200
@@ -182,9 +183,15 @@ application = Application(
 # support encodingStyle until now !!!!
 
 wsgi_application = WsgiApplication(application)
+home_directory = expanduser("~")
+default_log_path = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
-
-def start_server(host='0.0.0.0', port=8000, write_on_file=False):
+@click.command()
+@click.option('--host', '-h', default='0.0.0.0', help='Host ip adresse.')
+@click.option('--port', '-p', default=8000, help='Host port.')
+@click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
+@click.option('--log_file_path', '-fp', default=default_log_path, help='Log file path. default = ' + default_log_path)
+def start_server(host, port, write_on_file, log_file_path):
     """
     Start the xmla server.
 
@@ -207,17 +214,10 @@ def start_server(host='0.0.0.0', port=8000, write_on_file=False):
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
     if write_on_file:
-        home_directory = expanduser("~")
-        if not os.path.isdir(
-                os.path.join(home_directory, 'olapy-data', 'logs'),):
+        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')) and log_file_path != default_log_path:
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
-        logging.basicConfig(
-            level=logging.DEBUG,
-            filename=os.path.join(
-                home_directory,
-                'olapy-data',
-                'logs',
-                'xmla.log',),)
+        logging.basicConfig(level=logging.DEBUG,
+                            filename=log_file_path)
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
