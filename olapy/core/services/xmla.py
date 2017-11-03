@@ -204,6 +204,7 @@ def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     :return: server instance
     """
     if sql_alchemy_uri is not None:
+        # example olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
         from olapy.core.mdx.executor.execute import MdxEngine
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
         # refresh all databases (with the new connection string)
