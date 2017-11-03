@@ -63,7 +63,7 @@ class MdxEngine(object):
         self.facts = fact_table_name
         self._mdx_query = mdx_query
         if cubes_path is None:
-            self.cube_path = os.path.join(self._get_default_cube_directory(), self.cube_folder)
+            self.cube_path = os.path.join(self.get_default_cube_directory(), self.cube_folder)
         else:
             self.cube_path = cubes_path
 
@@ -136,8 +136,7 @@ class MdxEngine(object):
         :return: list cubes name that exist in cubes folder
             (under ~/olapy-data/cubes) and postgres database (if connected).
         """
-
-        olapy_data_location = MdxEngine._get_default_cube_directory()
+        olapy_data_location = MdxEngine.get_default_cube_directory()
         cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
 
         MdxEngine._get_csv_cubes_names(cubes_location)
@@ -146,7 +145,7 @@ class MdxEngine(object):
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @staticmethod
-    def _get_default_cube_directory():
+    def get_default_cube_directory():
 
         # toxworkdir does not expanduser properly under tox
         if 'OLAPY_PATH' in os.environ:
@@ -257,8 +256,7 @@ class MdxEngine(object):
         """
         fusion = None
         config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(self.client) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client):
+        if config_file_parser.config_file_exist(self.client) and self.cube in config_file_parser.get_cubes_names(self.client):
             fusion = self._construct_star_schema_from_config(config_file_parser)
 
         elif self.cube in self.from_db_cubes:
@@ -282,7 +280,7 @@ class MdxEngine(object):
             return [tab for tab in self.tables_names if self.facts not in tab]
         return self.tables_names
 
-    def get_cube(self):
+    def get_cube_path(self):
         """
         Get path to the cube (example /home_directory/olapy-data/cubes).
 
@@ -538,8 +536,6 @@ class MdxEngine(object):
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
         """
-        Solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
-
         if you want to concat two dataframes with different columns like :
 
         +-------------+---------+

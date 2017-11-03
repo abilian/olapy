@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 import os
 import pandas as pd
@@ -18,9 +18,7 @@ DB = 'sales_mysql'
 
 def test_conf_file_change():
     from olapy.core.mdx.executor.execute import MdxEngine
-    with open(
-            os.path.join(MdxEngine._get_default_cube_directory(),
-                         'olapy-config'), "w") as f:
+    with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
         f.write("""
         sgbd : mysql
         host : localhost

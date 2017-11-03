@@ -16,7 +16,7 @@ def load_tables_csv_files(executor_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    cube = executor_instance.get_cube()
+    cube = executor_instance.get_cube_path()
     for file in os.listdir(cube):
         # to remove file extension ".csv"
         table_name = os.path.splitext(file)[0]
@@ -37,7 +37,7 @@ def construct_star_schema_csv_files(executor_instance):
     :param cube_name:  cube name (folder name)
     :return: star schema DataFrame
     """
-    cube = executor_instance.get_cube()
+    cube = executor_instance.get_cube_path()
     # loading facts table
     fusion = pd.read_csv(
         os.path.join(cube, executor_instance.facts + '.csv'),
