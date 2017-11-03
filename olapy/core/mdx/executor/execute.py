@@ -99,6 +99,7 @@ class MdxEngine(object):
             db = MyDB(db_config_file_path=olapy_data_location)
             if db.sgbd.upper() == 'ORACLE':
                 # You can think of a mysql "database" as a schema/user in Oracle.
+                # todo username
                 MdxEngine.from_db_cubes = [db.username]
             else:
                 all_db_query = cls._gett_all_databeses_query(db.sgbd)
