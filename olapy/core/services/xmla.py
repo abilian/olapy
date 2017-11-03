@@ -223,8 +223,7 @@ def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     if write_on_file:
         if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')) and log_file_path != conf_file:
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
-        logging.basicConfig(level=logging.DEBUG,
-                            filename=log_file_path)
+        logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:
         logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)

@@ -39,21 +39,16 @@ def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
     # todo recheck + clean
     sql_server_driver = db_credentials['sql_server_driver'].replace(' ', '+')
     if db is not None:
-        return create_engine(driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver),
-                             encoding='utf-8'
-                             )
+        return create_engine(driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver), encoding='utf-8')
 
     if 'LOCALHOST' in db_credentials['user_name'].upper() or not db_credentials['user_name']:
-        return create_engine(
-            driver + '://(local)/msdb?driver={0}'.format(sql_server_driver))
+        return create_engine(driver + '://(local)/msdb?driver={0}'.format(sql_server_driver))
     else:
-        return create_engine(
-            driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(db_credentials['user_name'],
-                                                                 db_credentials['password'],
-                                                                 db_credentials['host'],
-                                                                 db_credentials['port'],
-                                                                 sql_server_driver))
-
+        return create_engine(driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(db_credentials['user_name'],
+                                                                                  db_credentials['password'],
+                                                                                  db_credentials['host'],
+                                                                                  db_credentials['port'],
+                                                                                  sql_server_driver))
 
 def _construct_engine(db, db_credentials):
     eng, con_db = _get_init_table(db_credentials['sgbd'])
@@ -63,11 +58,10 @@ def _construct_engine(db, db_credentials):
         else:
             # Show all databases to user (in excel)
             return create_engine(
-                str('{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
-                                                      db_credentials['host'],
-                                                      db_credentials['port'],
-                                                      con_db)),
-                encoding='utf-8'
+                '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
+                                                  db_credentials['host'],
+                                                  db_credentials['port'],
+                                                  con_db), encoding='utf-8'
             )
 
     else:
@@ -76,12 +70,10 @@ def _construct_engine(db, db_credentials):
         else:
             # and then we connect to the user db
             return create_engine(
-                '{0}://{1}:{2}@{3}:{4}/{5}'.format(
-                    eng, db_credentials['user_name'], db_credentials['password'], db_credentials['host'],
-                    db_credentials['port'],
-                    '' if db_credentials['sgbd'].upper() == 'ORACLE' else db),
-                encoding='utf-8'
-            )
+                '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
+                                                   db_credentials['host'], db_credentials['port'],
+                                                   '' if db_credentials['sgbd'].upper() == 'ORACLE' else db),
+                encoding='utf-8')
 
 
 class MyDB(object):
