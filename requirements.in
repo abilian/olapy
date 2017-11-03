@@ -2,7 +2,7 @@
 pandas<1
 lxml
 spyne<3
-SQLAlchemy
+SQLAlchemy<1.2
 xmlwitch
 attrs
 
