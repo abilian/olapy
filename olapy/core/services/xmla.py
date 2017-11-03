@@ -184,14 +184,16 @@ application = Application(
 
 wsgi_application = WsgiApplication(application)
 home_directory = expanduser("~")
-default_log_path = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
+conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
+
 
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip adresse.')
 @click.option('--port', '-p', default=8000, help='Host port.')
 @click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
-@click.option('--log_file_path', '-fp', default=default_log_path, help='Log file path. default = ' + default_log_path)
-def start_server(host, port, write_on_file, log_file_path):
+@click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
+@click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
+def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     """
     Start the xmla server.
 
@@ -201,6 +203,12 @@ def start_server(host, port, write_on_file, log_file_path):
 
     :return: server instance
     """
+    # todo fix (first start with no olapy config raise error)
+    if sql_alchemy_uri is not None:
+        from olapy.core.mdx.executor.execute import MdxEngine
+        os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
+        # refresh all databases (with the new connection string)
+        MdxEngine.get_cubes_names()
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
@@ -214,7 +222,7 @@ def start_server(host, port, write_on_file, log_file_path):
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
     if write_on_file:
-        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')) and log_file_path != default_log_path:
+        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')) and log_file_path != conf_file:
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG,
                             filename=log_file_path)
