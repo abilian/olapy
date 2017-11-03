@@ -203,7 +203,6 @@ def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
 
     :return: server instance
     """
-    # todo fix (first start with no olapy config raise error)
     if sql_alchemy_uri is not None:
         from olapy.core.mdx.executor.execute import MdxEngine
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
