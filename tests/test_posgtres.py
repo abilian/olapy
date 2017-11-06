@@ -13,6 +13,7 @@ USER_NAME = 'postgres'
 PASSWORD = 'root'
 DB = 'sales_postgres'
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_conf_file_change():
     if 'POSTGRES_URI' not in os.environ.keys():
@@ -27,6 +28,7 @@ def test_conf_file_change():
             password : root
             driver : postgres
             """)
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 @pytest.fixture(scope='function')
@@ -48,16 +50,19 @@ def connect(user=USER_NAME,
         # The return value of create_engine() is our connection object
         return sqlalchemy.create_engine(url, client_encoding='utf8')
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 # create tables in the postgres database
 def test_create_tables(connect):
     create_insert(connect)
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     return MdxEngine(CUBE)
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query1(executor):
@@ -70,6 +75,7 @@ def test_execution_query1(executor):
     }).groupby(['country']).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query2(executor):
@@ -100,6 +106,7 @@ def test_execution_query2(executor):
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query10(executor):
@@ -135,6 +142,7 @@ def test_execution_query10(executor):
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 # drop created tables from postgres database

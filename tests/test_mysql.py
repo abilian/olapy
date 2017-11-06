@@ -15,6 +15,7 @@ USER_NAME = 'root_db'
 PASSWORD = 'toor'
 DB = 'sales_mysql'
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_conf_file_change():
     if 'MYSQL_URI' not in os.environ.keys():
@@ -30,6 +31,7 @@ def test_conf_file_change():
             driver : mysql
             """)
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 @pytest.fixture(scope='function')
 def connect(user=USER_NAME,
@@ -39,7 +41,7 @@ def connect(user=USER_NAME,
             port=3306):
     """Returns a connection and a metadata object"""
     if 'MYSQL_URI' in os.environ.keys():
-        return sqlalchemy.create_engine(os.environ['MYSQL_URI'], connect_args={'charset': 'utf8'})
+        return sqlalchemy.create_engine(os.environ['MYSQL_URI'])
     else:
         # We connect with the help of the PostgreSQL URL
         # postgresql://federer:grandestslam@localhost:5432/tennis
@@ -49,10 +51,12 @@ def connect(user=USER_NAME,
         # The return value of create_engine() is our connection object
         return sqlalchemy.create_engine(url, connect_args={'charset': 'utf8'})
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 # create tables in the postgres database
 def test_create_tables(connect):
     create_insert(connect)
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 @pytest.fixture(scope='module')
@@ -60,10 +64,12 @@ def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     return MdxEngine(CUBE)
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query1(executor):
     executor.mdx_query = query1
     assert executor.execute_mdx()['result']['Amount'][0] == 1023
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query2(executor):
@@ -76,6 +82,7 @@ def test_execution_query2(executor):
     }).groupby(['Country']).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query6(executor):
@@ -106,6 +113,7 @@ def test_execution_query6(executor):
     }).groupby(['Year', 'Quarter', 'Month', 'Day']).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query7(executor):
@@ -148,6 +156,7 @@ def test_execution_query7(executor):
 
     assert assert_frame_equal(df, test_df) is None
 
+
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query8(executor):
     executor.mdx_query = query8
@@ -161,6 +170,7 @@ def test_execution_query8(executor):
         ['Continent', 'Country'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query9(executor):
@@ -196,6 +206,7 @@ def test_execution_query9(executor):
         ['Year', 'Quarter', 'Month', 'Day', 'Continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 def test_execution_query10(executor):
@@ -233,6 +244,7 @@ def test_execution_query10(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
 # drop created tables from postgres database
-# def test_drop_tables(connect):
-#     drop_tables(connect)
+def test_drop_tables(connect):
+    drop_tables(connect)
