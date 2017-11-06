@@ -8,12 +8,12 @@ from .olapy_config_file_parser import DbConfigParser
 # todo cleannnnnnnnnnnn
 
 def _get_dbms_from_conn_string(conn_string):
-    con_s = conn_string.split(':')[0]
-    if '+' in con_s:
-        con_s = con_s.split('+')[0]
+    db = conn_string.split(':')[0]
+    if '+' in db:
+        db = db.split('+')[0]
     # just for postgres
-    con_s = con_s.replace('postgresql', 'postgres')
-    return con_s
+    db = db.replace('postgresql', 'postgres')
+    return db
 
 
 def _get_init_table(sgbd):

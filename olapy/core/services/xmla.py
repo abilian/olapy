@@ -193,7 +193,7 @@ conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 @click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
-def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
+def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     """
     Start the xmla server.
 
@@ -235,4 +235,4 @@ def start_server(host, port, write_on_file, log_file_path, sql_alchemy_uri):
 
 
 if __name__ == '__main__':
-    start_server(write_on_file=True)
+    runserver(write_on_file=True)
