@@ -1,7 +1,8 @@
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
+from wsgiref.simple_server import make_server
 import imp
 import logging
 import os
@@ -17,7 +18,7 @@ from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
-
+from olapy.core.mdx.executor.execute import MdxEngine
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
@@ -173,18 +174,22 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
 
-application = Application(
-    [XmlaProviderService],
-    'urn:schemas-microsoft-com:xml-analysis',
-    in_protocol=XmlaSoap11(validator='soft'),
-    out_protocol=XmlaSoap11(validator='soft'),)
-
-# validator='soft' or nothing, this is important because spyne doesn't
-# support encodingStyle until now !!!!
-
-wsgi_application = WsgiApplication(application)
 home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
+
+
+def get_wsgi_application():
+    # [XmlaProviderService()], __name__ error ???
+    application = Application(
+        [XmlaProviderService],
+        'urn:schemas-microsoft-com:xml-analysis',
+        in_protocol=XmlaSoap11(validator='soft'),
+        out_protocol=XmlaSoap11(validator='soft'), )
+
+    # validator='soft' or nothing, this is important because spyne doesn't
+    # support encodingStyle until now !!!!
+
+    return WsgiApplication(application)
 
 
 @click.command()
@@ -193,7 +198,9 @@ conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 @click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
-def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri):
+@click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location ! ")
+@click.option('--source_type', '-st', default=None, help="Get cubes from where (db|csv), DEFAULT : csv and databases")
+def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type):
     """
     Start the xmla server.
 
@@ -205,10 +212,14 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     """
     if sql_alchemy_uri is not None:
         # example olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
-        from olapy.core.mdx.executor.execute import MdxEngine
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
         # refresh all databases (with the new connection string)
         MdxEngine.get_cubes_names()
+
+    MdxEngine.olapy_data_location = olapy_data
+    if source_type is not None:
+        MdxEngine.source_type = source_type
+
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
@@ -216,7 +227,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri):
     except Exception:
         pass
 
-    from wsgiref.simple_server import make_server
+    wsgi_application = get_wsgi_application()
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")

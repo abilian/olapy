@@ -5,10 +5,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import os
 import re
-import sys
+# import sys
 from collections import OrderedDict
 from os.path import expanduser
-from traceback import print_tb
+# from traceback import print_tb
 
 import numpy as np
 import pandas as pd
@@ -39,6 +39,8 @@ class MdxEngine(object):
     regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
             "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
+    # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
+    # ----
     # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
     DATA_FOLDER = None
@@ -46,6 +48,8 @@ class MdxEngine(object):
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
     from_db_cubes = []
+    olapy_data_location = None
+    source_type = 'csv', 'db'
 
     def __init__(
             self,
@@ -87,7 +91,7 @@ class MdxEngine(object):
         self._mdx_query = value.replace('\n', '').replace('\t', '')
 
     @classmethod
-    def _get_db_cubes_names(cls, olapy_data_location):
+    def _get_db_cubes_names(cls):
         """
         Get databases cubes names
         :param olapy_data_location:
@@ -95,41 +99,45 @@ class MdxEngine(object):
         """
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
-        try:
-            db = MyDB(db_config_file_path=olapy_data_location)
-            if db.sgbd.upper() == 'ORACLE':
-                # You can think of a mysql "database" as a schema/user in Oracle.
-                # todo username
-                MdxEngine.from_db_cubes = [db.username]
-            else:
-                all_db_query = cls._gett_all_databeses_query(db.sgbd)
-                result = db.engine.execute(all_db_query)
-                available_tables = result.fetchall()
-                MdxEngine.from_db_cubes = [
-                    database[0] for database in available_tables if
-                    database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-                ]
+        if cls.olapy_data_location is None:
+            olapy_data_location = MdxEngine.get_default_cube_directory()
+        else:
+            olapy_data_location = cls.olapy_data_location
+        # try:
+        db = MyDB(db_config_file_path=olapy_data_location)
+        if db.sgbd.upper() == 'ORACLE':
+            # You can think of a mysql "database" as a schema/user in Oracle.
+            # todo username
+            MdxEngine.from_db_cubes = [db.username]
+        else:
+            all_db_query = cls._gett_all_databeses_query(db.sgbd)
+            result = db.engine.execute(all_db_query)
+            available_tables = result.fetchall()
+            MdxEngine.from_db_cubes = [
+                database[0] for database in available_tables if
+                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+            ]
 
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            print(type)
-            print(value)
-            print_tb(traceback)
-            print('no database connexion')
-            pass
+        # except Exception:
+        #     type, value, traceback = sys.exc_info()
+        #     print(type)
+        #     print(value)
+        #     print_tb(traceback)
+        #     print('no database connexion')
+        #     pass
 
     @staticmethod
     def _get_csv_cubes_names(cubes_location):
-        try:
-            MdxEngine.csv_files_cubes = [
-                file for file in os.listdir(cubes_location)
-                if os.path.isdir(os.path.join(cubes_location, file))
-            ]
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            print('Error opening %s' % (value))
-            print('no csv folders')
-            pass
+        # try:
+        MdxEngine.csv_files_cubes = [
+            file for file in os.listdir(cubes_location)
+            if os.path.isdir(os.path.join(cubes_location, file))
+        ]
+        # except Exception:
+        #     type, value, traceback = sys.exc_info()
+        #     print('Error opening %s' % (value))
+        #     print('no csv folders')
+        #     pass
 
     @classmethod
     def get_cubes_names(cls):
@@ -137,11 +145,16 @@ class MdxEngine(object):
         :return: list cubes name that exist in cubes folder
             (under ~/olapy-data/cubes) and postgres database (if connected).
         """
-        olapy_data_location = MdxEngine.get_default_cube_directory()
+        if cls.olapy_data_location is None:
+            olapy_data_location = MdxEngine.get_default_cube_directory()
+        else:
+            olapy_data_location = cls.olapy_data_location
         cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
 
-        MdxEngine._get_csv_cubes_names(cubes_location)
-        MdxEngine._get_db_cubes_names(olapy_data_location)
+        if 'csv' in cls.source_type:
+            MdxEngine._get_csv_cubes_names(cubes_location)
+        if 'db' in cls.source_type:
+            MdxEngine._get_db_cubes_names()
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
@@ -198,12 +211,10 @@ class MdxEngine(object):
 
         :return: dict with key as table name and DataFrame as value
         """
-
         config_file_parser = ConfigParser(self.cube_path)
         tables = {}
         if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client) \
                 and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
-
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in config_file_parser.construct_cubes():
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
