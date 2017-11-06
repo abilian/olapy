@@ -13,20 +13,22 @@ USER_NAME = 'postgres'
 PASSWORD = 'root'
 DB = 'sales_postgres'
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_conf_file_change():
-    from olapy.core.mdx.executor.execute import MdxEngine
-    with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
-        f.write("""
-        sgbd : postgres
-        host : localhost
-        port : 5432
-        user : postgres
-        password : root
-        driver : postgres
-        """)
+    if 'POSTGRES_URI' not in os.environ.keys():
+        # py.test directly #todo fix remove this
+        from olapy.core.mdx.executor.execute import MdxEngine
+        with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
+            f.write("""
+            sgbd : postgres
+            host : localhost
+            port : 5432
+            user : postgres
+            password : root
+            driver : postgres
+            """)
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 @pytest.fixture(scope='function')
 def connect(user=USER_NAME,
             password=PASSWORD,
@@ -34,26 +36,30 @@ def connect(user=USER_NAME,
             host='localhost',
             port=5432):
     """Returns a connection and a metadata object"""
-    # We connect with the help of the PostgreSQL URL
-    # postgresql://federer:grandestslam@localhost:5432/tennis
-    url = 'postgresql://{}:{}@{}:{}/{}'
-    url = url.format(user, password, host, port, db)
+    if 'POSTGRES_URI' in os.environ.keys():
+        return sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
+    else:
+        # DEFAULT CONFIG
+        # We connect with the help of the PostgreSQL URL
+        # postgresql://federer:grandestslam@localhost:5432/tennis
+        url = 'postgresql://{}:{}@{}:{}/{}'
+        url = url.format(user, password, host, port, db)
 
-    # The return value of create_engine() is our connection object
-    return sqlalchemy.create_engine(url, client_encoding='utf8')
+        # The return value of create_engine() is our connection object
+        return sqlalchemy.create_engine(url, client_encoding='utf8')
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 # create tables in the postgres database
 def test_create_tables(connect):
     create_insert(connect)
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     return MdxEngine(CUBE)
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query1(executor):
     executor.mdx_query = query_posgres1
 
@@ -65,7 +71,7 @@ def test_execution_query1(executor):
 
     assert assert_frame_equal(df, test_df) is None
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query2(executor):
     executor.mdx_query = query_posgres2
 
@@ -95,7 +101,7 @@ def test_execution_query2(executor):
 
     assert assert_frame_equal(df, test_df) is None
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query10(executor):
     executor.mdx_query = query_postgres3
 
@@ -130,7 +136,7 @@ def test_execution_query10(executor):
 
     assert assert_frame_equal(df, test_df) is None
 
-
+@pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 # drop created tables from postgres database
 def test_drop_tables(connect):
     drop_tables(connect)
