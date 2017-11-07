@@ -91,11 +91,13 @@ class MdxEngine(object):
         else:
             self.olapy_data_location = olapy_data_location
             MdxEngine.olapy_data_location = olapy_data_location
+            MdxEngine.db_config = DbConfigParser(olapy_data_location)
         if cubes_path is None:
             self.cube_path = MdxEngine.cube_path
         else:
             self.cube_path = cubes_path
             MdxEngine.cube_path = cubes_path
+            MdxEngine.cube_config_file_parser = ConfigParser(cubes_path)
 
         self.database_config = database_config
         self.cube_config = cube_config
