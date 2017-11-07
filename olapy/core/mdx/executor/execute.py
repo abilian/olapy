@@ -136,14 +136,18 @@ class MdxEngine(object):
             # todo username
             MdxEngine.from_db_cubes = [db.username]
         else:
-            all_db_query = cls._gett_all_databeses_query(db.dbms)
+            if db.dbms.upper() == 'SQLITE':
+                all_db_query = 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name;'
+            else:
+                all_db_query = cls._gett_all_databeses_query(db.dbms)
             result = db.engine.execute(all_db_query)
             available_tables = result.fetchall()
+            print(available_tables)
             MdxEngine.from_db_cubes = [
                 database[0] for database in available_tables if
                 database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
-
+            print(MdxEngine.from_db_cubes)
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)
@@ -224,7 +228,7 @@ class MdxEngine(object):
                 and self.cube in self.cube_config.get_cubes_names(client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.construct_cubes():
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
+                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
                     tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
@@ -261,7 +265,7 @@ class MdxEngine(object):
     def _construct_star_schema_from_config(self, config_file_parser):
         fusion = None
         for cubes in config_file_parser.construct_cubes(self.client):
-            if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
+            if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
                 if self.client == 'web':
                     fusion = construct_web_star_schema_config_file(self, cubes)
                 else:
