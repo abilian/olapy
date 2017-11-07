@@ -16,17 +16,17 @@ def _get_dbms_from_conn_string(conn_string):
     return db
 
 
-def _get_init_table(sgbd):
-    if sgbd.upper() == 'POSTGRES':
+def _get_init_table(dbms):
+    if dbms.upper() == 'POSTGRES':
         con_db = '/postgres'
         engine = 'postgresql+psycopg2'
-    elif sgbd.upper() == 'MYSQL':
+    elif dbms.upper() == 'MYSQL':
         con_db = ''
         engine = 'mysql+mysqldb'
-    elif sgbd.upper() == 'MSSQL':
+    elif dbms.upper() == 'MSSQL':
         con_db = 'msdb'
         engine = 'mssql+pyodbc'
-    elif sgbd.upper() == 'ORACLE':
+    elif dbms.upper() == 'ORACLE':
         con_db = ''
         engine = 'oracle+cx_oracle'
     else:
@@ -53,9 +53,9 @@ def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
 
 
 def _construct_engine(db, db_credentials):
-    eng, con_db = _get_init_table(db_credentials['sgbd'])
+    eng, con_db = _get_init_table(db_credentials['dbms'])
     if db is None:
-        if db_credentials['sgbd'].upper() == 'MSSQL':
+        if db_credentials['dbms'].upper() == 'MSSQL':
             return _connect_to_mssql(db_credentials.replace(' ', '+'))
         else:
             # Show all databases to user (in excel)
@@ -66,14 +66,14 @@ def _construct_engine(db, db_credentials):
                                                   con_db), encoding='utf-8')
 
     else:
-        if db_credentials['sgbd'].upper() == 'MSSQL':
+        if db_credentials['dbms'].upper() == 'MSSQL':
             return _connect_to_mssql(db=db, db_credentials=db_credentials)
         else:
             # and then we connect to the user db
             return create_engine(
                 '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng, db_credentials['user'], db_credentials['password'],
                                                    db_credentials['host'], db_credentials['port'],
-                                                   '' if db_credentials['sgbd'].upper() == 'ORACLE' else db),
+                                                   '' if db_credentials['dbms'].upper() == 'ORACLE' else db),
                 encoding='utf-8')
 
 
@@ -88,13 +88,13 @@ class MyDB(object):
                 # todo test this with windows
                 conn_string = (conn_string + '/' + db)
             self.engine = create_engine(conn_string)
-            self.sgbd = _get_dbms_from_conn_string(conn_string)
+            self.dbms = _get_dbms_from_conn_string(conn_string)
             # oracle://scott:tiger@127.0.0.1:1521/sidname
             self.username = conn_string.split(':')[1].replace('//', '')
 
         else:
             db_credentials = db_config.get_db_credentials()
-            self.sgbd = db_credentials['sgbd']
+            self.dbms = db_credentials['dbms']
             self.username = db_credentials['user']
             self.engine = _construct_engine(db, db_credentials)
 

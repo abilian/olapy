@@ -13,14 +13,6 @@ def main(arg):
     :param arg: -c | --console :  show logs in server console
     :return:
     """
-    # home_directory = expanduser("~")
-    # conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
-    # if len(arg) > 1:
-    #     if arg[1] in ("-c", "--console"):
-    #         runserver()
-    #     else:
-    #         print('invalide argument !')
-    # else:
     runserver()
 
 

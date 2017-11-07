@@ -38,7 +38,7 @@ class DbConfigParser:
             try:
                 config = yaml.load(config_file)
                 return {
-                    'sgbd': config['sgbd'],
+                    'dbms': config['dbms'],
                     'user': config['user'],
                     'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
                     'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',

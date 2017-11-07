@@ -20,11 +20,11 @@ def load_tables_db(executor_instance):
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
-    if db.sgbd.upper() == 'POSTGRES':
+    if db.dbms.upper() == 'POSTGRES':
         executor_instance.facts = executor_instance.facts.lower()
 
     for table_name in inspector.get_table_names():
-        if db.sgbd.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
+        if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             # fix for oracle
             table_name = table_name.title()
 

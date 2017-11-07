@@ -101,7 +101,7 @@ class MdxEngine(object):
 
         self.database_config = database_config
         self.cube_config = cube_config
-        # to get cubes in db
+        # to get cubes from db
         self._ = self.get_cubes_names()
         self.client = client_type
         self.tables_loaded = self.load_tables()
@@ -131,12 +131,12 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         # try:
         db = MyDB(cls.db_config)
-        if db.sgbd.upper() == 'ORACLE':
+        if db.dbms.upper() == 'ORACLE':
             # You can think of a mysql "database" as a schema/user in Oracle.
             # todo username
             MdxEngine.from_db_cubes = [db.username]
         else:
-            all_db_query = cls._gett_all_databeses_query(db.sgbd)
+            all_db_query = cls._gett_all_databeses_query(db.dbms)
             result = db.engine.execute(all_db_query)
             available_tables = result.fetchall()
             MdxEngine.from_db_cubes = [
@@ -183,19 +183,19 @@ class MdxEngine(object):
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @classmethod
-    def _gett_all_databeses_query(cls, sgbd):
+    def _gett_all_databeses_query(cls, dbms):
         """
 
-        :param sgbd: postgres | mysql | oracle | mssql
-        :return: all databases in the sgbd
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: all databases in the dbms
         """
-        if sgbd.upper() == 'POSTGRES':
+        if dbms.upper() == 'POSTGRES':
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-        elif sgbd.upper() == 'MYSQL':
+        elif dbms.upper() == 'MYSQL':
             return 'SHOW DATABASES'
-        elif sgbd.upper() == 'MSSQL':
+        elif dbms.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
-        elif sgbd.upper() == 'ORACLE':
+        elif dbms.upper() == 'ORACLE':
             # You can think of a mysql "database" as a schema/user in Oracle.
             return 'select username from dba_users;'
 

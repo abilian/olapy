@@ -21,7 +21,7 @@ def test_conf_file_change():
         from olapy.core.mdx.executor.execute import MdxEngine
         with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
-            sgbd : postgres
+            dbms : postgres
             host : localhost
             port : 5432
             user : postgres
