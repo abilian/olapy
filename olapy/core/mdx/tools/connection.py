@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import os
 from sqlalchemy import create_engine
-from .olapy_config_file_parser import DbConfigParser
+# from .olapy_config_file_parser import DbConfigParser
 
 
 # todo cleannnnnnnnnnnn
@@ -80,7 +80,7 @@ def _construct_engine(db, db_credentials):
 class MyDB(object):
     """Connect to sql database (postgres only right now)."""
 
-    def __init__(self, db_config_file_path=None, db=None):
+    def __init__(self, db_config, db=None):
 
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
@@ -93,7 +93,6 @@ class MyDB(object):
             self.username = conn_string.split(':')[1].replace('//', '')
 
         else:
-            db_config = DbConfigParser(config_path=db_config_file_path)
             db_credentials = db_config.get_db_credentials()
             self.sgbd = db_credentials['sgbd']
             self.username = db_credentials['user']

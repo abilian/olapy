@@ -20,9 +20,7 @@ def load_table_config_file(executor_instance, cube_obj):
     tables = {}
     # just one facts table right now
     executor_instance.facts = cube_obj.facts[0].table_name
-    db = MyDB(
-        db_config_file_path=os.path.dirname(executor_instance.cube_path),
-        db=executor_instance.cube)
+    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
 
     for dimension in cube_obj.dimensions:
 
@@ -60,7 +58,7 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
     :return: star schema DataFrame
     """
     executor_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(db_config_file_path=os.path.dirname(executor_instance.cube_path), db=executor_instance.cube)
+    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     # load facts table
 
     fusion = psql.read_sql_query(
@@ -134,9 +132,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
     """
 
     executor_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(
-        db_config_file_path=os.path.dirname(executor_instance.cube_path),
-        db=executor_instance.cube,)
+    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
 
     # load facts table
     fusion = psql.read_sql_query(

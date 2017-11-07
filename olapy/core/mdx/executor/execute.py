@@ -13,6 +13,7 @@ from os.path import expanduser
 import numpy as np
 import pandas as pd
 
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
 from .execute_config_file import construct_star_schema_config_file, \
@@ -23,6 +24,22 @@ from .execute_db import construct_star_schema_db, load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
+
+def get_default_cube_directory():
+    # toxworkdir does not expanduser properly under tox
+    if 'OLAPY_PATH' in os.environ:
+        home_directory = os.environ.get('OLAPY_PATH')
+    # elif MdxEngine.DATA_FOLDER is not None:
+    #     home_directory = MdxEngine.DATA_FOLDER
+    elif RUNNING_TOX:
+        home_directory = os.environ.get('HOME_DIR')
+    else:
+        home_directory = expanduser("~")
+
+    if 'olapy-data' not in home_directory:
+        home_directory = os.path.join(home_directory, 'olapy-data')
+
+    return home_directory
 
 class MdxEngine(object):
     """The main class for executing a query.
@@ -39,17 +56,21 @@ class MdxEngine(object):
     regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
             "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
+
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
     # ----
     # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
-    DATA_FOLDER = None
+    # DATA_FOLDER = None
     CUBE_FOLDER = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
     from_db_cubes = []
-    olapy_data_location = None
+    olapy_data_location = get_default_cube_directory()
+    cube_path = os.path.join(olapy_data_location, CUBE_FOLDER)
     source_type = 'csv', 'db'
+    db_config = DbConfigParser(olapy_data_location)
+    cube_config_file_parser = ConfigParser(cube_path)
 
     def __init__(
             self,
@@ -57,20 +78,29 @@ class MdxEngine(object):
             client_type='excel',
             cubes_path=None,
             mdx_query=None,
-            cube_folder=CUBE_FOLDER,
+            olapy_data_location=None,
             sep=';',
-            fact_table_name="Facts"):
+            fact_table_name="Facts",
+            database_config = db_config,
+            cube_config=cube_config_file_parser):
 
-        self.cube_folder = cube_folder
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self._mdx_query = mdx_query
+        if olapy_data_location is None:
+            self.olapy_data_location = MdxEngine.olapy_data_location
+        else:
+            self.olapy_data_location = olapy_data_location
+            MdxEngine.olapy_data_location = olapy_data_location
         if cubes_path is None:
-            self.cube_path = os.path.join(self.get_default_cube_directory(), self.cube_folder)
+            self.cube_path = MdxEngine.cube_path
         else:
             self.cube_path = cubes_path
+            MdxEngine.cube_path = cubes_path
 
+        self.database_config = database_config
+        self.cube_config = cube_config
         # to get cubes in db
         self._ = self.get_cubes_names()
         self.client = client_type
@@ -99,12 +129,8 @@ class MdxEngine(object):
         """
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
-        if cls.olapy_data_location is None:
-            olapy_data_location = MdxEngine.get_default_cube_directory()
-        else:
-            olapy_data_location = cls.olapy_data_location
         # try:
-        db = MyDB(db_config_file_path=olapy_data_location)
+        db = MyDB(cls.db_config)
         if db.sgbd.upper() == 'ORACLE':
             # You can think of a mysql "database" as a schema/user in Oracle.
             # todo username
@@ -145,36 +171,16 @@ class MdxEngine(object):
         :return: list cubes name that exist in cubes folder
             (under ~/olapy-data/cubes) and postgres database (if connected).
         """
-        if cls.olapy_data_location is None:
-            olapy_data_location = MdxEngine.get_default_cube_directory()
-        else:
-            olapy_data_location = cls.olapy_data_location
-        cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
-
+        # if cls.olapy_data_location is None:
+        #     olapy_data_location = MdxEngine.get_default_cube_directory()
+        # else:
+        #     olapy_data_location = cls.olapy_data_location
         if 'csv' in cls.source_type:
-            MdxEngine._get_csv_cubes_names(cubes_location)
+            MdxEngine._get_csv_cubes_names(cls.cube_path)
         if 'db' in cls.source_type:
             MdxEngine._get_db_cubes_names()
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
-
-    @staticmethod
-    def get_default_cube_directory():
-
-        # toxworkdir does not expanduser properly under tox
-        if 'OLAPY_PATH' in os.environ:
-            home_directory = os.environ.get('OLAPY_PATH')
-        elif MdxEngine.DATA_FOLDER is not None:
-            home_directory = MdxEngine.DATA_FOLDER
-        elif RUNNING_TOX:
-            home_directory = os.environ.get('HOME_DIR')
-        else:
-            home_directory = expanduser("~")
-
-        if 'olapy-data' not in home_directory:
-            home_directory = os.path.join(home_directory, 'olapy-data')
-
-        return home_directory
 
     @classmethod
     def _gett_all_databeses_query(cls, sgbd):
@@ -190,6 +196,7 @@ class MdxEngine(object):
         elif sgbd.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
         elif sgbd.upper() == 'ORACLE':
+            # You can think of a mysql "database" as a schema/user in Oracle.
             return 'select username from dba_users;'
 
     def _get_tables_name(self):
@@ -211,12 +218,12 @@ class MdxEngine(object):
 
         :return: dict with key as table name and DataFrame as value
         """
-        config_file_parser = ConfigParser(self.cube_path)
+        # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client) \
-                and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
+        if self.client == 'excel' and self.cube_config.config_file_exist(client_type=self.client) \
+                and self.cube in self.cube_config.get_cubes_names(client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
-            for cubes in config_file_parser.construct_cubes():
+            for cubes in self.cube_config.construct_cubes():
                 if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
                     tables = load_table_config_file(self, cubes)
 
@@ -233,9 +240,9 @@ class MdxEngine(object):
 
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
-        config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist('web'):
-            for cubes in config_file_parser.construct_cubes(self.client):
+        # config_file_parser = ConfigParser(self.cube_path)
+        if self.client == 'web' and self.cube_config.config_file_exist('web'):
+            for cubes in self.cube_config.construct_cubes(self.client):
 
                 # update facts name
                 self.facts = cubes.facts[0].table_name
@@ -267,9 +274,9 @@ class MdxEngine(object):
         :return: star schema DataFrame
         """
         fusion = None
-        config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(self.client) and self.cube in config_file_parser.get_cubes_names(self.client):
-            fusion = self._construct_star_schema_from_config(config_file_parser)
+        # config_file_parser = ConfigParser(self.cube_path)
+        if self.cube_config.config_file_exist(self.client) and self.cube in self.cube_config.get_cubes_names(self.client):
+            fusion = self._construct_star_schema_from_config(self.cube_config)
 
         elif self.cube in self.from_db_cubes:
             fusion = construct_star_schema_db(self)
@@ -298,11 +305,12 @@ class MdxEngine(object):
 
         :return: path to the cube
         """
-        if MdxEngine.DATA_FOLDER is not None:
-            return os.path.join(
-                MdxEngine.DATA_FOLDER,
-                MdxEngine.CUBE_FOLDER,
-                self.cube,)
+        # todo check this
+        # if MdxEngine.DATA_FOLDER is not None:
+        #     return os.path.join(
+        #         MdxEngine.DATA_FOLDER,
+        #         MdxEngine.CUBE_FOLDER,
+        #         self.cube)
         return os.path.join(self.cube_path, self.cube)
 
     @staticmethod

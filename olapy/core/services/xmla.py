@@ -19,7 +19,7 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 from olapy.core.mdx.executor.execute import MdxEngine
-from ..mdx.tools.config_file_parser import ConfigParser
+# from ..mdx.tools.config_file_parser import ConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -78,8 +78,8 @@ class XmlaProviderService(ServiceBase):
         # (which cause problems when we want to access xmla_provider instantiation variables)
         discover_tools = XmlaProviderService.discover_tools
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
-
-        config_parser = ConfigParser(discover_tools.executor.cube_path)
+        # config_parser = ConfigParser(discover_tools.executor.cube_path)
+        config_parser = discover_tools.executor.cube_config
         if config_parser.xmla_authentication() \
                 and ctx.transport.req_env['QUERY_STRING'] != 'admin':
 

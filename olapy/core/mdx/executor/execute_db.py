@@ -15,9 +15,7 @@ def load_tables_db(executor_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    db = MyDB(
-        db_config_file_path=executor_instance.DATA_FOLDER,
-        db=executor_instance.cube)
+    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
@@ -51,7 +49,7 @@ def construct_star_schema_db(executor_instance):
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-    db = MyDB(db=executor_instance.cube)
+    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     # load facts table
 
     fusion = psql.read_sql_query(
