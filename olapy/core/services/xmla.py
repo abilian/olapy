@@ -19,7 +19,6 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 from olapy.core.mdx.executor.execute import MdxEngine
-# from ..mdx.tools.config_file_parser import ConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -180,6 +179,8 @@ conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 def get_wsgi_application():
     # [XmlaProviderService()], __name__ error ???
+    # to refresh mdxengine with their class data
+    XmlaProviderService.discover_tools = XmlaDiscoverTools()
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
@@ -213,8 +214,6 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     if sql_alchemy_uri is not None:
         # example olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
-        # refresh all databases (with the new connection string)
-        MdxEngine.get_cubes_names()
 
     MdxEngine.olapy_data_location = olapy_data
     if source_type is not None:

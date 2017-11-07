@@ -30,14 +30,10 @@ def load_tables_db(executor_instance):
 
         results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM {0}'.format(table_name))
         # Fetch all the results of the query
-        value = pd.DataFrame(
-            iter(results),
-            columns=results.keys(), )  # Pass results as an iterator
+        value = pd.DataFrame(iter(results), columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-        tables[table_name] = value[[
-            col for col in value.columns if col.lower()[-3:] != '_id'
-        ]]
+        tables[table_name] = value[[col for col in value.columns if col.lower()[-3:] != '_id']]
 
     return tables
 
@@ -52,8 +48,7 @@ def construct_star_schema_db(executor_instance):
     db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     # load facts table
 
-    fusion = psql.read_sql_query(
-        'SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
+    fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)
 
     for db_table_name in inspector.get_table_names():
@@ -63,8 +58,7 @@ def construct_star_schema_db(executor_instance):
             if isinstance(db_table_name, Iterable):
                 db_table_name = db_table_name[0]
         try:
-            fusion = fusion.merge(
-                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
+            fusion = fusion.merge(psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
         except BaseException:
             print('No common column between {0} and {1}'.format(executor_instance.facts, db_table_name))
             pass

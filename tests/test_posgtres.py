@@ -5,6 +5,7 @@ import pytest
 import sqlalchemy
 from pandas.util.testing import assert_frame_equal
 
+from olapy.core.mdx.executor.execute import get_default_cube_directory
 from tests.postgres_utils import create_insert, drop_tables
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
@@ -19,7 +20,7 @@ def test_conf_file_change():
     if 'POSTGRES_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
         from olapy.core.mdx.executor.execute import MdxEngine
-        with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
+        with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
             dbms : postgres
             host : localhost

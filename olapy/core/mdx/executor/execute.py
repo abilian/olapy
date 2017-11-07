@@ -5,10 +5,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import os
 import re
-# import sys
 from collections import OrderedDict
 from os.path import expanduser
-# from traceback import print_tb
 
 import numpy as np
 import pandas as pd
@@ -171,15 +169,15 @@ class MdxEngine(object):
         :return: list cubes name that exist in cubes folder
             (under ~/olapy-data/cubes) and postgres database (if connected).
         """
-        # if cls.olapy_data_location is None:
-        #     olapy_data_location = MdxEngine.get_default_cube_directory()
-        # else:
-        #     olapy_data_location = cls.olapy_data_location
-        if 'csv' in cls.source_type:
-            MdxEngine._get_csv_cubes_names(cls.cube_path)
-        if 'db' in cls.source_type:
-            MdxEngine._get_db_cubes_names()
 
+        MdxEngine._get_csv_cubes_names(cls.cube_path)
+        MdxEngine._get_db_cubes_names()
+        # by default , and before passing values to class with olapy runserver .... it executes this with csv and db
+        # todo fix
+        if 'csv' not in cls.source_type:
+            MdxEngine.csv_files_cubes = []
+        if 'db' not in cls.source_type:
+            MdxEngine.from_db_cubes = []
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @classmethod
@@ -305,12 +303,6 @@ class MdxEngine(object):
 
         :return: path to the cube
         """
-        # todo check this
-        # if MdxEngine.DATA_FOLDER is not None:
-        #     return os.path.join(
-        #         MdxEngine.DATA_FOLDER,
-        #         MdxEngine.CUBE_FOLDER,
-        #         self.cube)
         return os.path.join(self.cube_path, self.cube)
 
     @staticmethod

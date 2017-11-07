@@ -6,6 +6,7 @@ import pytest
 import sqlalchemy
 from pandas.util.testing import assert_frame_equal
 
+from olapy.core.mdx.executor.execute import get_default_cube_directory
 from tests.mysql_utils import create_insert, drop_tables
 from .queries import query1, query3, query6, query7, query8, query9, \
     query10
@@ -21,7 +22,7 @@ def test_conf_file_change():
     if 'MYSQL_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
         from olapy.core.mdx.executor.execute import MdxEngine
-        with open(os.path.join(MdxEngine.get_default_cube_directory(), 'olapy-config'), "w") as f:
+        with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
             dbms : mysql
             host : localhost
