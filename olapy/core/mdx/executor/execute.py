@@ -41,6 +41,7 @@ def get_default_cube_directory():
 
     return home_directory
 
+
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -55,7 +56,6 @@ class MdxEngine(object):
     # or use new regex 2017.02.08
     regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
             "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
-
 
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
     # ----
@@ -81,7 +81,7 @@ class MdxEngine(object):
             olapy_data_location=None,
             sep=';',
             fact_table_name="Facts",
-            database_config = db_config,
+            database_config=db_config,
             cube_config=cube_config_file_parser):
 
         self.cube = cube_name

@@ -6,7 +6,6 @@ import click
 from olapy.core.services.xmla import runserver
 
 
-
 def main(arg):
     """
     Execute xmla provider.
