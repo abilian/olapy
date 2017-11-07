@@ -21,7 +21,6 @@ DB = 'sales_mysql'
 def test_conf_file_change():
     if 'MYSQL_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
-        from olapy.core.mdx.executor.execute import MdxEngine
         with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
             dbms : mysql
