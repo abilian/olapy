@@ -135,19 +135,17 @@ class MdxEngine(object):
             # You can think of a mysql "database" as a schema/user in Oracle.
             # todo username
             MdxEngine.from_db_cubes = [db.username]
+        elif db.dbms.upper() == 'SQLITE':
+            available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
+            MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
         else:
-            if db.dbms.upper() == 'SQLITE':
-                all_db_query = 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name;'
-            else:
-                all_db_query = cls._gett_all_databeses_query(db.dbms)
+            all_db_query = cls._gett_all_databeses_query(db.dbms)
             result = db.engine.execute(all_db_query)
             available_tables = result.fetchall()
-            print(available_tables)
             MdxEngine.from_db_cubes = [
                 database[0] for database in available_tables if
                 database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
             ]
-            print(MdxEngine.from_db_cubes)
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)
