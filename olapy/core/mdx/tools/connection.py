@@ -42,10 +42,10 @@ def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
     if db is not None:
         return create_engine(driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver), encoding='utf-8')
 
-    if 'LOCALHOST' in db_credentials['user_name'].upper() or not db_credentials['user_name']:
+    if 'LOCALHOST' in db_credentials['user'].upper() or not db_credentials['user']:
         return create_engine(driver + '://(local)/msdb?driver={0}'.format(sql_server_driver))
     else:
-        return create_engine(driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(db_credentials['user_name'],
+        return create_engine(driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(db_credentials['user'],
                                                                                   db_credentials['password'],
                                                                                   db_credentials['host'],
                                                                                   db_credentials['port'],
@@ -60,7 +60,7 @@ def _construct_engine(db, db_credentials):
         else:
             # Show all databases to user (in excel)
             return create_engine(
-                '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
+                '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user'], db_credentials['password'],
                                                   db_credentials['host'],
                                                   db_credentials['port'],
                                                   con_db), encoding='utf-8')
@@ -71,7 +71,7 @@ def _construct_engine(db, db_credentials):
         else:
             # and then we connect to the user db
             return create_engine(
-                '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng, db_credentials['user_name'], db_credentials['password'],
+                '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng, db_credentials['user'], db_credentials['password'],
                                                    db_credentials['host'], db_credentials['port'],
                                                    '' if db_credentials['sgbd'].upper() == 'ORACLE' else db),
                 encoding='utf-8')
@@ -89,11 +89,14 @@ class MyDB(object):
                 conn_string = (conn_string + '/' + db)
             self.engine = create_engine(conn_string)
             self.sgbd = _get_dbms_from_conn_string(conn_string)
+            # oracle://scott:tiger@127.0.0.1:1521/sidname
+            self.username = conn_string.split(':')[1].replace('//', '')
 
         else:
             db_config = DbConfigParser(config_path=db_config_file_path)
             db_credentials = db_config.get_db_credentials()
             self.sgbd = db_credentials['sgbd']
+            self.username = db_credentials['user']
             self.engine = _construct_engine(db, db_credentials)
 
     def __del__(self):
