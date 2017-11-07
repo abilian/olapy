@@ -1,9 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sys
-
 import click
+
 from olapy.core.services.xmla import runserver
+
 
 
 def main(arg):
@@ -13,13 +14,15 @@ def main(arg):
     :param arg: -c | --console :  show logs in server console
     :return:
     """
-    if len(arg) > 1:
-        if arg[1] in ("-c", "--console"):
-            runserver(write_on_file=False)
-        else:
-            print('invalide argument !')
-    else:
-        runserver(write_on_file=True)
+    # home_directory = expanduser("~")
+    # conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
+    # if len(arg) > 1:
+    #     if arg[1] in ("-c", "--console"):
+    #         runserver()
+    #     else:
+    #         print('invalide argument !')
+    # else:
+    runserver()
 
 
 @click.group()

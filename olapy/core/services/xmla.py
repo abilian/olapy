@@ -195,7 +195,7 @@ def get_wsgi_application():
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip adresse.')
 @click.option('--port', '-p', default=8000, help='Host port.')
-@click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
+@click.option('--write_on_file', '-wf', default=True, help='Write logs into a file or display them into the console.')
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location ! ")
@@ -243,7 +243,3 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
     server = make_server(host, port, wsgi_application)
     server.serve_forever()
-
-
-if __name__ == '__main__':
-    runserver(write_on_file=True)
