@@ -9,6 +9,8 @@ import xmlwitch
 
 from six.moves import zip
 
+from olapy.core.mdx.parser.parse import Parser
+
 
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
@@ -83,7 +85,7 @@ class XmlaExecuteTools():
         """
 
         from ..mdx.executor.execute import MdxEngine
-        return [tup[0] for tup in re.compile(MdxEngine.regex).findall(self.executor.mdx_query)
+        return [tup[0] for tup in re.compile(Parser.regex).findall(self.executor.mdx_query)
                 if '[Measures].[XL_SD' not in tup[0] and tup[1]][::3]
 
     def split_dataframe(self):

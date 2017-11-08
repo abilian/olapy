@@ -4,13 +4,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import itertools
 import os
-import re
 from collections import OrderedDict
 from os.path import expanduser
 
 import numpy as np
 import pandas as pd
 
+from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
@@ -49,11 +49,6 @@ class MdxEngine(object):
     :param mdx_query: query to execute
     :param sep: separator in the csv files
     """
-
-    # french characters
-    # or use new regex 2017.02.08
-    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
-            "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
     # ----
@@ -111,6 +106,7 @@ class MdxEngine(object):
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
+        self.parser = Parser(mdx_query)
 
     @property
     def mdx_query(self):
@@ -311,126 +307,126 @@ class MdxEngine(object):
         """
         return os.path.join(self.cube_path, self.cube)
 
-    @staticmethod
-    def get_tuples(query, start=None, stop=None):
-        """Get all tuples in the mdx query.
-
-        Example::
-
-
-            SELECT  {
-                    [Geography].[Geography].[All Continent].Members,
-                    [Geography].[Geography].[Continent].[Europe]
-                    } ON COLUMNS,
-
-                    {
-                    [Product].[Product].[Company]
-                    } ON ROWS
-
-                    FROM {sales}
-
-        It returns ::
-
-            [
-                ['Geography','Geography','Continent'],
-                ['Geography','Geography','Continent','Europe'],
-                ['Product','Product','Company']
-            ]
-
-
-        :param query: mdx query
-        :param start: keyword in the query where we start (examples start = SELECT)
-        :param stop:  keyword in the query where we stop (examples start = ON ROWS)
-
-        :return:  nested list of tuples (see the example)
-        """
-
-        if start is not None:
-            start = query.index(start)
-        if stop is not None:
-            stop = query.index(stop)
-
-        # clean the query (remove All, Members...)
-        return [
-            [
-                tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '', ).split('].[') if tup_att
-            ]
-            for tup in re.compile(MdxEngine.regex).findall(
-                query[start:stop], )
-            if len(tup[0].split('].[')) > 1
-            # for tup in re.compile(MdxEngine.regex).findall(
-            #     query.encode("utf-8", 'replace')[start:stop],)
-            # if len(tup[0].split('].[')) > 1
-        ]
-
-    @staticmethod
-    def split_tuple(tupl):
-        """
-        Split Tuple (String) into items.
-
-            example : input : '[Geography].[Geography].[Continent].[Europe]'
-                      output : ['Geography','Geography','Continent','Europe']
-
-        :param tupl: MDX Tuple as String
-        :return: Tuple items in list
-        """
-        splitted_tupl = tupl.strip(' \t\n').split('].[')
-        splitted_tupl[0] = splitted_tupl[0].replace('[', '')
-        splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
-        return splitted_tupl
-
-    def decorticate_query(self, query):
-        """Get all tuples that exists in the MDX Query by axes.
-
-        :param query: MDX Query
-        :return: dict of axis as key and tuples as value
-        """
-
-        # Hierarchize -> ON COLUMNS , ON ROWS ...
-        # without Hierarchize -> ON 0
-
-        tuples_on_mdx_query = self.get_tuples(query)
-        on_rows = []
-        on_columns = []
-        on_where = []
-
-        try:
-            # ON ROWS
-            if 'ON ROWS' in query:
-                stop = 'ON ROWS'
-                if 'ON COLUMNS' in query:
-                    start = 'ON COLUMNS'
-                else:
-                    start = 'SELECT'
-                on_rows = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS
-            if 'ON COLUMNS' in query:
-                start = 'SELECT'
-                stop = 'ON COLUMNS'
-                on_columns = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS (AS 0)
-            if 'ON 0' in query:
-                start = 'SELECT'
-                stop = 'ON 0'
-                on_columns = self.get_tuples(query, start, stop)
-
-            # WHERE
-            if 'WHERE' in query:
-                start = 'FROM'
-                on_where = self.get_tuples(query, start)
-
-        except BaseException:
-            raise SyntaxError('Please check your MDX Query')
-
-        return {
-            'all': tuples_on_mdx_query,
-            'columns': on_columns,
-            'rows': on_rows,
-            'where': on_where,
-        }
+    # @staticmethod
+    # def get_tuples(query, start=None, stop=None):
+    #     """Get all tuples in the mdx query.
+    #
+    #     Example::
+    #
+    #
+    #         SELECT  {
+    #                 [Geography].[Geography].[All Continent].Members,
+    #                 [Geography].[Geography].[Continent].[Europe]
+    #                 } ON COLUMNS,
+    #
+    #                 {
+    #                 [Product].[Product].[Company]
+    #                 } ON ROWS
+    #
+    #                 FROM {sales}
+    #
+    #     It returns ::
+    #
+    #         [
+    #             ['Geography','Geography','Continent'],
+    #             ['Geography','Geography','Continent','Europe'],
+    #             ['Product','Product','Company']
+    #         ]
+    #
+    #
+    #     :param query: mdx query
+    #     :param start: keyword in the query where we start (examples start = SELECT)
+    #     :param stop:  keyword in the query where we stop (examples start = ON ROWS)
+    #
+    #     :return:  nested list of tuples (see the example)
+    #     """
+    #
+    #     if start is not None:
+    #         start = query.index(start)
+    #     if stop is not None:
+    #         stop = query.index(stop)
+    #
+    #     # clean the query (remove All, Members...)
+    #     return [
+    #         [
+    #             tup_att.replace('All ', '').replace('[', "").replace("]", "")
+    #             for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '', ).split('].[') if tup_att
+    #         ]
+    #         for tup in re.compile(MdxEngine.regex).findall(
+    #             query[start:stop], )
+    #         if len(tup[0].split('].[')) > 1
+    #         # for tup in re.compile(MdxEngine.regex).findall(
+    #         #     query.encode("utf-8", 'replace')[start:stop],)
+    #         # if len(tup[0].split('].[')) > 1
+    #     ]
+    #
+    # @staticmethod
+    # def split_tuple(tupl):
+    #     """
+    #     Split Tuple (String) into items.
+    #
+    #         example : input : '[Geography].[Geography].[Continent].[Europe]'
+    #                   output : ['Geography','Geography','Continent','Europe']
+    #
+    #     :param tupl: MDX Tuple as String
+    #     :return: Tuple items in list
+    #     """
+    #     splitted_tupl = tupl.strip(' \t\n').split('].[')
+    #     splitted_tupl[0] = splitted_tupl[0].replace('[', '')
+    #     splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
+    #     return splitted_tupl
+    #
+    # def decorticate_query(self, query):
+    #     """Get all tuples that exists in the MDX Query by axes.
+    #
+    #     :param query: MDX Query
+    #     :return: dict of axis as key and tuples as value
+    #     """
+    #
+    #     # Hierarchize -> ON COLUMNS , ON ROWS ...
+    #     # without Hierarchize -> ON 0
+    #
+    #     tuples_on_mdx_query = self.get_tuples(query)
+    #     on_rows = []
+    #     on_columns = []
+    #     on_where = []
+    #
+    #     try:
+    #         # ON ROWS
+    #         if 'ON ROWS' in query:
+    #             stop = 'ON ROWS'
+    #             if 'ON COLUMNS' in query:
+    #                 start = 'ON COLUMNS'
+    #             else:
+    #                 start = 'SELECT'
+    #             on_rows = self.get_tuples(query, start, stop)
+    #
+    #         # ON COLUMNS
+    #         if 'ON COLUMNS' in query:
+    #             start = 'SELECT'
+    #             stop = 'ON COLUMNS'
+    #             on_columns = self.get_tuples(query, start, stop)
+    #
+    #         # ON COLUMNS (AS 0)
+    #         if 'ON 0' in query:
+    #             start = 'SELECT'
+    #             stop = 'ON 0'
+    #             on_columns = self.get_tuples(query, start, stop)
+    #
+    #         # WHERE
+    #         if 'WHERE' in query:
+    #             start = 'FROM'
+    #             on_where = self.get_tuples(query, start)
+    #
+    #     except BaseException:
+    #         raise SyntaxError('Please check your MDX Query')
+    #
+    #     return {
+    #         'all': tuples_on_mdx_query,
+    #         'columns': on_columns,
+    #         'rows': on_rows,
+    #         'where': on_where,
+    #     }
 
     @staticmethod
     def change_measures(tuples_on_mdx):
@@ -527,7 +523,7 @@ class MdxEngine(object):
         :param tuple_as_list: tuple as list
         :param Dataframe_in: DataFrame in with you want to execute tuple
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
-        other columns to keep in the execution except the current tuple
+            other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
         df = Dataframe_in
@@ -667,14 +663,8 @@ class MdxEngine(object):
             example :
 
                 {
-
-                'Geography':
-
-                    ['Continent','Country'],
-
-                'Time':
-
-                    ['Year','Month','Day']
+                'Geography': ['Continent','Country'],
+                'Time': ['Year','Month','Day']
                 }
 
         :return: updated columns_to_keep
@@ -756,58 +746,58 @@ class MdxEngine(object):
             df = pd.concat(self.add_missed_column(df, next_df))
         return df
 
-    @staticmethod
-    def add_tuple_brackets(tupl):
-        """
-        After splitting tuple (with splited_group), you got some tuple like aa].[bb].[cc].[dd
-        so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
+    # @staticmethod
+    # def add_tuple_brackets(tupl):
+    #     """
+    #     After splitting tuple (with splited_group), you got some tuple like aa].[bb].[cc].[dd
+    #     so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
+    #
+    #     :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
+    #     :return: [aa].[bb].[cc].[dd].
+    #     """
+    #     tupl = tupl.strip()
+    #     if tupl[0] != '[':
+    #         tupl = '[' + tupl
+    #     if tupl[-1] != ']':
+    #         tupl = tupl + ']'
+    #     return tupl
 
-        :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
-        :return: [aa].[bb].[cc].[dd].
-        """
-        tupl = tupl.strip()
-        if tupl[0] != '[':
-            tupl = '[' + tupl
-        if tupl[-1] != ']':
-            tupl = tupl + ']'
-        return tupl
+    # def split_group(self, group):
+    #     """
+    #     Split group of tuples example '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
+    #     :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
+    #     :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
+    #     """
+    #     splited_group = group.replace('\n', '').replace('\t', '').split('],')
+    #     return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
 
-    def split_group(self, group):
-        """
-        Split group of tuples example '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
-        """
-        splited_group = group.replace('\n', '').replace('\t', '').split('],')
-        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
-
-    def get_nested_select(self):
-        """
-        Get tuples groups in query like :
-
-                Select {
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]),
-
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount])
-                    }
-
-        :return: All groups as list of strings : example:
-
-
-                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]',
-
-                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]'
-
-        """
-        return re.findall(r'\(([^()]+)\)', self.mdx_query)
+    # def get_nested_select(self):
+    #     """
+    #     Get tuples groups in query like :
+    #
+    #             Select {
+    #                 ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+    #                 [Geography].[Geography].[Continent].[Europe],
+    #                 [Measures].[Amount]),
+    #
+    #                 ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+    #                 [Geography].[Geography].[Continent].[Europe],
+    #                 [Measures].[Amount])
+    #                 }
+    #
+    #     :return: All groups as list of strings : example:
+    #
+    #
+    #                 ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+    #                 [Geography].[Geography].[Continent].[Europe],
+    #                 [Measures].[Amount]',
+    #
+    #                 '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+    #                 [Geography].[Geography].[Continent].[Europe],
+    #                 [Measures].[Amount]'
+    #
+    #     """
+    #     return re.findall(r'\(([^()]+)\)', self.mdx_query)
 
     def check_nested_select(self):
         """
@@ -815,7 +805,7 @@ class MdxEngine(object):
 
         :return: True | False
         """
-        return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
+        return not self.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
@@ -824,10 +814,10 @@ class MdxEngine(object):
         :return: Pandas DataFrame.
         """
         dfs = []
-        grouped_tuples = self.get_nested_select()
+        grouped_tuples = self.parser.get_nested_select()
         for tuple_groupe in grouped_tuples:
             transformed_tuple_groups = []
-            for tuple in self.split_group(tuple_groupe):
+            for tuple in self.parser.split_group(tuple_groupe):
                 tuple = tuple.split('].[')
                 tuple[0] = tuple[0].replace('[', '')
                 tuple[-1] = tuple[-1].replace(']', '')
@@ -857,7 +847,7 @@ class MdxEngine(object):
         """
 
         # use measures that exists on where or insides axes
-        query_axes = self.decorticate_query(self.mdx_query)
+        query_axes = self.parser.decorticate_query(self.mdx_query)
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
