@@ -200,7 +200,7 @@ def get_wsgi_application():
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location ! ")
-@click.option('--source_type', '-st', default=None, help="Get cubes from where (db|csv), DEFAULT : csv and databases")
+@click.option('--source_type', '-st', default=None, help="Get cubes from where (db|csv), DEFAULT : csv")
 def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type):
     """
     Start the xmla server.

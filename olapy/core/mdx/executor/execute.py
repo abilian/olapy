@@ -66,7 +66,7 @@ class MdxEngine(object):
     from_db_cubes = []
     olapy_data_location = get_default_cube_directory()
     cube_path = os.path.join(olapy_data_location, CUBE_FOLDER)
-    source_type = 'csv', 'db'
+    source_type = 'csv'
     db_config = DbConfigParser(olapy_data_location)
     cube_config_file_parser = ConfigParser(cube_path)
 
@@ -173,15 +173,17 @@ class MdxEngine(object):
         :return: list cubes name that exist in cubes folder
             (under ~/olapy-data/cubes) and postgres database (if connected).
         """
-
-        MdxEngine._get_csv_cubes_names(cls.cube_path)
-        MdxEngine._get_db_cubes_names()
-        # by default , and before passing values to class with olapy runserver .... it executes this with csv and db
+        # by default , and before passing values to class with olapy runserver .... it executes this with csv
         # todo fix
-        if 'csv' not in cls.source_type:
+        if 'csv' in cls.source_type:
+            MdxEngine._get_csv_cubes_names(cls.cube_path)
+        else:
             MdxEngine.csv_files_cubes = []
-        if 'db' not in cls.source_type:
+        if 'db' in cls.source_type:
+            MdxEngine._get_db_cubes_names()
+        else:
             MdxEngine.from_db_cubes = []
+
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
     @classmethod
