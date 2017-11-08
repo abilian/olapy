@@ -5,7 +5,7 @@
 
 Welcome to OlaPy's documentation!
 =================================
-**OlaPy** is an OLAP engine with MDX support, web interface (slice & dice) and XMLA support for excel client.
+**OlaPy** is an OLAP engine with MDX support and XMLA support for excel client.
 it can be found at
 `OlaPy <https://github.com/abilian/olapy>`_.
 
@@ -33,26 +33,6 @@ and use the url :http://127.0.0.1:8000/ in excel the see your :ref:`cubes <cubes
 
 you can also :ref:`customize <customize>` your cubes
 
-**Starting Web DEMO** by using::
-
-
-   1) python manage.py initdb : to initialize db *(one time only)*
-
-   2) python manage.py runserver : to run application
-
-
-**login** : admin
-
-**password** : admin
-
-
-* to drop the database use::
-
-    python manage.py dropdb
-
-Tests
------
-
 To run tests, run::
 
     pytest tests
@@ -69,7 +49,6 @@ Features
 
 - executing `MDX <https://msdn.microsoft.com/en-us/library/ms145514.aspx>`_ query
 - An excel demo
-- A web demo
 
 Contents:
 
@@ -79,7 +58,6 @@ Contents:
    cubes
    customize
    api
-   web
 
 
 
