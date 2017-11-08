@@ -61,7 +61,7 @@ def test_create_tables(connect):
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
-    MdxEngine.source_type = ('csv','db')
+    MdxEngine.source_type = ('csv', 'db')
     return MdxEngine(CUBE)
 
 
