@@ -15,9 +15,10 @@ First, to import the package use::
 
 .. automodule:: olapy.core.mdx.parser.parse
 
-    .. autoclass:: MdxParser
+    .. autoclass:: Parser
         :members:
-            parsing_mdx_query
+            decorticate_query,
+            get_tuples
 
 Package ``olapy.core.mdx.executor``
 -----------------------------------
@@ -37,8 +38,6 @@ to import the package use::
             get_star_schema_dataframe,
             get_all_tables_names,
             get_cube_path,
-            get_tuples,
-            decorticate_query,
             change_measures,
             get_tables_and_columns,
             execute_one_tuple,
