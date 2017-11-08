@@ -66,7 +66,6 @@ class MdxEngine(object):
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
 
-
     def __init__(
             self,
             cube_name,
