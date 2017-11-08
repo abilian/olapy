@@ -1,0 +1,11 @@
+geography_key,Continent,Country,City
+1,America,Canada,Quebec
+2,America,Canada,Toronto
+3,America,United States,Los Angeles
+4,America,United States,New York
+5,America,United States,San Francisco
+6,America,Mexico,Mexico
+7,America,Venezuela,Caracas
+8,Europe,France,Paris
+9,Europe,Spain,Barcelona
+10,Europe,Spain,Madrid
