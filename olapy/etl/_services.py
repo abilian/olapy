@@ -12,7 +12,7 @@ DB_CONFIG_DEFAULTS = {
     'host': config['host'],
     'port': config['port'],
     'name': config['db_name'],
-    'user': config['user_name'],
+    'user': config['user'],
     'pass': config['password'],
 }
 
