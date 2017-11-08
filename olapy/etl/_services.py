@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from collections import defaultdict
+
+import os
 from sqlalchemy import create_engine
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
@@ -20,13 +22,16 @@ DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
 
 
 def create_db_engine(driver='SQL Server Native Client', version='11.0'):
-    config = defaultdict(**DB_CONFIG_DEFAULTS)
-    dsn = DSN_TEMPLATE.format(**config)
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        dsn = os.environ['SQLALCHEMY_DATABASE_URI']
+    else:
+        config = defaultdict(**DB_CONFIG_DEFAULTS)
+        dsn = DSN_TEMPLATE.format(**config)
 
-    if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
-        dsn += '?client_encoding=utf8'
-    elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
-        dsn += '?driver={0}'.format(driver + ' ' + version)
+        if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
+            dsn += '?client_encoding=utf8'
+        elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
+            dsn += '?driver={0}'.format(driver + ' ' + version)
     return create_engine(dsn)
 
 
