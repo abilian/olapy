@@ -72,14 +72,9 @@ to import the package use::
     import olapy.core.services.xmla
 
 
-.. automodule:: olapy.core.services.xmla
-
-    .. autoclass:: XmlaProviderService
-        :members:
-            Discover,
-            Execute
-
-        .. autofunction:: start_server
+.. click:: olapy.core.services.xmla:runserver
+        :prog: olapy
+        :show-nested:
 
 
 .. automodule:: olapy.core.services.xmla_discover_tools
