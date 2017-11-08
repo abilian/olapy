@@ -36,7 +36,7 @@ to import the package use::
             get_measures,
             get_star_schema_dataframe,
             get_all_tables_names,
-            get_cube,
+            get_cube_path,
             get_tuples,
             decorticate_query,
             change_measures,
