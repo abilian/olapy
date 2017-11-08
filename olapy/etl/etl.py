@@ -41,7 +41,7 @@ class ETL(object):
         """
         self.source_type = source_type
         self.facts_table = facts_table
-        self.cube_path = MdxEngine.get_default_cube_directory()
+        self.cube_path = MdxEngine.olapy_data_location
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
@@ -56,7 +56,7 @@ class ETL(object):
         else:
             self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
-            MdxEngine.get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
+            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
