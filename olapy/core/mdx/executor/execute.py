@@ -106,7 +106,9 @@ class MdxEngine(object):
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
-        self.parser = Parser(mdx_query)
+        self.parser = Parser(self.mdx_query)
+        print(self.mdx_query)
+        print(self.parser.mdx_query)
 
     @property
     def mdx_query(self):
@@ -114,7 +116,7 @@ class MdxEngine(object):
 
     @mdx_query.setter
     def mdx_query(self, value):
-        self._mdx_query = value.replace('\n', '').replace('\t', '')
+        self._mdx_query = value.strip().replace('\n', '').replace('\t', '')
 
     @classmethod
     def _get_db_cubes_names(cls):
@@ -805,6 +807,7 @@ class MdxEngine(object):
 
         :return: True | False
         """
+        print(self.parser.mdx_query)
         return not self.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):

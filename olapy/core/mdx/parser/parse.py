@@ -189,4 +189,5 @@ class Parser(object):
                     [Measures].[Amount]'
 
         """
+        print(self.mdx_query)
         return re.findall(r'\(([^()]+)\)', self.mdx_query)
