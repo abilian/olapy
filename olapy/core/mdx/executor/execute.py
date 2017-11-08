@@ -64,6 +64,8 @@ class MdxEngine(object):
     source_type = 'csv'
     db_config = DbConfigParser(olapy_data_location)
     cube_config_file_parser = ConfigParser(cube_path)
+    mdx_parser = Parser()
+
 
     def __init__(
             self,
@@ -75,11 +77,13 @@ class MdxEngine(object):
             sep=';',
             fact_table_name="Facts",
             database_config=db_config,
-            cube_config=cube_config_file_parser):
+            cube_config=cube_config_file_parser,
+            parser=mdx_parser):
 
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
+        self.parser = parser
         self._mdx_query = mdx_query
         if olapy_data_location is None:
             self.olapy_data_location = MdxEngine.olapy_data_location
@@ -106,9 +110,6 @@ class MdxEngine(object):
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
-        self.parser = Parser(self.mdx_query)
-        print(self.mdx_query)
-        print(self.parser.mdx_query)
 
     @property
     def mdx_query(self):
@@ -116,7 +117,9 @@ class MdxEngine(object):
 
     @mdx_query.setter
     def mdx_query(self, value):
-        self._mdx_query = value.strip().replace('\n', '').replace('\t', '')
+        clean_query = value.strip().replace('\n', '').replace('\t', '')
+        self.parser.mdx_query = clean_query
+        self._mdx_query = clean_query
 
     @classmethod
     def _get_db_cubes_names(cls):
@@ -207,13 +210,6 @@ class MdxEngine(object):
         :return: list tables names
         """
         return self.tables_loaded.keys()
-
-    def hierarchized_tuples(self):
-        """Check if hierarchized mdx query.
-
-        :return: True | False
-        """
-        return 'Hierarchize' in self.mdx_query
 
     def load_tables(self):
         """Load all tables { Table name : DataFrame } of the current cube instance.
@@ -486,7 +482,7 @@ class MdxEngine(object):
                     tables_columns.update({
                         tupl[0]:
                             self.tables_loaded[tupl[0]].columns[:len(
-                                tupl[2:None if self.hierarchized_tuples() else -1], )],
+                                tupl[2:None if self.parser.hierarchized_tuples() else -1], )],
                     })
 
             axes.update({axis: tables_columns})
@@ -672,7 +668,7 @@ class MdxEngine(object):
         :return: updated columns_to_keep
         """
 
-        columns = 2 if self.hierarchized_tuples() else 3
+        columns = 2 if self.parser.hierarchized_tuples() else 3
         if len(tuple_as_list) == 3 \
                 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
@@ -807,8 +803,7 @@ class MdxEngine(object):
 
         :return: True | False
         """
-        print(self.parser.mdx_query)
-        return not self.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
+        return not self.parser.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
@@ -865,7 +860,7 @@ class MdxEngine(object):
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
-        if not self.hierarchized_tuples():
+        if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
@@ -882,7 +877,7 @@ class MdxEngine(object):
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
-            sort = self.hierarchized_tuples()
+            sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             return {
                 'result':

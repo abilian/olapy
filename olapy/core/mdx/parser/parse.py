@@ -3,18 +3,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import re
 
+
 class Parser(object):
-
-
     # french characters
     # or use new regex 2017.02.08
     regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
             "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
-    def __init__(self,mdx_query):
+    def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
-
-
 
     @staticmethod
     def split_tuple(tupl):
@@ -33,7 +30,7 @@ class Parser(object):
         return splitted_tupl
 
     @classmethod
-    def get_tuples(cls,query, start=None, stop=None):
+    def get_tuples(cls, query, start=None, stop=None):
         """Get all tuples in the mdx query.
 
         Example::
@@ -162,7 +159,6 @@ class Parser(object):
         splited_group = group.replace('\n', '').replace('\t', '').split('],')
         return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
 
-
     def get_nested_select(self):
         """
         Get tuples groups in query like :
@@ -189,5 +185,11 @@ class Parser(object):
                     [Measures].[Amount]'
 
         """
-        print(self.mdx_query)
         return re.findall(r'\(([^()]+)\)', self.mdx_query)
+
+    def hierarchized_tuples(self):
+        """Check if hierarchized mdx query.
+
+        :return: True | False
+        """
+        return 'Hierarchize' in self.mdx_query

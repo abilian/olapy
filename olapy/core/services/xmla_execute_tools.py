@@ -239,7 +239,7 @@ class XmlaExecuteTools():
                                     xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
 
                         # Hierarchize'
-                        if not self.executor.hierarchized_tuples():
+                        if not self.executor.parser.hierarchized_tuples():
                             self._gen_measures_xs0(xml, tupls)
         return xml
 
@@ -249,8 +249,8 @@ class XmlaExecuteTools():
             with xml.Tuples:
                 for group in tuples_groups:
                     with xml.Tuple:
-                        for tupl in self.executor.split_group(group):
-                            splited_tupl = self.executor.split_tuple(tupl)
+                        for tupl in self.executor.parser.split_group(group):
+                            splited_tupl = self.executor.parser.split_tuple(tupl)
                             if splited_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
                                 l_name = '[' + splited_tupl[0] + ']'
@@ -283,7 +283,7 @@ class XmlaExecuteTools():
 
         # patch 4 select (...) (...) (...) from bla bla bla
         if self.executor.check_nested_select():
-            return self._gen_xs0_grouped_tuples(axis, self.executor.get_nested_select())
+            return self._gen_xs0_grouped_tuples(axis, self.executor.parser.get_nested_select())
 
         xml = xmlwitch.Builder()
 
@@ -468,7 +468,7 @@ class XmlaExecuteTools():
                 xml.Value(tupl)
             index += 1
             with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(self.executor.split_tuple(tupl)[-1])
+                xml.Value(self.executor.parser.split_tuple(tupl)[-1])
             index += 1
 
             tupl2list = tupl.split('.')
@@ -597,7 +597,7 @@ class XmlaExecuteTools():
                         # Hierarchize
                         if self.executor.facts in self.columns_desc['all'] and (len(
                             self.columns_desc['all'][self.executor.facts]) > 1) or (
-                                not self.executor.hierarchized_tuples() and not self.columns_desc['where']):
+                                not self.executor.parser.hierarchized_tuples() and not self.columns_desc['where']):
                             continue
 
                         else:
@@ -686,7 +686,7 @@ class XmlaExecuteTools():
                                                           **{'type': 'xs:string'})
 
                 # Hierarchize
-                if not self.executor.hierarchized_tuples() and len(
+                if not self.executor.parser.hierarchized_tuples() and len(
                         self.columns_desc['columns'].get(self.executor.facts, [1, 1])) == 1:
                     self._gen_measures_one_axis_info(xml)
 
@@ -843,7 +843,7 @@ class XmlaExecuteTools():
 
                         # Hierarchize
                         if len(self.executor.selected_measures) <= 1 and (
-                                self.executor.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
+                                self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc['where']):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName('[Measures].[{0}]'.format(self.executor.measures[0]))
                                 xml.Caption('{0}'.format(self.executor.measures[0]))
