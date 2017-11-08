@@ -22,7 +22,7 @@ numpy==1.13.3             # via pandas
 packaging==16.8           # via bonobo
 pandas==0.21.0
 pbr==3.1.1                # via stevedore
-psutil==5.4.0             # via bonobo
+psutil==5.4.1             # via bonobo
 psycopg2==2.7.3.2
 pymysql==0.7.11
 pyparsing==2.2.0          # via packaging
@@ -30,7 +30,7 @@ python-dateutil==2.6.1    # via pandas
 python-dotenv==0.7.1
 pytz==2017.3              # via fs, pandas, spyne
 pyyaml==3.12
-regex==2017.11.8
+regex==2017.11.8          # via awesome-slugify
 requests==2.18.4          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.12.14
