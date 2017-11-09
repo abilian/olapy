@@ -253,6 +253,8 @@ class MdxEngine(object):
 
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
+            if not tables:
+                raise Exception('unable to load tables, check that the datase is not empty')
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)
