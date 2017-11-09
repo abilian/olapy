@@ -1,3 +1,10 @@
+"""
+to use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that data \
+(for example , if you want to use olapy with csv files, you must use semi columns separator for those csv file. \
+or if tables id columns don't contains _id, this will cause some bugs sometimes)
+So this module will do the work for you, here you extract data from your source, transform it with olapy's requirements \
+and load them to olapy-data folder (as csv files right now)
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 from shutil import copyfile
 
@@ -36,7 +43,7 @@ class ETL(object):
         /home/user/olapy-data/olapy-config file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
-        :param separator: file separator (, ; : ...)
+        :param separator: input file separator (, ; : ...)
         :param target_cube: generated file path
         """
         self.source_type = source_type
@@ -56,7 +63,7 @@ class ETL(object):
         else:
             self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
-            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER)
+            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER_NAME)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
@@ -70,10 +77,11 @@ class ETL(object):
 
     def transform_file(self, line):
         """
-
-        :param table_type: facts | dimension
-        :return:
+        transform data with olapy's requirements line by line
+        :param line: line is generated from extract function (see bonobo chain)
+        :return: dict { column_name : data}
         """
+
         line = line[0]
         transformed = {}
 
@@ -100,6 +108,11 @@ class ETL(object):
         return transformed
 
     def transform_csv(self, kwargs):
+        """
+        transform csv file
+        :param kwargs:
+        :return:
+        """
         if self.dim_first_row_headers:
             for key in self.current_dim_id_column:
                 if '_id' not in key:
@@ -109,7 +122,7 @@ class ETL(object):
 
     def transform(self, *args, **kwargs):
         """
-
+        Do transformation
         :param table_type: facts | dimension
         :return:
         """
@@ -147,7 +160,7 @@ class ETL(object):
 
     def copy_2_olapy_dir(self):
         """
-        bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
+        right now, bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
         :return:
         """
         if not os.path.isdir(

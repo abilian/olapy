@@ -1,3 +1,7 @@
+"""
+Olapy config file parser object contains credentials that allows olapy to access database \
+(of course this happens only if SQLALCHEMY_DATABASE_URI Environment variable is not specified
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
@@ -6,19 +10,21 @@ import yaml
 
 
 class DbConfigParser:
-    def __init__(self, config_path=None, file_name='olapy-config'):
+    """
+    Class to construct to olapy database config object
+    """
+    def __init__(self, config_file_path=None):
         """
 
-        :param cube_path: path to cube (csv folders)
-        :param file_name: config file name (DEFAULT = cubes-config.xml)
+        :param config_file_path:  config file path (DEFAULT = cubes-config)
         """
-        if config_path is None:
+
+        if config_file_path is None:
             from os.path import expanduser
             home_directory = expanduser("~")
-            self.cube_path = os.path.join(home_directory, 'olapy-data')
+            self.config_file_path = os.path.join(home_directory, 'olapy-data', 'olapy-config')
         else:
-            self.cube_path = config_path
-        self.file_name = file_name
+            self.config_file_path = config_file_path
 
     def config_file_exist(self):
         """
@@ -26,7 +32,7 @@ class DbConfigParser:
 
         :return: True | False
         """
-        return os.path.isfile(os.path.join(self.cube_path, self.file_name))
+        return os.path.isfile(self.config_file_path)
 
     def get_db_credentials(self):
         """
@@ -34,7 +40,7 @@ class DbConfigParser:
 
         :return: list of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
         """
-        with open(os.path.join(self.cube_path, self.file_name)) as config_file:
+        with open(self.config_file_path) as config_file:
             try:
                 config = yaml.load(config_file)
                 return {

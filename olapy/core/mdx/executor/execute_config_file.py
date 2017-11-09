@@ -1,3 +1,7 @@
+"""
+Part of :mod:`execute.py` module, here we can customize olapy's cube with a config file, \
+by default located in /home/user/olapy-data/cubes/cubes-config.xml (you can take a look to this file as an example)
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pandas.io.sql as psql
@@ -5,9 +9,6 @@ import pandas.io.sql as psql
 from ..tools.connection import MyDB
 
 
-# split execution into three part (execute from config files,
-# execute csv files if they respect olapy's start schema model,
-# and execute data base tables if they respect olapy's start schema model)
 def load_table_config_file(executor_instance, cube_obj):
     """
     Load tables from config file.
@@ -88,6 +89,12 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
 
 
 def get_columns_n_tables(tables_cubes_obj, connector):
+    """
+    Get all tables and their columns (and renames columns, if yu specify this in the config file)
+    :param tables_cubes_obj: config file parser obj
+    :param connector: db engine
+    :return:
+    """
 
     all_columns = []
     tables = {}

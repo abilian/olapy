@@ -1,3 +1,8 @@
+"""
+Part of :mod:`execute.py` module, here olapy construct cube from DATABASE automatically \
+based on `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
+"""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pandas as pd

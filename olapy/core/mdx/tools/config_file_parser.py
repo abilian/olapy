@@ -1,3 +1,6 @@
+"""
+Parse cube configuration file and create cube parser object which can be passed to the MdxEngine
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
@@ -9,7 +12,7 @@ from .models import Cube, Dashboard, Dimension, Facts, Table
 
 
 class ConfigParser:
-    """Parse olapy config files.
+    """Parse olapy config (web and excel) files.
 
     Config file used if you want to show only some measures, dimensions,
     columns... in excel
@@ -191,11 +194,12 @@ class ConfigParser:
             self,
             cube_path=None,
             file_name='cubes-config.xml',
-            web_config_file_name='web_cube_config.xml',):
+            web_config_file_name='web_cube_config.xml', ):
         """
 
-        :param cube_path: path to cube (csv folders)
+        :param cube_path: path to cube (csv folders) where config file is located by default
         :param file_name: config file name (DEFAULT = cubes-config.xml)
+        :param web_config_file_name: web config file name (DEFAULT = web_cube_config.xml)
         """
         # home_directory = home_directory
         if 'OLAPY_PATH' in os.environ:
@@ -208,26 +212,28 @@ class ConfigParser:
             self.cube_path = os.path.join(
                 home_directory,
                 'olapy-data',
-                'cubes',)
+                'cubes', )
         else:
             self.cube_path = cube_path
 
         self.file_name = file_name
         self.config_file_path = os.path.join(
             self.cube_path,
-            self.file_name,)
+            self.file_name, )
 
         self.web_config_file_name = web_config_file_name
         self.web_config_file_path = os.path.join(
             self.cube_path,
-            self.web_config_file_name,)
+            self.web_config_file_name, )
 
     def config_file_exist(self, client_type):
         """
         Check whether the config file exists or not.
 
+        :param client_type: excel config file or web
         :return: True | False
         """
+
         if client_type == 'web':
             return os.path.isfile(self.web_config_file_path)
         return os.path.isfile(self.config_file_path)
@@ -247,8 +253,7 @@ class ConfigParser:
                 tree = etree.parse(config_file, parser)
 
                 try:
-                    return tree.xpath('/cubes/xmla_authentication')[
-                        0].text == 'True'
+                    return tree.xpath('/cubes/xmla_authentication')[0].text == 'True'
                 except BaseException:
                     return False
         else:
@@ -279,6 +284,10 @@ class ConfigParser:
                 raise ValueError('missed name or source tags')
 
     def _construct_cubes_excel(self):
+        """
+        Construct parser cube obj (which can ben passed to MdxEngine) for excel
+        :return: Cube obj
+        """
         try:
             with open(self.config_file_path) as config_file:
                 parser = etree.XMLParser()
@@ -294,7 +303,7 @@ class ConfigParser:
                         measures=[
                             mes.text
                             for mes in xml_facts.findall('measures/name')
-                        ],) for xml_facts in tree.xpath('/cubes/cube/facts')
+                        ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
                 ]
 
                 dimensions = [
@@ -309,9 +318,9 @@ class ConfigParser:
                                 None if not column_name.attrib else
                                 column_name.attrib['column_new_name'],)
                             for column_name in xml_dimension.findall(
-                                'columns/name',)),)
+                                'columns/name', )), )
                     for xml_dimension in tree.xpath(
-                        '/cubes/cube/dimensions/dimension',)
+                        '/cubes/cube/dimensions/dimension', )
                 ]
 
             return [
@@ -319,7 +328,7 @@ class ConfigParser:
                     name=xml_cube.find('name').text,
                     source=xml_cube.find('source').text,
                     facts=facts,
-                    dimensions=dimensions,)
+                    dimensions=dimensions, )
                 for xml_cube in tree.xpath('/cubes/cube')
             ]
         except BaseException:
@@ -342,6 +351,10 @@ class ConfigParser:
             raise ValueError("Config file doesn't exist")
 
     def _construct_cubes_web(self):
+        """
+        Construct parser cube obj (which can ben passed to MdxEngine) for web
+        :return: Cube obj
+        """
         with open(self.web_config_file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
@@ -356,7 +369,7 @@ class ConfigParser:
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
                     ],
-                    columns=xml_facts.find('columns').text.split(','),)
+                    columns=xml_facts.find('columns').text.split(','), )
                 for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
@@ -367,7 +380,7 @@ class ConfigParser:
                     new_names={
                         new_col.attrib['old_column_name']: new_col.text
                         for new_col in xml_column.findall('new_name')
-                    },) for xml_column in tree.xpath('/cubes/cube/tables/table')
+                    }, ) for xml_column in tree.xpath('/cubes/cube/tables/table')
             ]
 
         return [
@@ -375,7 +388,7 @@ class ConfigParser:
                 name=xml_cube.find('name').text,
                 source=xml_cube.find('source').text,
                 facts=facts,
-                tables=tables,) for xml_cube in tree.xpath('/cubes/cube')
+                tables=tables, ) for xml_cube in tree.xpath('/cubes/cube')
         ]
 
     def construct_web_dashboard(self):
@@ -387,17 +400,17 @@ class ConfigParser:
             Dashboard(
                 global_table={
                     'columns':
-                    dashboard.find('Global_table/columns').text.split(','),
+                        dashboard.find('Global_table/columns').text.split(','),
                     'rows':
-                    dashboard.find('Global_table/rows').text.split(','),
+                        dashboard.find('Global_table/rows').text.split(','),
                 },
                 pie_charts=dashboard.find('PieCharts').text.split(','),
                 bar_charts=dashboard.find('BarCharts').text.split(','),
                 line_charts={
                     table.find('name').text:
-                    (table.find('columns').text.split(',')
-                     if table.find('columns') is not None else 'ALL')
+                        (table.find('columns').text.split(',')
+                         if table.find('columns') is not None else 'ALL')
                     for table in dashboard.findall('LineCharts/table')
-                },)
+                }, )
             for dashboard in tree.xpath('/cubes/cube/Dashboards/Dashboard')
         ]

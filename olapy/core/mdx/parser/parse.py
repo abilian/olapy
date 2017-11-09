@@ -1,10 +1,18 @@
 # -*- encoding: utf8 -*-
+
+"""
+Parse Mdx Query, And Break it in parts
+"""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import re
 
 
 class Parser(object):
+    """
+    Class for Parsing MdxQuery
+    """
     # french characters
     # or use new regex 2017.02.08
     regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
@@ -137,7 +145,7 @@ class Parser(object):
     @staticmethod
     def add_tuple_brackets(tupl):
         """
-        After splitting tuple (with splited_group), you got some tuple like aa].[bb].[cc].[dd
+        After splitting tuple (with splitted_group), you got some tuple like aa].[bb].[cc].[dd
         so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
 
         :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
@@ -156,8 +164,8 @@ class Parser(object):
         :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
         :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
         """
-        splited_group = group.replace('\n', '').replace('\t', '').split('],')
-        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
+        splitted_group = group.replace('\n', '').replace('\t', '').split('],')
+        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splitted_group))
 
     def get_nested_select(self):
         """

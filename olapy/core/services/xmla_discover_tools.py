@@ -1,3 +1,6 @@
+"""
+Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_ requests and responses
+"""
 # -*- encoding: utf8 -*-
 
 from __future__ import absolute_import, division, print_function, unicode_literals

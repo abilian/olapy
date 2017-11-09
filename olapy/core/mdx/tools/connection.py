@@ -1,13 +1,23 @@
+"""
+Managing all database access
+"""
 from __future__ import absolute_import, division, print_function
 
 import os
 from sqlalchemy import create_engine
-# from .olapy_config_file_parser import DbConfigParser
 
 
 # todo cleannnnnnnnnnnn
 
 def _get_dbms_from_conn_string(conn_string):
+    """
+    get the dbms from the connection string
+    example:
+    connection string => oracle://scott:tiger@127.0.0.1:1521/sidname
+    it returns oracle
+    :param conn_string: connection string
+    :return: dbms
+    """
     db = conn_string.split(':')[0]
     if '+' in db:
         db = db.split('+')[0]
@@ -17,6 +27,11 @@ def _get_dbms_from_conn_string(conn_string):
 
 
 def _get_init_table(dbms):
+    """
+    some dbms have default database so we can connect to the dbms without connecting to a specific database
+    :param dbms: postgres, oracle....
+    :return: default database name
+    """
     if dbms.upper() == 'POSTGRES':
         con_db = '/postgres'
         engine = 'postgresql+psycopg2'
@@ -37,6 +52,13 @@ def _get_init_table(dbms):
 
 
 def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
+    """
+    as always, microsoft ruin our life, to access sql server you need to add driver clause to the connection string, we do this here
+    :param db_credentials: olapy database config parser obj
+    :param driver: driver to user for sql server, by default mssql+pyodbc
+    :param db: database to connect to
+    :return: SqlAlchemy engine
+    """
     # todo recheck + clean
     sql_server_driver = db_credentials['sql_server_driver'].replace(' ', '+')
     if db is not None:
@@ -53,10 +75,16 @@ def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
 
 
 def _construct_engine(db, db_credentials):
+    """
+     Create the SqlAlchemy object which will use it to connect to database
+    :param db: database to connect to
+    :param db_credentials: olapy database config parser obj
+    :return: SqlAlchemy engine
+    """
     eng, con_db = _get_init_table(db_credentials['dbms'])
     if db is None:
         if db_credentials['dbms'].upper() == 'MSSQL':
-            return _connect_to_mssql(db_credentials.replace(' ', '+'))
+            return _connect_to_mssql(db_credentials)
         else:
             # Show all databases to user (in excel)
             return create_engine(
@@ -78,9 +106,15 @@ def _construct_engine(db, db_credentials):
 
 
 class MyDB(object):
-    """Connect to sql database (postgres only right now)."""
+    """Connect to sql database."""
 
     def __init__(self, db_config, db=None):
+        """
+        Connection can be made either with connection string provided from \
+        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config file parser obj
+        :param db_config: olapy config file obj
+        :param db: database name to connect to
+        """
 
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]

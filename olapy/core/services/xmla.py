@@ -1,5 +1,9 @@
 # -*- encoding: utf8 -*-
+"""
+The main Module to manage `XMLA <https://technet.microsoft.com/fr-fr/library/ms187178(v=sql.90).aspx>`_ \
+requests and responses, and managing Spyne soap server.
 
+"""
 from __future__ import absolute_import, division, print_function
 
 from wsgiref.simple_server import make_server
@@ -26,7 +30,7 @@ from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaSoap11(Soap11):
-
+    """xhr does not work over https without this patch"""
     def create_in_document(self, ctx, charset=None):
         if isinstance(ctx.transport, HttpTransportContext):
             http_verb = ctx.transport.get_request_method()
