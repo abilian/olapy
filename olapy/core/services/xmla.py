@@ -200,7 +200,7 @@ def get_wsgi_application():
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip adresse.')
 @click.option('--port', '-p', default=8000, help='Host port.')
-@click.option('--write_on_file', '-wf', default=True, help='Write logs into a file or display them into the console.')
+@click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console.')
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , DON'T PUT THE DATABASE NAME ! ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location ! ")
