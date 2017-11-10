@@ -3,15 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OlaPy's documentation!
-=================================
-**OlaPy** is an OLAP engine with MDX support and XMLA support for excel client.
-it can be found at
-`OlaPy <https://github.com/abilian/olapy>`_.
+OlaPy - OLAP Engine
+===================
+**OlaPy** is an OLAP engine based on python, which gives you a set of tools for development of reporting and analytical applications, multidimensional analysis and browsing of aggregated data with `MDX <https://en.wikipedia.org/wiki/MultiDimensional_eXpressions>`__ and `XMLA <https://en.wikipedia.org/wiki/XML_for_Analysis>`_. support.
+it can be found in
+`Github <https://github.com/abilian/olapy>`_. or `pypi <https://pypi.python.org/pypi/olapy>`_.
 
+- It is fast and uses in-memory technology and various techniques (aggregation and real-time computation) to provide sub-second responses.
 
-Simple use
-----------
+- It includes an ETL layer (Extract Transform Load) for better data handling.
+
+- It support Most common databases (Postgres, MySql, Oracle, SQL Server) and CSV file format (only csv right now) to construct cubes.
+
+Quick start
+-----------
 
 For the impatient: here's a quick overview of how to use this project.
 
@@ -47,7 +52,7 @@ For more information about how to use this library, see the :ref:`api`.
 Features
 --------
 
-- executing `MDX <https://msdn.microsoft.com/en-us/library/ms145514.aspx>`_ query
+- executing `MDX <https://msdn.microsoft.com/en-us/library/ms145514.aspx>`__ query
 - An excel demo
 
 Contents:
@@ -55,6 +60,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   installation
+   quick_start
    cubes
    customize
    api
