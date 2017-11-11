@@ -1,28 +1,35 @@
 .. _cubes:
+.. _OLAPY CUBES RULES:
 
 Cubes creation
 ==============
 
-If you want to add new cubes, this is very simple, just paste your csv files under a new folder with (its name will be your new cube name)
-in cubes folder, so the path to your cube become, home-directory/olapy-data/cubes/YOUR_CUBE/{YOU_CSV_FILES}
+If you want to add new cube, this is very simple, put you csv files in a folder
+(the folder name wil be the cube name), **make sure that they follow** :ref:`OLAPY CUBES RULES <OLAPY CUBES RULES>`,
+and move them to `olapy-data/cubes` folder,
+thus, the path to your cube will be like, `~/olapy-data/cubes/{YOUR_CUBE}/{YOU_CSV_FILES}` for mac/linux,
+and `C:\\User\\{USER_NAME}\\olapy-data\\{YOUR_CUBE}\\{YOU_CSV_FILES}` for windows
 
-**IMPORTANT**
+OLAPY CUBES RULES
+^^^^^^^^^^^^^^^^^
 
-Here are the rules to apply in the tables (csv files) so that it works perfectly:
+**NOTE : THE SAME THING IF YOU WANT TO WORK WITH DATABASES**
+
+Here are the rules to apply to your tables so that can works perfectly with olapy:
 
 1) make sure that your tables follow the `star schema <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
 2) Fact table should be named 'Facts'
-3) the id columns must have _id at the end (product_id, person_id...)
-4) the columns name must be in a good order (hierarchy) (example : Continent -> Country -> City...)
+3) each table id columns, must be the same in facts table, example ( product_id column from product table must be product_id in Facts table,
+4) avoid 'id' for id columns name, you should use something_id for example
+5) the columns name must be in a good order (hierarchy) (example : Continent -> Country -> City...)
 
 
 *take a look to the default cubes structure (sales and foodmart)*
 
-**THE SAME THING IF YOU WANT TO WORK WITH POSTGRES TABLES**
 
 -----------------------------------------------------------------------
 
-Here are two examples of dimensions structure:
+Here are two examples of table structures that follows olapy rules:
 
 Examples:
 ^^^^^^^^^
@@ -77,7 +84,7 @@ Product table
 Cube 2
 ++++++
 
-*here we don't use id in tables*
+*here we don't use id column name in tables*
 
 Geography table
 ---------------
