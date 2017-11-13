@@ -62,11 +62,11 @@ Contents:
 
    installation
    quick_start
+   adv_olapy_config
    cubes
    customize
    working_with_db
    olapy_etl
-   adv_olapy_config
    api
 
 
