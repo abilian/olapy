@@ -64,6 +64,9 @@ Contents:
    quick_start
    cubes
    customize
+   working_with_db
+   olapy_etl
+   adv_olapy_config
    api
 
 
