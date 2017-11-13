@@ -15,5 +15,5 @@ with runserver command you can pass a lot of option to it:
 
 here an example of olapy runserver with all options::
 
-    olapy runserver -sa=postgresql://postgres:root@localhost:5432 -h=0.0.0.0 -p=8000 -wf=False -lf=/home/{USER_NAME}/Documents/olapy_logs -od=/home/{USER_NAME}/Documents -st=db,csv
+    olapy runserver -sa=postgresql://postgres:root@localhost:5432 -wf=False -lf=/home/{USER_NAME}/Documents/olapy_logs -od=/home/{USER_NAME}/Documents -st=db,csv -h=0.0.0.0 -p=8000
 

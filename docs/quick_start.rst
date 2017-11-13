@@ -14,7 +14,7 @@ open excel, open new spreadsheet and go to : Data -> From Other Sources -> From 
 
 .. image:: pictures/excel
 
-after that, excel will ask you the server name, put http://192.168.22.1:8000/ and click next, then you can chose one of default olapy demo cubes (sales, foodmart...) and finish.
+after that, excel will ask you the server name, put http://127.0.0.1:8000/ and click next, then you can chose one of default olapy demo cubes (sales, foodmart...) and finish.
 
 that's it ! now you can play with data
 
