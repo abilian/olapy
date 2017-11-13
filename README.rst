@@ -24,14 +24,14 @@ Installation
 ------------
 
 Install from PyPI
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 You can install it directly from the `Python Package Index <https://pypi.python.org/pypi/olapy>`_::
 
     pip install olapy
 
 Install from Github
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 The project sources are stored in `Github repository <https://github.com/abilian/olapy>`_.
 
