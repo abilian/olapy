@@ -1,7 +1,7 @@
 # -*- encoding: utf8 -*-
 
 """
-Parse Mdx Query, And Break it in parts
+This module Parse Mdx Query, And Break it in parts
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -26,8 +26,11 @@ class Parser(object):
         """
         Split Tuple (String) into items.
 
-            example : input : '[Geography].[Geography].[Continent].[Europe]'
-                      output : ['Geography','Geography','Continent','Europe']
+        example::
+
+             input : '[Geography].[Geography].[Continent].[Europe]'
+
+             output : ['Geography','Geography','Continent','Europe']
 
         :param tupl: MDX Tuple as String
         :return: Tuple items in list
@@ -45,12 +48,12 @@ class Parser(object):
 
 
             SELECT  {
-                    [Geography].[Geography].[All Continent].Members,
-                    [Geography].[Geography].[Continent].[Europe]
+                        [Geography].[Geography].[All Continent].Members,
+                        [Geography].[Geography].[Continent].[Europe]
                     } ON COLUMNS,
 
                     {
-                    [Product].[Product].[Company]
+                        [Product].[Product].[Company]
                     } ON ROWS
 
                     FROM {sales}
@@ -92,6 +95,31 @@ class Parser(object):
 
     def decorticate_query(self, query):
         """Get all tuples that exists in the MDX Query by axes.
+
+        Example::
+
+            query : SELECT  {
+                                [Geography].[Geography].[All Continent].Members,
+                                [Geography].[Geography].[Continent].[Europe]
+                            } ON COLUMNS,
+
+                            {
+                                [Product].[Product].[Company]
+                            } ON ROWS
+
+                            FROM {sales}
+
+            output : {
+                    'all': [   ['Geography', 'Geography', 'Continent'],
+                               ['Geography', 'Geography', 'Continent', 'Europe'],
+                               ['Product', 'Product', 'Company']],
+
+                    'columns': [['Geography', 'Geography', 'Continent'],
+                                ['Geography', 'Geography', 'Continent', 'Europe']],
+
+                    'rows': [['Product', 'Product', 'Company']],
+                    'where': []
+                    }
 
         :param query: MDX Query
         :return: dict of axis as key and tuples as value
@@ -145,11 +173,11 @@ class Parser(object):
     @staticmethod
     def add_tuple_brackets(tupl):
         """
-        After splitting tuple (with splitted_group), you got some tuple like aa].[bb].[cc].[dd
-        so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
+        After splitting tuple with :func:`splitted_group`, you got some tuple like **aa].[bb].[cc].[dd**
+        so add_tuple_brackets fix this by adding missed brackets **[aa].[bb].[cc].[dd]**.
 
-        :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
-        :return: [aa].[bb].[cc].[dd].
+        :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
+        :return: [aa].[bb].[cc].[dd] as string.
         """
         tupl = tupl.strip()
         if tupl[0] != '[':
@@ -160,16 +188,22 @@ class Parser(object):
 
     def split_group(self, group):
         """
-        Split group of tuples example '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
+        Split group of tuples.
+        example::
+
+            group : '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'
+
+            out : ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]']
+
+        :param group: Group of tuple as string.
+        :return: Separated tuples as list.
         """
         splitted_group = group.replace('\n', '').replace('\t', '').split('],')
         return list(map(lambda tupl: self.add_tuple_brackets(tupl), splitted_group))
 
     def get_nested_select(self):
         """
-        Get tuples groups in query like :
+        Get tuples groups in query like ::
 
                 Select {
                     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
@@ -181,22 +215,18 @@ class Parser(object):
                     [Measures].[Amount])
                     }
 
-        :return: All groups as list of strings : example:
+                out :
+                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],[Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
 
+                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],[Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
 
-                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]',
-
-                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]'
+        :return: All groups as list of strings.
 
         """
         return re.findall(r'\(([^()]+)\)', self.mdx_query)
 
     def hierarchized_tuples(self):
-        """Check if hierarchized mdx query.
+        """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
 
         :return: True | False
         """

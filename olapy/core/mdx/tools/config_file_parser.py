@@ -17,91 +17,110 @@ class ConfigParser:
     Config file used if you want to show only some measures, dimensions,
     columns... in excel
 
-    Config file should be under 'home-directory/olapy-data/cubes/cubes-config.xml'
+    Config file should be under '~/olapy-data/cubes/cubes-config.xml'
 
-    Excel Config file Structure::
+    Assuming we have two tables as follows under 'labster' folder
+
+    table 1: stats_line (which is the facts table)
+
+    +----------------+---------+--------------------+----------------------+
+    | departement_id | amount  |    monthly_salary  |  total monthly cost  |
+    +----------------+---------+--------------------+----------------------+
+    |  111           |  1000   |      2000          |    3000              |
+    +----------------+---------+--------------------+----------------------+
+    | bla  bla bla   |         |                    |                      |
+    +----------------+---------+--------------------+----------------------+
+
+    table 2: orgunit (which is a dimension)
+
+    +------+---------------+-----------+------------------+------------------+
+    | id   | type          |  name     |  acronym         | other colums.....|
+    +------+---------------+-----------+------------------+------------------+
+    |  111 | humanitarian  |  humania  | for better life  |                  |
+    +------+---------------+-----------+------------------+------------------+
+    | bla  | bla   bla     |           |                  |                  |
+    +------+---------------+-----------+------------------+------------------+
+
+
+    Excel Config file Structure example::
 
         <?xml version="1.0" encoding="UTF-8"?>
-            <cubes>
-                <!-- if you want to set an authentication mechanism in excel so to access cube,
-                    user must set a token with login url like 'http://127.0.0.1/admin  -->
 
+            <cubes>
+
+                <!-- if you want to set an authentication mechanism for excel to access cube,
+                    user must set a token with login url like 'http://127.0.0.1/admin  -->
                 <!-- default password = admin -->
+
+                <!-- enable/disable xmla authentication -->
                 <xmla_authentication>False</xmla_authentication>
 
                 <cube>
-                    <!-- cube name => db name -->
+
+                    <!-- cube name => csv folder name or database name -->
                     <name>labster</name>
 
-                    <!-- source : postgres | csv -->
-                    <source>postgres</source>
+                    <!-- source : csv | postgres | mysql | oracle | mssql -->
+                    <source>csv</source>
+
 
                     <!-- star building customized star schema -->
+
                     <facts>
 
                         <!-- facts table name -->
                         <table_name>stats_line</table_name>
 
                         <keys>
-                            <!-- ref = table_name.column  -->
+                            <!-- <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name> -->
                             <column_name ref="orgunit.id">departement_id</column_name>
+
                         </keys>
 
                         <!-- specify measures explicitly -->
                         <measures>
+
                             <!-- by default, all number type columns in facts table, or you can specify them here -->
                             <name>montant</name>
                             <name>salaire_brut_mensuel</name>
                             <name>cout_total_mensuel</name>
                         </measures>
+
                     </facts>
                     <!-- end building customized star schema -->
 
+
                     <!-- star building customized dimensions display in excel from the star schema -->
                     <dimensions>
-                        <!-- ADD facts table name to the dimensions section like this (this is a little bug to be solved soon) -->
 
-                         <dimension>
-                            <name>stats_line</name>
-                            <displayName>stats_line</displayName>
-                        </dimension>
 
                         <dimension>
-                            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
 
-                            <name>stats_line</name>
-                            <displayName>Demande</displayName>
-
-                            <columns>
-                                <!-- columns order matter -->
-                                <!-- column_new_name if you want to change column display name in excel -->
-                                <!-- if you don't want to change display name , rewrite it in column_new_name -->
-                                <name column_new_name="Type">type_demande</name>
-                                <name column_new_name="Financeur">financeur</name>
-                                <name column_new_name="Etat">wf_state</name>
-                                <name column_new_name="type_recrutement">type_recrutement</name>
-                            </columns>
-                        </dimension>
-
-                        <dimension>
                             <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
                             <name>orgunit</name>
                             <displayName>Organisation</displayName>
 
                             <columns>
-                                <!-- columns order matter -->
-                                <name column_new_name="type">type</name>
-                                <name column_new_name="Nom">nom</name>
-                                <name column_new_name="SIGLE">sigle</name>
+
+                                <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
+                                <name>type</name>
+                                <name>nom</name>
+                                <name>sigle</name>
                             </columns>
+
                         </dimension>
+
                     </dimensions>
+
                     <!-- end building customized dimensions display in excel from the star schema -->
+
+
                 </cube>
+
             </cubes>
 
 
-    WEB Config file Structure::
+    WEB Config file Structure (work with `olapy-web <https://github.com/abilian/olapy-web>`_)::
 
         <cubes>
            <cube>
@@ -262,7 +281,7 @@ class ConfigParser:
     def get_cubes_names(self, client_type):
         """Get all cubes names in the config file.
 
-        :return: dict of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
+        :return: dict with dict name as key and cube source as value (csv | postgres | mysql | oracle | mssql)
         """
         if client_type == 'excel':
             file_path = self.config_file_path
@@ -335,7 +354,7 @@ class ConfigParser:
             raise ValueError('Bad configuration in the configuration file')
 
     def construct_cubes(self, client_type='excel'):
-        """Construct cube (with it dimensions) and facts from the config file.
+        """Construct cube based on config file.
 
         :param client_type: excel | web
         :return: list of Cubes instance

@@ -2,13 +2,16 @@
 """
 Olapy main's module, this module manipulate Mdx Queries and execute them.
 Execution need two main objects:
-* table_loaded: which contains all tables needed to construct a cube
-* star_schema: which is the cube
+
+    - table_loaded: which contains all tables needed to construct a cube
+    - star_schema: which is the cube
+
 Those two objects are constructed in three ways:
-* manually with a config file, see :mod:`execute_config_file`
-* automatically from csv files, if they respect olapy's \
-`start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_, see :mod:`execute_csv_files`
-* automatically from database, also if they respect the start schema model, see :mod:`execute_db`
+
+    - manually with a config file, see :mod:`execute_config_file`
+    - automatically from csv files, if they respect olapy's \
+    `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_, see :mod:`execute_csv_files`
+    - automatically from database, also if they respect the start schema model, see :mod:`execute_db`
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -53,15 +56,19 @@ def get_default_cube_directory():
 class MdxEngine(object):
     """The main class for executing a query.
 
-    :param cube_name: It must be under ~/olapy-data/cube_name
-        (example : home_directory/olapy-data/cubes/sales => cube_name:sales)
+    :param cube_name: It must be under ~/olapy-data/cubes/cube_name.
+
+        example cube_name = sales
+
+        the full path -> *home_directory/olapy-data/cubes/sales*
     :param client_type: excel | web , by default excel, so you can use olapy as xmla server with excel spreadsheet,
         web if you want to use olapy with `olapy-web <https://github.com/abilian/olapy-web>`_,
-    :param cubes_path: Olapy cubes path, which is under olapy-data, by default ~/olapy-data/cube_name
+    :param cubes_path: Olapy cubes path, which is under olapy-data,
+        by default *~/olapy-data/cube_name*
     :param mdx_query: mdx query to execute
-    :param olapy_data_location: By default ~/olapy-data/
+    :param olapy_data_location: By default *~/olapy-data/*
     :param sep: separator used in csv files
-    :param fact_table_name: By default, facts table name should be Facts (Facts.csv if you want to use csv file)
+    :param fact_table_name: facts table name, Default **Facts**
     """
 
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
@@ -198,8 +205,11 @@ class MdxEngine(object):
     def get_cubes_names(cls):
         """
         list all cubes ( By default from csv folder only), you can explicitly specify csv folder and databases
+        with *MdxEngine.source_type = ('csv','db')*
+
         :return: list of all cubes
         """
+
         # by default , and before passing values to class with olapy runserver .... it executes this with csv
         # todo fix
         if 'csv' in cls.source_type:
@@ -238,7 +248,7 @@ class MdxEngine(object):
         return self.tables_loaded.keys()
 
     def load_tables(self):
-        """Load all tables { Table : DataFrame } of the current cube instance.
+        """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
         :return: dict with key as table name and DataFrame as value
         """
@@ -333,7 +343,7 @@ class MdxEngine(object):
 
     def get_cube_path(self):
         """
-        Get path to the cube (example /home_directory/olapy-data/cubes).
+        Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
@@ -343,13 +353,14 @@ class MdxEngine(object):
     def change_measures(tuples_on_mdx):
         """Set measures to which exists in the query.
 
-        :param tuples_on_mdx: List of tuples:
+        :param tuples_on_mdx: List of tuples
+
+            example ::
+
+             [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
 
 
-            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-
-
-        :return: measures column's names (Amount)
+        :return: measures column's names *(Amount for the example)*
         """
 
         list_measures = []
@@ -364,13 +375,18 @@ class MdxEngine(object):
 
         :param tuple_as_list: list of tuples
 
-            example : [ '[Measures].[Amount]',
-                        '[Product].[Product].[Crazy Development]',
-                        '[Geography].[Geography].[Continent]' ]
+        example ::
+
+            [
+            '[Measures].[Amount]',
+            '[Product].[Product].[Crazy Development]',
+            '[Geography].[Geography].[Continent]'
+            ]
 
         :return: dimension and columns dict
 
-            example :
+        example::
+
             {
             Geography : ['Continent','Country'],
             Product : ['Company']
@@ -568,10 +584,13 @@ class MdxEngine(object):
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
-        :param tuple_as_list:  example : ['Geography','Geography','Continent']
+        :param tuple_as_list:  example::
+
+                ['Geography','Geography','Continent']
+
         :param columns_to_keep:
 
-            example :
+            example::
 
                 {
                 'Geography': ['Continent','Country'],
@@ -609,12 +628,15 @@ class MdxEngine(object):
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
         """
         Construct DataFrame of many groups mdx query.
+
         many groups mdx query is something like:
-        example with 3 groups
-        SELECT{ ([A].[A].[A])
-                ([B].[B].[B])
-                ([C].[C].[C]) }
-        FROM [D]
+
+        example with 3 groups::
+
+            SELECT{ ([A].[A].[A])
+                    ([B].[B].[B])
+                    ([C].[C].[C]) }
+            FROM [D]
 
         :param tuples_on_mdx_query: list of string of tuples.
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
@@ -655,6 +677,7 @@ class MdxEngine(object):
     def fusion_dataframes(self, df_to_fusion):
         """
         Concat chunks of DataFrames.
+
         :param df_to_fusion: List of Pandas DataFrame.
         :return: Pandas DataFrame.
         """
@@ -675,7 +698,8 @@ class MdxEngine(object):
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
         Construct DataFrame of many groups.
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+
+        :param columns_to_keep: :func:`columns_to_keep` (useful for executing many tuples, for instance execute_mdx).
         :return: Pandas DataFrame.
         """
         dfs = []
@@ -703,6 +727,8 @@ class MdxEngine(object):
             executor.execute_mdx()
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
+
+        example::
 
             {
             'result' : DataFrame result
