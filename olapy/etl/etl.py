@@ -132,8 +132,10 @@ class ETL(object):
             return Select('SELECT * from {};'.format(table_name))
         elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
-            kwargs.pop('delimiter', None)
-        return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
+            return bonobo.FileReader(table_name),
+        elif self.source_type.upper() == 'CSV':
+            bonobo.CsvReader(table_name, **kwargs)
+            # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
 
     def transform(self, *args, **kwargs):
         """
