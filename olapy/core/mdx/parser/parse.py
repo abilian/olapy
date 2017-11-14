@@ -216,9 +216,11 @@ class Parser(object):
                     }
 
                 out :
-                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],[Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
+                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
+                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
 
-                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],[Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
+                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
+                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
 
         :return: All groups as list of strings.
 
