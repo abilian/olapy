@@ -5,13 +5,14 @@ Advanced Olapy options
 Olapy is easy configurable library,
 with runserver command you can pass a lot of option to it:
 
-    -h      : Host ip adresse.
-    -p      : Host port.
-    -wf     : Write logs into a file or display them into the console. log file location by default under olapy-data folder
-    -lf     : If you want to change log file location.
-    -sa     : SQL Alchemy URI to connect to database , **DON'T PUT THE DATABASE NAME !**
-    -od     : Olapy-Data folder location
-    -st     : Get cubes from where (db|csv), DEFAULT : csv only
+    -st     Get cubes from where (db|csv), DEFAULT : csv only
+    -sa     SQL Alchemy URI to connect to database , **DON'T PUT THE DATABASE NAME !**
+    -wf     Write logs into a file or display them into the console. log file location by default under olapy-data folder
+    -lf     If you want to change log file location.
+    -od     Olapy-Data folder location
+    -h      Host ip adresse
+    -p      Host port
+
 
 here an example of olapy runserver with all options::
 

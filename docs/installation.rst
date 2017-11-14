@@ -28,7 +28,17 @@ Install::
 Testing
 +++++++
 
-OlaPy is configured perfectly to run units and integrations tests suites, you just need to use::
+OlaPy is configured perfectly to run units and integrations tests suites, before running tests make sure you have postgres and mysql installed, and then set the environment variables to connect to each database management system with::
+
+      # for mysql
+      export MYSQL_URI = mysql://{USER}:{PASSWORD}@localhost:3306/{YourTestDataBase}
+      export SQLALCHEMY_DATABASE_URI_MYSQL=mysql://{USER}:{PASSWORD}@localhost:3306 #don't put database name here
+
+      # for postgres
+      export POSTGRES_URI=postgresql://{USER}:{PASSWORD}@localhost:5432/{YourTestDataBase}
+      export SQLALCHEMY_DATABASE_URI_POSTGRES=postgresql://{USER}:{PASSWORD}@localhost:5432 #don't put database name here
+
+and then run::
 
     tox
 
