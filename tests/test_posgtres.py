@@ -67,9 +67,7 @@ def executor():
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query1(executor):
-    executor.mdx_query = query_posgres1
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query_posgres1)['result']
     test_df = pd.DataFrame({
         'country': ['France', 'Spain', 'Switzerland', 'United States'],
         'amount': [4, 3, 248, 768],
@@ -80,9 +78,7 @@ def test_execution_query1(executor):
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query2(executor):
-    executor.mdx_query = query_posgres2
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query_posgres2)['result']
     test_df = pd.DataFrame({
         'year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
@@ -111,9 +107,7 @@ def test_execution_query2(executor):
 
 @pytest.mark.skipif("os.environ['DB_TEST'] == 'MYSQL'")
 def test_execution_query10(executor):
-    executor.mdx_query = query_postgres3
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query_postgres3)['result']
     test_df = pd.DataFrame({
         'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'quarter': [

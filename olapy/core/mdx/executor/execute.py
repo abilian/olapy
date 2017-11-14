@@ -717,14 +717,14 @@ class MdxEngine(object):
 
         return dfs
 
-    def execute_mdx(self):
+    def execute_mdx(self, mdx_query):
         """Execute an MDX Query.
 
         Usage ::
 
             executor = MdxEngine('sales')
-            executor.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
-            executor.execute_mdx()
+            query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
+            executor.execute_mdx(query)
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
 
@@ -737,8 +737,11 @@ class MdxEngine(object):
 
         """
 
+        # todo temp  self.mdx_query is used in many places
+        self.mdx_query = mdx_query
+
         # use measures that exists on where or insides axes
-        query_axes = self.parser.decorticate_query(self.mdx_query)
+        query_axes = self.parser.decorticate_query(mdx_query)
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 

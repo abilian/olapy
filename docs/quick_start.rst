@@ -37,11 +37,9 @@ we set an mdx query::
     FROM [sales]
     """
 
-    executor.mdx_query = query
-
 and execute::
 
-    data_frame = executor.execute_mdx()['result']
+    data_frame = executor.execute_mdx(query)['result']
     print(data_frame)
 
 result:

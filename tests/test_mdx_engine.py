@@ -12,14 +12,11 @@ executor = MdxEngine(CUBE)
 
 
 def test_execution_query1():
-    executor.mdx_query = query1
-    assert executor.execute_mdx()['result']['Amount'][0] == 1023
+    assert executor.execute_mdx(query1)['result']['Amount'][0] == 1023
 
 
 def test_execution_query2():
-    executor.mdx_query = query3
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
         'Country': ['France', 'Spain', 'Switzerland', 'United States'],
         'Amount': [4, 3, 248, 768],
@@ -29,9 +26,7 @@ def test_execution_query2():
 
 
 def test_execution_query6():
-    executor.mdx_query = query6
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
         'Year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
@@ -59,9 +54,7 @@ def test_execution_query6():
 
 
 def test_execution_query7():
-    executor.mdx_query = query7
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
         'Company': [
             'Crazy Development', 'Crazy Development', 'Crazy Development',
@@ -100,9 +93,7 @@ def test_execution_query7():
 
 
 def test_execution_query8():
-    executor.mdx_query = query8
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
         'Continent': ['Europe', 'Europe', 'Europe'],
         'Country': ['Spain', 'France', 'Switzerland'],
@@ -114,9 +105,7 @@ def test_execution_query8():
 
 
 def test_execution_query9():
-    executor.mdx_query = query9
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
         'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'Quarter': [
@@ -149,9 +138,7 @@ def test_execution_query9():
 
 
 def test_execution_query10():
-    executor.mdx_query = query10
-
-    df = executor.execute_mdx()['result']
+    df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
         'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'Quarter': [

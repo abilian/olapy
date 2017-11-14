@@ -24,7 +24,8 @@ class XmlaExecuteTools():
         if convert2formulas:
             self.mdx_execution_result = self._execute_convert_formulas_query()
         else:
-            self.mdx_execution_result = executor.execute_mdx()
+            # todo remove executor.execute_mdx
+            self.mdx_execution_result = executor.execute_mdx(executor.execute_mdx)
         if isinstance(self.mdx_execution_result, dict):
             self.columns_desc = self.mdx_execution_result.get('columns_desc')
 
