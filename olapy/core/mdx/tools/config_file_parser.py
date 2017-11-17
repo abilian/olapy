@@ -328,13 +328,13 @@ class ConfigParser:
                 dimensions = [
                     Dimension(
                         name=xml_dimension.find('name').text,
-                        # column_new_name = [key.attrib['column_new_name']
-                        # for key in xml_dimension.findall('name')],
+                        column_new_name = [key.attrib['column_new_name']
+                        for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
                         columns=OrderedDict(
                             (
                                 column_name.text,
-                                None if not column_name.attrib else
+                                column_name.text if not column_name.attrib else
                                 column_name.attrib['column_new_name'],)
                             for column_name in xml_dimension.findall(
                                 'columns/name', )), )
@@ -375,6 +375,7 @@ class ConfigParser:
         :return: Cube obj
         """
         with open(self.web_config_file_path) as config_file:
+
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
@@ -388,7 +389,9 @@ class ConfigParser:
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
                     ],
-                    columns=xml_facts.find('columns').text.split(','), )
+                    columns=xml_facts.find('columns').text.split(','),
+                )
+
                 for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
@@ -399,7 +402,8 @@ class ConfigParser:
                     new_names={
                         new_col.attrib['old_column_name']: new_col.text
                         for new_col in xml_column.findall('new_name')
-                    }, ) for xml_column in tree.xpath('/cubes/cube/tables/table')
+                    },
+                ) for xml_column in tree.xpath('/cubes/cube/tables/table')
             ]
 
         return [

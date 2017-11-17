@@ -258,7 +258,7 @@ class MdxEngine(object):
                 and self.cube in self.cube_config.get_cubes_names(client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.construct_cubes():
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
+                if cubes.source.upper() in ['CSV', 'POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
                     tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
@@ -286,7 +286,6 @@ class MdxEngine(object):
                 # if measures are specified in the config file
                 if cubes.facts[0].measures:
                     return cubes.facts[0].measures
-
         # col.lower()[-2:] != 'id' to ignore any id column
         return [
             col
@@ -303,7 +302,7 @@ class MdxEngine(object):
         """
         fusion = None
         for cubes in config_file_parser.construct_cubes(self.client):
-            if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
+            if cubes.source.upper() in ['CSV', 'POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
                 if self.client == 'web':
                     fusion = construct_web_star_schema_config_file(self, cubes)
                 else:

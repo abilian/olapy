@@ -4,6 +4,9 @@ by default located in /home/user/olapy-data/cubes/cubes-config.xml (you can take
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
+
+import pandas as pd
 import pandas.io.sql as psql
 
 from ..tools.connection import MyDB
@@ -19,13 +22,20 @@ def load_table_config_file(executor_instance, cube_obj):
     tables = {}
     # just one facts table right now
     executor_instance.facts = cube_obj.facts[0].table_name
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
 
     for dimension in cube_obj.dimensions:
 
-        df = psql.read_sql_query(
-            "SELECT * FROM {0}".format(dimension.name),
-            db.engine,)
+        if cube_obj.source.upper() == 'CSV':
+            file = os.path.join(executor_instance.get_cube_path(), dimension.name + '.csv')
+            # with extension or not
+            if not os.path.isfile(file):
+                file.replace('.csv', '')
+            df = pd.read_csv(file, sep=executor_instance.sep)
+        else:
+            db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+            df = psql.read_sql_query(
+                "SELECT * FROM {0}".format(dimension.name),
+                db.engine)
         # only certain columns
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
@@ -39,7 +49,7 @@ def load_table_config_file(executor_instance, cube_obj):
         # rename columns if value not None
         df.rename(
             columns=(dict((k, v) for k, v in dimension.columns.items() if v)),
-            inplace=True,)
+            inplace=True, )
 
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
@@ -57,17 +67,34 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
     :return: star schema DataFrame
     """
     executor_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-    # load facts table
 
-    fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executor_instance.facts),
-        db.engine,)
+    if cubes_obj.source.upper() == 'CSV':
+        facts = os.path.join(executor_instance.get_cube_path(), executor_instance.facts + '.csv')
+        # with extension or not
+        if not os.path.isfile(facts):
+            facts.replace('.csv', '')
+        fusion = pd.read_csv(facts, sep=executor_instance.sep)
+    else:
+        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+        # load facts table
+
+        fusion = psql.read_sql_query(
+            "SELECT * FROM {0}".format(executor_instance.facts),
+            db.engine, )
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-        df = psql.read_sql_query(
-            "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-            db.engine,)
+
+        if cubes_obj.source.upper() == 'CSV':
+            file = os.path.join(executor_instance.get_cube_path(), dimension_and_key.split('.')[0] + '.csv')
+            # with extension or not
+            if not os.path.isfile(file):
+                file.replace('.csv', '')
+            df = pd.read_csv(file, sep=executor_instance.sep)
+        else:
+            db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+            df = psql.read_sql_query(
+                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+                db.engine)
 
         for dimension in cubes_obj.dimensions:
             if dimension_and_key.split('.')[0] == dimension.name:
@@ -79,12 +106,11 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
             right_on=dimension_and_key.split('.')[1],
             how='left',
             # remove suffixe from dimension and keep the same column name for facts
-            suffixes=('', '_y'),)
+            suffixes=('', '_y'), )
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
         executor_instance.measures = cubes_obj.facts[0].measures
-
     return fusion
 
 
@@ -103,7 +129,7 @@ def get_columns_n_tables(tables_cubes_obj, connector):
 
         tab = psql.read_sql_query(
             "SELECT * FROM {0}".format(table.name),
-            connector,)
+            connector, )
 
         try:
             if table.columns:
@@ -142,7 +168,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
     # load facts table
     fusion = psql.read_sql_query(
         "SELECT * FROM {0}".format(executor_instance.facts),
-        db.engine,)
+        db.engine, )
 
     all_columns, tables = get_columns_n_tables(cubes_obj.tables, db.engine)
 
@@ -162,7 +188,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
         else:
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.engine,)
+                db.engine, )
 
         fusion = fusion.merge(
             df,
@@ -170,6 +196,6 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
             right_on=dimension_and_key.split('.')[1],
             how='left',
             # remove suffixe from dimension and keep the same column name for facts
-            suffixes=('', '_y'),)
+            suffixes=('', '_y'), )
 
     return fusion[[column for column in all_columns if 'id' != column[-2:]]]
