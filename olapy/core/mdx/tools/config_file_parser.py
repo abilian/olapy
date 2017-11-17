@@ -377,7 +377,6 @@ class ConfigParser:
         with open(self.web_config_file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
-
             facts = [
                 Facts(
                     table_name=xml_facts.find('table_name').text,
@@ -388,7 +387,7 @@ class ConfigParser:
                     measures=[
                         mes.text for mes in xml_facts.findall('measures/name')
                     ],
-                    columns=xml_facts.find('columns').text.split(','),
+                    columns=xml_facts.find('columns').text.split(',') if xml_facts.find('columns') else '',
                 )
 
                 for xml_facts in tree.xpath('/cubes/cube/facts')

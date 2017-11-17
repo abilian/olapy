@@ -108,7 +108,7 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
     return fusion
 
 
-def get_columns_n_tables(tables_cubes_obj, connector):
+def get_columns_n_tables(cubes_obj, executor_instance):
     """
     Get all tables and their columns (and renames columns, if yu specify this in the config file)
     :param tables_cubes_obj: config file parser obj
@@ -119,11 +119,9 @@ def get_columns_n_tables(tables_cubes_obj, connector):
     all_columns = []
     tables = {}
 
-    for table in tables_cubes_obj:
+    for table in cubes_obj.tables:
 
-        tab = psql.read_sql_query(
-            "SELECT * FROM {0}".format(table.name),
-            connector, )
+        tab = load_one_table(cubes_obj, executor_instance, table.name)
 
         try:
             if table.columns:
@@ -157,14 +155,10 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
     """
 
     executor_instance.facts = cubes_obj.facts[0].table_name
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
 
-    # load facts table
-    fusion = psql.read_sql_query(
-        "SELECT * FROM {0}".format(executor_instance.facts),
-        db.engine, )
+    fusion = load_one_table(cubes_obj, executor_instance, executor_instance.facts)
 
-    all_columns, tables = get_columns_n_tables(cubes_obj.tables, db.engine)
+    all_columns, tables = get_columns_n_tables(cubes_obj, executor_instance)
 
     # load facts table columns
     if cubes_obj.facts[0].columns:
@@ -180,9 +174,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
         if dimension_name in tables.keys():
             df = tables[dimension_name]
         else:
-            df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.engine, )
+            df = load_one_table(cubes_obj, executor_instance, dimension_and_key.split('.')[0])
 
         fusion = fusion.merge(
             df,
