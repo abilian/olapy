@@ -12,6 +12,23 @@ import pandas.io.sql as psql
 from ..tools.connection import MyDB
 
 
+def load_one_table(cubes_obj, executor_instance, table_name):
+    if cubes_obj.source.upper() == 'CSV':
+        facts = os.path.join(executor_instance.get_cube_path(), table_name + '.csv')
+        # with extension or not
+        if not os.path.isfile(facts):
+            facts.replace('.csv', '')
+        table = pd.read_csv(facts, sep=executor_instance.sep)
+    else:
+        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+        # load facts table
+
+        table = psql.read_sql_query(
+            "SELECT * FROM {0}".format(table_name),
+            db.engine, )
+    return table
+
+
 def load_table_config_file(executor_instance, cube_obj):
     """
     Load tables from config file.
@@ -25,18 +42,7 @@ def load_table_config_file(executor_instance, cube_obj):
 
     for dimension in cube_obj.dimensions:
 
-        if cube_obj.source.upper() == 'CSV':
-            file = os.path.join(executor_instance.get_cube_path(), dimension.name + '.csv')
-            # with extension or not
-            if not os.path.isfile(file):
-                file.replace('.csv', '')
-            df = pd.read_csv(file, sep=executor_instance.sep)
-        else:
-            db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-            df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension.name),
-                db.engine)
-        # only certain columns
+        df = load_one_table(cube_obj, executor_instance, dimension.name)
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
 
@@ -68,19 +74,7 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
     """
     executor_instance.facts = cubes_obj.facts[0].table_name
 
-    if cubes_obj.source.upper() == 'CSV':
-        facts = os.path.join(executor_instance.get_cube_path(), executor_instance.facts + '.csv')
-        # with extension or not
-        if not os.path.isfile(facts):
-            facts.replace('.csv', '')
-        fusion = pd.read_csv(facts, sep=executor_instance.sep)
-    else:
-        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-        # load facts table
-
-        fusion = psql.read_sql_query(
-            "SELECT * FROM {0}".format(executor_instance.facts),
-            db.engine, )
+    fusion = load_one_table(cubes_obj, executor_instance, executor_instance.facts)
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
 

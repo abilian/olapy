@@ -328,8 +328,8 @@ class ConfigParser:
                 dimensions = [
                     Dimension(
                         name=xml_dimension.find('name').text,
-                        column_new_name = [key.attrib['column_new_name']
-                        for key in xml_dimension.findall('name')],
+                        column_new_name=[key.attrib['column_new_name']
+                                         for key in xml_dimension.findall('name')],
                         displayName=xml_dimension.find('displayName').text,
                         columns=OrderedDict(
                             (
@@ -375,7 +375,6 @@ class ConfigParser:
         :return: Cube obj
         """
         with open(self.web_config_file_path) as config_file:
-
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 
