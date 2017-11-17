@@ -33,6 +33,7 @@ class Cube(object):
     facts = attr.ib()
     tables = attr.ib()
 
+
 @attr.s
 class Table(object):
     """Column class used to encapsulate config file attributes for web client."""
