@@ -268,7 +268,6 @@ class MdxEngine(object):
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)
-
         return tables
 
     def get_measures(self):
@@ -279,13 +278,14 @@ class MdxEngine(object):
         # config_file_parser = ConfigParser(self.cube_path)
         if self.client == 'web' and self.cube_config.config_file_exist('web'):
             for cubes in self.cube_config.construct_cubes(self.client):
+                if cubes.facts:
+                    # update facts table name
+                    self.facts = cubes.facts[0].table_name
 
-                # update facts name
-                self.facts = cubes.facts[0].table_name
+                    # if measures are specified in the config file
+                    if cubes.facts[0].measures:
+                        return cubes.facts[0].measures
 
-                # if measures are specified in the config file
-                if cubes.facts[0].measures:
-                    return cubes.facts[0].measures
         # col.lower()[-2:] != 'id' to ignore any id column
         return [
             col
@@ -304,7 +304,15 @@ class MdxEngine(object):
         for cubes in config_file_parser.construct_cubes(self.client):
             if cubes.source.upper() in ['CSV', 'POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
                 if self.client == 'web':
-                    fusion = construct_web_star_schema_config_file(self, cubes)
+                    # todo clean!!!!!
+                    if cubes.facts:
+                        fusion = construct_web_star_schema_config_file(self, cubes)
+                    # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
+                    elif cubes.source.upper()  == 'CSV' and cubes.name in self.csv_files_cubes:
+                        fusion = construct_star_schema_csv_files(self)
+                    elif cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE'] and \
+                                    cubes.name in self.from_db_cubes:
+                        fusion = construct_star_schema_db(self)
                 else:
                     fusion = construct_star_schema_config_file(self, cubes)
         return fusion

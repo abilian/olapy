@@ -289,7 +289,6 @@ class ConfigParser:
             file_path = self.web_config_file_path
         else:
             raise ValueError("Unknown client_type: {}".format(client_type))
-
         with open(file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
@@ -374,6 +373,7 @@ class ConfigParser:
         Construct parser cube obj (which can ben passed to MdxEngine) for web
         :return: Cube obj
         """
+        # todo fix path with instance path
         with open(self.web_config_file_path) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
