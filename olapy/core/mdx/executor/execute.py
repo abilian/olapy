@@ -37,6 +37,7 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 SUPPORTED_DATABASES = ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']
 SUPPORTED_FILES = ['CSV']
 
+
 def get_default_cube_directory():
     # toxworkdir does not expanduser properly under tox
     if 'OLAPY_PATH' in os.environ:
