@@ -38,6 +38,7 @@ def construct_star_schema_csv_files(executor_instance):
     :return: star schema DataFrame
     """
     cube = executor_instance.get_cube_path()
+
     # loading facts table
     fusion = pd.read_csv(
         os.path.join(cube, executor_instance.facts + '.csv'),

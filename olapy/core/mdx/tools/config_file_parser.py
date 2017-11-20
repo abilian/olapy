@@ -220,30 +220,30 @@ class ConfigParser:
         :param file_name: config file name (DEFAULT = cubes-config.xml)
         :param web_config_file_name: web config file name (DEFAULT = web_cube_config.xml)
         """
-        # home_directory = home_directory
+
+        if cube_path:
+            self.cube_path = cube_path
+        else:
+            self.cube_path = self._get_cube_path()
+
+        self.file_name = file_name
+        self.web_config_file_name = web_config_file_name
+
+    def _get_cube_path(self):
         if 'OLAPY_PATH' in os.environ:
             home_directory = os.environ['OLAPY_PATH']
         else:
             from os.path import expanduser
             home_directory = expanduser("~")
 
-        if cube_path is None:
-            self.cube_path = os.path.join(
-                home_directory,
-                'olapy-data',
-                'cubes', )
-        else:
-            self.cube_path = cube_path
+        return os.path.join(home_directory, 'olapy-data', 'cubes', )
 
-        self.file_name = file_name
-        self.config_file_path = os.path.join(
-            self.cube_path,
-            self.file_name, )
+    # todo one function
+    def get_config_file_path(self):
+        return os.path.join(self.cube_path, self.file_name)
 
-        self.web_config_file_name = web_config_file_name
-        self.web_config_file_path = os.path.join(
-            self.cube_path,
-            self.web_config_file_name, )
+    def get_web_confile_file_path(self):
+        return os.path.join(self.cube_path, self.web_config_file_name)
 
     def config_file_exist(self, client_type):
         """
@@ -254,8 +254,8 @@ class ConfigParser:
         """
 
         if client_type == 'web':
-            return os.path.isfile(self.web_config_file_path)
-        return os.path.isfile(self.config_file_path)
+            return os.path.isfile(self.get_web_confile_file_path())
+        return os.path.isfile(self.get_config_file_path())
 
     def xmla_authentication(self):
         """Check if excel need authentication to access cubes or not.
@@ -267,7 +267,7 @@ class ConfigParser:
 
         # xmla authentication only in excel
         if self.config_file_exist(client_type='excel'):
-            with open(self.config_file_path) as config_file:
+            with open(self.get_config_file_path()) as config_file:
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
 
@@ -284,9 +284,9 @@ class ConfigParser:
         :return: dict with dict name as key and cube source as value (csv | postgres | mysql | oracle | mssql)
         """
         if client_type == 'excel':
-            file_path = self.config_file_path
+            file_path = self.get_config_file_path()
         elif client_type == 'web':
-            file_path = self.web_config_file_path
+            file_path = self.get_web_confile_file_path()
         else:
             raise ValueError("Unknown client_type: {}".format(client_type))
         with open(file_path) as config_file:
@@ -307,7 +307,7 @@ class ConfigParser:
         :return: Cube obj
         """
         try:
-            with open(self.config_file_path) as config_file:
+            with open(self.get_config_file_path()) as config_file:
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
 
@@ -374,7 +374,7 @@ class ConfigParser:
         :return: Cube obj
         """
         # todo fix path with instance path
-        with open(self.web_config_file_path) as config_file:
+        with open(self.get_web_confile_file_path()) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
             facts = [
@@ -413,7 +413,7 @@ class ConfigParser:
         ]
 
     def construct_web_dashboard(self):
-        with open(self.web_config_file_path) as config_file:
+        with open(self.get_web_confile_file_path()) as config_file:
             parser = etree.XMLParser()
             tree = etree.parse(config_file, parser)
 

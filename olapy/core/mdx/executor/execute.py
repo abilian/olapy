@@ -34,14 +34,15 @@ from .execute_csv_files import construct_star_schema_csv_files, \
 from .execute_db import construct_star_schema_db, load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
-
+SUPPORTED_DATABASES = ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']
+SUPPORTED_FILES = ['CSV']
 
 def get_default_cube_directory():
     # toxworkdir does not expanduser properly under tox
     if 'OLAPY_PATH' in os.environ:
         home_directory = os.environ.get('OLAPY_PATH')
-    # elif MdxEngine.DATA_FOLDER is not None:
-    #     home_directory = MdxEngine.DATA_FOLDER
+    # elif DATA_FOLDER is not None:
+    #     home_directory = DATA_FOLDER
     elif RUNNING_TOX:
         home_directory = os.environ.get('HOME_DIR')
     else:
@@ -258,7 +259,7 @@ class MdxEngine(object):
                 and self.cube in self.cube_config.get_cubes_names(client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.construct_cubes():
-                if cubes.source.upper() in ['CSV', 'POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
+                if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
                     tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
@@ -275,7 +276,10 @@ class MdxEngine(object):
 
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
-        # config_file_parser = ConfigParser(self.cube_path)
+
+        # update config file path IMPORTANT
+        self.cube_config.cube_path = self.cube_path
+
         if self.client == 'web' and self.cube_config.config_file_exist('web'):
             for cubes in self.cube_config.construct_cubes(self.client):
                 if cubes.facts:
@@ -302,16 +306,15 @@ class MdxEngine(object):
         """
         fusion = None
         for cubes in config_file_parser.construct_cubes(self.client):
-            if cubes.source.upper() in ['CSV', 'POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']:
+            if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
                 if self.client == 'web':
                     # todo clean!!!!!
                     if cubes.facts:
                         fusion = construct_web_star_schema_config_file(self, cubes)
                     # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
-                    elif cubes.source.upper() == 'CSV' and cubes.name in self.csv_files_cubes:
+                    elif cubes.source.upper() in SUPPORTED_FILES and cubes.name in self.csv_files_cubes:
                         fusion = construct_star_schema_csv_files(self)
-                    elif cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE',
-                                                  'SQLITE'] and cubes.name in self.from_db_cubes:
+                    elif cubes.source.upper() in SUPPORTED_DATABASES and cubes.name in self.from_db_cubes:
                         fusion = construct_star_schema_db(self)
                 else:
                     fusion = construct_star_schema_config_file(self, cubes)
