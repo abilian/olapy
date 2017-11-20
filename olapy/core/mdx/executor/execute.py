@@ -308,10 +308,10 @@ class MdxEngine(object):
                     if cubes.facts:
                         fusion = construct_web_star_schema_config_file(self, cubes)
                     # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
-                    elif cubes.source.upper()  == 'CSV' and cubes.name in self.csv_files_cubes:
+                    elif cubes.source.upper() == 'CSV' and cubes.name in self.csv_files_cubes:
                         fusion = construct_star_schema_csv_files(self)
-                    elif cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE'] and \
-                                    cubes.name in self.from_db_cubes:
+                    elif cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE',
+                                                  'SQLITE'] and cubes.name in self.from_db_cubes:
                         fusion = construct_star_schema_db(self)
                 else:
                     fusion = construct_star_schema_config_file(self, cubes)
