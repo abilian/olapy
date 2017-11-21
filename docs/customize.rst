@@ -3,7 +3,11 @@
 Cube customization
 ==================
 
-If you don't want to follow olapy cubes rules and  you want to customize olapy cube construction, you can use a configuration file, you can find the default example under ~/olapy-data/cubes/cubes-config.xml for mac/linux and C:\\User\\{USER_NAME}\\olapy-data\\cubes\\cubes-config.xml for windows
+If you don't want to follow olapy cubes rules and  you want to customize olapy cube construction, you can use a configuration file, you can find the default example under ::
+
+    ~/olapy-data/cubes/cubes-config.xml for mac/linux
+
+    C:\\User\\{USER_NAME}\\olapy-data\\cubes\\cubes-config.xml for windows
 
 
 Here is an examples of configuration:
