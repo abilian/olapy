@@ -90,7 +90,7 @@ def main():
 
     for config_file in os.listdir(os.path.join(os.getcwd(), 'db_config_files')):
 
-        sgbd = str(config_file.split('_')[0])
+        dbms = str(config_file.split('_')[0])
 
         try:
             copy_2_olapy_dir(config_file)
@@ -105,11 +105,11 @@ def main():
             XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
 
             t = PrettyTable(
-                ['Query', '{0} - olapy execution time'.format(sgbd)])
+                ['Query', '{0} - olapy execution time'.format(dbms)])
 
             for idx, query in enumerate([query1, query6, query7, query9]):
 
-                if sgbd.upper() in ['POSTGRES', 'ORACLE']:
+                if dbms.upper() in ['POSTGRES', 'ORACLE']:
                     query = fix_query_lowercase_db(query)
                 t.add_row([
                     'Query' + str(idx + 1),
@@ -120,7 +120,7 @@ def main():
         except:
             type, value, traceback = sys.exc_info()
             print('Error opening %s' % (value))
-            print("Can't connect to {0} database".format(sgbd))
+            print("Can't connect to {0} database".format(dbms))
             pass
     server.stop()
 

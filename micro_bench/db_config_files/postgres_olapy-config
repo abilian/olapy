@@ -1,4 +1,4 @@
-sgbd : postgres
+dbms : postgres
 port : 5432
 user : postgres
 host : localhost

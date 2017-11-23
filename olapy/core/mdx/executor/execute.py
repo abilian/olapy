@@ -1,18 +1,30 @@
 # -*- encoding: utf8 -*-
+"""
+Olapy main's module, this module manipulate Mdx Queries and execute them.
+Execution need two main objects:
 
+    - table_loaded: which contains all tables needed to construct a cube
+    - star_schema: which is the cube
+
+Those two objects are constructed in three ways:
+
+    - manually with a config file, see :mod:`execute_config_file`
+    - automatically from csv files, if they respect olapy's \
+    `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_, see :mod:`execute_csv_files`
+    - automatically from database, also if they respect the start schema model, see :mod:`execute_db`
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import itertools
 import os
-import re
-import sys
 from collections import OrderedDict
 from os.path import expanduser
-from traceback import print_tb
 
 import numpy as np
 import pandas as pd
 
+from olapy.core.mdx.parser.parse import Parser
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB
 from .execute_config_file import construct_star_schema_config_file, \
@@ -22,30 +34,60 @@ from .execute_csv_files import construct_star_schema_csv_files, \
 from .execute_db import construct_star_schema_db, load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
+SUPPORTED_DATABASES = ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']
+SUPPORTED_FILES = ['CSV']
+
+
+def get_default_cube_directory():
+    # toxworkdir does not expanduser properly under tox
+    if 'OLAPY_PATH' in os.environ:
+        home_directory = os.environ.get('OLAPY_PATH')
+    # elif DATA_FOLDER is not None:
+    #     home_directory = DATA_FOLDER
+    elif RUNNING_TOX:
+        home_directory = os.environ.get('HOME_DIR')
+    else:
+        home_directory = expanduser("~")
+
+    if 'olapy-data' not in home_directory:
+        home_directory = os.path.join(home_directory, 'olapy-data')
+
+    return home_directory
 
 
 class MdxEngine(object):
     """The main class for executing a query.
 
-    :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER
-        (example : home_directory/olapy-data/cubes/sales)
-    :param cube_folder: parent cube folder name
-    :param mdx_query: query to execute
-    :param sep: separator in the csv files
+    :param cube_name: It must be under ~/olapy-data/cubes/cube_name.
+
+        example cube_name = sales
+
+        the full path -> *home_directory/olapy-data/cubes/sales*
+    :param client_type: excel | web , by default excel, so you can use olapy as xmla server with excel spreadsheet,
+        web if you want to use olapy with `olapy-web <https://github.com/abilian/olapy-web>`_,
+    :param cubes_path: Olapy cubes path, which is under olapy-data,
+        by default *~/olapy-data/cube_name*
+    :param mdx_query: mdx query to execute
+    :param olapy_data_location: By default *~/olapy-data/*
+    :param sep: separator used in csv files
+    :param fact_table_name: facts table name, Default **Facts**
     """
 
-    # french characters
-    # or use new regex 2017.02.08
-    regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
-            "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
-
+    # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
+    # ----
     # DATA_FOLDER useful for olapy web (flask instance_path)
     # get olapy-data path with instance_path instead of 'expanduser'
-    DATA_FOLDER = None
-    CUBE_FOLDER = "cubes"
+    # DATA_FOLDER = None
+    CUBE_FOLDER_NAME = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
     from_db_cubes = []
+    olapy_data_location = get_default_cube_directory()
+    cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
+    source_type = 'csv'
+    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
+    cube_config_file_parser = ConfigParser(cube_path)
+    mdx_parser = Parser()
 
     def __init__(
             self,
@@ -53,21 +95,34 @@ class MdxEngine(object):
             client_type='excel',
             cubes_path=None,
             mdx_query=None,
-            cube_folder=CUBE_FOLDER,
+            olapy_data_location=None,
             sep=';',
-            fact_table_name="Facts"):
+            fact_table_name="Facts",
+            database_config=db_config,
+            cube_config=cube_config_file_parser,
+            parser=mdx_parser):
 
-        self.cube_folder = cube_folder
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
+        self.parser = parser
         self._mdx_query = mdx_query
+        if olapy_data_location is None:
+            self.olapy_data_location = MdxEngine.olapy_data_location
+        else:
+            self.olapy_data_location = olapy_data_location
+            MdxEngine.olapy_data_location = olapy_data_location
+            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
         if cubes_path is None:
-            self.cube_path = os.path.join(self._get_default_cube_directory(), self.cube_folder)
+            self.cube_path = MdxEngine.cube_path
         else:
             self.cube_path = cubes_path
+            MdxEngine.cube_path = cubes_path
+            MdxEngine.cube_config_file_parser = ConfigParser(cubes_path)
 
-        # to get cubes in db
+        self.database_config = database_config
+        self.cube_config = cube_config
+        # to get cubes from db
         self._ = self.get_cubes_names()
         self.client = client_type
         self.tables_loaded = self.load_tables()
@@ -84,99 +139,107 @@ class MdxEngine(object):
 
     @mdx_query.setter
     def mdx_query(self, value):
-        self._mdx_query = value.replace('\n', '').replace('\t', '')
+        clean_query = value.strip().replace('\n', '').replace('\t', '')
+        self.parser.mdx_query = clean_query
+        self._mdx_query = clean_query
 
     @classmethod
-    def _get_db_cubes_names(cls, olapy_data_location):
+    def _get_db_cubes_names(cls):
         """
         Get databases cubes names
-        :param olapy_data_location:
+
         :return:
         """
+        # get databases names first , and them instantiate MdxEngine with this database, thus \
+        # MdxEngine will try to construct the star schema either automatically or manually
+
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
-        try:
-            db = MyDB(db_config_file_path=olapy_data_location)
-            if db.sgbd.upper() == 'ORACLE':
-                # You can think of a mysql "database" as a schema/user in Oracle.
-                MdxEngine.from_db_cubes = [db.username]
-            else:
-                all_db_query = cls._gett_all_databeses_query(db.sgbd)
-                result = db.engine.execute(all_db_query)
-                available_tables = result.fetchall()
-                MdxEngine.from_db_cubes = [
-                    database[0] for database in available_tables if
-                    database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-                ]
-
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            print(type)
-            print(value)
-            print_tb(traceback)
-            print('no database connexion')
-            pass
+        # try:
+        db = MyDB(cls.db_config)
+        if db.dbms.upper() == 'ORACLE':
+            # You can think of a mysql "database" as a schema/user in Oracle.
+            # todo username
+            MdxEngine.from_db_cubes = [db.username]
+        elif db.dbms.upper() == 'SQLITE':
+            available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
+            MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
+        else:
+            all_db_query = cls._gen_all_databases_query(db.dbms)
+            result = db.engine.execute(all_db_query)
+            available_tables = result.fetchall()
+            MdxEngine.from_db_cubes = [
+                database[0] for database in available_tables if
+                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+            ]
+        # except Exception:
+        #     type, value, traceback = sys.exc_info()
+        #     print(type)
+        #     print(value)
+        #     print_tb(traceback)
+        #     print('no database connexion')
+        #     pass
 
     @staticmethod
     def _get_csv_cubes_names(cubes_location):
-        try:
-            MdxEngine.csv_files_cubes = [
-                file for file in os.listdir(cubes_location)
-                if os.path.isdir(os.path.join(cubes_location, file))
-            ]
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            print('Error opening %s' % (value))
-            print('no csv folders')
-            pass
+        """
+        Get csv folder names
+
+        :param cubes_location: Olapy cubes path, which is under olapy-data, by default ~/olapy-data/cubes_location
+        :return:
+        """
+
+        # get csv folders names first , and them instantiate MdxEngine with this database, thus \
+        # MdxEngine will try to construct the star schema either automatically or manually
+
+        # try:
+        MdxEngine.csv_files_cubes = [
+            file for file in os.listdir(cubes_location)
+            if os.path.isdir(os.path.join(cubes_location, file))
+        ]
+        # except Exception:
+        #     type, value, traceback = sys.exc_info()
+        #     print('Error opening %s' % (value))
+        #     print('no csv folders')
+        #     pass
 
     @classmethod
     def get_cubes_names(cls):
         """
-        :return: list cubes name that exist in cubes folder
-            (under ~/olapy-data/cubes) and postgres database (if connected).
+        list all cubes ( By default from csv folder only), you can explicitly specify csv folder and databases
+        with *MdxEngine.source_type = ('csv','db')*
+
+        :return: list of all cubes
         """
 
-        olapy_data_location = MdxEngine._get_default_cube_directory()
-        cubes_location = os.path.join(olapy_data_location, cls.CUBE_FOLDER)
-
-        MdxEngine._get_csv_cubes_names(cubes_location)
-        MdxEngine._get_db_cubes_names(olapy_data_location)
+        # by default , and before passing values to class with olapy runserver .... it executes this with csv
+        # todo fix
+        if 'csv' in cls.source_type:
+            MdxEngine._get_csv_cubes_names(cls.cube_path)
+        else:
+            MdxEngine.csv_files_cubes = []
+        if 'db' in cls.source_type:
+            MdxEngine._get_db_cubes_names()
+        else:
+            MdxEngine.from_db_cubes = []
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
-    @staticmethod
-    def _get_default_cube_directory():
-
-        # toxworkdir does not expanduser properly under tox
-        if 'OLAPY_PATH' in os.environ:
-            home_directory = os.environ.get('OLAPY_PATH')
-        elif MdxEngine.DATA_FOLDER is not None:
-            home_directory = MdxEngine.DATA_FOLDER
-        elif RUNNING_TOX:
-            home_directory = os.environ.get('HOME_DIR')
-        else:
-            home_directory = expanduser("~")
-
-        if 'olapy-data' not in home_directory:
-            home_directory = os.path.join(home_directory, 'olapy-data')
-
-        return home_directory
-
     @classmethod
-    def _gett_all_databeses_query(cls, sgbd):
+    def _gen_all_databases_query(cls, dbms):
         """
-
-        :param sgbd: postgres | mysql | oracle | mssql
-        :return: all databases in the sgbd
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
         """
-        if sgbd.upper() == 'POSTGRES':
+        if dbms.upper() == 'POSTGRES':
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-        elif sgbd.upper() == 'MYSQL':
+        elif dbms.upper() == 'MYSQL':
             return 'SHOW DATABASES'
-        elif sgbd.upper() == 'MSSQL':
+        elif dbms.upper() == 'MSSQL':
             return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
-        elif sgbd.upper() == 'ORACLE':
+        elif dbms.upper() == 'ORACLE':
+            # You can think of a mysql "database" as a schema/user in Oracle.
             return 'select username from dba_users;'
 
     def _get_tables_name(self):
@@ -186,52 +249,47 @@ class MdxEngine(object):
         """
         return self.tables_loaded.keys()
 
-    def hierarchized_tuples(self):
-        """Check if hierarchized mdx query.
-
-        :return: True | False
-        """
-        return 'Hierarchize' in self.mdx_query
-
     def load_tables(self):
-        """Load all tables { Table name : DataFrame } of the current cube instance.
+        """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
         :return: dict with key as table name and DataFrame as value
         """
-
-        config_file_parser = ConfigParser(self.cube_path)
+        # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.client == 'excel' and config_file_parser.config_file_exist(client_type=self.client) \
-                and self.cube in config_file_parser.get_cubes_names(client_type=self.client):
-
+        if self.client == 'excel' and self.cube_config.config_file_exist(client_type=self.client) \
+                and self.cube in self.cube_config.get_cubes_names(client_type=self.client):
             # for web (config file) we need only star_schema_dataframes, not all tables
-            for cubes in config_file_parser.construct_cubes():
-                if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
+            for cubes in self.cube_config.construct_cubes():
+                if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
                     tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
+            if not tables:
+                raise Exception('unable to load tables, check that the datase is not empty')
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)
-
         return tables
 
     def get_measures(self):
-        """:return: all numerical columns in facts table."""
+        """:return: all numerical columns in Facts table."""
 
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
-        config_file_parser = ConfigParser(self.cube_path)
-        if self.client == 'web' and config_file_parser.config_file_exist('web'):
-            for cubes in config_file_parser.construct_cubes(self.client):
 
-                # update facts name
-                self.facts = cubes.facts[0].table_name
+        # update config file path IMPORTANT
+        self.cube_config.cube_path = self.cube_path
 
-                # if measures are specified in the config file
-                if cubes.facts[0].measures:
-                    return cubes.facts[0].measures
+        if self.client == 'web' and self.cube_config.config_file_exist('web'):
+            for cubes in self.cube_config.construct_cubes(self.client):
+                if cubes.facts:
+                    # update facts table name
+                    self.facts = cubes.facts[0].table_name
+
+                    # if measures are specified in the config file
+                    if cubes.facts[0].measures:
+                        return cubes.facts[0].measures
 
         # col.lower()[-2:] != 'id' to ignore any id column
         return [
@@ -241,11 +299,24 @@ class MdxEngine(object):
         ]
 
     def _construct_star_schema_from_config(self, config_file_parser):
+        """
+        There is two different configuration, one for excel 'cubes-config.xml', \
+        and the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
+        :param config_file_parser: star schema Dataframe
+        :return:
+        """
         fusion = None
         for cubes in config_file_parser.construct_cubes(self.client):
-            if cubes.source.upper() in ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE']:
+            if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
                 if self.client == 'web':
-                    fusion = construct_web_star_schema_config_file(self, cubes)
+                    # todo clean!!!!!
+                    if cubes.facts:
+                        fusion = construct_web_star_schema_config_file(self, cubes)
+                    # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
+                    elif cubes.source.upper() in SUPPORTED_FILES and cubes.name in self.csv_files_cubes:
+                        fusion = construct_star_schema_csv_files(self)
+                    elif cubes.source.upper() in SUPPORTED_DATABASES and cubes.name in self.from_db_cubes:
+                        fusion = construct_star_schema_db(self)
                 else:
                     fusion = construct_star_schema_config_file(self, cubes)
         return fusion
@@ -256,10 +327,9 @@ class MdxEngine(object):
         :return: star schema DataFrame
         """
         fusion = None
-        config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(self.client) and self.cube in config_file_parser.get_cubes_names(
-                client_type=self.client):
-            fusion = self._construct_star_schema_from_config(config_file_parser)
+        # config_file_parser = ConfigParser(self.cube_path)
+        if self.cube_config.config_file_exist(self.client) and self.cube in self.cube_config.get_cubes_names(self.client):
+            fusion = self._construct_star_schema_from_config(self.cube_config)
 
         elif self.cube in self.from_db_cubes:
             fusion = construct_star_schema_db(self)
@@ -273,160 +343,35 @@ class MdxEngine(object):
 
     def get_all_tables_names(self, ignore_fact=False):
         """
-        Get list of tables names of the cube.
+        Get list of tables names.
 
-        :param ignore_fact: return all table name with facts table name
+        :param ignore_fact: return all table name with or without facts table name
         :return: all tables names
         """
         if ignore_fact:
             return [tab for tab in self.tables_names if self.facts not in tab]
         return self.tables_names
 
-    def get_cube(self):
+    def get_cube_path(self):
         """
-        Get path to the cube (example /home_directory/olapy-data/cubes).
+        Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
-        if MdxEngine.DATA_FOLDER is not None:
-            return os.path.join(
-                MdxEngine.DATA_FOLDER,
-                MdxEngine.CUBE_FOLDER,
-                self.cube,)
         return os.path.join(self.cube_path, self.cube)
-
-    @staticmethod
-    def get_tuples(query, start=None, stop=None):
-        """Get all tuples in the mdx query.
-
-        Example::
-
-
-            SELECT  {
-                    [Geography].[Geography].[All Continent].Members,
-                    [Geography].[Geography].[Continent].[Europe]
-                    } ON COLUMNS,
-
-                    {
-                    [Product].[Product].[Company]
-                    } ON ROWS
-
-                    FROM {sales}
-
-        It returns ::
-
-            [
-                ['Geography','Geography','Continent'],
-                ['Geography','Geography','Continent','Europe'],
-                ['Product','Product','Company']
-            ]
-
-
-        :param query: mdx query
-        :param start: keyword in the query where we start (examples start = SELECT)
-        :param stop:  keyword in the query where we stop (examples start = ON ROWS)
-
-        :return:  nested list of tuples (see the example)
-        """
-
-        if start is not None:
-            start = query.index(start)
-        if stop is not None:
-            stop = query.index(stop)
-
-        # clean the query (remove All, Members...)
-        return [
-            [
-                tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '', ).split('].[') if tup_att
-            ]
-            for tup in re.compile(MdxEngine.regex).findall(
-                query[start:stop], )
-            if len(tup[0].split('].[')) > 1
-            # for tup in re.compile(MdxEngine.regex).findall(
-            #     query.encode("utf-8", 'replace')[start:stop],)
-            # if len(tup[0].split('].[')) > 1
-        ]
-
-    @staticmethod
-    def split_tuple(tupl):
-        """
-        Split Tuple (String) into items.
-
-            example : input : '[Geography].[Geography].[Continent].[Europe]'
-                      output : ['Geography','Geography','Continent','Europe']
-
-        :param tupl: MDX Tuple as String
-        :return: Tuple items in list
-        """
-        splitted_tupl = tupl.strip(' \t\n').split('].[')
-        splitted_tupl[0] = splitted_tupl[0].replace('[', '')
-        splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
-        return splitted_tupl
-
-    def decorticate_query(self, query):
-        """Get all tuples that exists in the MDX Query by axes.
-
-        :param query: MDX Query
-        :return: dict of axis as key and tuples as value
-        """
-
-        # Hierarchize -> ON COLUMNS , ON ROWS ...
-        # without Hierarchize -> ON 0
-
-        tuples_on_mdx_query = self.get_tuples(query)
-        on_rows = []
-        on_columns = []
-        on_where = []
-
-        try:
-            # ON ROWS
-            if 'ON ROWS' in query:
-                stop = 'ON ROWS'
-                if 'ON COLUMNS' in query:
-                    start = 'ON COLUMNS'
-                else:
-                    start = 'SELECT'
-                on_rows = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS
-            if 'ON COLUMNS' in query:
-                start = 'SELECT'
-                stop = 'ON COLUMNS'
-                on_columns = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS (AS 0)
-            if 'ON 0' in query:
-                start = 'SELECT'
-                stop = 'ON 0'
-                on_columns = self.get_tuples(query, start, stop)
-
-            # WHERE
-            if 'WHERE' in query:
-                start = 'FROM'
-                on_where = self.get_tuples(query, start)
-
-        except BaseException:
-            raise SyntaxError('Please check your MDX Query')
-
-        return {
-            'all': tuples_on_mdx_query,
-            'columns': on_columns,
-            'rows': on_rows,
-            'where': on_where,
-        }
 
     @staticmethod
     def change_measures(tuples_on_mdx):
         """Set measures to which exists in the query.
 
-        :param tuples_on_mdx: List of tuples:
+        :param tuples_on_mdx: List of tuples
+
+            example ::
+
+             [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
 
 
-            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-
-
-        :return: measures column's names (Amount)
+        :return: measures column's names *(Amount for the example)*
         """
 
         list_measures = []
@@ -441,13 +386,18 @@ class MdxEngine(object):
 
         :param tuple_as_list: list of tuples
 
-            example : [ '[Measures].[Amount]',
-                        '[Product].[Product].[Crazy Development]',
-                        '[Geography].[Geography].[Continent]' ]
+        example ::
+
+            [
+            '[Measures].[Amount]',
+            '[Product].[Product].[Crazy Development]',
+            '[Geography].[Geography].[Continent]'
+            ]
 
         :return: dimension and columns dict
 
-            example :
+        example::
+
             {
             Geography : ['Continent','Country'],
             Product : ['Company']
@@ -472,7 +422,7 @@ class MdxEngine(object):
                     tables_columns.update({
                         tupl[0]:
                             self.tables_loaded[tupl[0]].columns[:len(
-                                tupl[2:None if self.hierarchized_tuples() else -1], )],
+                                tupl[2:None if self.parser.hierarchized_tuples() else -1], )],
                     })
 
             axes.update({axis: tables_columns})
@@ -511,7 +461,7 @@ class MdxEngine(object):
         :param tuple_as_list: tuple as list
         :param Dataframe_in: DataFrame in with you want to execute tuple
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
-        other columns to keep in the execution except the current tuple
+            other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
         df = Dataframe_in
@@ -538,9 +488,7 @@ class MdxEngine(object):
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
         """
-        Solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
-
-        if you want to concat two dataframes with different columns like :
+        if you want to concat two Dataframes with different columns like :
 
         +-------------+---------+
         | Continent   | Amount  |
@@ -647,26 +595,23 @@ class MdxEngine(object):
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
-        :param tuple_as_list:  example : ['Geography','Geography','Continent']
+        :param tuple_as_list:  example::
+
+                ['Geography','Geography','Continent']
+
         :param columns_to_keep:
 
-            example :
+            example::
 
                 {
-
-                'Geography':
-
-                    ['Continent','Country'],
-
-                'Time':
-
-                    ['Year','Month','Day']
+                'Geography': ['Continent','Country'],
+                'Time': ['Year','Month','Day']
                 }
 
         :return: updated columns_to_keep
         """
 
-        columns = 2 if self.hierarchized_tuples() else 3
+        columns = 2 if self.parser.hierarchized_tuples() else 3
         if len(tuple_as_list) == 3 \
                 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
@@ -694,6 +639,16 @@ class MdxEngine(object):
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
         """
         Construct DataFrame of many groups mdx query.
+
+        many groups mdx query is something like:
+
+        example with 3 groups::
+
+            SELECT{ ([A].[A].[A])
+                    ([B].[B].[B])
+                    ([C].[C].[C]) }
+            FROM [D]
+
         :param tuples_on_mdx_query: list of string of tuples.
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
         :return: Pandas DataFrame.
@@ -733,6 +688,7 @@ class MdxEngine(object):
     def fusion_dataframes(self, df_to_fusion):
         """
         Concat chunks of DataFrames.
+
         :param df_to_fusion: List of Pandas DataFrame.
         :return: Pandas DataFrame.
         """
@@ -742,78 +698,26 @@ class MdxEngine(object):
             df = pd.concat(self.add_missed_column(df, next_df))
         return df
 
-    @staticmethod
-    def add_tuple_brackets(tupl):
-        """
-        After splitting tuple (with splited_group), you got some tuple like aa].[bb].[cc].[dd
-        so add_tuple_brackets fix this by adding missed brackets [aa].[bb].[cc].[dd].
-
-        :param tupl: Tuple as string exple  'aa].[bb].[cc].[dd'.
-        :return: [aa].[bb].[cc].[dd].
-        """
-        tupl = tupl.strip()
-        if tupl[0] != '[':
-            tupl = '[' + tupl
-        if tupl[-1] != ']':
-            tupl = tupl + ']'
-        return tupl
-
-    def split_group(self, group):
-        """
-        Split group of tuples example '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :param group: Group of tuple as string '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'.
-        :return: Separated tuples as list ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]'].
-        """
-        splited_group = group.replace('\n', '').replace('\t', '').split('],')
-        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splited_group))
-
-    def get_nested_select(self):
-        """
-        Get tuples groups in query like :
-
-                Select {
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]),
-
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount])
-                    }
-
-        :return: All groups as list of strings : example:
-
-
-                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]',
-
-                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]'
-
-        """
-        return re.findall(r'\(([^()]+)\)', self.mdx_query)
-
     def check_nested_select(self):
         """
         Check if the MDX Query is Hierarchized and contains many tuples groups.
 
         :return: True | False
         """
-        return not self.hierarchized_tuples() and len(self.get_nested_select()) >= 2
+        return not self.parser.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
         Construct DataFrame of many groups.
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+
+        :param columns_to_keep: :func:`columns_to_keep` (useful for executing many tuples, for instance execute_mdx).
         :return: Pandas DataFrame.
         """
         dfs = []
-        grouped_tuples = self.get_nested_select()
+        grouped_tuples = self.parser.get_nested_select()
         for tuple_groupe in grouped_tuples:
             transformed_tuple_groups = []
-            for tuple in self.split_group(tuple_groupe):
+            for tuple in self.parser.split_group(tuple_groupe):
                 tuple = tuple.split('].[')
                 tuple[0] = tuple[0].replace('[', '')
                 tuple[-1] = tuple[-1].replace(']', '')
@@ -824,16 +728,18 @@ class MdxEngine(object):
 
         return dfs
 
-    def execute_mdx(self):
+    def execute_mdx(self, mdx_query):
         """Execute an MDX Query.
 
         Usage ::
 
             executor = MdxEngine('sales')
-            executor.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
-            executor.execute_mdx()
+            query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
+            executor.execute_mdx(query)
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
+
+        example::
 
             {
             'result' : DataFrame result
@@ -842,8 +748,11 @@ class MdxEngine(object):
 
         """
 
+        # todo temp  self.mdx_query is used in many places
+        self.mdx_query = mdx_query
+
         # use measures that exists on where or insides axes
-        query_axes = self.decorticate_query(self.mdx_query)
+        query_axes = self.parser.decorticate_query(mdx_query)
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 
@@ -858,7 +767,7 @@ class MdxEngine(object):
             tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
         ]
 
-        if not self.hierarchized_tuples():
+        if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
@@ -875,7 +784,7 @@ class MdxEngine(object):
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
-            sort = self.hierarchized_tuples()
+            sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             return {
                 'result':

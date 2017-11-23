@@ -1,4 +1,4 @@
-sgbd : mysql
+dbms : mysql
 port : 3306
 user : root
 host : localhost

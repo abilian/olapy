@@ -35,7 +35,13 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6"
         # "Topic :: Business intelligence",
-    ],)
+    ],
+    entry_points={
+        'console_scripts': [
+            'olapy = olapy.__main__:cli'
+        ]
+    },
+)
 
 if 'OLAPY_PATH' in os.environ:
     home_directory = os.environ['OLAPY_PATH']

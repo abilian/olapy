@@ -1,3 +1,6 @@
+"""
+Model of olapy database config file parser object
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 import attr
 
@@ -9,6 +12,7 @@ class Facts(object):
     table_name = attr.ib()
     keys = attr.ib()
     measures = attr.ib()
+    columns = attr.ib()
 
 
 @attr.s
@@ -27,22 +31,23 @@ class Cube(object):
     name = attr.ib()
     source = attr.ib()
     facts = attr.ib()
-    dimensions = attr.ib()
+    tables = attr.ib()
 
 
 @attr.s
 class Table(object):
     """Column class used to encapsulate config file attributes for web client."""
 
-    table_name = attr.ib()
-    old_column_name = attr.ib()
-    new_column_name = attr.ib()
+    name = attr.ib()
+    new_names = attr.ib()
+    columns = attr.ib()
 
 
 @attr.s
 class Dashboard(object):
     """Column class used to encapsulate config file attributes for web client."""
 
-    table_name = attr.ib()
-    old_column_name = attr.ib()
-    new_column_name = attr.ib()
+    global_table = attr.ib()
+    pie_charts = attr.ib()
+    bar_charts = attr.ib()
+    line_charts = attr.ib()

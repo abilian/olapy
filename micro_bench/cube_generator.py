@@ -29,7 +29,7 @@ class CubeGen:
         self.rows_length = rows_length
         self.columns_length = columns_length
         self.cube_path = os.path.join(
-            expanduser('~'), 'olapy-data', MdxEngine.CUBE_FOLDER)
+            expanduser('~'), 'olapy-data', MdxEngine.CUBE_FOLDER_NAME)
 
     def generate_cube(self, min_val=5, max_val=100):
         """Generate dimension and fact that follows star schema.

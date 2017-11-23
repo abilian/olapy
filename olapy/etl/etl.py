@@ -1,3 +1,11 @@
+"""
+To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that data \
+(for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files. \
+or if tables id columns don't contains _id, this will cause some bugs sometimes)
+
+This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data structure rules \
+and load them to olapy-data folder *(as csv files right now)*
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 from shutil import copyfile
 
@@ -20,6 +28,10 @@ INPUT_DIR = 'input_dir'
 
 
 class ETL(object):
+    """
+    Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
+    that data, and then load them into olapy-data directory
+    """
     def __init__(self,
                  source_type,
                  facts_table,
@@ -28,15 +40,16 @@ class ETL(object):
                  target_cube='etl_cube'):
         """
 
-        :param source_type: file | csv
+        :param source_type: file | csv | db (if db , make sure that you put database connection credentials in the
+        /home/user/olapy-data/olapy-config file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
-        :param separator: file separator (, ; : ...)
+        :param separator: input file separator (, ; : ...)
         :param target_cube: generated file path
         """
         self.source_type = source_type
         self.facts_table = facts_table
-        self.cube_path = MdxEngine._get_default_cube_directory()
+        self.cube_path = MdxEngine.olapy_data_location
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
@@ -51,7 +64,7 @@ class ETL(object):
         else:
             self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
-            MdxEngine._get_default_cube_directory(), MdxEngine.CUBE_FOLDER)
+            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER_NAME)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
@@ -63,12 +76,13 @@ class ETL(object):
         if self.source_type.upper() in ['CSV', 'FILE']:
             return ','
 
-    def transform_file(self, line):
+    def _transform_file(self, line):
+        """
+        :func:`extract` return line by line as args if :func:`extract` from text file
+        :param line: line is generated from extract function (see bonobo chain)
+        :return: dict { column_name : data}
         """
 
-        :param table_type: facts | dimension
-        :return:
-        """
         line = line[0]
         transformed = {}
 
@@ -94,7 +108,12 @@ class ETL(object):
 
         return transformed
 
-    def transform_csv(self, kwargs):
+    def _transform_csv(self, kwargs):
+        """
+        :func:`extract` return dict as kwargs if :func:`extract` from csv file
+        :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
+        :return: transformed kwargs
+        """
         if self.dim_first_row_headers:
             for key in self.current_dim_id_column:
                 if '_id' not in key:
@@ -102,35 +121,42 @@ class ETL(object):
                     del kwargs[key]
         return kwargs
 
+    def extract(self, table_name, **kwargs):
+        """
+        Bonobo's First chain, extract data from source.
+
+        :param table_name: table/file to extract
+        :return: Bonobo Reader
+        """
+        if self.source_type.upper() == 'DB':
+            return Select('SELECT * from {};'.format(table_name))
+        elif self.source_type.upper() == 'FILE':
+            # delimiter not used with files
+            return bonobo.FileReader(table_name)
+        elif self.source_type.upper() == 'CSV':
+            return bonobo.CsvReader(table_name, **kwargs)
+            # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
+
     def transform(self, *args, **kwargs):
         """
+        Bonobo's second chain, transform data based on olapy rules.
 
-        :param table_type: facts | dimension
-        :return:
+        :param args: :func:`extract` return line by line as args if :func:`extract` from text file
+        :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
+        :return: args or kwargs transformed
         """
+
         if self.source_type.upper() == 'FILE':
-            return self.transform_file(args)
+            return self._transform_file(args)
 
         elif self.source_type.upper() == 'CSV':
-            return self.transform_csv(kwargs)
+            return self._transform_csv(kwargs)
         else:
             return args if args else kwargs
 
-    def extract(self, file, **kwargs):
-        """
-
-        :param file: file | csv
-        :return:
-        """
-        if self.source_type.upper() == 'DB':
-            return Select('SELECT * from {};'.format(file))
-        elif self.source_type.upper() == 'FILE':
-            # delimiter not used with files
-            kwargs.pop('delimiter', None)
-        return getattr(bonobo, self.source_type.title() + "Reader")(file, **kwargs)
-
     def load(self, table_name):
         """
+        Bonobo's third chain, load data transformed to olapy-data.
 
         :param table_name: table name to generate
         :return: generated table into olapy dir
@@ -142,8 +168,7 @@ class ETL(object):
 
     def copy_2_olapy_dir(self):
         """
-        bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
-        :return:
+        right now, bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
         """
         if not os.path.isdir(
                 os.path.join(self.olapy_cube_path, self.target_cube)):
@@ -158,8 +183,9 @@ class ETL(object):
 
     def get_source_extension(self):
         """
-        get source file extension
-        :return: .txt | .csv
+        get source file extension based on :attr:`self.source_type`
+
+        :return: .txt OR .csv
         """
         if self.source_type.upper() == 'FILE':
             return '.txt'
@@ -177,15 +203,26 @@ def run_olapy_etl(dims_infos,
                   in_delimiter=',',
                   **kwargs):
     """
+    Run ETl Process on each table pass to it.
 
-    :param dims_infos: example : dims_infos = {
-                                            'Geography': ['geography_key'],
-                                            'Product': ['product_key']
-                                             }
+    :param dims_infos: dict of Dimension name as key, column id name as value
+
+    example::
+
+        dims_infos = {
+                    'Geography': ['geography_key'],
+                    'Product': ['product_key']
+                     }
+
+    :param facts_ids: list of facts ids
+
+    example::
+
+        facts_ids = ['geography_key', 'product_key']
+
     :param facts_table: facts table name
-    :param facts_ids: example : facts_ids = ['geography_key', 'product_key']
-    :param source_folder: from where you get your files
     :param source_type: file -> .txt files in input || csv -> .csv files in input
+    :param source_folder: from where you get your files (if source is csv or text files)
     :return: generate files to olapy dir
     """
 

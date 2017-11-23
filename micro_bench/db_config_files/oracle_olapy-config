@@ -1,4 +1,4 @@
-sgbd : oracle
+dbms : oracle
 port : 1521
 user : hr
 host : localhost
