@@ -18,7 +18,7 @@ install_requires = [str(ir.req) for ir in _install_requires]
 
 setup(
     name='olapy',
-    version="0.4.7",
+    version="0.4.8",
     packages=find_packages(),
     author="Abilian SAS",
     author_email="contact@abilian.com",
