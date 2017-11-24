@@ -22,3 +22,6 @@ yapf==0.20.0
 autopep8==1.3.3
 add-trailing-comma
 
+# Doc
+sphinx-click
+sphinx-rtd-theme
