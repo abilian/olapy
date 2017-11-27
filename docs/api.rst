@@ -4,18 +4,21 @@ API Documentation
 =================
 
 
-Package ``olapy.core.mdx.parser``
----------------------------------
+Package ``olapy.core.services.xmla``
+------------------------------------
 
-First, to import the package use::
+to import the package use::
 
-    import olapy.core.mdx.parser.parse
+    import olapy.core.services.xmla
 
 
-.. automodule:: olapy.core.mdx.parser.parse
+.. automodule:: olapy.core.services.xmla
 
-    .. autoclass:: Parser
-        :members:
+    .. autoclass:: XmlaProviderService
+
+.. click:: olapy.core.services.xmla:runserver
+        :prog: olapy
+        :show-nested:
 
 
 Package ``olapy.core.mdx.executor``
@@ -30,40 +33,12 @@ to import the package use::
 
     .. autoclass:: MdxEngine
         :members:
-
-
-Package ``olapy.core.mdx.tools``
---------------------------------
-
-to import the package use::
-
-    import olapy.core.mdx.tools.config_file_parser
-
-
-.. automodule:: olapy.core.mdx.tools.config_file_parser
-
-    .. autoclass:: ConfigParser
-        :members:
-
-
-Package ``olapy.core.services.xmla``
-------------------------------------
-
-to import the package use::
-
-    import olapy.core.services.xmla
-
-
-.. automodule:: olapy.core.services.xmla
-
-    .. autoclass:: XmlaProviderService
-        :members:
-
-.. click:: olapy.core.services.xmla:runserver
-        :prog: olapy
-        :show-nested:
-
-
+                get_cubes_names,
+                load_tables,
+                get_all_tables_names,
+                get_star_schema_dataframe,
+                get_measures,
+                execute_mdx
 
 Package ``olapy.etl.etl``
 ------------------------------------
@@ -75,6 +50,3 @@ to import the package use::
 
 .. automodule:: olapy.etl.etl
         :members: run_olapy_etl
-
-        .. autoclass:: ETL
-                :members:
