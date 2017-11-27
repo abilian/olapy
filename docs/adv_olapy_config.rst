@@ -2,7 +2,7 @@
 Advanced Olapy options
 **********************
 
-Olapy is ileasy configurable. When using the ``olapy runserver`` command, you can pass a lot of options to it::
+Olapy is easy configurable. When using the ``olapy runserver`` command, you can pass a lot of options to it::
 
     -st     Get cubes from where (db|csv), DEFAULT : csv only
     -sa     SQL Alchemy URI to connect to database , **DON'T PUT THE DATABASE NAME !**
