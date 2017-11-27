@@ -4,11 +4,13 @@
 Cubes creation
 ==============
 
-If you want to add new cube, this is very simple, put you csv files in a folder
+If you want to add new cube, this is very simple, put you CSV files in a folder
 (the folder name wil be the cube name), **make sure that they follow** :ref:`OLAPY CUBES RULES <OLAPY CUBES RULES>`,
-and move them to `olapy-data/cubes` folder,
-thus, the path to your cube will be like, `~/olapy-data/cubes/{YOUR_CUBE}/{YOU_CSV_FILES}` for mac/linux,
-and `C:\\User\\{USER_NAME}\\olapy-data\\{YOUR_CUBE}\\{YOU_CSV_FILES}` for windows
+and move them to ``olapy-data/cubes`` folder,
+thus, the path to your cube will be like:
+
+- ``~/olapy-data/cubes/{YOUR_CUBE}/{YOU_CSV_FILES}`` for Mac/Linux,
+- and ``C:\\User\\{USER_NAME}\\olapy-data\\{YOUR_CUBE}\\{YOU_CSV_FILES}`` for Windows.
 
 OLAPY CUBES RULES
 ^^^^^^^^^^^^^^^^^
@@ -17,14 +19,13 @@ OLAPY CUBES RULES
 
 Here are the rules to apply to your tables so that can works perfectly with olapy:
 
-1) make sure that your tables follow the `star schema <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
-2) Fact table should be named 'Facts'
-3) each table id columns, must be the same in facts table, example ( product_id column from product table must be product_id in Facts table,
-4) avoid 'id' for id columns name, you should use something_id for example
-5) the columns name must be in a good order (hierarchy) (example : Continent -> Country -> City...)
+1) Make sure that your tables follow the `star schema <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
+2) The fact table should be named 'Facts'
+3) Each table id columns, must be the same in facts table, example ( product_id column from product table must be product_id in Facts table,
+4) Avoid 'id' for id columns name, you should use something_id for example
+5) The columns name must be in a good order (hierarchy) (example : Continent -> Country -> City...)
 
-
-*take a look to the default cubes structure (sales and foodmart)*
+*take a look to the default cubes structure (sales and foodmart).*
 
 
 -----------------------------------------------------------------------
@@ -46,7 +47,7 @@ Geography table
 +============+============+===========+
 | 0001       | America    | Canada    |
 +------------+------------+-----------+
-|               bla    bla      bla   |
+|               ...                   |
 +------------+------------+-----------+
 | 00526      | Europe     | France    |
 +------------+------------+-----------+
@@ -59,7 +60,7 @@ Facts table
 +============+============+===========+===========+
 | 0001       | 111111     | 5000      | 20        |
 +------------+------------+-----------+-----------+
-|               bla    bla      bla    bla        |
+|              ...                                |
 +------------+------------+-----------+-----------+
 | 0011       |   222222   | 1000      | 40        |
 +------------+------------+-----------+-----------+
@@ -72,7 +73,7 @@ Product table
 +============+============+===========+
 | 111111     | Ferrero    | Nutella   |
 +------------+------------+-----------+
-|               bla    bla      bla   |
+|               ...                   |
 +------------+------------+-----------+
 | 222222     |   Nestle   | KitKat    |
 +------------+------------+-----------+
@@ -84,7 +85,7 @@ Product table
 Cube 2
 ++++++
 
-*here we don't use id column name in tables*
+*Here we don't use id column name in tables.*
 
 Geography table
 ---------------
@@ -94,7 +95,7 @@ Geography table
 +============+===========+
 | America    | Canada    |
 +------------+-----------+
-|    bla  bla   bla      |
+|    ...                 |
 +------------+-----------+
 | Europe     | France    |
 +------------+-----------+
@@ -107,7 +108,7 @@ Facts table
 +============+============+===========+===========+
 | America    | Ferrero    | 5000      | 20        |
 +------------+------------+-----------+-----------+
-|         bla    bla      bla    bla              |
+|         ...                                     |
 +------------+------------+-----------+-----------+
 | Europe     |   Nestle   | 1000      | 40        |
 +------------+------------+-----------+-----------+
@@ -120,7 +121,7 @@ Product table
 +============+===========+
 | Ferrero    | Nutella   |
 +------------+-----------+
-|     bla  bla  bla      |
+|      ...               |
 +------------+-----------+
 |   Nestle   | KitKat    |
 +------------+-----------+

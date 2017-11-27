@@ -15,11 +15,11 @@ Install from Github
 
 The project sources are stored in `Github repository <https://github.com/abilian/olapy>`_.
 
-Download from Github::
+Download from GitHub::
 
     git clone git://github.com/abilian/olapy.git
 
-Install::
+Then install::
 
     cd olapy
     python setup.py install
@@ -28,7 +28,7 @@ Install::
 Testing
 +++++++
 
-OlaPy is configured perfectly to run units and integrations tests suites, before running tests make sure you have postgres and mysql installed, and then set the environment variables to connect to each database management system with::
+OlaPy is configured to run units and integrations tests suites. Before running tests, make sure you have Postgres and Mysql installed, and then set the environment variables to connect to each database management system with::
 
       # for mysql
       export MYSQL_URI = mysql://{USER}:{PASSWORD}@localhost:3306/{YourTestDataBase}
@@ -45,11 +45,10 @@ and then run::
 Olapy-data
 ----------
 
-after installation, you can take a look to olapy-data folder located under::
+After installation, you can take a look to `olapy-data` folder located under::
 
-    ~/olapy-data                       for linux/mac user
+    ~/olapy-data                       for Linux/Mac user
 
-    C:\User\{USER_NAME}\olapy-data     for windows
+    C:\User\{USER_NAME}\olapy-data     for Windows
 
 This folder contains some required files to configure olapy and some demo cubes under /cubes folder, we will deeply discuss about this in the :advanced configuration section:
-

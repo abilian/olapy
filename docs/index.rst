@@ -5,15 +5,16 @@
 
 OlaPy - OLAP Engine
 ===================
-**OlaPy** is an OLAP engine based on python, which gives you a set of tools for development of reporting and analytical applications, multidimensional analysis and browsing of aggregated data with `MDX <https://en.wikipedia.org/wiki/MultiDimensional_eXpressions>`__ and `XMLA <https://en.wikipedia.org/wiki/XML_for_Analysis>`_. support.
-it can be found in
-`Github <https://github.com/abilian/olapy>`_. or `pypi <https://pypi.python.org/pypi/olapy>`_.
+
+**OlaPy** is an OLAP engine based on Python, which gives you a set of tools for the development of reporting and analytical applications, multidimensional analysis, and browsing of aggregated data with `MDX <https://en.wikipedia.org/wiki/MultiDimensional_eXpressions>`__ and `XMLA <https://en.wikipedia.org/wiki/XML_for_Analysis>`_ support.
+It can be found in
+`GitHub <https://github.com/abilian/olapy>`_. or `PyPI <https://pypi.python.org/pypi/olapy>`_.
 
 - It is fast and uses in-memory technology and various techniques (aggregation and real-time computation) to provide sub-second responses.
 
 - It includes an ETL layer (Extract Transform Load) for better data handling.
 
-- It support Most common databases (Postgres, MySql, Oracle, SQL Server) and CSV file format (only csv right now) to construct cubes.
+- It support most common databases (Postgres, MySql, Oracle, SQL Server) and CSV file format (only CSV right now) to construct cubes.
 
 
 Contents:
@@ -38,4 +39,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

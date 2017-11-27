@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OlaPy'
-copyright = u'2017, Abilian SAS'
+copyright = u'2016-2018, Abilian SAS'
 author = u'Abilian SAS'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -263,7 +263,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'olapy.tex', u'olapy Documentation',
-     u'Mouadh Kaabachi', 'manual'),
+     author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

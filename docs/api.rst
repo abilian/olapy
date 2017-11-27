@@ -7,7 +7,6 @@ API Documentation
 Package ``olapy.core.mdx.parser``
 ---------------------------------
 
-
 First, to import the package use::
 
     import olapy.core.mdx.parser.parse
@@ -17,6 +16,7 @@ First, to import the package use::
 
     .. autoclass:: Parser
         :members:
+
 
 Package ``olapy.core.mdx.executor``
 -----------------------------------
@@ -78,4 +78,3 @@ to import the package use::
 
         .. autoclass:: ETL
                 :members:
-

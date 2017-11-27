@@ -1,35 +1,35 @@
 Quick Start
 -----------
 
-olapy as xmla server
+olapy as XMLA server
 ********************
 
-After :ref:`installation <installation>`, you can run olapy server with::
+After :ref:`installation <installation>`, you can run the Olapy server with::
 
     olapy runserver
 
-all you have to do now is to try it with excel spreadsheet,
+All you have to do now is to try it with an Excel spreadsheet:
 
-open excel, open new spreadsheet and go to : Data -> From Other Sources -> From Analysis Services
+    open excel, open new spreadsheet and go to : Data -> From Other Sources -> From Analysis Services
 
-.. image:: pictures/excel
+    .. image:: pictures/excel.png
 
-after that, excel will ask you the server name, put http://127.0.0.1:8000/ and click next, then you can chose one of default olapy demo cubes (sales, foodmart...) and finish.
+After that, Excel will ask you the server name: put ``http://127.0.0.1:8000/`` and click next, then you can chose one of default olapy demo cubes (sales, foodmart...) and finish.
 
-that's it ! now you can play with data
+That's it! Now you can play with your data.
 
-olapy as library
-****************
+Olapy as a library
+******************
 
-if you want to use olapy as library to execute mdx queries, very simple, start by importing the mdx engine::
+If you want to use olapy as a library to execute MDX queries, start by importing the MDX engine::
 
     from olapy.core.mdx.executor.execute import MdxEngine
 
-in our example, we're going to use sales demo cube, so we instantiate MdxEngine with this cube::
+In our example, we're going to use sales demo cube, so we instantiate *MdxEngine* with this cube::
 
     executor = MdxEngine('sales')
 
-we set an mdx query::
+We set an MDX query::
 
     query = """
     SELECT
@@ -42,7 +42,8 @@ and execute::
     data_frame = executor.execute_mdx(query)['result']
     print(data_frame)
 
-result:
+Result:
+
     +---+--------+
     |   | Amount |
     +---+--------+

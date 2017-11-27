@@ -21,7 +21,7 @@ table 1: stats_line (which is the facts table)
 +----------------+---------+--------------------+----------------------+
 |  111           |  1000   |      2000          |    3000              |
 +----------------+---------+--------------------+----------------------+
-| bla  bla bla   |         |                    |                      |
+| ...            |         |                    |                      |
 +----------------+---------+--------------------+----------------------+
 
 table 2: orgunit (which is a dimension)
@@ -31,84 +31,79 @@ table 2: orgunit (which is a dimension)
 +------+---------------+-----------+------------------+------------------+
 |  111 | humanitarian  |  humania  | for better life  |                  |
 +------+---------------+-----------+------------------+------------------+
-| bla  | bla   bla     |           |                  |                  |
+| ...  | ...           |           |                  |                  |
 +------+---------------+-----------+------------------+------------------+
 
 you can use a configuration file like this to construct cube and access to it with excel::
 
-
     <?xml version="1.0" encoding="UTF-8"?>
 
-        <cubes>
+    <cubes>
 
-            <!-- if you want to set an authentication mechanism for excel to access cube,
-                user must set a token with login url like 'http://127.0.0.1/admin  -->
-            <!-- default password = admin -->
+        <!-- if you want to set an authentication mechanism for excel to access cube,
+        user must set a token with login url like 'http://127.0.0.1/admin  -->
+        <!-- default password = admin -->
 
-            <!-- enable/disable xmla authentication -->
-            <xmla_authentication>False</xmla_authentication>
+        <!-- enable/disable xmla authentication -->
+        <xmla_authentication>False</xmla_authentication>
 
-            <cube>
+        <cube>
 
-                <!-- cube name => csv folder name or database name -->
-                <name>labster</name>
+        <!-- cube name => csv folder name or database name -->
+        <name>labster</name>
 
-                <!-- source : csv | postgres | mysql | oracle | mssql -->
-                <source>csv</source>
-
-
-                <!-- star building customized star schema -->
-
-                <facts>
-
-                    <!-- facts table name -->
-                    <table_name>stats_line</table_name>
-
-                    <keys>
-                        <!-- <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name> -->
-                        <column_name ref="orgunit.id">departement_id</column_name>
-
-                    </keys>
-
-                    <!-- specify measures explicitly -->
-                    <measures>
-
-                        <!-- by default, all number type columns in facts table, or you can specify them here -->
-                        <name>montant</name>
-                        <name>salaire_brut_mensuel</name>
-                        <name>cout_total_mensuel</name>
-                    </measures>
-
-                </facts>
-                <!-- end building customized star schema -->
+        <!-- source : csv | postgres | mysql | oracle | mssql -->
+        <source>csv</source>
 
 
-                <!-- star building customized dimensions display in excel from the star schema -->
-                <dimensions>
+        <!-- star building customized star schema -->
+
+        <facts>
+
+            <!-- facts table name -->
+            <table_name>stats_line</table_name>
+
+            <keys>
+            <!-- <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name> -->
+            <column_name ref="orgunit.id">departement_id</column_name>
+
+            </keys>
+
+            <!-- specify measures explicitly -->
+            <measures>
+
+            <!-- by default, all number type columns in facts table, or you can specify them here -->
+            <name>montant</name>
+            <name>salaire_brut_mensuel</name>
+            <name>cout_total_mensuel</name>
+            </measures>
+
+        </facts>
+        <!-- end building customized star schema -->
 
 
-                    <dimension>
+        <!-- star building customized dimensions display in excel from the star schema -->
+        <dimensions>
 
-                        <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                        <name>orgunit</name>
-                        <displayName>Organisation</displayName>
+            <dimension>
 
-                        <columns>
+            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+            <name>orgunit</name>
+            <displayName>Organisation</displayName>
 
-                            <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
-                            <name>type</name>
-                            <name>nom</name>
-                            <name>sigle</name>
-                        </columns>
+            <columns>
+                <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
+                <name>type</name>
+                <name>nom</name>
+                <name>sigle</name>
+            </columns>
 
-                    </dimension>
+            </dimension>
 
-                </dimensions>
+        </dimensions>
 
-                <!-- end building customized dimensions display in excel from the star schema -->
+        <!-- end building customized dimensions display in excel from the star schema -->
 
+        </cube>
 
-            </cube>
-
-        </cubes>
-
+    </cubes>
