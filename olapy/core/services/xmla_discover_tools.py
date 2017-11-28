@@ -26,12 +26,13 @@ class XmlaDiscoverTools():
     def __init__(self):
         # right now the catalogue_name and cube name are the same
         self.catalogues = MdxEngine.get_cubes_names()
-        self.selected_catalogue = self.catalogues[0]
-        self.executor = MdxEngine(self.selected_catalogue)
-        self.star_schema_dataframe = self.executor.load_star_schema_dataframe[[
-            col for col in self.executor.load_star_schema_dataframe.columns
-            if col[-3:] != "_id"
-        ]]
+        if self.catalogues:
+            self.selected_catalogue = self.catalogues[0]
+            self.executor = MdxEngine(self.selected_catalogue)
+            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[[
+                col for col in self.executor.load_star_schema_dataframe.columns
+                if col[-3:] != "_id"
+            ]]
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):

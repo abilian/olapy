@@ -2,9 +2,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
-import zipfile
-from os.path import expanduser
-from shutil import copyfile
+# import zipfile
+# from os.path import expanduser
+# from shutil import copyfile
 
 from pip.download import PipSession
 from pip.req import parse_requirements
@@ -27,6 +27,7 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=install_requires,
     include_package_data=False,
+    # scripts=['olapy/bin/olapy'],
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
@@ -42,21 +43,21 @@ setup(
         ]
     },
 )
-
-if 'OLAPY_PATH' in os.environ:
-    home_directory = os.environ['OLAPY_PATH']
-elif RUNNING_TOX:
-    home_directory = os.environ.get('HOME_DIR')
-else:
-    home_directory = expanduser("~")
-
-if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
-    os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
-    zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
-    zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
-    zip_ref.close()
-
-if not os.path.isfile(
-        os.path.join(home_directory, 'olapy-data', 'olapy-config')):
-    copyfile('config/olapy-config',
-             os.path.join(home_directory, 'olapy-data', 'olapy-config'))
+#
+# if 'OLAPY_PATH' in os.environ:
+#     home_directory = os.environ['OLAPY_PATH']
+# elif RUNNING_TOX:
+#     home_directory = os.environ.get('HOME_DIR')
+# else:
+#     home_directory = expanduser("~")
+#
+# if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
+#     os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
+#     zip_ref = zipfile.ZipFile('cubes_templates/cubes_temp.zip', 'r')
+#     zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
+#     zip_ref.close()
+#
+# if not os.path.isfile(
+#         os.path.join(home_directory, 'olapy-data', 'olapy-config')):
+#     copyfile('config/olapy-config',
+#              os.path.join(home_directory, 'olapy-data', 'olapy-config'))

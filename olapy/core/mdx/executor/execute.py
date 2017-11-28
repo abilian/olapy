@@ -214,7 +214,7 @@ class MdxEngine(object):
 
         # by default , and before passing values to class with olapy runserver .... it executes this with csv
         # todo fix
-        if 'csv' in cls.source_type:
+        if 'csv' in cls.source_type and os.path.exists(cls.cube_path):
             MdxEngine._get_csv_cubes_names(cls.cube_path)
         else:
             MdxEngine.csv_files_cubes = []
