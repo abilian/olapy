@@ -27,7 +27,7 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=install_requires,
     include_package_data=False,
-    # scripts=['olapy/bin/olapy'],
+    scripts=['olapy/cli.py'],
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
