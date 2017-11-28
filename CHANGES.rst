@@ -1,6 +1,11 @@
 Changelog for Olapy
 ===================
 
+0.5.0 (2017-11-28)
+------------------
+
+- Refactor and cleanup API
+- Cleanup documentation
 
 0.4.8 (2017-11-17)
 ------------------
@@ -9,7 +14,6 @@ Changelog for Olapy
 - Add ETL (Alpha)
 - Work wit python 3.6
 - Bugs fixes
-
 
 0.4.7 (2017-10-02)
 -----------------
