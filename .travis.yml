@@ -11,7 +11,6 @@ install:
   - pip install -U pip setuptools tox wheel
 
 script:
-  - olapy init
   - tox
 
 services:
