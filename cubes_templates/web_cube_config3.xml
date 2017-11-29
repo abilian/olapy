@@ -1,0 +1,119 @@
+<cubes>
+   <cube>
+      <!-- cube name => db name -->
+      <name>foodmart_with_config</name>
+      <!-- source : csv | postgres | mysql| mssql | oracle -->
+      <source>csv</source>
+      <!--
+         star building customized star schema
+        -->
+      <facts>
+         <!-- facts table name -->
+         <table_name>food_facts</table_name>
+         <keys>
+            <!-- ref = table_name.column  -->
+
+
+            <column_name ref="Product.id">product_id</column_name>
+            <column_name ref="Warehouse.id">warehouse_id</column_name>
+            <column_name ref="Store.id">store_id</column_name>
+
+         </keys>
+         <!-- specify measures explicitly -->
+         <measures>
+            <!-- by default, all number type columns in facts table, or you can specify them here -->
+             <name>units_ordered</name>
+             <name>units_shipped</name>
+             <name>supply_time</name>
+
+         </measures>
+
+         <!-- additional columns to keep other than measures and ids -->
+         <columns></columns>
+         <!--<columns>labelized,financed</columns>-->
+
+      </facts>
+      <!--
+         end building customized star schema
+        -->
+      <!-- ****************************************************  -->
+      <!-- FOR WEB -->
+      <tables>
+
+         <!-- Table name -->
+         <table name="Product">
+            <!-- Columns to keep (INCLUDING id)-->
+            <!-- They must be seperated with comma ',' -->
+            <columns>id,brand_name,product_name</columns>
+            <!-- Change insignificant table columns names -->
+            <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+            <new_name old_column_name="product_name">Product_Name</new_name>
+         </table>
+         <!-- ***********************  -->
+         <!-- Table name -->
+         <table name="Store">
+            <!-- Columns to keep (INCLUDING id)-->
+            <!-- They must be seperated with comma ',' -->
+            <columns>id,store_type,store_name,store_city</columns>
+            <!-- Change insignificant table columns names -->
+            <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+            <!--<new_name old_column_name="label">Pole leader</new_name>-->
+         </table>
+         <!-- ***********************  -->
+         <!-- Table name -->
+         <table name="Warehouse">
+            <!-- Columns to keep (INCLUDING id)-->
+            <!-- They must be seperated with comma ',' -->
+            <columns>id,warehouse_name,warehouse_city,warehouse_country</columns>
+            <!-- Change insignificant table columns names -->
+            <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
+            <!--<new_name old_column_name="label">Type</new_name>-->
+         </table>
+         <!-- ***********************  -->
+         <!-- Table name -->
+      </tables>
+      <!-- END FOR WEB -->
+      <!-- ****************************************************  -->
+
+      <!-- Dashboards -->
+
+      <Dashboards>
+
+         <Dashboard>
+
+            <Global_table>
+               <!-- IMPORTANT !! columns and rows names must be specified as above with their new names -->
+               <!-- EXAMPLE <new_name old_column_name="label">Pole leader</new_name>, you put Pole leader -->
+               <columns>warehouse_name,warehouse_country,store_type,store_name,brand_name</columns>
+               <rows>store_city</rows>
+
+            </Global_table>
+
+            <PieCharts>store_city,store_type,warehouse_city</PieCharts>
+
+            <!-- TODO BarCharts with Stacked Bar Chart -->
+            <BarCharts>warehouse_country</BarCharts>
+
+            <!-- Preferably with time/date (or sequenced) tables-->
+           
+
+            <!--<LineCharts>-->
+
+               <!--<table>-->
+
+                  <!--<name>annee_immatriculation</name>-->
+                  <!-- if not specified, then all columns attributs -->
+                  <!--<columns>1945,2000,2006,2015</columns>-->
+
+               <!--</table>-->
+               
+            <!--</LineCharts>-->
+            
+         </Dashboard>
+
+      </Dashboards>
+
+      <!-- END Dashboards -->
+
+   </cube>
+</cubes>

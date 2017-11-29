@@ -1,0 +1,50 @@
+<cubes>
+   <cube>
+      <!-- cube name => db name -->
+      <name>Black_Friday</name>
+      <!-- source : csv | postgres | mysql| mssql | oracle -->
+      <source>csv</source>
+
+             <!-- Dashboards -->
+
+      <Dashboards>
+
+         <Dashboard>
+
+            <Global_table>
+               <!-- IMPORTANT !! columns and rows names must be specified as above with their new names -->
+               <!-- EXAMPLE <new_name old_column_name="label">Pole leader</new_name>, you put Pole leader -->
+               <columns>Year,Country</columns>
+               <rows>Company,Category</rows>
+
+            </Global_table>
+
+            <PieCharts>Year,Country,Sub_Category</PieCharts>
+
+            <!-- TODO BarCharts with Stacked Bar Chart -->
+            <BarCharts>Year,Category</BarCharts>
+
+            <!-- Preferably with time/date (or sequenced) tables-->
+
+
+            <!--<LineCharts>-->
+
+               <!--<table>-->
+                  <!-- COLUMN NAME NOT TABLE NAME !!-->
+                  <!--<name>Year</name>-->
+                  <!-- if not specified, then all columns attributs -->
+                   <!--<columns>2010,2011</columns>-->
+                  <!--<columns>1945,2000,2006,2015</columns>-->
+
+               <!--</table>-->
+
+           <!--</LineCharts>-->
+
+         </Dashboard>
+
+      </Dashboards>
+
+      <!-- END Dashboards -->
+
+   </cube>
+</cubes>
