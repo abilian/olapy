@@ -26,8 +26,8 @@ setup(
     url='https://github.com/abilian/olapy',
     long_description=open('README.rst').read(),
     install_requires=install_requires,
-    include_package_data=False,
-    scripts=['olapy/cli.py'],
+    data_files=[('cubes_templates', ['cubes_templates/cubes_temp.zip']),
+                ('config', ['config/olapy-config'])],
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
