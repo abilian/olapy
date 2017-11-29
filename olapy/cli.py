@@ -26,8 +26,7 @@ def init():
         zip_ref.extractall(os.path.join(home_directory, 'olapy-data', 'cubes'))
         zip_ref.close()
 
-    if not os.path.isfile(
-            os.path.join(home_directory, 'olapy-data', 'olapy-config')):
+    if not os.path.isfile(os.path.join(home_directory, 'olapy-data', 'olapy-config')):
         copyfile(os.path.join(olapy_lib_dir, 'config/olapy-config'),
                  os.path.join(home_directory, 'olapy-data', 'olapy-config'))
 
