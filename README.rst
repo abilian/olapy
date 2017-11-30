@@ -52,7 +52,11 @@ or just::
 Usage
 -----
 
-you can run olapy server with::
+Before running OlaPy, you need to initialize it with::
+
+    olapy init
+
+and then you can run the server with::
 
     olapy runserver
 

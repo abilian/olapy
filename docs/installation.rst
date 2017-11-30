@@ -25,6 +25,14 @@ Then install::
     python setup.py install
 
 
+Initialization
+--------------
+
+Before running olapy, you have to initialize it with::
+
+    olapy init
+
+
 Testing
 +++++++
 
@@ -45,7 +53,7 @@ and then run::
 Olapy-data
 ----------
 
-After installation, you can take a look to `olapy-data` folder located under::
+After Olapy initialization, you can take a look to `olapy-data` folder located under::
 
     ~/olapy-data                       for Linux/Mac user
 
