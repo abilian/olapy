@@ -1,0 +1,8 @@
+ ************************
+ *       IMPORTANT      *
+ ************************
+1) Fact table should be named 'Facts'
+2) the id columns must have _id at the end (product_id, person_id...)
+3) each table's column name must be unique from the other tables column names
+4) the columns name must be in a good order (hierarchy)
+5) use a simple star modele with one key and numeric measures ( the other cases not tested yet)

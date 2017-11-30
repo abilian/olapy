@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cubes>
+
+    <xmla_authentication>False</xmla_authentication>
+
+    <cube>
+        <!-- cube name => db name -->
+        <name>foodmart_with_config</name>
+        <!-- source : postgres | mysql -->
+        <source>csv</source>
+
+        <!--
+        star building customized star schema
+        -->
+        <facts>
+            <!-- facts table name -->
+            <!--<table_name>projet</table_name>-->
+            <table_name>food_facts</table_name>
+            <keys>
+                <!-- ref = table_name.column  -->
+                <!-- <column_name ref="dossier_labellisation.projet_id">id</column_name> many null values in the db-->
+                <column_name ref="Product.id">product_id</column_name>
+                <column_name ref="Warehouse.id">warehouse_id</column_name>
+                <column_name ref="Store.id">store_id</column_name>
+
+            </keys>
+
+            <!-- specify measures explicitly -->
+            <measures>
+                <!-- by default, all number type columns in facts table, or you can specify them here -->
+                <name>units_ordered</name>
+                <name>units_shipped</name>
+                <name>supply_time</name>
+ 
+            </measures>
+
+        </facts>
+
+        <!--
+        end building customized star schema
+        -->
+
+        <!--
+        star building customized dimensions display in excel from the star schema
+        -->
+        <dimensions>
+        	<dimension>
+                <!-- IMPORTANT , put here facts table also (little bug)-->
+               <name>food_facts</name>
+               <displayName>food_facts</displayName>
+       		</dimension>
+
+            <dimension>
+                <!-- IMPORTANT , put here facts table also (little bug)-->
+
+               <name>Product</name>
+               <displayName>Product</displayName>
+               <columns>
+               		<name>id</name>
+               		<name>brand_name</name>
+               		<name>product_name</name>
+               		<name column_new_name="Stock_keeping_unit">SKU</name>
+               </columns>	
+                <!--<columns> -->
+                    <!-- columns order matter -->
+                    <!-- INCLUDE ID -->
+                    <!-- <name>titre</name> -->
+                <!-- </columns>  -->
+            </dimension>
+
+            <!-- if you whant to use columns other than measures and ids in facts table, use something like this-->
+            <dimension>
+                <!-- IMPORTANT , put here facts table also (little bug)-->
+               <name>Store</name>
+               <displayName>Store</displayName>
+                <columns>
+                    <!-- columns order matter -->
+                    <!-- names and column_new_name must be as they are in the facts table !! -->
+                    <name>id</name>
+               		<name>store_type</name>
+               		<name>store_name</name>
+               		<name>store_city</name>
+                    <name column_new_name="country">store_country</name>
+
+                </columns>
+            </dimension>
+                    
+            <dimension>
+                <!-- IMPORTANT , put here facts table also (little bug)-->
+                 <!-- names and column_new_name must be as they are in the facts table !! -->
+               <name>Warehouse</name>
+               <displayName>Warehouse</displayName>
+                <columns>
+                	<name>id</name>
+               		<name>warehouse_name</name>
+               		<name>warehouse_city</name>
+               		<name>warehouse_country</name>
+                    <!-- columns order matter -->
+                    <!-- INCLUDE ID -->
+                                       
+                </columns>
+            </dimension>
+
+          <!-- <dimension> -->
+                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+            <!-- <name>dossier_labellisation</name> -->
+            <!-- <displayName>Dossier</displayName> -->
+            <!-- <columns> -->
+                    <!-- columns order matter -->
+            <!--     <name column_new_name="Etat">etat</name> -->
+            <!-- </columns> -->
+
+          <!-- </dimension> -->
+      </dimensions>
+        <!--
+        end building customized dimensions display in excel from the star schema
+        -->
+
+    </cube>
+
+</cubes>
+

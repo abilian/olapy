@@ -41,18 +41,18 @@ class DbConfigParser:
         :return: list of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
         """
         with open(self.config_file_path) as config_file:
-            try:
-                config = yaml.load(config_file)
-                return {
-                    'dbms': config['dbms'],
-                    'user': config['user'],
-                    'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
-                    'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
-                    'port': config['port'],
-                    'db_name': config['db_name'] if 'db_name' in config.keys() else '',
-                    'driver': config['driver'] if 'driver' in config.keys() else ''
-                }
-
-            except OSError:
-                print('olapy db_config not valid')
-                # raise OSError()
+            # try:
+            config = yaml.load(config_file)
+            return {
+                'dbms': config['dbms'],
+                'user': config['user'],
+                'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
+                'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
+                'port': config['port'],
+                'db_name': config['db_name'] if 'db_name' in config.keys() else '',
+                'driver': config['driver'] if 'driver' in config.keys() else ''
+            }
+            #
+            # except OSError:
+            #     print('olapy db_config not valid')
+            #     # raise OSError()

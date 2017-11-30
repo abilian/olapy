@@ -3,7 +3,7 @@ typing
 pandas<1
 lxml
 spyne<3
-SQLAlchemy<1.2
+SQLAlchemy==1.1.15 # <1.2 required by bonobo
 xmlwitch
 attrs
 

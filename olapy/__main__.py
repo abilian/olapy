@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 import click
 
+from olapy.cli import init
 from olapy.core.services.xmla import runserver
 
 
@@ -22,6 +23,7 @@ def cli():
 
 
 cli.add_command(runserver)
+cli.add_command(init)
 
 if __name__ == "__main__":
     main(sys.argv)
