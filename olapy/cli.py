@@ -1,4 +1,3 @@
-import zipfile
 from distutils.dir_util import copy_tree
 from os.path import expanduser, dirname
 from shutil import copyfile
