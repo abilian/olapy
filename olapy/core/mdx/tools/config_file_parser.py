@@ -8,7 +8,7 @@ from collections import OrderedDict
 
 from lxml import etree
 
-from .models import Cube, Dashboard, Dimension, Facts, Table
+from .models import Cube, Dimension, Facts
 
 
 class ConfigParser:
