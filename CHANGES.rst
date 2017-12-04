@@ -1,11 +1,13 @@
 Changelog for Olapy
 ===================
 
-0.5.0 (2017-11-28)
+0.5.0 (2017-12-04)
 ------------------
 
 - Refactor and cleanup API
 - Cleanup documentation
+- Bugs fixes
+
 
 0.4.8 (2017-11-17)
 ------------------
