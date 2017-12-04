@@ -41,6 +41,7 @@ Download from Github::
 
 
 To set up the application, run, ideally in a virtualenv::
+
     cd olapy
     python setup.py install
 
