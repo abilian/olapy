@@ -134,7 +134,10 @@ class MyDB(object):
 
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            if db is not None:
+            if conn_string.split(':/')[0].upper() == 'SQLITE':
+                self.engine = create_engine(conn_string)
+                self.dbms = 'SQLITE'
+            elif db is not None:
                 # todo test this with windows
                 conn_string = (conn_string + '/' + db)
             self.engine = create_engine(conn_string)
