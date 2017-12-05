@@ -1,5 +1,5 @@
 """
-Olapy config file parser object contains credentials that allows olapy to access database \
+OlaPy config file parser object contains credentials that allows olapy to access database \
 (of course this happens only if SQLALCHEMY_DATABASE_URI Environment variable is not specified
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -13,6 +13,7 @@ class DbConfigParser:
     """
     Class to construct to olapy database config object
     """
+
     def __init__(self, config_file_path=None):
         """
 
@@ -43,16 +44,35 @@ class DbConfigParser:
         with open(self.config_file_path) as config_file:
             # try:
             config = yaml.load(config_file)
-            return {
-                'dbms': config['dbms'],
-                'user': config['user'],
-                'password': config['password'] if 'LOCALHOST' not in config['user'].upper() else '',
-                'host': config['host'] if 'LOCALHOST' not in config['user'].upper() else '',
-                'port': config['port'],
-                'db_name': config['db_name'] if 'db_name' in config.keys() else '',
-                'driver': config['driver'] if 'driver' in config.keys() else ''
-            }
-            #
-            # except OSError:
-            #     print('olapy db_config not valid')
-            #     # raise OSError()
+            dbms = config['dbms']
+            if dbms.upper() == 'SQLITE':
+                path = config['path'] if 'path' in config.keys() and dbms.upper() == 'SQLITE' else None
+            else:
+                user = config['user']
+                password = config['password'] if 'LOCALHOST' not in config['user'].upper() else ''
+                host = config['host'] if 'LOCALHOST' not in config['user'].upper() else ''
+                port = config['port']
+                db_name = config['db_name'] if 'db_name' in config.keys() else ''
+                driver = config['driver'] if 'driver' in config.keys() else ''
+
+            if dbms.upper() == 'SQLITE':
+                credentials = {
+                    'dbms': dbms,
+                    'path': path,
+                }
+            else:
+                credentials = {
+                    'dbms': dbms,
+                    'user': user,
+                    'password': password if 'LOCALHOST' not in user.upper() else '',
+                    'host': host if 'LOCALHOST' not in user.upper() else '',
+                    'port': port,
+                    'db_name': db_name if 'db_name' in config.keys() else '',
+                    'driver': driver if 'driver' in config.keys() else ''
+                }
+
+        return credentials
+        #
+        # except OSError:
+        #     print('olapy db_config not valid')
+        #     # raise OSError()
