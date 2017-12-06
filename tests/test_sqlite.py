@@ -6,7 +6,7 @@ import sqlalchemy
 from pandas.util.testing import assert_frame_equal
 
 from olapy.core.mdx.executor.execute import get_default_cube_directory, MdxEngine
-from tests.queries import query3, query_posgres2, query10, query6
+from tests.queries import query3, query10, query6
 
 CUBE = 'sales_sqlite'
 sqlite_lite_db_path = os.path.join(get_default_cube_directory(), MdxEngine.CUBE_FOLDER_NAME, CUBE)
@@ -23,7 +23,7 @@ def test_conf_file_change():
             """.format(sqlite_lite_db_path))
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] in ['MYSQL','POSTGRES']")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 @pytest.fixture(scope='function')
 def connect():
     """Returns a connection and a metadata object"""
@@ -38,7 +38,8 @@ def connect():
         # The return value of create_engine() is our connection object
         return sqlalchemy.create_engine(url)
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] in ['MYSQL','POSTGRES']")
+
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -46,7 +47,7 @@ def executor():
     return MdxEngine(CUBE)
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] in ['MYSQL','POSTGRES']")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 def test_execution_query1(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
@@ -56,7 +57,7 @@ def test_execution_query1(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] in ['MYSQL','POSTGRES']")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 def test_execution_query2(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
@@ -85,7 +86,7 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] in ['MYSQL','POSTGRES']")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
