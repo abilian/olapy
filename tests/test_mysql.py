@@ -17,7 +17,7 @@ PASSWORD = 'toor'
 DB = 'sales_mysql'
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_conf_file_change():
     if 'MYSQL_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
@@ -32,7 +32,7 @@ def test_conf_file_change():
             """)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 @pytest.fixture(scope='function')
 def connect(user=USER_NAME,
             password=PASSWORD,
@@ -52,13 +52,13 @@ def connect(user=USER_NAME,
         return sqlalchemy.create_engine(url, connect_args={'charset': 'utf8'})
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 # create tables in the postgres database
 def test_create_tables(connect):
     create_insert(connect)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -66,12 +66,12 @@ def executor():
     return MdxEngine(CUBE)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query1(executor):
     assert executor.execute_mdx(query1)['result']['Amount'][0] == 1023
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query2(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
@@ -82,7 +82,7 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query6(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
@@ -111,7 +111,7 @@ def test_execution_query6(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query7(executor):
     df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
@@ -151,7 +151,7 @@ def test_execution_query7(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query8(executor):
     df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
@@ -164,7 +164,7 @@ def test_execution_query8(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query9(executor):
     df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
@@ -198,7 +198,7 @@ def test_execution_query9(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
@@ -232,7 +232,7 @@ def test_execution_query10(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] == 'POSTGRES'")
+@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
 # drop created tables from postgres database
 def test_drop_tables(connect):
     drop_tables(connect)
