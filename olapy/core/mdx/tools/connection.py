@@ -51,6 +51,18 @@ def _get_init_table(dbms):
     return engine, con_db
 
 
+def _connect_to_sqlite(db_credentials):
+    """
+    As always, microsoft ruin our life, to access sql server you need to add driver clause to the connection string, we do this here.
+
+    :param db_credentials: olapy database config parser obj
+    :param driver: driver to user for sql server, by default mssql+pyodbc
+    :param db: database to connect to
+    :return: SqlAlchemy engine
+    """
+    return create_engine('sqlite:///' + db_credentials['path'])
+
+
 def _connect_to_mssql(db_credentials, driver='mssql+pyodbc', db=None):
     """
     As always, microsoft ruin our life, to access sql server you need to add driver clause to the connection string, we do this here.
@@ -88,6 +100,8 @@ def _construct_engine(db, db_credentials):
     if db is None:
         if db_credentials['dbms'].upper() == 'MSSQL':
             return _connect_to_mssql(db_credentials)
+        elif db_credentials['dbms'].upper() == 'SQLITE':
+            return _connect_to_sqlite(db_credentials)
         else:
             # Show all databases to user (in excel)
             url = '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user'], db_credentials['password'],
@@ -97,6 +111,8 @@ def _construct_engine(db, db_credentials):
     else:
         if db_credentials['dbms'].upper() == 'MSSQL':
             return _connect_to_mssql(db=db, db_credentials=db_credentials)
+        elif db_credentials['dbms'].upper() == 'SQLITE':
+            return _connect_to_sqlite(db_credentials=db_credentials)
         else:
             # and then we connect to the user db
             url = '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng, db_credentials['user'], db_credentials['password'],
@@ -118,7 +134,10 @@ class MyDB(object):
 
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            if db is not None:
+            if conn_string.split(':/')[0].upper() == 'SQLITE':
+                self.engine = create_engine(conn_string)
+                self.dbms = 'SQLITE'
+            elif db is not None:
                 # todo test this with windows
                 conn_string = (conn_string + '/' + db)
             self.engine = create_engine(conn_string)
@@ -129,7 +148,10 @@ class MyDB(object):
         else:
             db_credentials = db_config.get_db_credentials()
             self.dbms = db_credentials['dbms']
-            self.username = db_credentials['user']
+            if self.dbms.upper() == 'SQLITE':
+                self.path = db_credentials['path']
+            else:
+                self.username = db_credentials['user']
             self.engine = _construct_engine(db, db_credentials)
 
     def __del__(self):

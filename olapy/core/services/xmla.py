@@ -229,7 +229,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
     if write_on_file:
-        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')) and log_file_path != conf_file:
+        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:
