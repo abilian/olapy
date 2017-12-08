@@ -48,7 +48,7 @@ class DbConfigParser:
             if dbms.upper() == 'SQLITE':
                 path = config['path'] if 'path' in config.keys() and dbms.upper() == 'SQLITE' else None
             else:
-                user = config['user']
+                user = config['user'] if 'user' in config.keys() else ''
                 password = config['password'] if 'LOCALHOST' not in config['user'].upper() else ''
                 host = config['host'] if 'LOCALHOST' not in config['user'].upper() else ''
                 port = config['port']
@@ -64,11 +64,11 @@ class DbConfigParser:
                 credentials = {
                     'dbms': dbms,
                     'user': user,
-                    'password': password if 'LOCALHOST' not in user.upper() else '',
-                    'host': host if 'LOCALHOST' not in user.upper() else '',
+                    'password': password,
+                    'host': host,
                     'port': port,
-                    'db_name': db_name if 'db_name' in config.keys() else '',
-                    'driver': driver if 'driver' in config.keys() else ''
+                    'db_name': db_name,
+                    'driver': driver
                 }
 
         return credentials

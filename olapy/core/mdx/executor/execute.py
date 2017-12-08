@@ -26,7 +26,7 @@ import pandas as pd
 from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
-from ..tools.connection import MyDB
+from ..tools.connection import MyDB, MySqliteDB
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -156,12 +156,17 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        db = MyDB(cls.db_config)
+        dbms = cls.db_config.get_db_credentials().get('dbms').upper()
+        if dbms == 'SQLITE':
+            db = MySqliteDB(cls.db_config)
+        else:
+            db = MyDB(cls.db_config)
         if db.dbms.upper() == 'ORACLE':
             # You can think of a mysql "database" as a schema/user in Oracle.
             # todo username
             MdxEngine.from_db_cubes = [db.username]
         elif db.dbms.upper() == 'SQLITE':
+            # todo clean
             available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
             MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
         else:

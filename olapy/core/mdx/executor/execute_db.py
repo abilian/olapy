@@ -10,7 +10,7 @@ import pandas.io.sql as psql
 from collections import Iterable
 from sqlalchemy import inspect
 
-from ..tools.connection import MyDB
+from ..tools.connection import MyDB, MySqliteDB
 
 
 def load_tables_db(executor_instance):
@@ -20,7 +20,12 @@ def load_tables_db(executor_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+    # todo db from executro instance
+    dbms = executor_instance.db_config.get_db_credentials().get('dbms').upper()
+    if dbms == 'SQLITE':
+        db = MySqliteDB(executor_instance.db_config)
+    else:
+        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
@@ -50,7 +55,13 @@ def construct_star_schema_db(executor_instance):
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+    dbms = executor_instance.db_config.get_db_credentials().get('dbms').upper()
+    if dbms == 'SQLITE':
+        db = MySqliteDB(executor_instance.db_config)
+    else:
+        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+    # todo db from executor intance
+    # db = MyDB(executor_instance.database_config, db=executor_instance.cube)
     # load facts table
 
     fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
