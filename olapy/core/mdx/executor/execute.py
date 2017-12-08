@@ -26,7 +26,7 @@ import pandas as pd
 from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
-from ..tools.connection import MyDB, MySqliteDB, MyOracleDB
+from ..tools.connection import MyDB, MySqliteDB, MyOracleDB, MyMssqlDB
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -162,6 +162,8 @@ class MdxEngine(object):
             db = MySqliteDB(cls.db_config)
         elif dbms == 'ORACLE':
             db = MyOracleDB(cls.db_config)
+        elif dbms == 'MSSQL':
+            db = MyMssqlDB(cls.db_config)
         else:
             db = MyDB(cls.db_config)
 
