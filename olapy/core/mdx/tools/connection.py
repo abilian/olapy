@@ -133,7 +133,7 @@ class MyDB(object):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
             print('1111111111111111111')
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            self.engine, self.dbms = self.connect_with_env_var(self.conn_string, db)
+            self.engine, self.dbms = self.connect_with_env_var(db)
 
         else:
             print('222222222222222222222')
@@ -168,9 +168,10 @@ class MyDB(object):
 
         if db is not None:
             # todo test this with windows
-            conn_string = (self.conn_string + '/' + db)
+            engine = create_engine(self.conn_string + '/' + db)
+        else:
+            engine = create_engine(self.conn_string)
 
-        engine = create_engine(self.conn_string)
         dbms = MyDB.get_dbms_from_conn_string(self.conn_string)
         # oracle://scott:tiger@127.0.0.1:1521/sidname
         # username = conn_string.split(':')[1].replace('//', '')
