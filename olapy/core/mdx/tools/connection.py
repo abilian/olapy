@@ -25,28 +25,27 @@ def _get_dbms_from_conn_string(conn_string):
     db = db.replace('postgresql', 'postgres')
     return db
 
-
-def _get_init_table(dbms):
-    """
-    some dbms have default database so we can connect to the dbms without connecting to a specific database
-    :param dbms: postgres, oracle....
-    :return: default database name
-    """
-    if dbms.upper() == 'POSTGRES':
-        con_db = '/postgres'
-        engine = 'postgresql+psycopg2'
-    elif dbms.upper() == 'MYSQL':
-        con_db = ''
-        engine = 'mysql+mysqldb'
-    elif dbms.upper() == 'MSSQL':
-        con_db = 'msdb'
-        engine = 'mssql+pyodbc'
-    elif dbms.upper() == 'ORACLE':
-        con_db = ''
-        engine = 'oracle+cx_oracle'
-    else:
-        con_db = ''
-        engine = ''
+    # def _get_init_table(dbms):
+    #     """
+    #     some dbms have default database so we can connect to the dbms without connecting to a specific database
+    #     :param dbms: postgres, oracle....
+    #     :return: default database name
+    #     """
+    #     if dbms.upper() == 'POSTGRES':
+    #         con_db = '/postgres'
+    #         engine = 'postgresql+psycopg2'
+    #     elif dbms.upper() == 'MYSQL':
+    #         con_db = ''
+    #         engine = 'mysql+mysqldb'
+    #     elif dbms.upper() == 'MSSQL':
+    #         con_db = 'msdb'
+    #         engine = 'mssql+pyodbc'
+    #     elif dbms.upper() == 'ORACLE':
+    #         con_db = ''
+    #         engine = 'oracle+cx_oracle'
+    #     else:
+    #         con_db = ''
+    #         engine = ''
 
     return engine, con_db
 
@@ -131,29 +130,120 @@ class MyDB(object):
         :param db_config: olapy config file obj
         :param db: database name to connect to
         """
-
         if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
-            conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            if conn_string.split(':/')[0].upper() == 'SQLITE':
-                self.engine = create_engine(conn_string)
-                self.dbms = 'SQLITE'
-            elif db is not None:
-                # todo test this with windows
-                conn_string = (conn_string + '/' + db)
-            self.engine = create_engine(conn_string)
-            self.dbms = _get_dbms_from_conn_string(conn_string)
-            # oracle://scott:tiger@127.0.0.1:1521/sidname
-            self.username = conn_string.split(':')[1].replace('//', '')
+            self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
+            self.engine, self.dbms = self.connect_with_env_var(self.conn_string, db)
 
         else:
-            db_credentials = db_config.get_db_credentials()
-            self.dbms = db_credentials['dbms']
-            if self.dbms.upper() == 'SQLITE':
-                self.path = db_credentials['path']
-            else:
-                self.username = db_credentials['user']
-            self.engine = _construct_engine(db, db_credentials)
+            self.db_credentials = db_config.get_db_credentials()
+            self.engine, self.dbms = self.connect_without_env_var(db, self.db_credentials)
+            # self.engine, self.dbms, self.username, self.path = self.connect_without_env_var(db, self.db_credentials)
+
+    @staticmethod
+    def connect_with_env_var(conn_string, db):
+
+        # if conn_string.split(':/')[0].upper() == 'SQLITE':
+        #     engine = create_engine(conn_string)
+        #     dbms = 'SQLITE'
+        #     return engine, dbms
+
+        if db is not None:
+            # todo test this with windows
+            conn_string = (conn_string + '/' + db)
+
+        engine = create_engine(conn_string)
+        dbms = _get_dbms_from_conn_string(conn_string)
+        # oracle://scott:tiger@127.0.0.1:1521/sidname
+        # username = conn_string.split(':')[1].replace('//', '')
+
+        return engine, dbms
+
+    @staticmethod
+    def connect_without_env_var(db, db_credentials):
+        # username, path = None, None
+        # dbms = db_credentials['dbms']
+        # if dbms.upper() == 'SQLITE':
+        #     path = db_credentials['path']
+        # else:
+        #     username = db_credentials['user']
+        engine = _construct_engine(db, db_credentials)
+
+        return engine, dbms
+        # return engine, dbms, username, path
+
+    def _get_init_table(self):
+        """
+        some dbms have default database so we can connect to the dbms without connecting to a specific database
+        :param dbms: postgres, oracle....
+        :return: default database name
+        """
+        if self.dbms.upper() == 'POSTGRES':
+            con_db = '/postgres'
+            engine = 'postgresql+psycopg2'
+        elif self.dbms.upper() == 'MYSQL':
+            con_db = ''
+            engine = 'mysql+mysqldb'
+        elif self.dbms.upper() == 'MSSQL':
+            con_db = 'msdb'
+            engine = 'mssql+pyodbc'
+        elif self.dbms.upper() == 'ORACLE':
+            con_db = ''
+            engine = 'oracle+cx_oracle'
+        else:
+            con_db = ''
+            engine = ''
+        return engine, con_db
+
+    def construct_engine(self, db, db_credentials):
+        """
+        Create the SqlAlchemy object which will use it to connect to database.
+
+        :param db: database to connect to
+        :param db_credentials: olapy database config parser obj
+        :return: SqlAlchemy engine
+        """
+        eng, con_db = self._get_init_table()
+        if db is None:
+            # if db_credentials['dbms'].upper() == 'MSSQL':
+            #     return _connect_to_mssql(db_credentials)
+            # elif db_credentials['dbms'].upper() == 'SQLITE':
+            #     return _connect_to_sqlite(db_credentials)
+            # else:
+            # Show all databases to user (in excel)
+            url = '{0}://{1}:{2}@{3}:{4}{5}'.format(eng, db_credentials['user'], db_credentials['password'],
+                                                    db_credentials['host'], db_credentials['port'], con_db)
+            return create_engine(url, encoding='utf-8')
+
+        else:
+            # if db_credentials['dbms'].upper() == 'MSSQL':
+            #     return _connect_to_mssql(db=db, db_credentials=db_credentials)
+            # elif db_credentials['dbms'].upper() == 'SQLITE':
+            #     return _connect_to_sqlite(db_credentials=db_credentials)
+            # else:
+            # and then we connect to the user db
+            db_to_connect_to = '' if db_credentials['dbms'].upper() == 'ORACLE' else db
+            url = '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng,
+                                                     db_credentials['user'],
+                                                     db_credentials['password'],
+                                                     db_credentials['host'],
+                                                     db_credentials['port'],
+                                                     db_to_connect_to)
+
+            return create_engine(url, encoding='utf-8')
 
     def __del__(self):
         if hasattr(self, 'connection'):
             self.engine.dispose()
+
+
+class MyOracleDB(MyDB):
+    def __init__(self, db_config, db=None):
+        MyDB.__init__(self, db_config, db=db)
+
+
+    def get_username(self):
+        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
+            conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
+            return conn_string.split(':')[1].replace('//', '')
+        else:
+            db_credentials = MyDB.db_credentials
