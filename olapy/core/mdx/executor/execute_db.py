@@ -22,7 +22,7 @@ def _get_instantiate_db(executer_instace):
     elif dbms == 'MSSQL':
         db = MyMssqlDB(executer_instace.db_config)
     else:
-        db = MyDB(executer_instace.db_config)
+        db = MyDB(executer_instace.db_config, db=executer_instace.cube)
     return db
 
 
