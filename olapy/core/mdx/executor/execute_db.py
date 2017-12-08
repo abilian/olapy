@@ -10,7 +10,20 @@ import pandas.io.sql as psql
 from collections import Iterable
 from sqlalchemy import inspect
 
-from ..tools.connection import MyDB, MySqliteDB
+from ..tools.connection import MyDB, MySqliteDB, MyOracleDB, MyMssqlDB
+
+
+def _get_instantiate_db(executer_instace):
+    dbms = executer_instace.db_config.get_db_credentials().get('dbms').upper()
+    if dbms == 'SQLITE':
+        db = MySqliteDB(executer_instace.db_config)
+    elif dbms == 'ORACLE':
+        db = MyOracleDB(executer_instace.db_config)
+    elif dbms == 'MSSQL':
+        db = MyMssqlDB(executer_instace.db_config)
+    else:
+        db = MyDB(executer_instace.db_config)
+    return db
 
 
 def load_tables_db(executor_instance):
@@ -21,11 +34,7 @@ def load_tables_db(executor_instance):
     """
     tables = {}
     # todo db from executro instance
-    dbms = executor_instance.db_config.get_db_credentials().get('dbms').upper()
-    if dbms == 'SQLITE':
-        db = MySqliteDB(executor_instance.db_config)
-    else:
-        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+    db = _get_instantiate_db(executor_instance)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
@@ -44,7 +53,6 @@ def load_tables_db(executor_instance):
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[col for col in value.columns if col.lower()[-3:] != '_id']]
-
     return tables
 
 
@@ -55,14 +63,8 @@ def construct_star_schema_db(executor_instance):
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-    dbms = executor_instance.db_config.get_db_credentials().get('dbms').upper()
-    if dbms == 'SQLITE':
-        db = MySqliteDB(executor_instance.db_config)
-    else:
-        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-    # todo db from executor intance
-    # db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-    # load facts table
+
+    db = _get_instantiate_db(executor_instance)
 
     fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)

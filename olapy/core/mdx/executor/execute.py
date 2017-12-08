@@ -144,6 +144,19 @@ class MdxEngine(object):
         self._mdx_query = clean_query
 
     @classmethod
+    def instantiate_db(cls):
+        dbms = cls.db_config.get_db_credentials().get('dbms').upper()
+        if dbms == 'SQLITE':
+            db = MySqliteDB(cls.db_config)
+        elif dbms == 'ORACLE':
+            db = MyOracleDB(cls.db_config)
+        elif dbms == 'MSSQL':
+            db = MyMssqlDB(cls.db_config)
+        else:
+            db = MyDB(cls.db_config)
+        return db
+
+    @classmethod
     def _get_db_cubes_names(cls):
         """
         Get databases cubes names
@@ -156,22 +169,12 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        # todo change
-        dbms = cls.db_config.get_db_credentials().get('dbms').upper()
-        if dbms == 'SQLITE':
-            db = MySqliteDB(cls.db_config)
-        elif dbms == 'ORACLE':
-            db = MyOracleDB(cls.db_config)
-        elif dbms == 'MSSQL':
-            db = MyMssqlDB(cls.db_config)
-        else:
-            db = MyDB(cls.db_config)
+        db = cls.instantiate_db()
 
-        if dbms.upper() == 'ORACLE':
+        if isinstance(db, MyOracleDB):
             # You can think of a mysql "database" as a schema/user in Oracle.
-            # todo username
             MdxEngine.from_db_cubes = [db.get_username()]
-        elif db.dbms.upper() == 'SQLITE':
+        elif isinstance(db, MySqliteDB):
             # todo clean
             available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
             MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
