@@ -26,7 +26,7 @@ import pandas as pd
 from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..tools.config_file_parser import ConfigParser
-from ..tools.connection import MyDB, MySqliteDB
+from ..tools.connection import MyDB, MySqliteDB, MyOracleDB
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -156,15 +156,19 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
+        # todo change
         dbms = cls.db_config.get_db_credentials().get('dbms').upper()
         if dbms == 'SQLITE':
             db = MySqliteDB(cls.db_config)
+        elif dbms == 'ORACLE':
+            db = MyOracleDB(cls.db_config)
         else:
             db = MyDB(cls.db_config)
-        if db.dbms.upper() == 'ORACLE':
+
+        if dbms.upper() == 'ORACLE':
             # You can think of a mysql "database" as a schema/user in Oracle.
             # todo username
-            MdxEngine.from_db_cubes = [db.username]
+            MdxEngine.from_db_cubes = [db.get_username()]
         elif db.dbms.upper() == 'SQLITE':
             # todo clean
             available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
@@ -300,7 +304,7 @@ class MdxEngine(object):
         return [
             col
             for col in self.tables_loaded[self.facts].select_dtypes(
-                include=[np.number],).columns if col.lower()[-2:] != 'id'
+                include=[np.number], ).columns if col.lower()[-2:] != 'id'
         ]
 
     def _construct_star_schema_from_config(self, config_file_parser):
@@ -623,7 +627,7 @@ class MdxEngine(object):
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[columns:],)]
+                tuple_as_list[columns:], )]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
