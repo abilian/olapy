@@ -32,6 +32,7 @@ class ETL(object):
     Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
     that data, and then load them into olapy-data directory
     """
+
     def __init__(self,
                  source_type,
                  facts_table,
@@ -195,6 +196,17 @@ class ETL(object):
             return ''
 
 
+def get_graph(etl, **options):
+    # graph = bonobo.Graph()
+    # graph.add_chain(...)
+    return bonobo.Graph(
+        etl.extract(options.get("extraction_source"), delimiter=options.get("in_delimiter")),
+        etl.transform,
+        etl.load(options.get("table"))
+
+    )
+
+
 def run_olapy_etl(dims_infos,
                   facts_table,
                   facts_ids,
@@ -246,10 +258,12 @@ def run_olapy_etl(dims_infos,
             etl.current_dim_id_column = facts_ids
         else:
             etl.current_dim_id_column = dims_infos[table]
-        graph = bonobo.Graph(
-            etl.extract(extraction_source, delimiter=in_delimiter),
-            etl.transform, etl.load(table))
-        bonobo.run(graph, services=etl.services)
+
+        bonobo.run(get_graph(etl,
+                             extraction_source=extraction_source,
+                             in_delimiter=in_delimiter,
+                             table=table)
+                   )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
