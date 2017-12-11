@@ -5,6 +5,7 @@ based on `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import pandas as pd
 import pandas.io.sql as psql
 from collections import Iterable
@@ -14,7 +15,10 @@ from ..tools.connection import MyDB, MySqliteDB, MyOracleDB, MyMssqlDB
 
 
 def _get_instantiate_db(executer_instace):
-    dbms = executer_instace.db_config.get_db_credentials().get('dbms').upper()
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
+        dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
+    else:
+        dbms = executer_instace.db_config.get_db_credentials().get('dbms').upper()
     if dbms == 'SQLITE':
         db = MySqliteDB(executer_instace.db_config)
     elif dbms == 'ORACLE':
@@ -53,6 +57,7 @@ def load_tables_db(executor_instance):
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[col for col in value.columns if col.lower()[-3:] != '_id']]
+
     return tables
 
 

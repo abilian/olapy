@@ -44,7 +44,6 @@ class MyDB(object):
     def connect_with_env_var(self, db):
 
         if db is not None:
-            # todo test this with windows
             self.conn_string = self.conn_string.rstrip('/')
             engine = create_engine(self.conn_string + '/' + db)
         else:

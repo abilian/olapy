@@ -145,12 +145,15 @@ class MdxEngine(object):
 
     @classmethod
     def instantiate_db(cls):
-        dbms = cls.db_config.get_db_credentials().get('dbms').upper()
-        if dbms == 'SQLITE':
+        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
+            dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
+        else:
+            dbms = cls.db_config.get_db_credentials().get('dbms').upper()
+        if 'SQLITE' in dbms:
             db = MySqliteDB(cls.db_config)
-        elif dbms == 'ORACLE':
+        elif 'ORACLE' in dbms:
             db = MyOracleDB(cls.db_config)
-        elif dbms == 'MSSQL':
+        elif 'MSSQL' in dbms:
             db = MyMssqlDB(cls.db_config)
         else:
             db = MyDB(cls.db_config)
@@ -170,7 +173,6 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         # try:
         db = cls.instantiate_db()
-
         if isinstance(db, MyOracleDB):
             # You can think of a mysql "database" as a schema/user in Oracle.
             MdxEngine.from_db_cubes = [db.get_username()]
