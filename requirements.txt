@@ -13,7 +13,6 @@ certifi==2017.11.5        # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via python-dotenv
 colorama==0.3.9           # via bonobo
-enum34==1.1.6             # via fs
 fs==2.0.17                # via bonobo
 idna==2.6                 # via requests
 lxml==4.1.1
@@ -30,7 +29,7 @@ python-dateutil==2.6.1    # via pandas
 python-dotenv==0.7.1
 pytz==2017.3              # via fs, pandas, spyne
 pyyaml==3.12
-regex==2017.12.9          # via awesome-slugify
+regex==2017.12.12         # via awesome-slugify
 requests==2.18.4          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.12.14
