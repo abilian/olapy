@@ -13,6 +13,7 @@ certifi==2017.11.5        # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via python-dotenv
 colorama==0.3.9           # via bonobo
+enum34==1.1.6             # via fs
 fs==2.0.17                # via bonobo
 idna==2.6                 # via requests
 lxml==4.1.1
@@ -21,7 +22,7 @@ numpy==1.13.3             # via pandas
 packaging==16.8           # via bonobo
 pandas==0.21.0
 pbr==3.1.1                # via stevedore
-psutil==5.4.1             # via bonobo
+psutil==5.4.2             # via bonobo
 psycopg2==2.7.3.2
 pymysql==0.7.11
 pyparsing==2.2.0          # via packaging
@@ -29,7 +30,7 @@ python-dateutil==2.6.1    # via pandas
 python-dotenv==0.7.1
 pytz==2017.3              # via fs, pandas, spyne
 pyyaml==3.12
-regex==2017.12.5          # via awesome-slugify
+regex==2017.12.9          # via awesome-slugify
 requests==2.18.4          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.12.14
@@ -38,5 +39,5 @@ stevedore==1.28.0         # via bonobo
 typing==3.6.2
 unidecode==0.4.21         # via awesome-slugify
 urllib3==1.22             # via requests
-werkzeug==0.12.2
+werkzeug==0.13
 xmlwitch==0.3

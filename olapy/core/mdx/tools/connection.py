@@ -24,7 +24,7 @@ class MyDB(object):
             self.db_credentials = db_config.get_db_credentials()
             self.engine, self.dbms = self.connect_without_env_var(db)
 
-    def _gen_all_databases_query(self):
+    def gen_all_databases_query(self):
         """
         Each dbms has different query to get user databases names
         :param dbms: postgres | mysql | oracle | mssql
@@ -34,11 +34,6 @@ class MyDB(object):
             return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
         elif self.dbms.upper() == 'MYSQL':
             return 'SHOW DATABASES'
-        elif self.dbms.upper() == 'MSSQL':
-            return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
-        elif self.dbms.upper() == 'ORACLE':
-            # You can think of a mysql "database" as a schema/user in Oracle.
-            return 'select username from dba_users;'
 
     @staticmethod
     def get_dbms_from_conn_string(conn_string):
@@ -58,7 +53,7 @@ class MyDB(object):
         return db
 
     def get_all_databases(self):
-        all_db_query = self._gen_all_databases_query()
+        all_db_query = self.gen_all_databases_query()
         result = self.engine.execute(all_db_query)
         available_tables = result.fetchall()
         return [
@@ -142,6 +137,15 @@ class MyOracleDB(MyDB):
     def get_all_databases(self):
         return [self.get_username()]
 
+    def gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
+        # You can think of a mysql "database" as a schema/user in Oracle.
+        return 'select username from dba_users;'
+
     def get_init_table(self):
         """
         some dbms have default database so we can connect to the dbms without connecting to a specific database
@@ -209,6 +213,15 @@ class MyMssqlDB(MyDB):
         engine = self.construct_engine(db)
         return engine, dbms
         # return engine, dbms, username, path
+
+    def gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
+
+        return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
 
     def _connect_to_mssql(self, driver='mssql+pyodbc', db=None):
         """
