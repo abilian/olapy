@@ -173,21 +173,7 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         # try:
         db = cls.instantiate_db()
-        if isinstance(db, MyOracleDB):
-            # You can think of a mysql "database" as a schema/user in Oracle.
-            MdxEngine.from_db_cubes = [db.get_username()]
-        elif isinstance(db, MySqliteDB):
-            # todo clean
-            available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
-            MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
-        else:
-            all_db_query = cls._gen_all_databases_query(db.dbms)
-            result = db.engine.execute(all_db_query)
-            available_tables = result.fetchall()
-            MdxEngine.from_db_cubes = [
-                database[0] for database in available_tables if
-                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-            ]
+        MdxEngine.from_db_cubes = db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)

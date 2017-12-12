@@ -24,6 +24,22 @@ class MyDB(object):
             self.db_credentials = db_config.get_db_credentials()
             self.engine, self.dbms = self.connect_without_env_var(db)
 
+    def _gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
+        if self.dbms.upper() == 'POSTGRES':
+            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+        elif self.dbms.upper() == 'MYSQL':
+            return 'SHOW DATABASES'
+        elif self.dbms.upper() == 'MSSQL':
+            return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
+        elif self.dbms.upper() == 'ORACLE':
+            # You can think of a mysql "database" as a schema/user in Oracle.
+            return 'select username from dba_users;'
+
     @staticmethod
     def get_dbms_from_conn_string(conn_string):
         """
@@ -40,6 +56,15 @@ class MyDB(object):
         # just for postgres
         db = db.replace('postgresql', 'postgres')
         return db
+
+    def get_all_databases(self):
+        all_db_query = self._gen_all_databases_query()
+        result = self.engine.execute(all_db_query)
+        available_tables = result.fetchall()
+        return [
+            database[0] for database in available_tables if
+            database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+        ]
 
     def connect_with_env_var(self, db):
 
@@ -114,6 +139,9 @@ class MyOracleDB(MyDB):
         else:
             return self.db_credentials['user']
 
+    def get_all_databases(self):
+        return [self.get_username()]
+
     def get_init_table(self):
         """
         some dbms have default database so we can connect to the dbms without connecting to a specific database
@@ -139,6 +167,10 @@ class MySqliteDB(MyDB):
         """
         # eng, con_db = self.get_init_table()
         return create_engine('sqlite:///' + self.db_credentials['path'])
+
+    def get_all_databases(self):
+        available_tables = self.engine.execute('PRAGMA database_list;').fetchall()
+        return [available_tables[0][-1].split('/')[-1]]
 
     def connect_with_env_var(self, db):
         if self.conn_string.split(':/')[0].upper() == 'SQLITE':
