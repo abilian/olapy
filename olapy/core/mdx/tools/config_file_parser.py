@@ -306,51 +306,49 @@ class ConfigParser:
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
         :return: Cube obj
         """
-        try:
-            with open(self.get_config_file_path()) as config_file:
-                parser = etree.XMLParser()
-                tree = etree.parse(config_file, parser)
+        # try:
+        with open(self.get_config_file_path()) as config_file:
+            parser = etree.XMLParser()
+            tree = etree.parse(config_file, parser)
 
-                facts = [
-                    Facts(
-                        table_name=xml_facts.find('table_name').text,
-                        keys={
-                            key.text: key.attrib['ref']
-                            for key in xml_facts.findall('keys/column_name')
-                        },
-                        measures=[
-                            mes.text
-                            for mes in xml_facts.findall('measures/name')
-                        ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
-                ]
-
-                dimensions = [
-                    Dimension(
-                        name=xml_dimension.find('name').text,
-                        column_new_name=[key.attrib['column_new_name']
-                                         for key in xml_dimension.findall('name')],
-                        displayName=xml_dimension.find('displayName').text,
-                        columns=OrderedDict(
-                            (
-                                column_name.text,
-                                column_name.text if not column_name.attrib else
-                                column_name.attrib['column_new_name'],)
-                            for column_name in xml_dimension.findall(
-                                'columns/name', )), )
-                    for xml_dimension in tree.xpath(
-                        '/cubes/cube/dimensions/dimension', )
-                ]
-
-            return [
-                Cube(
-                    name=xml_cube.find('name').text,
-                    source=xml_cube.find('source').text,
-                    facts=facts,
-                    dimensions=dimensions, )
-                for xml_cube in tree.xpath('/cubes/cube')
+            facts = [
+                Facts(
+                    table_name=xml_facts.find('table_name').text,
+                    keys={
+                        key.text: key.attrib['ref']
+                        for key in xml_facts.findall('keys/column_name')
+                    },
+                    measures=[
+                        mes.text
+                        for mes in xml_facts.findall('measures/name')
+                    ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
-        except BaseException:
-            raise ValueError('Bad configuration in the configuration file')
+
+            dimensions = [
+                Dimension(
+                    name=xml_dimension.find('name').text,
+                    displayName=xml_dimension.find('displayName').text,
+                    columns=OrderedDict(
+                        (
+                            column_name.text,
+                            column_name.text if not column_name.attrib else column_name.attrib['column_new_name']
+                        )
+                        for column_name in xml_dimension.findall(
+                            'columns/name', )), )
+                for xml_dimension in tree.xpath(
+                    '/cubes/cube/dimensions/dimension', )
+            ]
+
+        return [
+            Cube(
+                name=xml_cube.find('name').text,
+                source=xml_cube.find('source').text,
+                facts=facts,
+                dimensions=dimensions, )
+            for xml_cube in tree.xpath('/cubes/cube')
+        ]
+        # except BaseException:
+        #     raise ValueError('Bad configuration in the configuration file')
 
     def construct_cubes(self):
         """Construct cube based on config file.
