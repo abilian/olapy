@@ -14,7 +14,7 @@ sqlite_lite_db_path = os.path.join(get_default_cube_directory(), MdxEngine.CUBE_
 
 @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 def test_conf_file_change():
-    if 'SQLITE_URI' not in os.environ.keys():
+    if 'SQLALCHEMY_DATABASE_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
         with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
@@ -27,8 +27,8 @@ def test_conf_file_change():
 @pytest.fixture(scope='function')
 def connect():
     """Returns a connection and a metadata object"""
-    if 'SQLITE_URI' in os.environ.keys():
-        return sqlalchemy.create_engine(os.environ['SQLITE_URI'])
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        return sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'])
     else:
         # DEFAULT CONFIG
         # We connect with the help of the PostgreSQL URL

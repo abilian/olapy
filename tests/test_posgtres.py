@@ -17,7 +17,7 @@ DB = 'sales_postgres'
 
 @pytest.mark.skipif("os.environ['DB_TEST'] != 'POSTGRES'")
 def test_conf_file_change():
-    if 'POSTGRES_URI' not in os.environ.keys():
+    if 'SQLALCHEMY_DATABASE_URI' not in os.environ.keys():
         # py.test directly #todo fix remove this
         with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
             f.write("""
@@ -38,8 +38,8 @@ def connect(user=USER_NAME,
             host='localhost',
             port=5432):
     """Returns a connection and a metadata object"""
-    if 'POSTGRES_URI' in os.environ.keys():
-        return sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        return sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], client_encoding='utf8')
     else:
         # DEFAULT CONFIG
         # We connect with the help of the PostgreSQL URL
