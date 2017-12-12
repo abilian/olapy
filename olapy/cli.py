@@ -24,10 +24,12 @@ def init():
 
         copy_tree(os.path.join(olapy_lib_dir, 'cubes_templates'),
                   os.path.join(home_directory, 'olapy-data', 'cubes'))
+        print('Initializing demo cubes')
 
     if not os.path.isfile(os.path.join(home_directory, 'olapy-data', 'olapy-config')):
         copyfile(os.path.join(olapy_lib_dir, 'config', 'olapy-config'),
                  os.path.join(home_directory, 'olapy-data', 'olapy-config'))
+        print('Initializing config files')
 
 
 if __name__ == '__main__':
