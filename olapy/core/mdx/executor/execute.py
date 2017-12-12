@@ -225,23 +225,6 @@ class MdxEngine(object):
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
-    @classmethod
-    def _gen_all_databases_query(cls, dbms):
-        """
-        Each dbms has different query to get user databases names
-        :param dbms: postgres | mysql | oracle | mssql
-        :return: sql query to fetch all databases
-        """
-        if dbms.upper() == 'POSTGRES':
-            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-        elif dbms.upper() == 'MYSQL':
-            return 'SHOW DATABASES'
-        elif dbms.upper() == 'MSSQL':
-            return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
-        elif dbms.upper() == 'ORACLE':
-            # You can think of a mysql "database" as a schema/user in Oracle.
-            return 'select username from dba_users;'
-
     def _get_tables_name(self):
         """Get all tables names.
 
@@ -307,10 +290,8 @@ class MdxEngine(object):
         fusion = None
         for cubes in config_file_parser.construct_cubes():
             if self.client == 'web':
-                # todo clean!!!!!
                 if cubes.facts:
                     fusion = construct_web_star_schema_config_file(self, cubes)
-                # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
                 elif cubes.name in self.csv_files_cubes:
                     fusion = construct_star_schema_csv_files(self)
                 elif cubes.name in self.from_db_cubes:

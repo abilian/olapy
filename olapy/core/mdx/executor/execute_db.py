@@ -5,29 +5,10 @@ based on `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
 import pandas as pd
 import pandas.io.sql as psql
 from collections import Iterable
 from sqlalchemy import inspect
-
-from ..tools.connection import MyDB, MySqliteDB, MyOracleDB, MyMssqlDB
-
-
-def _get_instantiate_db(executer_instace):
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-        dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
-    else:
-        dbms = executer_instace.db_config.get_db_credentials().get('dbms').upper()
-    if dbms == 'SQLITE':
-        db = MySqliteDB(executer_instace.db_config)
-    elif dbms == 'ORACLE':
-        db = MyOracleDB(executer_instace.db_config)
-    elif dbms == 'MSSQL':
-        db = MyMssqlDB(executer_instace.db_config)
-    else:
-        db = MyDB(executer_instace.db_config, db=executer_instace.cube)
-    return db
 
 
 def load_tables_db(executor_instance):
@@ -38,7 +19,7 @@ def load_tables_db(executor_instance):
     """
     tables = {}
     # todo db from executro instance
-    db = _get_instantiate_db(executor_instance)
+    db = executor_instance.instantiate_db()
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
@@ -69,7 +50,7 @@ def construct_star_schema_db(executor_instance):
     :return: star schema DataFrame
     """
 
-    db = _get_instantiate_db(executor_instance)
+    db = executor_instance.instantiate_db()
 
     fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)
