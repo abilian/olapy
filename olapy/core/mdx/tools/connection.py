@@ -62,8 +62,8 @@ class MyDB(object):
         ]
 
     def connect_with_env_var(self, db):
-
         if db is not None:
+
             self.conn_string = self.conn_string.rstrip('/')
             engine = create_engine(self.conn_string + '/' + db)
         else:
@@ -127,7 +127,8 @@ class MyOracleDB(MyDB):
     def __init__(self, db_config, db=None):
         MyDB.__init__(self, db_config, db=db)
 
-    def get_username(self):
+    @property
+    def username(self):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
             return conn_string.split(':')[1].replace('//', '')
@@ -135,7 +136,7 @@ class MyOracleDB(MyDB):
             return self.db_credentials['user']
 
     def get_all_databases(self):
-        return [self.get_username()]
+        return [self.username]
 
     def gen_all_databases_query(self):
         """
