@@ -51,7 +51,8 @@ class DbConfigParser:
                 user = config['user'] if 'user' in config.keys() else ''
                 password = config['password'] if 'LOCALHOST' not in config['user'].upper() else ''
                 host = config['host'] if 'LOCALHOST' not in config['user'].upper() else ''
-                port = config['port']
+                port = config['port'] if 'port' in config.keys() else ''
+                sql_server_driver = config['sql_server_driver'] if 'sql_server_driver' in config.keys() else ''
                 db_name = config['db_name'] if 'db_name' in config.keys() else ''
                 driver = config['driver'] if 'driver' in config.keys() else ''
 
@@ -68,7 +69,8 @@ class DbConfigParser:
                     'host': host,
                     'port': port,
                     'db_name': db_name,
-                    'driver': driver
+                    'driver': driver,
+                    'sql_server_driver' : sql_server_driver
                 }
 
         return credentials
