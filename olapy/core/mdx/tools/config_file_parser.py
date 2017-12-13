@@ -241,6 +241,7 @@ class ConfigParser:
     # todo one function
     def get_config_file_path(self):
         return os.path.join(self.cube_path, self.file_name)
+
     #
     # def get_web_confile_file_path(self):
     #     return os.path.join(self.cube_path, self.web_config_file_name)
@@ -336,7 +337,7 @@ class ConfigParser:
                         for column_name in xml_dimension.findall(
                             'columns/name', )), )
                 for xml_dimension in tree.xpath(
-                    '/cubes/cube/dimensions/dimension', )
+                    '/cubes/cube/dimensions/dimension')
             ]
 
         return [

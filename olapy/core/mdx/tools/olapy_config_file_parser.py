@@ -70,7 +70,7 @@ class DbConfigParser:
                     'port': port,
                     'db_name': db_name,
                     'driver': driver,
-                    'sql_server_driver' : sql_server_driver
+                    'sql_server_driver': sql_server_driver
                 }
 
         return credentials
