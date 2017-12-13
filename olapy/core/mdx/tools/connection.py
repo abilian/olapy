@@ -203,18 +203,6 @@ class MyMssqlDB(MyDB):
         engine = 'mssql+pyodbc'
         return engine, con_db
 
-    def connect_with_env_var(self, db):
-        if self.conn_string.split(':/')[0].upper() == 'SQLITE':
-            engine = create_engine(self.conn_string)
-            dbms = 'SQLITE'
-            return engine, dbms
-
-    def connect_without_env_var(self, db):
-        dbms = 'SQLITE'
-        engine = self.construct_engine(db)
-        return engine, dbms
-        # return engine, dbms, username, path
-
     def gen_all_databases_query(self):
         """
         Each dbms has different query to get user databases names
@@ -250,13 +238,4 @@ class MyMssqlDB(MyDB):
         return create_engine(url)
 
     def construct_engine(self, db):
-
-        """
-        Create the SqlAlchemy object which will use it to connect to database.
-
-        :param db: database to connect to
-        :param db_credentials: olapy database config parser obj
-        :return: SqlAlchemy engine
-        """
-        # eng, con_db = self.get_init_table()
         return self._connect_to_mssql(db=db)

@@ -142,7 +142,7 @@ class MdxEngine(object):
         self._mdx_query = clean_query
 
     @classmethod
-    def instantiate_db(cls):
+    def instantiate_db(cls, db=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
@@ -152,7 +152,7 @@ class MdxEngine(object):
         elif 'ORACLE' in dbms:
             db = MyOracleDB(cls.db_config)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(cls.db_config)
+            db = MyMssqlDB(cls.db_config, db)
         else:
             db = MyDB(cls.db_config)
         return db

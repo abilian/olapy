@@ -19,14 +19,13 @@ def load_tables_db(executor_instance):
     """
     tables = {}
     # todo db from executro instance
-    db = executor_instance.instantiate_db()
+    db = executor_instance.instantiate_db(executor_instance.cube)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.dbms.upper() == 'POSTGRES':
         executor_instance.facts = executor_instance.facts.lower()
-
     for table_name in inspector.get_table_names():
         if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             # fix for oracle
@@ -50,7 +49,7 @@ def construct_star_schema_db(executor_instance):
     :return: star schema DataFrame
     """
 
-    db = executor_instance.instantiate_db()
+    db = executor_instance.instantiate_db(executor_instance.cube)
 
     fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)
