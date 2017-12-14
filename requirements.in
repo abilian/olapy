@@ -17,7 +17,7 @@ werkzeug
 #pympler
 
 #ETL
-bonobo
-bonobo-sqlalchemy
+bonobo==0.5.2
+bonobo-sqlalchemy==0.5.1
 awesome-slugify
 python-dotenv
