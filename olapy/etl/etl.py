@@ -19,6 +19,8 @@ import dotenv
 import logging
 import os
 
+from olapy.etl.utils import create_db_engine, get_services
+
 dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
@@ -216,46 +218,7 @@ def get_graph(etl, **options):
 
     )
 
-from collections import defaultdict
 
-import os
-from sqlalchemy import create_engine
-
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
-
-db_config = DbConfigParser()
-config = db_config.get_db_credentials()
-
-DB_CONFIG_DEFAULTS = {
-    'driver': config['driver'],
-    'host': config['host'],
-    'port': config['port'],
-    'name': config['db_name'],
-    'user': config['user'],
-    'pass': config['password'],
-}
-
-DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
-
-
-
-def create_db_engine(driver='SQL Server Native Client', version='11.0'):
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
-        dsn = os.environ['SQLALCHEMY_DATABASE_URI']
-    else:
-        config = defaultdict(**DB_CONFIG_DEFAULTS)
-        dsn = DSN_TEMPLATE.format(**config)
-
-        if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
-            dsn += '?client_encoding=utf8'
-        elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
-            dsn += '?driver={0}'.format(driver + ' ' + version)
-    return create_engine(dsn)
-
-def get_services(**options):
-    return {
-        'sqlalchemy.engine': create_db_engine()
-    }
 
 
 def run_olapy_etl(dims_infos,
@@ -312,10 +275,6 @@ def run_olapy_etl(dims_infos,
 
         parser = bonobo.get_argument_parser()
         with bonobo.parse_args(parser) as options:
-            # bonobo.run(
-            #     get_graph(**options),
-            #     services=get_services(**options)
-            # )
             bonobo.run(get_graph(etl,
                                  extraction_source=extraction_source,
                                  in_delimiter=in_delimiter,

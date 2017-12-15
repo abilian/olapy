@@ -1,7 +1,3 @@
-"""
-Bonobo etl require this file to access databases (and files)
-"""
-from __future__ import absolute_import, division, print_function, unicode_literals
 from collections import defaultdict
 
 import os
@@ -38,7 +34,7 @@ def create_db_engine(driver='SQL Server Native Client', version='11.0'):
     return create_engine(dsn)
 
 
-def get_services():
+def get_services(**options):
     return {
         'sqlalchemy.engine': create_db_engine()
     }
