@@ -12,7 +12,6 @@ class Facts(object):
     table_name = attr.ib()
     keys = attr.ib()
     measures = attr.ib()
-    columns = attr.ib()
 
 
 @attr.s
@@ -31,4 +30,4 @@ class Cube(object):
     name = attr.ib()
     source = attr.ib()
     facts = attr.ib()
-    tables = attr.ib()
+    dimensions = attr.ib()

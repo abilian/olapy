@@ -1,5 +1,6 @@
 sudo: required
 dist: trusty
+group: deprecated-2017Q3
 
 language: python
 cache: pip
@@ -40,4 +41,3 @@ notifications:
       - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
     on_success: change
     on_failure: always
-

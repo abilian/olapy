@@ -6,15 +6,8 @@ spyne<3
 SQLAlchemy==1.1.15 # <1.2 required by bonobo
 xmlwitch
 attrs
-
-#databases_connectors
-#pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
-#cx_oracle
-#mysql-python # don't work in py3
-mysqlclient
-pymysql
-psycopg2
 pyyaml
+
 
 # Test
 werkzeug
@@ -24,7 +17,7 @@ werkzeug
 #pympler
 
 #ETL
-bonobo
-bonobo-sqlalchemy
+bonobo==0.5.2
+bonobo-sqlalchemy==0.5.1
 awesome-slugify
 python-dotenv

@@ -10,8 +10,6 @@ import pandas.io.sql as psql
 from collections import Iterable
 from sqlalchemy import inspect
 
-from ..tools.connection import MyDB
-
 
 def load_tables_db(executor_instance):
     """
@@ -20,14 +18,14 @@ def load_tables_db(executor_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+    # todo db from executro instance
+    db = executor_instance.instantiate_db(executor_instance.cube)
     inspector = inspect(db.engine)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.dbms.upper() == 'POSTGRES':
         executor_instance.facts = executor_instance.facts.lower()
-
     for table_name in inspector.get_table_names():
         if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             # fix for oracle
@@ -50,8 +48,8 @@ def construct_star_schema_db(executor_instance):
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-    db = MyDB(executor_instance.database_config, db=executor_instance.cube)
-    # load facts table
+
+    db = executor_instance.instantiate_db(executor_instance.cube)
 
     fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
     inspector = inspect(db.engine)
