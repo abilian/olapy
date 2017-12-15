@@ -257,13 +257,13 @@ def run_olapy_etl(dims_infos,
         else:
             etl.current_dim_id_column = dims_infos[table]
 
-        parser = bonobo.get_argument_parser()
-        with bonobo.parse_args(parser):
-            bonobo.run(get_graph(etl,
-                                 extraction_source=extraction_source,
-                                 in_delimiter=in_delimiter,
-                                 table=table)
-                       )
+        # parser = bonobo.get_argument_parser()
+        # with bonobo.parse_args(parser):
+        bonobo.run(get_graph(etl,
+                             extraction_source=extraction_source,
+                             in_delimiter=in_delimiter,
+                             table=table)
+                   )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
