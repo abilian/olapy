@@ -24,6 +24,17 @@ class MyDB(object):
             self.db_credentials = db_config.get_db_credentials()
             self.engine, self.dbms = self.connect_without_env_var(db)
 
+    def gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
+        if self.dbms.upper() == 'POSTGRES':
+            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+        elif self.dbms.upper() == 'MYSQL':
+            return 'SHOW DATABASES'
+
     @staticmethod
     def get_dbms_from_conn_string(conn_string):
         """
@@ -41,9 +52,18 @@ class MyDB(object):
         db = db.replace('postgresql', 'postgres')
         return db
 
-    def connect_with_env_var(self, db):
+    def get_all_databases(self):
+        all_db_query = self.gen_all_databases_query()
+        result = self.engine.execute(all_db_query)
+        available_tables = result.fetchall()
+        return [
+            database[0] for database in available_tables if
+            database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+        ]
 
+    def connect_with_env_var(self, db):
         if db is not None:
+
             self.conn_string = self.conn_string.rstrip('/')
             engine = create_engine(self.conn_string + '/' + db)
         else:
@@ -107,12 +127,25 @@ class MyOracleDB(MyDB):
     def __init__(self, db_config, db=None):
         MyDB.__init__(self, db_config, db=db)
 
-    def get_username(self):
+    @property
+    def username(self):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
             return conn_string.split(':')[1].replace('//', '')
         else:
             return self.db_credentials['user']
+
+    def get_all_databases(self):
+        return [self.username]
+
+    def gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
+        # You can think of a mysql "database" as a schema/user in Oracle.
+        return 'select username from dba_users;'
 
     def get_init_table(self):
         """
@@ -140,6 +173,10 @@ class MySqliteDB(MyDB):
         # eng, con_db = self.get_init_table()
         return create_engine('sqlite:///' + self.db_credentials['path'])
 
+    def get_all_databases(self):
+        available_tables = self.engine.execute('PRAGMA database_list;').fetchall()
+        return [available_tables[0][-1].split('/')[-1]]
+
     def connect_with_env_var(self, db):
         if self.conn_string.split(':/')[0].upper() == 'SQLITE':
             engine = create_engine(self.conn_string)
@@ -166,17 +203,14 @@ class MyMssqlDB(MyDB):
         engine = 'mssql+pyodbc'
         return engine, con_db
 
-    def connect_with_env_var(self, db):
-        if self.conn_string.split(':/')[0].upper() == 'SQLITE':
-            engine = create_engine(self.conn_string)
-            dbms = 'SQLITE'
-            return engine, dbms
+    def gen_all_databases_query(self):
+        """
+        Each dbms has different query to get user databases names
+        :param dbms: postgres | mysql | oracle | mssql
+        :return: sql query to fetch all databases
+        """
 
-    def connect_without_env_var(self, db):
-        dbms = 'SQLITE'
-        engine = self.construct_engine(db)
-        return engine, dbms
-        # return engine, dbms, username, path
+        return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
 
     def _connect_to_mssql(self, driver='mssql+pyodbc', db=None):
         """
@@ -204,13 +238,4 @@ class MyMssqlDB(MyDB):
         return create_engine(url)
 
     def construct_engine(self, db):
-
-        """
-        Create the SqlAlchemy object which will use it to connect to database.
-
-        :param db: database to connect to
-        :param db_credentials: olapy database config parser obj
-        :return: SqlAlchemy engine
-        """
-        # eng, con_db = self.get_init_table()
         return self._connect_to_mssql(db=db)

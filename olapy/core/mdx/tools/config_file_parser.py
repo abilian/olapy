@@ -12,7 +12,7 @@ from .models import Cube, Dimension, Facts
 
 
 class ConfigParser:
-    """Parse olapy config (web and excel) files.
+    """Parse olapy config excel file.
 
     Config file used if you want to show only some measures, dimensions,
     columns... in excel
@@ -119,94 +119,6 @@ class ConfigParser:
 
             </cubes>
 
-
-    WEB Config file Structure (work with `olapy-web <https://github.com/abilian/olapy-web>`_)::
-
-        <cubes>
-           <cube>
-              <!-- cube name => db name -->
-              <name>mpr</name>
-
-              <!-- source : postgres | csv -->
-              <source>postgres</source>
-
-              <!-- star building customized star schema -->
-              <facts>
-                 <!-- facts table name -->
-                 <table_name>projet</table_name>
-
-                 <keys>
-                    <!-- ref = table_name.column  -->
-                    <column_name ref="vocabulary_crm_status.id">status_id</column_name>
-                    <column_name ref="vocabulary_crm_pole_leader.id">pole_leader_id</column_name>
-                    <column_name ref="contact.id">contact_id</column_name>
-                    <column_name ref="compte.id">compte_porteur_id</column_name>
-                    <column_name ref="vocabulary_crm_aap_type.id">aap_name_id</column_name>
-                 </keys>
-
-                 <!-- specify measures explicitly -->
-                 <measures>
-                    <!-- by default, all number type columns in facts table, or you can specify them here -->
-                    <name>budget_total</name>
-                    <name>subvention_totale</name>
-                    <name>duree_projet</name>
-                 </measures>
-
-                 <!-- additional columns to keep other than measures and ids -->
-                 <columns>etat,aap,axes_de_developpement</columns>
-              </facts>
-
-              <!-- end building customized star schema -->
-              <tables>
-                 <!-- Table name -->
-                 <table name="vocabulary_crm_status">
-
-                    <!-- Columns to keep (INCLUDING id)-->
-                    <!-- They must be seperated with comma ',' -->
-                    <columns>id,label</columns>
-
-                    <!-- Change insignificant table columns names -->
-                    <!-- {IMPORTANT} Renaming COMMUN columns between dimensions and other columns if you want, other than ids column -->
-                    <new_name old_column_name="label">Status</new_name>
-                 </table>
-
-                 <table name="contact">
-                    <columns>id,nom,prenom,fonction</columns>
-                    <new_name old_column_name="fonction">Contact Fonction</new_name>
-                 </table>
-              </tables>
-
-              <!-- Dashboards -->
-              <Dashboards>
-                 <Dashboard>
-                    <Global_table>
-                       <!-- IMPORTANT !! columns and rows names must be specified as above with their new names -->
-                       <!-- EXAMPLE <new_name old_column_name="label">Pole leader</new_name>, you put Pole leader -->
-                       <!-- marches,axes_de_developpement,statut_pour_book are columns from facts table  -->
-                       <columns>marches,axes_de_developpement</columns>
-                       <rows>statut_pour_book</rows>
-                    </Global_table>
-
-                    <!-- Contact Fonction,Type Organisation columns name from different tables (with ther new names) -->
-                    <PieCharts>Contact Fonction,Type Organisation</PieCharts>
-
-                    <!-- TODO BarCharts with Stacked Bar Chart -->
-                    <BarCharts>Avis</BarCharts>
-
-                    <!-- Preferably with time/date (or sequenced) tables-->
-                    <LineCharts>
-                       <table>
-                          <!-- date_debut_envisagee a column from facts table  -->
-                          <name>date_debut_envisagee</name>
-                          <!-- if not specified, then all columns attributs -->
-                          <!--<columns>1945,2000,2006,2015</columns> -->
-                       </table>
-                    </LineCharts>
-                 </Dashboard>
-              </Dashboards>
-            <!-- END Dashboards -->
-           </cube>
-        </cubes>
     """
 
     def __init__(
@@ -241,6 +153,7 @@ class ConfigParser:
     # todo one function
     def get_config_file_path(self):
         return os.path.join(self.cube_path, self.file_name)
+
     #
     # def get_web_confile_file_path(self):
     #     return os.path.join(self.cube_path, self.web_config_file_name)
@@ -306,51 +219,49 @@ class ConfigParser:
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
         :return: Cube obj
         """
-        try:
-            with open(self.get_config_file_path()) as config_file:
-                parser = etree.XMLParser()
-                tree = etree.parse(config_file, parser)
+        # try:
+        with open(self.get_config_file_path()) as config_file:
+            parser = etree.XMLParser()
+            tree = etree.parse(config_file, parser)
 
-                facts = [
-                    Facts(
-                        table_name=xml_facts.find('table_name').text,
-                        keys={
-                            key.text: key.attrib['ref']
-                            for key in xml_facts.findall('keys/column_name')
-                        },
-                        measures=[
-                            mes.text
-                            for mes in xml_facts.findall('measures/name')
-                        ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
-                ]
-
-                dimensions = [
-                    Dimension(
-                        name=xml_dimension.find('name').text,
-                        column_new_name=[key.attrib['column_new_name']
-                                         for key in xml_dimension.findall('name')],
-                        displayName=xml_dimension.find('displayName').text,
-                        columns=OrderedDict(
-                            (
-                                column_name.text,
-                                column_name.text if not column_name.attrib else
-                                column_name.attrib['column_new_name'],)
-                            for column_name in xml_dimension.findall(
-                                'columns/name', )), )
-                    for xml_dimension in tree.xpath(
-                        '/cubes/cube/dimensions/dimension', )
-                ]
-
-            return [
-                Cube(
-                    name=xml_cube.find('name').text,
-                    source=xml_cube.find('source').text,
-                    facts=facts,
-                    dimensions=dimensions, )
-                for xml_cube in tree.xpath('/cubes/cube')
+            facts = [
+                Facts(
+                    table_name=xml_facts.find('table_name').text,
+                    keys={
+                        key.text: key.attrib['ref']
+                        for key in xml_facts.findall('keys/column_name')
+                    },
+                    measures=[
+                        mes.text
+                        for mes in xml_facts.findall('measures/name')
+                    ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
-        except BaseException:
-            raise ValueError('Bad configuration in the configuration file')
+
+            dimensions = [
+                Dimension(
+                    name=xml_dimension.find('name').text,
+                    displayName=xml_dimension.find('displayName').text,
+                    columns=OrderedDict(
+                        (
+                            column_name.text,
+                            column_name.text if not column_name.attrib else column_name.attrib['column_new_name']
+                        )
+                        for column_name in xml_dimension.findall(
+                            'columns/name', )), )
+                for xml_dimension in tree.xpath(
+                    '/cubes/cube/dimensions/dimension')
+            ]
+
+        return [
+            Cube(
+                name=xml_cube.find('name').text,
+                source=xml_cube.find('source').text,
+                facts=facts,
+                dimensions=dimensions, )
+            for xml_cube in tree.xpath('/cubes/cube')
+        ]
+        # except BaseException:
+        #     raise ValueError('Bad configuration in the configuration file')
 
     def construct_cubes(self):
         """Construct cube based on config file.

@@ -34,8 +34,6 @@ from .execute_csv_files import construct_star_schema_csv_files, \
 from .execute_db import construct_star_schema_db, load_tables_db
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
-SUPPORTED_DATABASES = ['POSTGRES', 'MYSQL', 'MSSQL', 'ORACLE', 'SQLITE']
-SUPPORTED_FILES = ['CSV']
 
 
 def get_default_cube_directory():
@@ -144,7 +142,7 @@ class MdxEngine(object):
         self._mdx_query = clean_query
 
     @classmethod
-    def instantiate_db(cls):
+    def instantiate_db(cls, db=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
@@ -154,7 +152,7 @@ class MdxEngine(object):
         elif 'ORACLE' in dbms:
             db = MyOracleDB(cls.db_config)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(cls.db_config)
+            db = MyMssqlDB(cls.db_config, db)
         else:
             db = MyDB(cls.db_config)
         return db
@@ -173,21 +171,7 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         # try:
         db = cls.instantiate_db()
-        if isinstance(db, MyOracleDB):
-            # You can think of a mysql "database" as a schema/user in Oracle.
-            MdxEngine.from_db_cubes = [db.get_username()]
-        elif isinstance(db, MySqliteDB):
-            # todo clean
-            available_tables = db.engine.execute('PRAGMA database_list;').fetchall()
-            MdxEngine.from_db_cubes = [available_tables[0][-1].split('/')[-1]]
-        else:
-            all_db_query = cls._gen_all_databases_query(db.dbms)
-            result = db.engine.execute(all_db_query)
-            available_tables = result.fetchall()
-            MdxEngine.from_db_cubes = [
-                database[0] for database in available_tables if
-                database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
-            ]
+        MdxEngine.from_db_cubes = db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)
@@ -241,23 +225,6 @@ class MdxEngine(object):
 
         return MdxEngine.csv_files_cubes + MdxEngine.from_db_cubes
 
-    @classmethod
-    def _gen_all_databases_query(cls, dbms):
-        """
-        Each dbms has different query to get user databases names
-        :param dbms: postgres | mysql | oracle | mssql
-        :return: sql query to fetch all databases
-        """
-        if dbms.upper() == 'POSTGRES':
-            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-        elif dbms.upper() == 'MYSQL':
-            return 'SHOW DATABASES'
-        elif dbms.upper() == 'MSSQL':
-            return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
-        elif dbms.upper() == 'ORACLE':
-            # You can think of a mysql "database" as a schema/user in Oracle.
-            return 'select username from dba_users;'
-
     def _get_tables_name(self):
         """Get all tables names.
 
@@ -276,8 +243,7 @@ class MdxEngine(object):
                 and self.cube in self.cube_config.get_cubes_names():
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.construct_cubes():
-                if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
-                    tables = load_table_config_file(self, cubes)
+                tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
@@ -323,18 +289,15 @@ class MdxEngine(object):
         """
         fusion = None
         for cubes in config_file_parser.construct_cubes():
-            if cubes.source.upper() in SUPPORTED_FILES + SUPPORTED_DATABASES:
-                if self.client == 'web':
-                    # todo clean!!!!!
-                    if cubes.facts:
-                        fusion = construct_web_star_schema_config_file(self, cubes)
-                    # todo clean!!!!! # todo clean!!!!! # todo clean!!!!!
-                    elif cubes.source.upper() in SUPPORTED_FILES and cubes.name in self.csv_files_cubes:
-                        fusion = construct_star_schema_csv_files(self)
-                    elif cubes.source.upper() in SUPPORTED_DATABASES and cubes.name in self.from_db_cubes:
-                        fusion = construct_star_schema_db(self)
-                else:
-                    fusion = construct_star_schema_config_file(self, cubes)
+            if self.client == 'web':
+                if cubes.facts:
+                    fusion = construct_web_star_schema_config_file(self, cubes)
+                elif cubes.name in self.csv_files_cubes:
+                    fusion = construct_star_schema_csv_files(self)
+                elif cubes.name in self.from_db_cubes:
+                    fusion = construct_star_schema_db(self)
+            else:
+                fusion = construct_star_schema_config_file(self, cubes)
         return fusion
 
     def get_star_schema_dataframe(self):
