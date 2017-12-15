@@ -6,7 +6,7 @@ language: python
 cache: pip
 python:
   - "2.7"
-#  - "3.6"
+  - "3.6"
 
 install:
   - pip install -U pip setuptools tox wheel
@@ -35,10 +35,9 @@ before_install:
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
   - mysql -u root -e "GRANT ALL ON sales_mysql.* TO 'root_db'@'localhost';"
 
-#notifications:
-#  slack:
-#    rooms:
-#      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
-#    on_success: change
-#    on_failure: always
-#
+notifications:
+  slack:
+    rooms:
+      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
+    on_success: change
+    on_failure: always
