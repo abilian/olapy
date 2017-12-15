@@ -10,7 +10,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from shutil import copyfile
 
 import shutil
-# from bonobo_sqlalchemy import Select
 from distutils.dir_util import copy_tree
 from olapy.core.mdx.executor.execute import MdxEngine
 # from bonobo.commands.run import get_default_services
@@ -131,8 +130,16 @@ class ETL(object):
         """
         # from olapy.etl._services import get_services
         # print(get_services())
+
+        # def get_services(**options):
+        #     return {
+        #         'sqlalchemy.engine': create_db_engine()
+        #     }
+
+
         if self.source_type.upper() == 'DB':
-            pass
+            engine = get_services().get('sqlalchemy.engine')
+            return engine.execute('SELECT * from {};'.format(table_name))
             # return Select('SELECT * from {};'.format(table_name))
         elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
