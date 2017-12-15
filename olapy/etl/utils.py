@@ -33,8 +33,7 @@ def create_db_engine(driver='SQL Server Native Client', version='11.0'):
             dsn += '?driver={0}'.format(driver + ' ' + version)
     return create_engine(dsn)
 
-
-def get_services(**options):
-    return {
-        'sqlalchemy.engine': create_db_engine()
-    }
+# def get_services(**options):
+#     return {
+#         'sqlalchemy.engine': create_db_engine()
+#     }

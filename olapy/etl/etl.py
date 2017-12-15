@@ -12,14 +12,13 @@ from shutil import copyfile
 import shutil
 from distutils.dir_util import copy_tree
 from olapy.core.mdx.executor.execute import MdxEngine
-# from bonobo.commands.run import get_default_services
 
 import bonobo
 import dotenv
 import logging
 import os
 
-from olapy.etl.utils import create_db_engine, get_services
+from olapy.etl.utils import create_db_engine
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -72,7 +71,6 @@ class ETL(object):
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
-        # self.services = get_default_services(__file__)
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
@@ -130,19 +128,9 @@ class ETL(object):
         :param table_name: table/file to extract
         :return: Bonobo Reader
         """
-        # from olapy.etl._services import get_services
-        # print(get_services())
-
-        # def get_services(**options):
-        #     return {
-        #         'sqlalchemy.engine': create_db_engine()
-        #     }
-
-
         if self.source_type.upper() == 'DB':
-            engine = get_services().get('sqlalchemy.engine')
+            engine = create_db_engine()
             return engine.execute('SELECT * from {};'.format(table_name))
-            # return Select('SELECT * from {};'.format(table_name))
         elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
             return bonobo.FileReader(table_name)
@@ -209,16 +197,12 @@ class ETL(object):
 
 
 def get_graph(etl, **options):
-    # graph = bonobo.Graph()
-    # graph.add_chain(...)
     return bonobo.Graph(
         etl.extract(options.get("extraction_source"), delimiter=options.get("in_delimiter")),
         etl.transform,
         etl.load(options.get("table"))
 
     )
-
-
 
 
 def run_olapy_etl(dims_infos,
@@ -274,12 +258,11 @@ def run_olapy_etl(dims_infos,
             etl.current_dim_id_column = dims_infos[table]
 
         parser = bonobo.get_argument_parser()
-        with bonobo.parse_args(parser) as options:
+        with bonobo.parse_args(parser):
             bonobo.run(get_graph(etl,
                                  extraction_source=extraction_source,
                                  in_delimiter=in_delimiter,
-                                 table=table),
-                       services=get_services(**options)
+                                 table=table)
                        )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
