@@ -10,10 +10,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from shutil import copyfile
 
 import shutil
-from bonobo_sqlalchemy import Select
+# from bonobo_sqlalchemy import Select
 from distutils.dir_util import copy_tree
 from olapy.core.mdx.executor.execute import MdxEngine
-from bonobo.commands.run import get_default_services
+# from bonobo.commands.run import get_default_services
 
 import bonobo
 import dotenv
@@ -71,7 +71,7 @@ class ETL(object):
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
-        self.services = get_default_services(__file__)
+        # self.services = get_default_services(__file__)
 
     def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
@@ -129,8 +129,11 @@ class ETL(object):
         :param table_name: table/file to extract
         :return: Bonobo Reader
         """
+        # from olapy.etl._services import get_services
+        # print(get_services())
         if self.source_type.upper() == 'DB':
-            return Select('SELECT * from {};'.format(table_name))
+            pass
+            # return Select('SELECT * from {};'.format(table_name))
         elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
             return bonobo.FileReader(table_name)
@@ -165,7 +168,7 @@ class ETL(object):
         if table_name == self.facts_table:
             table_name = 'Facts'
         return bonobo.CsvWriter(
-            os.path.join(GEN_FOLDER, table_name + '.csv'), ioformat='arg0')
+            os.path.join(GEN_FOLDER, table_name + '.csv'))
 
     def copy_2_olapy_dir(self):
         """
@@ -205,6 +208,47 @@ def get_graph(etl, **options):
         etl.load(options.get("table"))
 
     )
+
+from collections import defaultdict
+
+import os
+from sqlalchemy import create_engine
+
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+
+db_config = DbConfigParser()
+config = db_config.get_db_credentials()
+
+DB_CONFIG_DEFAULTS = {
+    'driver': config['driver'],
+    'host': config['host'],
+    'port': config['port'],
+    'name': config['db_name'],
+    'user': config['user'],
+    'pass': config['password'],
+}
+
+DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
+
+
+
+def create_db_engine(driver='SQL Server Native Client', version='11.0'):
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        dsn = os.environ['SQLALCHEMY_DATABASE_URI']
+    else:
+        config = defaultdict(**DB_CONFIG_DEFAULTS)
+        dsn = DSN_TEMPLATE.format(**config)
+
+        if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
+            dsn += '?client_encoding=utf8'
+        elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
+            dsn += '?driver={0}'.format(driver + ' ' + version)
+    return create_engine(dsn)
+
+def get_services(**options):
+    return {
+        'sqlalchemy.engine': create_db_engine()
+    }
 
 
 def run_olapy_etl(dims_infos,
@@ -259,11 +303,18 @@ def run_olapy_etl(dims_infos,
         else:
             etl.current_dim_id_column = dims_infos[table]
 
-        bonobo.run(get_graph(etl,
-                             extraction_source=extraction_source,
-                             in_delimiter=in_delimiter,
-                             table=table)
-                   )
+        parser = bonobo.get_argument_parser()
+        with bonobo.parse_args(parser) as options:
+            # bonobo.run(
+            #     get_graph(**options),
+            #     services=get_services(**options)
+            # )
+            bonobo.run(get_graph(etl,
+                                 extraction_source=extraction_source,
+                                 in_delimiter=in_delimiter,
+                                 table=table),
+                       services=get_services(**options)
+                       )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
