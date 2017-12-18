@@ -7,6 +7,7 @@ from tests.mysql_utils import create_insert
 
 from tests.queries import query3, query10, query6
 from olapy.core.mdx.executor.execute import MdxEngine
+
 MdxEngine.source_type = ('csv', 'db')
 CUBE = 'main'
 
@@ -18,6 +19,7 @@ def connect():
     eng = sqlalchemy.create_engine("sqlite://")
     MdxEngine.engine = eng
     return eng
+
 
 @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
 # create tables in the postgres database
