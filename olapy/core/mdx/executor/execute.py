@@ -130,6 +130,7 @@ class MdxEngine(object):
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
+        self.engine = None
 
     @property
     def mdx_query(self):
