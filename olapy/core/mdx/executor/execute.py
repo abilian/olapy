@@ -40,8 +40,6 @@ def get_default_cube_directory():
     # toxworkdir does not expanduser properly under tox
     if 'OLAPY_PATH' in os.environ:
         home_directory = os.environ.get('OLAPY_PATH')
-    # elif DATA_FOLDER is not None:
-    #     home_directory = DATA_FOLDER
     elif RUNNING_TOX:
         home_directory = os.environ.get('HOME_DIR')
     else:
@@ -460,8 +458,7 @@ class MdxEngine(object):
                 if tup_att.isdigit():
                     tup_att = int(tup_att)
 
-                df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
-                         == tup_att)]
+                df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -743,9 +740,7 @@ class MdxEngine(object):
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
 
-        tuples_on_mdx_query = [
-            tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
-        ]
+        tuples_on_mdx_query = [tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES']
 
         if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)

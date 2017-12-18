@@ -178,7 +178,6 @@ class MySqliteDB(MyDB):
         dbs = [available_dbs[0][-1].split('/')[-1]]
         return dbs if dbs != [''] else [available_dbs[0][1]]
 
-
     def connect_with_env_var(self, db):
         if self.conn_string.split(':/')[0].upper() == 'SQLITE':
             engine = create_engine(self.conn_string)

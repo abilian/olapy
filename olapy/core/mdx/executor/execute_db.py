@@ -31,7 +31,6 @@ def load_tables_db(executor_instance):
         executor_instance.facts = executor_instance.facts.lower()
     for table_name in inspector.get_table_names():
         if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
-            # fix for oracle
             table_name = table_name.title()
 
         results = executor_instance.engine.engine.execution_options(stream_results=True).execute(
@@ -52,8 +51,6 @@ def construct_star_schema_db(executor_instance):
     :param cube_name:  cube name (database name)
     :return: star schema DataFrame
     """
-
-    # db = executor_instance.instantiate_db(executor_instance.cube)
 
     if not executor_instance.engine:
         executor_instance.engine = executor_instance.instantiate_db(executor_instance.cube)
