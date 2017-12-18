@@ -102,6 +102,7 @@ class MdxEngine(object):
         self.sep = sep
         self.facts = fact_table_name
         self.parser = parser
+        self.engine = None
         self._mdx_query = mdx_query
         if olapy_data_location is None:
             self.olapy_data_location = MdxEngine.olapy_data_location
@@ -128,7 +129,6 @@ class MdxEngine(object):
         self.tables_names = self._get_tables_name()
         # default measure is the first one
         self.selected_measures = [self.measures[0]]
-        self.engine = None
 
     @property
     def mdx_query(self):
