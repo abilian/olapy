@@ -1,4 +1,3 @@
-
 discover_schema_rowsets_response_rows = [
     {
         'SchemaName': 'DBSCHEMA_CATALOGS',
