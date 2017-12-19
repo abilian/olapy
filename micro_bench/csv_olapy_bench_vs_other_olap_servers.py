@@ -24,100 +24,12 @@ REFINEMENT_LVL = 5
 PROFILING_LINES = 15
 
 
-def main():
-    file = open('bench_result' +
-                str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
-    gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
-    gen.generate_csv(gen.generate_cube(3, 1000))
-    XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
-    mbench = MicBench()
-
-    file.write("Benchmarks are made with cpu :\n")
-    file.write(cpuinfo.get_cpu_info()['brand'] + "\n\n")
-
-    application = Application(
-        [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'))
-    wsgi_application = WsgiApplication(application)
-    server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
-    server.start()
-
-    provider = xmla.XMLAProvider()
-    conn = provider.connect(location=server.url)
-
-    t = PrettyTable(['Query', 'olapy execution time'])
-
-    cmd = """
-            SELECT
-            FROM [""" + CUBE_NAME + """]
-            WHERE ([Measures].[Amount])
-            CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-
-    file.write(
-        "Query 1 :\n" + cmd +
-        "\n----------------------------------------------------------\n\n")
-
-    t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
-
-    cmd = """SELECT
-        NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
-        [table0].[table0].[All table0A].Members}}}, {
-        [table0].[table0].[table0A].[""" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[1]
-    ) + """]})))
-        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
-        ON COLUMNS
-        FROM [""" + CUBE_NAME + """]
-        WHERE ([Measures].[Amount])
-        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-        """
-
-    file.write(
-        "Query 2 :\n" + cmd +
-        "\n----------------------------------------------------------\n\n")
-    t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
-
-    tup = "[table0].[table0].[table0A].[" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[0]
-    ) + "]"
-    for d in range(REFINEMENT_LVL):
-        tup += ",\n[table0].[table0].[table0A].[" + str(
-            XmlaProviderService.discover_tools.star_schema_dataframe.
-            table0A[d + 1]) + "]"
-
-    cmd = """
-        SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
-        [table0].[table0].[All table0A].Members}}}, {
-        """ + tup + """
-        })))
-        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
-        ON COLUMNS
-        FROM [""" + CUBE_NAME + """]
-        WHERE ([Measures].[Amount])
-        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-        """
-
-    file.write(
-        "Query 3 :\n" + cmd +
-        "\n----------------------------------------------------------\n\n")
-    t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
-    file.write(str(t) + "\n\n")
-
+def olapy_vs_mondrian(file, mbench, conn):
     try:
-        file.write(
-            '******************************************************************************\n'
-        )
-        file.write(
-            '* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n'
-        )
-        file.write(
-            '* (olapy warehouse"s cube has more rows)                                     *\n'
-        )
-        file.write(
-            '******************************************************************************\n\n'
-        )
+        file.write('******************************************************************************\n')
+        file.write('* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n')
+        file.write('* (olapy warehouse"s cube has more rows)                                     *\n')
+        file.write('******************************************************************************\n\n')
 
         t = PrettyTable(['Query', 'mondrian', 'olapy'])
         p2 = xmla.XMLAProvider()
@@ -200,6 +112,8 @@ def main():
         print('Make sure mondrian is running and containing Warehouse cube')
         pass
 
+
+def olapy_vs_iccube(file, mbench, conn):
     try:
         file.write('******************************************\n')
         file.write('* iCcube v4.8.2 with "sales Excel" Cube  *\n')
@@ -388,37 +302,92 @@ def main():
         print('Make sure icCube is running and containing sales Excel cube')
         pass
 
-    file.write(
-        '---------------- Profiling olapy Query 5 ------------------ \n\n')
-    cProfile.run("""cmd = '''
+
+def olapy_query_excution_bench(file, mbench, conn):
+    t = PrettyTable(['Query', 'olapy execution time'])
+
+    cmd = """
             SELECT
-            NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
-            [Geography].[Geography].[All Continent].Members}}}, {
-            [Geography].[Geography].[Continent].[America],
-            [Geography].[Geography].[Continent].[Europe]})}}, {
-            [Geography].[Geography].[Continent].[America].[United States],
-            [Geography].[Geography].[Continent].[Europe].[France],
-            [Geography].[Geography].[Continent].[Europe].[Spain]}))),
-            Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{
-            [Product].[Product].[Company].Members}}, {
-            [Product].[Product].[Company].[Crazy Development]})}}, {
-            [Product].[Product].[Company].[Crazy Development].[olapy]})))),
-            Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownMember({{
-            [Time].[Time].[Year].Members}}, {
-            [Time].[Time].[Year].[2010]})}}, {
-            [Time].[Time].[Year].[2010].[Q2 2010]})}}, {
-            [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]}))))
-            DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
-            ON COLUMNS
-            FROM [sales]
+            FROM [""" + CUBE_NAME + """]
             WHERE ([Measures].[Amount])
-            CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
+            CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-request = ExecuteRequest()
-request.Command = Command(Statement = cmd)
-request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
+    file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
 
-XmlaProviderService().Execute(XmlaProviderService(),request)""",
+    t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
+
+    cmd = """SELECT
+        NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
+        [table0].[table0].[All table0A].Members}}}, {
+        [table0].[table0].[table0A].[""" + str(
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[1]
+    ) + """]})))
+        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+        ON COLUMNS
+        FROM [""" + CUBE_NAME + """]
+        WHERE ([Measures].[Amount])
+        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+        """
+
+    file.write("Query 2 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
+
+    tup = "[table0].[table0].[table0A].[" + str(
+        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[0]
+    ) + "]"
+    for d in range(REFINEMENT_LVL):
+        tup += ",\n[table0].[table0].[table0A].[" + str(
+            XmlaProviderService.discover_tools.star_schema_dataframe.
+                table0A[d + 1]) + "]"
+
+    cmd = """
+        SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
+        [table0].[table0].[All table0A].Members}}}, {
+        """ + tup + """
+        })))
+        DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+        ON COLUMNS
+        FROM [""" + CUBE_NAME + """]
+        WHERE ([Measures].[Amount])
+        CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+        """
+
+    file.write("Query 3 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
+    file.write(str(t) + "\n\n")
+
+
+def olapy_profile(file):
+    file.write('---------------- Profiling olapy Query 5 ------------------ \n\n')
+    cProfile.run("""cmd = '''
+                SELECT
+                NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
+                [Geography].[Geography].[All Continent].Members}}}, {
+                [Geography].[Geography].[Continent].[America],
+                [Geography].[Geography].[Continent].[Europe]})}}, {
+                [Geography].[Geography].[Continent].[America].[United States],
+                [Geography].[Geography].[Continent].[Europe].[France],
+                [Geography].[Geography].[Continent].[Europe].[Spain]}))),
+                Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{
+                [Product].[Product].[Company].Members}}, {
+                [Product].[Product].[Company].[Crazy Development]})}}, {
+                [Product].[Product].[Company].[Crazy Development].[olapy]})))),
+                Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{DrilldownMember({{
+                [Time].[Time].[Year].Members}}, {
+                [Time].[Time].[Year].[2010]})}}, {
+                [Time].[Time].[Year].[2010].[Q2 2010]})}}, {
+                [Time].[Time].[Year].[2010].[Q2 2010].[May 2010]}))))
+                DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+                ON COLUMNS
+                FROM [sales]
+                WHERE ([Measures].[Amount])
+                CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
+
+    request = ExecuteRequest()
+    request.Command = Command(Statement = cmd)
+    request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
+
+    XmlaProviderService().Execute(XmlaProviderService(),request)""",
                  "{}.profile".format(__file__))
 
     s = pstats.Stats("{}.profile".format(__file__), stream=file)
@@ -426,15 +395,45 @@ XmlaProviderService().Execute(XmlaProviderService(),request)""",
     s.sort_stats("time").print_stats(PROFILING_LINES)
 
     try:
-        os.system(
-            'gprof2dot -f pstats csv_olapy_bench_vs_other_olap_servers.py.profile | dot -Tpng -o profile.png'
-        )
+        os.system('gprof2dot -f pstats csv_olapy_bench_vs_other_olap_servers.py.profile | dot -Tpng -o profile.png')
     except:
         print('make sure gprof2dot and graphviz are installed')
 
     os.remove('csv_olapy_bench_vs_other_olap_servers.py.profile')
 
+
+def main():
+    file = open('bench_result' + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
+    gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
+    gen.generate_csv(gen.generate_cube(3, 1000))
+    XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+    mbench = MicBench()
+
+    file.write("Benchmarks are made with cpu :\n")
+    file.write(cpuinfo.get_cpu_info()['brand'] + "\n\n")
+
+    application = Application(
+        [XmlaProviderService],
+        'urn:schemas-microsoft-com:xml-analysis',
+        in_protocol=Soap11(validator='soft'),
+        out_protocol=Soap11(validator='soft'))
+    wsgi_application = WsgiApplication(application)
+    server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
+    server.start()
+
+    provider = xmla.XMLAProvider()
+    conn = provider.connect(location=server.url)
+
+    olapy_query_excution_bench(file, mbench, conn)
+
+    olapy_vs_mondrian(file, mbench, conn)
+
+    olapy_vs_iccube(file, mbench, conn)
+
+    olapy_profile(file)
+
     gen.remove_temp_cube()
+
     file.close()
     server.stop()
 
