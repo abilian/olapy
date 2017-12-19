@@ -174,8 +174,9 @@ class MySqliteDB(MyDB):
         return create_engine('sqlite:///' + self.db_credentials['path'])
 
     def get_all_databases(self):
-        available_tables = self.engine.execute('PRAGMA database_list;').fetchall()
-        return [available_tables[0][-1].split('/')[-1]]
+        available_dbs = self.engine.execute('PRAGMA database_list;').fetchall()
+        dbs = [available_dbs[0][-1].split('/')[-1]]
+        return dbs if dbs != [''] else [available_dbs[0][1]]
 
     def connect_with_env_var(self, db):
         if self.conn_string.split(':/')[0].upper() == 'SQLITE':

@@ -18,20 +18,23 @@ def load_tables_db(executor_instance):
     :return: tables dict with table name as key and dataframe as value
     """
     tables = {}
+
     # todo db from executro instance
     db = executor_instance.instantiate_db(executor_instance.cube)
-    inspector = inspect(db.engine)
+    if not executor_instance.engine:
+        executor_instance.engine = executor_instance.instantiate_db(executor_instance.cube).engine
 
+    inspector = inspect(executor_instance.engine)
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.dbms.upper() == 'POSTGRES':
         executor_instance.facts = executor_instance.facts.lower()
     for table_name in inspector.get_table_names():
         if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
-            # fix for oracle
             table_name = table_name.title()
 
-        results = db.engine.execution_options(stream_results=True).execute('SELECT * FROM {0}'.format(table_name))
+        results = executor_instance.engine.engine.execution_options(stream_results=True).execute(
+            'SELECT * FROM {0}'.format(table_name))
         # Fetch all the results of the query
         value = pd.DataFrame(iter(results), columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
@@ -49,10 +52,11 @@ def construct_star_schema_db(executor_instance):
     :return: star schema DataFrame
     """
 
-    db = executor_instance.instantiate_db(executor_instance.cube)
+    if not executor_instance.engine:
+        executor_instance.engine = executor_instance.instantiate_db(executor_instance.cube)
 
-    fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), db.engine)
-    inspector = inspect(db.engine)
+    fusion = psql.read_sql_query('SELECT * FROM {0}'.format(executor_instance.facts), executor_instance.engine)
+    inspector = inspect(executor_instance.engine)
 
     for db_table_name in inspector.get_table_names():
         try:
@@ -61,7 +65,8 @@ def construct_star_schema_db(executor_instance):
             if isinstance(db_table_name, Iterable):
                 db_table_name = db_table_name[0]
         try:
-            fusion = fusion.merge(psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), db.engine))
+            fusion = fusion.merge(
+                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name), executor_instance.engine))
         except BaseException:
             print('No common column between {0} and {1}'.format(executor_instance.facts, db_table_name))
             pass
