@@ -171,7 +171,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
         dimension_name = dimension_and_key.split('.')[0]
-        if dimension_name in tables.keys():
+        if dimension_name in list(tables.keys()):
             df = tables[dimension_name]
         else:
             df = load_one_table(cubes_obj, executor_instance, dimension_and_key.split('.')[0])

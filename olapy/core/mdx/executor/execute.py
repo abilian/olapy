@@ -229,7 +229,7 @@ class MdxEngine(object):
 
         :return: list tables names
         """
-        return self.tables_loaded.keys()
+        return list(self.tables_loaded.keys())
 
     def load_tables(self):
         """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.

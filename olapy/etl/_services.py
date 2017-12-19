@@ -25,7 +25,7 @@ DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
 
 
 def create_db_engine(driver='SQL Server Native Client', version='11.0'):
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+    if 'SQLALCHEMY_DATABASE_URI' in list(os.environ.keys()):
         dsn = os.environ['SQLALCHEMY_DATABASE_URI']
     else:
         config = defaultdict(**DB_CONFIG_DEFAULTS)
