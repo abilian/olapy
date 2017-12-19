@@ -84,6 +84,7 @@ class MdxEngine(object):
     db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
+    engine = None
 
     def __init__(
             self,
@@ -102,7 +103,6 @@ class MdxEngine(object):
         self.sep = sep
         self.facts = fact_table_name
         self.parser = parser
-        self.engine = None
         self._mdx_query = mdx_query
         if olapy_data_location is None:
             self.olapy_data_location = MdxEngine.olapy_data_location
