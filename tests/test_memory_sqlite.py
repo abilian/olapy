@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
+import os
 import pandas as pd
 import pytest
 import sqlalchemy
@@ -17,6 +18,7 @@ CUBE = 'main'
 def connect():
     """Returns a connection and a metadata object"""
     eng = sqlalchemy.create_engine("sqlite://")
+    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
     MdxEngine.engine = eng
     return eng
 
