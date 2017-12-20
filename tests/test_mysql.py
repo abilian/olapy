@@ -33,6 +33,7 @@ def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     MdxEngine.source_type = ('csv', 'db')
     os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URI']
+    MdxEngine.engine = None
     return MdxEngine(CUBE)
 
 
