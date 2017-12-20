@@ -1,22 +1,25 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import cProfile
-import pstats
 import datetime
-import cpuinfo
 import os
+import pstats
 
+import cpuinfo
+from micro_bench import MicBench
+from olap.xmla import xmla
+# do not remove this (used in profiler)
+from olapy.core.services.models import Command, ExecuteRequest, \
+    Propertielist, Property
+from olapy.core.services.xmla import XmlaProviderService
+from prettytable import PrettyTable
+from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
-from micro_bench import MicBench
 from tests.test_xmla import WSGIServer
-from olap.xmla import xmla
-from olapy.core.services.xmla import XmlaProviderService
-from cube_generator import CubeGen, CUBE_NAME
-from spyne import Application
-from prettytable import PrettyTable
-# do not remove this (used in profiler)
-from olapy.core.services.models import ExecuteRequest, Command, Propertielist, Property
+
+from cube_generator import CUBE_NAME, CubeGen
 
 HOST = "127.0.0.1"
 PORT = 8230
@@ -26,10 +29,18 @@ PROFILING_LINES = 15
 
 def olapy_vs_mondrian(file, mbench, conn):
     try:
-        file.write('******************************************************************************\n')
-        file.write('* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n')
-        file.write('* (olapy warehouse"s cube has more rows)                                     *\n')
-        file.write('******************************************************************************\n\n')
+        file.write(
+            '******************************************************************************\n'
+        )
+        file.write(
+            '* mondrian with "warehouse" Cube (note the same as olapy but resemble to it) *\n'
+        )
+        file.write(
+            '* (olapy warehouse"s cube has more rows)                                     *\n'
+        )
+        file.write(
+            '******************************************************************************\n\n'
+        )
 
         t = PrettyTable(['Query', 'mondrian', 'olapy'])
         p2 = xmla.XMLAProvider()
@@ -312,7 +323,9 @@ def olapy_query_excution_bench(file, mbench, conn):
             WHERE ([Measures].[Amount])
             CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 
-    file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 1 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
 
     t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
 
@@ -329,7 +342,9 @@ def olapy_query_excution_bench(file, mbench, conn):
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
         """
 
-    file.write("Query 2 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 2 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
 
     tup = "[table0].[table0].[table0A].[" + str(
@@ -338,7 +353,7 @@ def olapy_query_excution_bench(file, mbench, conn):
     for d in range(REFINEMENT_LVL):
         tup += ",\n[table0].[table0].[table0A].[" + str(
             XmlaProviderService.discover_tools.star_schema_dataframe.
-                table0A[d + 1]) + "]"
+            table0A[d + 1]) + "]"
 
     cmd = """
         SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
@@ -352,13 +367,16 @@ def olapy_query_excution_bench(file, mbench, conn):
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
         """
 
-    file.write("Query 3 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 3 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
     file.write(str(t) + "\n\n")
 
 
 def olapy_profile(file):
-    file.write('---------------- Profiling olapy Query 5 ------------------ \n\n')
+    file.write(
+        '---------------- Profiling olapy Query 5 ------------------ \n\n')
     cProfile.run("""cmd = '''
                 SELECT
                 NON EMPTY CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers(DrilldownMember({{DrilldownMember({{{
@@ -395,7 +413,9 @@ def olapy_profile(file):
     s.sort_stats("time").print_stats(PROFILING_LINES)
 
     try:
-        os.system('gprof2dot -f pstats csv_olapy_bench_vs_other_olap_servers.py.profile | dot -Tpng -o profile.png')
+        os.system(
+            'gprof2dot -f pstats csv_olapy_bench_vs_other_olap_servers.py.profile | dot -Tpng -o profile.png'
+        )
     except:
         print('make sure gprof2dot and graphviz are installed')
 
@@ -403,7 +423,8 @@ def olapy_profile(file):
 
 
 def main():
-    file = open('bench_result' + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
+    file = open('bench_result' +
+                str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
     XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)

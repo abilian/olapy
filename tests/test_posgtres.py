@@ -1,11 +1,12 @@
 from __future__ import absolute_import, division, print_function
+
 import os
+
 import pandas as pd
 import pytest
 import sqlalchemy
-from pandas.util.testing import assert_frame_equal
-
 from olapy.core.mdx.executor.execute import get_default_cube_directory
+from pandas.util.testing import assert_frame_equal
 from tests.postgres_utils import create_insert, drop_tables
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
@@ -19,7 +20,9 @@ DB = 'sales_postgres'
 def test_conf_file_change():
     if 'SQLALCHEMY_DATABASE_URI' not in os.environ:
         # py.test directly #todo fix remove this
-        with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
+        with open(
+                os.path.join(get_default_cube_directory(), 'olapy-config'),
+                "w") as f:
             f.write("""
             dbms : postgres
             host : localhost
@@ -39,7 +42,8 @@ def connect(user=USER_NAME,
             port=5432):
     """Returns a connection and a metadata object"""
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], client_encoding='utf8')
+        return sqlalchemy.create_engine(
+            os.environ['SQLALCHEMY_DATABASE_URI'], client_encoding='utf8')
     else:
         # DEFAULT CONFIG
         # We connect with the help of the PostgreSQL URL

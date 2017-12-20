@@ -1,4 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
 import shutil
@@ -7,7 +8,6 @@ from os.path import expanduser
 
 import numpy as np
 import pandas as pd
-
 from olapy.core.mdx.executor.execute import MdxEngine
 
 CUBE_NAME = "temp_cube"

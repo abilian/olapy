@@ -4,6 +4,7 @@ Managing all database access
 from __future__ import absolute_import, division, print_function
 
 import os
+
 from sqlalchemy import create_engine
 
 
@@ -57,8 +58,10 @@ class MyDB(object):
         result = self.engine.execute(all_db_query)
         available_tables = result.fetchall()
         return [
-            database[0] for database in available_tables if
-            database[0] not in ['mysql', 'information_schema', 'performance_schema', 'sys']
+            database[0]
+            for database in available_tables
+            if database[0] not in
+            ['mysql', 'information_schema', 'performance_schema', 'sys']
         ]
 
     def connect_with_env_var(self, db):
@@ -107,14 +110,17 @@ class MyDB(object):
         if db is None:
             db_to_connect_to = con_db
         else:
-            db_to_connect_to = '' if self.db_credentials['dbms'].upper() == 'ORACLE' else db
+            db_to_connect_to = '' if self.db_credentials[
+                'dbms'].upper() == 'ORACLE' else db
 
-        url = '{0}://{1}:{2}@{3}:{4}/{5}'.format(eng,
-                                                 self.db_credentials['user'],
-                                                 self.db_credentials['password'],
-                                                 self.db_credentials['host'],
-                                                 self.db_credentials['port'],
-                                                 db_to_connect_to)
+        url = '{0}://{1}:{2}@{3}:{4}/{5}'.format(
+            eng,
+            self.db_credentials['user'],
+            self.db_credentials['password'],
+            self.db_credentials['host'],
+            self.db_credentials['port'],
+            db_to_connect_to,
+        )
 
         return create_engine(url, encoding='utf-8')
 
@@ -124,6 +130,7 @@ class MyDB(object):
 
 
 class MyOracleDB(MyDB):
+
     def __init__(self, db_config, db=None):
         MyDB.__init__(self, db_config, db=db)
 
@@ -159,6 +166,7 @@ class MyOracleDB(MyDB):
 
 
 class MySqliteDB(MyDB):
+
     def __init__(self, db_config, db=None):
         MyDB.__init__(self, db_config, db=db)
 
@@ -191,6 +199,7 @@ class MySqliteDB(MyDB):
 
 
 class MyMssqlDB(MyDB):
+
     def __init__(self, db_config, db=None):
         MyDB.__init__(self, db_config, db=db)
 
@@ -223,19 +232,25 @@ class MyMssqlDB(MyDB):
         :return: SqlAlchemy engine
         """
         # todo recheck + clean
-        sql_server_driver = self.db_credentials['sql_server_driver'].replace(' ', '+')
+        sql_server_driver = self.db_credentials['sql_server_driver'].replace(
+            ' ', '+')
         if db is not None:
-            url = driver + '://(local)/{0}?driver={1}'.format(db, sql_server_driver)
+            url = driver + '://(local)/{0}?driver={1}'.format(
+                db, sql_server_driver)
             return create_engine(url, encoding='utf-8')
 
-        if 'LOCALHOST' in self.db_credentials['user'].upper() or not self.db_credentials['user']:
-            url = driver + '://(local)/msdb?driver={0}'.format(sql_server_driver)
+        if 'LOCALHOST' in self.db_credentials['user'].upper(
+        ) or not self.db_credentials['user']:
+            url = driver + \
+                '://(local)/msdb?driver={0}'.format(sql_server_driver)
         else:
-            url = driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(self.db_credentials['user'],
-                                                                       self.db_credentials['password'],
-                                                                       self.db_credentials['host'],
-                                                                       self.db_credentials['port'],
-                                                                       sql_server_driver)
+            url = driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(
+                self.db_credentials['user'],
+                self.db_credentials['password'],
+                self.db_credentials['host'],
+                self.db_credentials['port'],
+                sql_server_driver,
+            )
         return create_engine(url)
 
     def construct_engine(self, db):

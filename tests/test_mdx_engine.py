@@ -1,9 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
-
 from olapy.core.mdx.executor.execute import MdxEngine
+from pandas.util.testing import assert_frame_equal
 
 from .queries import CUBE, query1, query3, query6, query7, query8, query9, \
     query10

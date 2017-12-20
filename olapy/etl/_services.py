@@ -1,13 +1,14 @@
 """
 Bonobo etl require this file to access databases (and files)
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-from collections import defaultdict
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
-from sqlalchemy import create_engine
+from collections import defaultdict
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+from sqlalchemy import create_engine
 
 db_config = DbConfigParser()
 config = db_config.get_db_credentials()
@@ -40,5 +41,5 @@ def create_db_engine(driver='SQL Server Native Client', version='11.0'):
 
 def get_services():
     return {
-        'sqlalchemy.engine': create_db_engine()
+        'sqlalchemy.engine': create_db_engine(),
     }

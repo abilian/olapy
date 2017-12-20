@@ -1,11 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
+import os
 from distutils.dir_util import copy_tree
-from os.path import expanduser, dirname
+from os.path import dirname, expanduser
 from shutil import copyfile
 
 import click
-import os
 
 RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
@@ -19,18 +20,24 @@ def init():
     else:
         home_directory = expanduser("~")
 
-    olapy_lib_dir = dirname(os.path.join(os.path.dirname(os.path.realpath(__file__))))
+    olapy_lib_dir = dirname(
+        os.path.join(os.path.dirname(os.path.realpath(__file__))))
 
     if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'cubes')):
         os.makedirs(os.path.join(home_directory, 'olapy-data', 'cubes'))
 
-        copy_tree(os.path.join(olapy_lib_dir, 'cubes_templates'),
-                  os.path.join(home_directory, 'olapy-data', 'cubes'))
+        copy_tree(
+            os.path.join(olapy_lib_dir, 'cubes_templates'),
+            os.path.join(home_directory, 'olapy-data', 'cubes'),
+        )
         print('Initializing demo cubes')
 
-    if not os.path.isfile(os.path.join(home_directory, 'olapy-data', 'olapy-config')):
-        copyfile(os.path.join(olapy_lib_dir, 'config', 'olapy-config'),
-                 os.path.join(home_directory, 'olapy-data', 'olapy-config'))
+    if not os.path.isfile(
+            os.path.join(home_directory, 'olapy-data', 'olapy-config')):
+        copyfile(
+            os.path.join(olapy_lib_dir, 'config', 'olapy-config'),
+            os.path.join(home_directory, 'olapy-data', 'olapy-config'),
+        )
         print('Initializing config files')
 
 

@@ -1,22 +1,27 @@
 from __future__ import absolute_import, division, print_function
+
 import os
+
 import pandas as pd
 import pytest
 import sqlalchemy
+from olapy.core.mdx.executor.execute import MdxEngine, \
+    get_default_cube_directory
 from pandas.util.testing import assert_frame_equal
-
-from olapy.core.mdx.executor.execute import get_default_cube_directory, MdxEngine
-from tests.queries import query3, query10, query6
+from tests.queries import query3, query6, query10
 
 CUBE = 'sales_sqlite'
-sqlite_lite_db_path = os.path.join(get_default_cube_directory(), MdxEngine.CUBE_FOLDER_NAME, CUBE)
+sqlite_lite_db_path = os.path.join(get_default_cube_directory(),
+                                   MdxEngine.CUBE_FOLDER_NAME, CUBE)
 
 
 @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
 def test_conf_file_change():
     if 'SQLALCHEMY_DATABASE_URI' not in os.environ:
         # py.test directly #todo fix remove this
-        with open(os.path.join(get_default_cube_directory(), 'olapy-config'), "w") as f:
+        with open(
+                os.path.join(get_default_cube_directory(), 'olapy-config'),
+                "w") as f:
             f.write("""
             dbms : sqlite
             path : {0}

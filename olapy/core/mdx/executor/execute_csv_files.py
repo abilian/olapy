@@ -2,7 +2,8 @@
 Part of :mod:`execute.py` module, here olapy construct cube from CSV FILES automatically based on \
 `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
 
@@ -22,7 +23,8 @@ def load_tables_csv_files(executor_instance):
         table_name = os.path.splitext(file)[0]
         value = pd.read_csv(
             os.path.join(cube, file),
-            sep=executor_instance.sep)
+            sep=executor_instance.sep,
+        )
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
         ]]
@@ -42,13 +44,15 @@ def construct_star_schema_csv_files(executor_instance):
     # loading facts table
     fusion = pd.read_csv(
         os.path.join(cube, executor_instance.facts + '.csv'),
-        sep=executor_instance.sep, )
+        sep=executor_instance.sep,
+    )
     for file_name in os.listdir(cube):
         try:
             fusion = fusion.merge(
                 pd.read_csv(
                     os.path.join(cube, file_name),
-                    sep=executor_instance.sep, ), )
+                    sep=executor_instance.sep,
+                ),)
         except BaseException:
             print('No common column')
             pass

@@ -242,7 +242,6 @@ SELECT {
 
 where = "WHERE [Time].[Calendar].[Day].[May 12,2010]"
 
-
 query_posgres1 = """
     SELECT
     Hierarchize(non empty {[geography].[geography].[country].Members}) ON COLUMNS,
@@ -260,7 +259,6 @@ query_posgres2 = """
     FROM [sales_postgres]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-
 
 query_postgres3 = """
     SELECT {(

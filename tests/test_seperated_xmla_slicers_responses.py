@@ -1,6 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-import xmlwitch
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
+import xmlwitch
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 from tests.queries import query11, query12, query13, query14

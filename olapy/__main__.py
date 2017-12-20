@@ -1,8 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import sys
-import click
 
+import click
 from olapy.cli import init
 from olapy.core.services.xmla import runserver
 
