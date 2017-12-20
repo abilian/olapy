@@ -18,7 +18,7 @@ class MyDB(object):
         :param db_config: olapy config file obj
         :param db: database name to connect to
         """
-        if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
             self.engine, self.dbms = self.connect_with_env_var(db)
         else:
