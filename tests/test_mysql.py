@@ -5,62 +5,29 @@ import os
 import pandas as pd
 import pytest
 import sqlalchemy
-from olapy.core.mdx.executor.execute import get_default_cube_directory
 from pandas.util.testing import assert_frame_equal
 from tests.mysql_utils import create_insert, drop_tables
 
 from .queries import query1, query3, query6, query7, query8, query9, query10
 
 CUBE = 'sales_mysql'
-USER_NAME = 'root_db'
-PASSWORD = 'toor'
-DB = 'sales_mysql'
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
-def test_conf_file_change():
-    if 'SQLALCHEMY_DATABASE_URI' not in os.environ:
-        # py.test directly #todo fix remove this
-        with open(
-                os.path.join(get_default_cube_directory(), 'olapy-config'),
-                "w") as f:
-            f.write("""
-            dbms : mysql
-            host : localhost
-            port : 3306
-            user : root_db
-            password : toor
-            driver : mysql
-            """)
-
-
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or MYSQL_URI not in os.environ")
 @pytest.fixture(scope='function')
-def connect(user=USER_NAME,
-            password=PASSWORD,
-            db=DB,
-            host='localhost',
-            port=3306):
+def connect():
     """Returns a connection and a metadata object"""
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'])
-    else:
-        # We connect with the help of the PostgreSQL URL
-        # postgresql://federer:grandestslam@localhost:5432/tennis
-        url = 'mysql://{}:{}@{}:{}/{}'
-        url = url.format(user, password, host, port, db)
-
-        # The return value of create_engine() is our connection object
-        return sqlalchemy.create_engine(url, connect_args={'charset': 'utf8'})
+    if 'MYSQL_URI' in os.environ:
+        return sqlalchemy.create_engine(os.environ['MYSQL_URI'])
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 # create tables in the postgres database
 def test_create_tables(connect):
     create_insert(connect)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -68,12 +35,12 @@ def executor():
     return MdxEngine(CUBE)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query1(executor):
     assert executor.execute_mdx(query1)['result']['Amount'][0] == 1023
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query2(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
@@ -84,7 +51,7 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query6(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
@@ -113,7 +80,7 @@ def test_execution_query6(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query7(executor):
     df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
@@ -153,7 +120,7 @@ def test_execution_query7(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query8(executor):
     df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
@@ -166,7 +133,7 @@ def test_execution_query8(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query9(executor):
     df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
@@ -200,7 +167,7 @@ def test_execution_query9(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
@@ -234,7 +201,7 @@ def test_execution_query10(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'MYSQL'")
+@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 # drop created tables from postgres database
 def test_drop_tables(connect):
     drop_tables(connect)
