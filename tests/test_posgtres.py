@@ -10,9 +10,6 @@ from tests.postgres_utils import create_insert, drop_tables
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'
-USER_NAME = 'postgres'
-PASSWORD = 'root'
-DB = 'sales_postgres'
 
 
 @pytest.mark.skipif(
@@ -37,6 +34,7 @@ def test_create_tables(connect):
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     MdxEngine.source_type = ('csv', 'db')
+    os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URI']
     return MdxEngine(CUBE)
 
 

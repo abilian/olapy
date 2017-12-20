@@ -24,6 +24,7 @@ def connect():
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     MdxEngine.source_type = ('csv', 'db')
+    os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLITE_URI']
     return MdxEngine(CUBE)
 
 

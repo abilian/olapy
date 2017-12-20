@@ -32,6 +32,7 @@ def test_create_tables(connect):
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
     MdxEngine.source_type = ('csv', 'db')
+    os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URI']
     return MdxEngine(CUBE)
 
 
