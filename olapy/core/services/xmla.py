@@ -40,7 +40,7 @@ class XmlaSoap11(Soap11):
                 raise Fault("")
         return Soap11.create_in_document(self, ctx, charset)
 
-
+# todo find a solution for spyne ctx
 class XmlaProviderService(ServiceBase):
     """
     The main class to activate SOAP services between xmla clients and olapy.
