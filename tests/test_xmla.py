@@ -1,14 +1,18 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import threading
+
+import os
 import pytest
+import sqlalchemy
 from olap.xmla import xmla
+from tests.mysql_utils import create_insert
+
+from olapy.core.mdx.executor.execute import MdxEngine
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
-
-from olapy.core.services.xmla import XmlaProviderService
 
 from .xs0_responses import TEST_QUERY_AXIS0
 
@@ -43,6 +47,21 @@ class Member(object):
         return str(self.__dict__)
 
 
+@pytest.fixture(scope='function')
+def connect():
+    """Returns a connection and a metadata object"""
+    eng = sqlalchemy.create_engine("sqlite://")
+    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    MdxEngine.engine = eng
+    return eng
+
+
+# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
+# create tables in the postgres database
+def test_create_tables(connect):
+    create_insert(connect)
+
+
 class WSGIServer:
     """HTTP server running a WSGI application in its own thread.
 
@@ -75,6 +94,7 @@ class WSGIServer:
 
 @pytest.fixture(scope="module")
 def conn():
+    from olapy.core.services.xmla import XmlaProviderService
     print("spawning server")
     application = Application(
         [XmlaProviderService],
@@ -100,7 +120,7 @@ def test_discover_properties(conn):
     discover = conn.Discover(
         'DISCOVER_PROPERTIES',
         properties={'LocaleIdentifier': '1036'},
-        restrictions={'PropertyName': 'Catalog'},)[0]
+        restrictions={'PropertyName': 'Catalog'}, )[0]
     assert discover['PropertyName'] == "Catalog"
     assert discover['PropertyDescription'] == "Catalog"
     assert discover['PropertyType'] == "string"
@@ -113,7 +133,7 @@ def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
         restrictions={'CUBE_NAME': 'sales'},
-        properties={'Catalog': 'sales'},)[0]
+        properties={'Catalog': 'sales'}, )[0]
     assert discover['CATALOG_NAME'] == "sales"
     assert discover['CUBE_NAME'] == "sales"
     assert discover['CUBE_TYPE'] == "CUBE"
