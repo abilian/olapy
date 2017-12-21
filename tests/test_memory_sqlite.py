@@ -1,12 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
-import os
 import pandas as pd
-import pytest
-import sqlalchemy
-from olapy.core.mdx.executor.execute import MdxEngine
 from pandas.util.testing import assert_frame_equal
-from tests.mysql_utils import create_insert
 from tests.queries import query3, query6, query10
 
 
