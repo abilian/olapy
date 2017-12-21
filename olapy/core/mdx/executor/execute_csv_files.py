@@ -14,8 +14,10 @@ def load_tables_csv_files(executor_instance):
     """
     Load tables from csv files.
 
+    :param executor_instance: MdxEngine instance
     :return: tables dict with table name as key and dataframe as value
     """
+
     tables = {}
     cube = executor_instance.get_cube_path()
     for file in os.listdir(cube):
@@ -36,7 +38,7 @@ def construct_star_schema_csv_files(executor_instance):
     """
     Construct star schema DataFrame from csv files.
 
-    :param cube_name:  cube name (folder name)
+    :param executor_instance: MdxEngine instance
     :return: star schema DataFrame
     """
     cube = executor_instance.get_cube_path()

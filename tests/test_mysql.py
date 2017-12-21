@@ -17,7 +17,7 @@ CUBE = 'sales_mysql'
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or MYSQL_URI not in os.environ")
 @pytest.fixture(scope='function')
 def connect():
-    """Returns a connection and a metadata object"""
+    """Returns an sqlalchemy engine"""
     if 'MYSQL_URI' in os.environ:
         return sqlalchemy.create_engine(os.environ['MYSQL_URI'])
 

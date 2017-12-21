@@ -16,7 +16,7 @@ CUBE = 'sales_postgres'
     "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
 @pytest.fixture(scope='function')
 def connect():
-    """Returns a connection and a metadata object"""
+    """Returns an sqlalchemy engine"""
     if 'POSTGRES_URI' in os.environ:
         return sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
 

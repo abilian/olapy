@@ -39,7 +39,7 @@ class DbConfigParser:
         """
         Get all db credentials in the config file.
 
-        :return: list of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
+        :return: dict of database connection credentials.
         """
         with open(self.config_file_path) as config_file:
             # try:

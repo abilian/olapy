@@ -54,7 +54,7 @@ def get_default_cube_directory():
 class MdxEngine(object):
     """The main class for executing a query.
 
-    :param cube_name: It must be under ~/olapy-data/cubes/cube_name.
+    :param cube_name: It must be under ~/olapy-data/cubes/{cube_name}.
 
         example cube_name = sales
 
@@ -70,10 +70,6 @@ class MdxEngine(object):
     """
 
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
-    # ----
-    # DATA_FOLDER useful for olapy web (flask instance_path)
-    # get olapy-data path with instance_path instead of 'expanduser'
-    # DATA_FOLDER = None
     CUBE_FOLDER_NAME = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
@@ -248,7 +244,7 @@ class MdxEngine(object):
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
             if not tables:
-                raise Exception('unable to load tables, check that the datase is not empty')
+                raise Exception('unable to load tables, check that the database is not empty')
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)

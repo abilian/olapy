@@ -17,8 +17,10 @@ def load_tables_db(executor_instance):
     """
     Load tables from database.
 
+    :param executor_instance: MdxEngine instance
     :return: tables dict with table name as key and dataframe as value
     """
+
     tables = {}
 
     # todo db from executro instance
@@ -56,7 +58,7 @@ def construct_star_schema_db(executor_instance):
     """
     Construct star schema DataFrame from database.
 
-    :param cube_name:  cube name (database name)
+    :param executor_instance: MdxEngine instance
     :return: star schema DataFrame
     """
 
