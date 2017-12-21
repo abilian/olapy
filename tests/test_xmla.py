@@ -2,13 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import threading
 
-import os
 import pytest
-import sqlalchemy
 from olap.xmla import xmla
-from tests.mysql_utils import create_insert
-
-from olapy.core.mdx.executor.execute import MdxEngine
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
@@ -47,21 +42,6 @@ class Member(object):
         return str(self.__dict__)
 
 
-@pytest.fixture(scope='function')
-def connect():
-    """Returns a connection and a metadata object"""
-    eng = sqlalchemy.create_engine("sqlite://")
-    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-    MdxEngine.engine = eng
-    return eng
-
-
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
-# create tables in the postgres database
-def test_create_tables(connect):
-    create_insert(connect)
-
-
 class WSGIServer:
     """HTTP server running a WSGI application in its own thread.
 
@@ -93,8 +73,9 @@ class WSGIServer:
 
 
 @pytest.fixture(scope="module")
-def conn():
+def conn(executor):
     from olapy.core.services.xmla import XmlaProviderService
+    XmlaProviderService.discover_tools.executor = executor
     print("spawning server")
     application = Application(
         [XmlaProviderService],
@@ -132,13 +113,13 @@ def test_discover_properties(conn):
 def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
-        restrictions={'CUBE_NAME': 'sales'},
-        properties={'Catalog': 'sales'}, )[0]
-    assert discover['CATALOG_NAME'] == "sales"
-    assert discover['CUBE_NAME'] == "sales"
+        restrictions={'CUBE_NAME': 'main'},
+        properties={'Catalog': 'main'}, )[0]
+    assert discover['CATALOG_NAME'] == "main"
+    assert discover['CUBE_NAME'] == "main"
     assert discover['CUBE_TYPE'] == "CUBE"
     assert discover['IS_DRILLTHROUGH_ENABLED'] == "true"
-    assert discover['CUBE_CAPTION'] == "sales"
+    assert discover['CUBE_CAPTION'] == "main"
 
 
 def test_query1(conn):
@@ -150,11 +131,11 @@ def test_query1(conn):
 
     cmd = """
     SELECT
-    FROM [sales]
+    FROM [main]
     WHERE ([Measures].[Amount])
      CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     assert res.cellmap[0]['_CellOrdinal'] == '0'
     assert res.cellmap[0]['Value'] == 1023
 
@@ -186,11 +167,11 @@ def test_query2(conn):
         [Geography].[Geography].[Continent].[Europe].[Spain]})))
     DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [sales]
+    FROM [main]
     WHERE ([Measures].[Amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -316,11 +297,11 @@ def test_query3(conn):
         [Product].[Product].[Company].Members}))),
         Hierarchize(AddCalculatedMembers({[Time].[Time].[Year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS
-        FROM [sales]
+        FROM [main]
         WHERE ([Measures].[Amount])
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -438,11 +419,11 @@ def test_query4(conn):
         [Time].[Time].[Year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [sales]
+    FROM [main]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():

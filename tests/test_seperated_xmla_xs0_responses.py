@@ -7,12 +7,11 @@ from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 from tests.queries import query15
 
 
-def test_xs0_axis_query15():
+def test_xs0_axis_query15(executor):
     """
     select ()()()...
     :return:
     """
-    executor = MdxEngine('sales')
     xml = xmlwitch.Builder()
     with xml.Axis(name="Axis0"):
         with xml.Tuples:

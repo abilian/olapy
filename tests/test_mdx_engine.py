@@ -2,20 +2,16 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import pandas as pd
-from olapy.core.mdx.executor.execute import MdxEngine
 from pandas.util.testing import assert_frame_equal
 
-from .queries import CUBE, query1, query3, query6, query7, query8, query9, \
+from .queries import query1, query3, query6, query7, query8, query9, \
     query10
 
-executor = MdxEngine(CUBE)
-
-
-def test_execution_query1():
+def test_execution_query1(executor):
     assert executor.execute_mdx(query1)['result']['Amount'][0] == 1023
 
 
-def test_execution_query2():
+def test_execution_query2(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
         'Country': ['France', 'Spain', 'Switzerland', 'United States'],
@@ -25,7 +21,7 @@ def test_execution_query2():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query6():
+def test_execution_query6(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
         'Year': [
@@ -53,7 +49,7 @@ def test_execution_query6():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query7():
+def test_execution_query7(executor):
     df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
         'Company': [
@@ -92,7 +88,7 @@ def test_execution_query7():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query8():
+def test_execution_query8(executor):
     df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
         'Continent': ['Europe', 'Europe', 'Europe'],
@@ -104,7 +100,7 @@ def test_execution_query8():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query9():
+def test_execution_query9(executor):
     df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
         'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
@@ -137,7 +133,7 @@ def test_execution_query9():
     assert assert_frame_equal(df, test_df) is None
 
 
-def test_execution_query10():
+def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
         'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],

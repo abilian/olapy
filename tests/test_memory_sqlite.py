@@ -9,33 +9,7 @@ from pandas.util.testing import assert_frame_equal
 from tests.mysql_utils import create_insert
 from tests.queries import query3, query6, query10
 
-MdxEngine.source_type = ('csv', 'db')
-CUBE = 'main'
 
-
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
-@pytest.fixture(scope='function')
-def connect():
-    """Returns a connection and a metadata object"""
-    eng = sqlalchemy.create_engine("sqlite://")
-    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-    MdxEngine.engine = eng
-    return eng
-
-
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
-# create tables in the postgres database
-def test_create_tables(connect):
-    create_insert(connect)
-
-
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
-@pytest.fixture(scope='module')
-def executor():
-    return MdxEngine(CUBE)
-
-
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
 def test_execution_query1(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
@@ -45,7 +19,6 @@ def test_execution_query1(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
 def test_execution_query2(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
@@ -74,7 +47,6 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-# @pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE_MEM'")
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
