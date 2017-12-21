@@ -81,7 +81,7 @@ class MdxEngine(object):
     olapy_data_location = get_default_cube_directory()
     cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
     source_type = 'csv'
-    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
+    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
     engine = None
@@ -109,7 +109,7 @@ class MdxEngine(object):
         else:
             self.olapy_data_location = olapy_data_location
             MdxEngine.olapy_data_location = olapy_data_location
-            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
+            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
         if cubes_path is None:
             self.cube_path = MdxEngine.cube_path
         else:

@@ -33,10 +33,10 @@ def init():
         print('Initializing demo cubes')
 
     if not os.path.isfile(
-            os.path.join(home_directory, 'olapy-data', 'olapy-config')):
+            os.path.join(home_directory, 'olapy-data', 'olapy-config.yml')):
         copyfile(
-            os.path.join(olapy_lib_dir, 'config', 'olapy-config'),
-            os.path.join(home_directory, 'olapy-data', 'olapy-config'),
+            os.path.join(olapy_lib_dir, 'config', 'olapy-config.yml'),
+            os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
         )
         print('Initializing config files')
 

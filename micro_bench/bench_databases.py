@@ -36,7 +36,7 @@ def copy_2_olapy_dir(config_file):
     olapy_dir = get_olapy_dir()
     shutil.copy(
         os.path.join(os.getcwd(), 'db_config_files', config_file),
-        os.path.join(olapy_dir, 'olapy-config'))
+        os.path.join(olapy_dir, 'olapy-config.yml'))
 
 
 def fix_query_lowercase_db(query):
@@ -51,19 +51,19 @@ def fix_query_lowercase_db(query):
 
 def backup_config_file():
     olapy_dir = get_olapy_dir()
-    if os.path.isfile(os.path.join(olapy_dir, 'olapy-config')):
+    if os.path.isfile(os.path.join(olapy_dir, 'olapy-config.yml')):
         os.rename(
-            os.path.join(olapy_dir, 'olapy-config'),
-            os.path.join(olapy_dir, 'backup_olapy-config'))
+            os.path.join(olapy_dir, 'olapy-config.yml'),
+            os.path.join(olapy_dir, 'backup_olapy-config.yml'))
 
 
 def restore_config_file():
     olapy_dir = get_olapy_dir()
-    if os.path.isfile(os.path.join(olapy_dir, 'backup_olapy-config')):
+    if os.path.isfile(os.path.join(olapy_dir, 'backup_olapy-config.yml')):
         os.rename(
-            os.path.join(olapy_dir, 'backup_olapy-config'),
-            os.path.join(olapy_dir, 'olapy-config'))
-        os.remove(os.path.join(olapy_dir, 'backup_olapy-config'))
+            os.path.join(olapy_dir, 'backup_olapy-config.yml'),
+            os.path.join(olapy_dir, 'olapy-config.yml'))
+        os.remove(os.path.join(olapy_dir, 'backup_olapy-config.yml'))
 
 
 def main():

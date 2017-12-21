@@ -48,7 +48,7 @@ and the same rule **don't put the database name in the connection string, you wi
 Olapy config file
 -----------------
 
-The third way to configure a database connection is using a file configuration named ``olapy-config`` under ``olapy-data`` folder. A default/demo ``olapy-config`` file is created after installing olapy under ``olapy-data``.
+The third way to configure a database connection is using a file configuration named ``olapy-config.yml`` under ``olapy-data`` folder. A default/demo ``olapy-config`` file is created after installing olapy under ``olapy-data``.
 
 You can modify this file according to your configuration::
 

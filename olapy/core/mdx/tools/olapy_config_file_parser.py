@@ -23,7 +23,7 @@ class DbConfigParser:
         if config_file_path is None:
             from os.path import expanduser
             home_directory = expanduser("~")
-            self.config_file_path = os.path.join(home_directory, 'olapy-data', 'olapy-config')
+            self.config_file_path = os.path.join(home_directory, 'olapy-data', 'olapy-config.yml')
         else:
             self.config_file_path = config_file_path
 
