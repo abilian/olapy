@@ -20,8 +20,8 @@ def test_xs0_axis_query15(executor):
         xml.Value(str(3), **{'xsi:type': 'xsi:long'})
     with xml.Cell(CellOrdinal=str(3)):
         xml.Value(str(4), **{'xsi:type': 'xsi:long'})
-    with xml.Cell(CellOrdinal=str(4)):
-        xml.Value(str(96), **{'xsi:type': 'xsi:long'})
+    # with xml.Cell(CellOrdinal=str(4)):
+    #     xml.Value(str(96), **{'xsi:type': 'xsi:long'})
 
     executor.mdx_query = query15
 

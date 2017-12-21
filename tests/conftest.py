@@ -1,9 +1,9 @@
 import os
 import pytest
 import sqlalchemy
-from tests.mysql_utils import create_insert
 
 from olapy.core.mdx.executor.execute import MdxEngine
+from tests.db_creation_utils import create_insert
 
 CUBE = 'main'
 
@@ -15,4 +15,4 @@ def executor():
     MdxEngine.source_type = ('csv', 'db')
     MdxEngine.engine = eng
     create_insert(eng)
-    return MdxEngine(CUBE)
+    return MdxEngine(CUBE, fact_table_name='facts')

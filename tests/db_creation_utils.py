@@ -1,17 +1,17 @@
 def create_insert(con):
 
     statement = """
-    CREATE TABLE IF NOT EXISTS Facts (
-    Day text,
-    City text,
-    Licence text,
-    Amount integer,
-    Count integer);
+    CREATE TABLE IF NOT EXISTS facts (
+    day text,
+    city text,
+    licence text,
+    amount integer,
+    count integer);
     """
     con.execute(statement)
 
     statement = """
-    INSERT INTO Facts (Day, City, Licence, Amount, Count) VALUES
+    INSERT INTO facts (day, city, licence, amount, count) VALUES
     ('May 12,2010','Madrid','Personal',1,84),
     ('May 13,2010','Barcelona','Personal',2,841),
     ('May 14,2010','Paris','Personal',4,2),
@@ -26,15 +26,15 @@ def create_insert(con):
     con.execute(statement)
 
     statement = """
-    CREATE TABLE IF NOT EXISTS Geography (
-    Continent text,
-    Country text,
-    City text);
+    CREATE TABLE IF NOT EXISTS geography (
+    continent text,
+    country text,
+    city text);
     """
     con.execute(statement)
 
     statement = """
-    INSERT INTO Geography (Continent, Country, City) VALUES
+    INSERT INTO geography (continent, country, city) VALUES
     ('America','Canada','Quebec'),
     ('America','Canada','Toronto'),
     ('America','United States','Los Angeles'),
@@ -53,15 +53,15 @@ def create_insert(con):
     con.execute(statement)
 
     statement = """
-    CREATE TABLE IF NOT EXISTS Product (
-    Company text,
-    Article text,
-    Licence text);
+    CREATE TABLE IF NOT EXISTS product (
+    company text,
+    article text,
+    licence text);
     """
     con.execute(statement)
 
     statement = """
-        INSERT INTO Product (Company, Article, Licence) VALUES
+        INSERT INTO product (company, article, licence) VALUES
         ('Crazy Development','olapy','Corporate'),
         ('Crazy Development','olapy','Partnership'),
         ('Crazy Development','olapy','Personal'),
@@ -70,26 +70,26 @@ def create_insert(con):
     con.execute(statement)
 
     statement = """
-      CREATE TABLE `Time` (
-      `Year` int(11) DEFAULT NULL,
-      `Quarter` text,
-      `Month` text,
-      `Day` text
+    CREATE TABLE IF NOT EXISTS "time" (
+    year integer,
+    quarter text,
+    month text,
+    day text
     );
     """
     con.execute(statement)
 
-    statement = """INSERT INTO Time (Year, Quarter, Month, Day) VALUES
-        (2010, 'Q2 2010', 'May 2010', 'May 12,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 13,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 14,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 15,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 16,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 17,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 18,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 19,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 20,2010'),
-        (2010, 'Q2 2010', 'May 2010', 'May 21,2010');"""
+    statement = """INSERT INTO time (year, quarter, month, day) VALUES
+              (2010, 'Q2 2010', 'May 2010', 'May 12,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 13,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 14,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 15,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 16,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 17,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 18,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 19,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 20,2010'),
+              (2010, 'Q2 2010', 'May 2010', 'May 21,2010');"""
 
     con.execute(statement)
 
@@ -97,21 +97,21 @@ def create_insert(con):
 def drop_tables(con):
 
     statement = """
-    DROP TABLE Facts;
+    DROP TABLE facts;
     """
     con.execute(statement)
 
     statement = """
-    DROP TABLE Geography;
+    DROP TABLE geography;
     """
     con.execute(statement)
 
     statement = """
-    DROP TABLE Product;
+    DROP TABLE product;
     """
     con.execute(statement)
 
     statement = """
-    DROP TABLE Time;
+    DROP TABLE "time";
     """
     con.execute(statement)

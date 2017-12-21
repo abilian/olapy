@@ -9,15 +9,15 @@ from .queries import query1, query3, query6, query7, query8, query9, \
 
 
 def test_execution_query1(executor):
-    assert executor.execute_mdx(query1)['result']['Amount'][0] == 1023
+    assert executor.execute_mdx(query1)['result']['amount'][0] == 1023
 
 
 def test_execution_query2(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
-        'Country': ['France', 'Spain', 'Switzerland', 'United States'],
-        'Amount': [4, 3, 248, 768],
-    }).groupby(['Country']).sum()
+        'country': ['France', 'Spain', 'Switzerland', 'United States'],
+        'amount': [4, 3, 248, 768],
+    }).groupby(['country']).sum()
 
     assert assert_frame_equal(df, test_df) is None
 
@@ -25,27 +25,27 @@ def test_execution_query2(executor):
 def test_execution_query6(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
-        'Year': [
+        'year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
             2010, 2010
         ],
-        'Quarter': [
+        'quarter': [
             -1, 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010'
         ],
-        'Month': [
+        'month': [
             -1, -1, 'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010'
         ],
-        'Day': [
+        'day': [
             -1, -1, -1, 'May 12,2010', 'May 13,2010', 'May 14,2010',
             'May 15,2010', 'May 16,2010', 'May 17,2010', 'May 18,2010',
             'May 19,2010', 'May 20,2010', 'May 21,2010'
         ],
-        'Amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    }).groupby(['Year', 'Quarter', 'Month', 'Day']).sum()
+        'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
     assert assert_frame_equal(df, test_df) is None
 
@@ -53,21 +53,21 @@ def test_execution_query6(executor):
 def test_execution_query7(executor):
     df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
-        'Company': [
+        'company': [
             'Crazy Development', 'Crazy Development', 'Crazy Development',
             'Crazy Development', 'Crazy Development', 'Crazy Development',
             'Crazy Development', 'Crazy Development'
         ],
-        'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
-        'Quarter': [
+        'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
+        'quarter': [
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010'
         ],
-        'Month': [
+        'month': [
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010'
         ],
-        'Day': [
+        'day': [
             'May 18,2010',
             'May 16,2010',
             'May 14,2010',
@@ -77,13 +77,13 @@ def test_execution_query7(executor):
             'May 17,2010',
             'May 19,2010',
         ],
-        'Continent': [
+        'continent': [
             'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
             'Europe', 'Europe'
         ],
-        'Amount': [64, 16, 4, 1, 2, 8, 32, 128]
+        'amount': [64, 16, 4, 1, 2, 8, 32, 128]
     }).groupby(
-        ['Company', 'Year', 'Quarter', 'Month', 'Day', 'Continent'],
+        ['company', 'year', 'quarter', 'month', 'day', 'continent'],
         sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
@@ -92,11 +92,11 @@ def test_execution_query7(executor):
 def test_execution_query8(executor):
     df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
-        'Continent': ['Europe', 'Europe', 'Europe'],
-        'Country': ['Spain', 'France', 'Switzerland'],
-        'Amount': [3, 4, 248]
+        'continent': ['Europe', 'Europe', 'Europe'],
+        'country': ['Spain', 'France', 'Switzerland'],
+        'amount': [3, 4, 248]
     }).groupby(
-        ['Continent', 'Country'], sort=False).sum()
+        ['continent', 'country'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
 
@@ -104,16 +104,16 @@ def test_execution_query8(executor):
 def test_execution_query9(executor):
     df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
-        'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
-        'Quarter': [
+        'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
+        'quarter': [
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010'
         ],
-        'Month': [
+        'month': [
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010'
         ],
-        'Day': [
+        'day': [
             'May 19,2010',
             'May 17,2010',
             'May 15,2010',
@@ -123,13 +123,13 @@ def test_execution_query9(executor):
             'May 16,2010',
             'May 18,2010',
         ],
-        'Continent': [
+        'continent': [
             'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
             'Europe', 'Europe'
         ],
-        'Amount': [128, 32, 8, 2, 1, 4, 16, 64]
+        'amount': [128, 32, 8, 2, 1, 4, 16, 64]
     }).groupby(
-        ['Year', 'Quarter', 'Month', 'Day', 'Continent'], sort=False).sum()
+        ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
 
@@ -137,16 +137,16 @@ def test_execution_query9(executor):
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
-        'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
-        'Quarter': [
+        'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
+        'quarter': [
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010'
         ],
-        'Month': [
+        'month': [
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010'
         ],
-        'Day': [
+        'day': [
             'May 19,2010',
             'May 17,2010',
             'May 15,2010',
@@ -156,12 +156,12 @@ def test_execution_query10(executor):
             'May 16,2010',
             'May 18,2010',
         ],
-        'Continent': [
+        'continent': [
             'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
             'Europe', 'Europe'
         ],
-        'Count': [13, 65, 231, 841, 84, 2, 4, 64]
+        'count': [13, 65, 231, 841, 84, 2, 4, 64]
     }).groupby(
-        ['Year', 'Quarter', 'Month', 'Day', 'Continent'], sort=False).sum()
+        ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None

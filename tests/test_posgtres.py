@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from pandas.util.testing import assert_frame_equal
-from tests.postgres_utils import create_insert, drop_tables
+from tests.db_creation_utils import create_insert, drop_tables
 from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 CUBE = 'sales_postgres'

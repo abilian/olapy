@@ -15,28 +15,28 @@ def test_slicer_axis_query11(executor):
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Continent].[America]')
+                with xml.Member(Hierarchy="[geography].[geography]"):
+                    xml.UName('[geography].[geography].[continent].[America]')
                     xml.Caption('America')
-                    xml.LName('[Geography].[Geography].[Continent]')
+                    xml.LName('[geography].[geography].[continent]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Company].[Crazy Development]')
+                        '[product].[product].[company].[Crazy Development]')
                     xml.Caption('Crazy Development')
-                    xml.LName('[Product].[Product].[Company]')
+                    xml.LName('[product].[product].[company]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Time].[Time]"):
-                    xml.UName('[Time].[Time].[Year].[2010]')
+                with xml.Member(Hierarchy="[time].[time]"):
+                    xml.UName('[time].[time].[year].[2010]')
                     xml.Caption('2010')
-                    xml.LName('[Time].[Time].[Year]')
+                    xml.LName('[time].[time].[year]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')
@@ -55,23 +55,23 @@ def test_slicer_axis_query12(executor):
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
-                    xml.UName('[Geography].[Geography].[Continent].[America]')
+                with xml.Member(Hierarchy="[geography].[geography]"):
+                    xml.UName('[geography].[geography].[continent].[America]')
                     xml.Caption('America')
-                    xml.LName('[Geography].[Geography].[Continent]')
+                    xml.LName('[geography].[geography].[continent]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Company].[Crazy Development]')
+                        '[product].[product].[company].[Crazy Development]')
                     xml.Caption('Crazy Development')
-                    xml.LName('[Product].[Product].[Company]')
+                    xml.LName('[product].[product].[company]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Time].[Time]"):
-                    xml.UName('[Time].[Time].[Year].[2010]')
+                with xml.Member(Hierarchy="[time].[time]"):
+                    xml.UName('[time].[time].[year].[2010]')
                     xml.Caption('2010')
-                    xml.LName('[Time].[Time].[Year]')
+                    xml.LName('[time].[time].[year]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
@@ -91,17 +91,17 @@ def test_slicer_axis_query13(executor):
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Company].[Crazy Development]')
+                        '[product].[product].[company].[Crazy Development]')
                     xml.Caption('Crazy Development')
-                    xml.LName('[Product].[Product].[Company]')
+                    xml.LName('[product].[product].[company]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Time].[Time]"):
-                    xml.UName('[Time].[Time].[Year].[2010]')
+                with xml.Member(Hierarchy="[time].[time]"):
+                    xml.UName('[time].[time].[year].[2010]')
                     xml.Caption('2010')
-                    xml.LName('[Time].[Time].[Year]')
+                    xml.LName('[time].[time].[year]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
@@ -121,17 +121,17 @@ def test_slicer_axis_query14(executor):
     with xml.Axis(name="SlicerAxis"):
         with xml.Tuples:
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Company].[Crazy Development]')
+                        '[product].[product].[company].[Crazy Development]')
                     xml.Caption('Crazy Development')
-                    xml.LName('[Product].[Product].[Company]')
+                    xml.LName('[product].[product].[company]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
-                with xml.Member(Hierarchy="[Time].[Time]"):
-                    xml.UName('[Time].[Time].[Year].[2010]')
+                with xml.Member(Hierarchy="[time].[time]"):
+                    xml.UName('[time].[time].[year].[2010]')
                     xml.Caption('2010')
-                    xml.LName('[Time].[Time].[Year]')
+                    xml.LName('[time].[time].[year]')
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
