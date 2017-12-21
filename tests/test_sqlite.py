@@ -11,7 +11,8 @@ from tests.queries import query3, query6, query10
 CUBE = 'sales_sqlite'
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine
@@ -21,7 +22,8 @@ def executor():
     return MdxEngine(CUBE)
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
 def test_execution_query1(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
@@ -31,7 +33,8 @@ def test_execution_query1(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
 def test_execution_query2(executor):
     df = executor.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
@@ -60,7 +63,8 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
 def test_execution_query10(executor):
     df = executor.execute_mdx(query10)['result']
     test_df = pd.DataFrame({

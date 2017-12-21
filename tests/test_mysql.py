@@ -16,7 +16,9 @@ CUBE = 'sales_mysql'
 
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 # create tables in the postgres database
-def test_create_tables():
+# def test_create_tables():
+@pytest.fixture(scope="module", autouse=True)
+def create_tables():
     sqlalchemy_engine = sqlalchemy.create_engine(os.environ['MYSQL_URI'])
     create_insert(sqlalchemy_engine)
 
