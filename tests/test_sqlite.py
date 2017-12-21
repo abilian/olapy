@@ -12,14 +12,6 @@ CUBE = 'sales_sqlite'
 
 
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
-@pytest.fixture(scope='function')
-def connect():
-    """Returns a connection and a metadata object"""
-    if 'SQLITE_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['SQLITE_URI'])
-
-
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
 @pytest.fixture(scope='module')
 def executor():
     from olapy.core.mdx.executor.execute import MdxEngine

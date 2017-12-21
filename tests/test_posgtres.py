@@ -14,18 +14,10 @@ CUBE = 'sales_postgres'
 
 @pytest.mark.skipif(
     "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-@pytest.fixture(scope='function')
-def connect():
-    """Returns an sqlalchemy engine"""
-    if 'POSTGRES_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
-
-
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
 # create tables in the postgres database
-def test_create_tables(connect):
-    create_insert(connect)
+def test_create_tables():
+    sqlalchemy_engine = sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
+    create_insert(sqlalchemy_engine)
 
 
 @pytest.mark.skipif(

@@ -14,18 +14,11 @@ from .queries import query1, query3, query6, query7, query8, query9, query10
 CUBE = 'sales_mysql'
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or MYSQL_URI not in os.environ")
-@pytest.fixture(scope='function')
-def connect():
-    """Returns an sqlalchemy engine"""
-    if 'MYSQL_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['MYSQL_URI'])
-
-
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
 # create tables in the postgres database
-def test_create_tables(connect):
-    create_insert(connect)
+def test_create_tables():
+    sqlalchemy_engine = sqlalchemy.create_engine(os.environ['MYSQL_URI'])
+    create_insert(sqlalchemy_engine)
 
 
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
