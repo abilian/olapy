@@ -128,7 +128,8 @@ class MdxEngine(object):
         self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
-        self.selected_measures = [self.measures[0]]
+        if self.measures:
+            self.selected_measures = [self.measures[0]]
 
     @property
     def mdx_query(self):
@@ -273,11 +274,12 @@ class MdxEngine(object):
                         return cubes.facts[0].measures
 
         # col.lower()[-2:] != 'id' to ignore any id column
-        return [
-            col
-            for col in self.tables_loaded[self.facts].select_dtypes(
-                include=[np.number], ).columns if col.lower()[-2:] != 'id'
-        ]
+        if self.facts in list(self.tables_loaded.keys()):
+            return [
+                col
+                for col in self.tables_loaded[self.facts].select_dtypes(
+                    include=[np.number], ).columns if col.lower()[-2:] != 'id'
+            ]
 
     def _construct_star_schema_from_config(self, config_file_parser):
         """
