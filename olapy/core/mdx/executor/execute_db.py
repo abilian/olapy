@@ -29,7 +29,7 @@ def load_tables_db(executor_instance):
     if not executor_instance.sqlengine:
         executor_instance.sqlengine = executor_instance.instantiate_db(
             executor_instance.cube).engine
-    print('Connection string = ' + executor_instance.sqlengine)
+    print('Connection string = ' + str(executor_instance.sqlengine))
     inspector = inspect(executor_instance.sqlengine)
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
