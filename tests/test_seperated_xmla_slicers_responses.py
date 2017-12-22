@@ -6,7 +6,14 @@ from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 from tests.queries import query11, query12, query13, query14
 
 
-def test_slicer_axis_query11(executor):
+
+def test_slicer_axis(executor):
+    slicer_axis_query11(executor)
+    slicer_axis_query12(executor)
+    slicer_axis_query13(executor)
+    slicer_axis_query14(executor)
+
+def slicer_axis_query11(executor):
     """
     One measure.
     :return:
@@ -46,7 +53,7 @@ def test_slicer_axis_query11(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def test_slicer_axis_query12(executor):
+def slicer_axis_query12(executor):
     """
     Many measure.
     :return:
@@ -82,7 +89,7 @@ def test_slicer_axis_query12(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def test_slicer_axis_query13(executor):
+def slicer_axis_query13(executor):
     """
     Dimension without measures.
     :return:
@@ -112,7 +119,7 @@ def test_slicer_axis_query13(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def test_slicer_axis_query14(executor):
+def slicer_axis_query14(executor):
     """
     Dimension with all measures.
     :return:
