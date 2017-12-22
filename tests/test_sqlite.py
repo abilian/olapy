@@ -8,10 +8,11 @@ from tests.queries import query3, query6, query10
 
 @pytest.mark.skipif(
     "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
-def test_mysql_execution_queries(executor_sqlite):
-    check_execution_query1(executor_sqlite)
-    check_execution_query2(executor_sqlite)
-    check_execution_query10(executor_sqlite)
+@pytest.mark.parametrize('executor', [['SQLITE_URI']], indirect=True)
+def test_mysql_execution_queries(executor):
+    check_execution_query1(executor)
+    check_execution_query2(executor)
+    check_execution_query10(executor)
 
 
 def check_execution_query1(executor_sqlite):

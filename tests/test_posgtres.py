@@ -8,10 +8,11 @@ from pandas.util.testing import assert_frame_equal
 
 @pytest.mark.skipif(
     "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-def test_mysql_execution_queries(executor_postgres):
-    check_execution_query1(executor_postgres)
-    check_execution_query2(executor_postgres)
-    check_execution_query10(executor_postgres)
+@pytest.mark.parametrize('executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
+def test_mysql_execution_queries(executor):
+    check_execution_query1(executor)
+    check_execution_query2(executor)
+    check_execution_query10(executor)
 
 
 def check_execution_query1(executor_postgres):

@@ -7,14 +7,15 @@ from .queries import query1, query3, query6, query7, query8, query9, query10
 
 
 @pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
-def test_mysql_execution_queries(executor_mysql):
-    check_query1(executor_mysql)
-    check_execution_query2(executor_mysql)
-    check_execution_query6(executor_mysql)
-    check_execution_query7(executor_mysql)
-    check_execution_query8(executor_mysql)
-    check_execution_query9(executor_mysql)
-    check_execution_query10(executor_mysql)
+@pytest.mark.parametrize('executor', [['MYSQL_URI', 'sales_mysql']], indirect=True)
+def test_mysql_execution_queries(executor):
+    check_query1(executor)
+    check_execution_query2(executor)
+    check_execution_query6(executor)
+    check_execution_query7(executor)
+    check_execution_query8(executor)
+    check_execution_query9(executor)
+    check_execution_query10(executor)
 
 
 def check_query1(executor_mysql):
