@@ -31,6 +31,7 @@ from .xmla_execute_xsds import execute_xsd
 
 class XmlaSoap11(Soap11):
     """xhr does not work over https without this patch"""
+
     def create_in_document(self, ctx, charset=None):
         if isinstance(ctx.transport, HttpTransportContext):
             http_verb = ctx.transport.get_request_method()
@@ -39,6 +40,7 @@ class XmlaSoap11(Soap11):
                 ctx.transport.respond(HTTP_200)
                 raise Fault("")
         return Soap11.create_in_document(self, ctx, charset)
+
 
 # todo find a solution for spyne ctx
 class XmlaProviderService(ServiceBase):
