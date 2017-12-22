@@ -13,17 +13,17 @@ def executor(request):
     if 'param' in request.__dict__.keys():
         os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ[request.param[0]]
         if request.param[0] == 'SQLITE_URI':
-            MdxEngine.engine = None
+            MdxEngine.sqlengine = None
             yield MdxEngine('sales_sqlite', fact_table_name='facts')
         else:
-            MdxEngine.engine = sqlalchemy.create_engine(os.environ[request.param[0]])
-            create_insert(MdxEngine.engine)
+            MdxEngine.sqlengine = sqlalchemy.create_engine(os.environ[request.param[0]])
+            create_insert(MdxEngine.sqlengine)
             yield MdxEngine(request.param[1], fact_table_name='facts')
-            drop_tables(MdxEngine.engine)
+            drop_tables(MdxEngine.sqlengine)
     else:
         # sqlite mem bd
         os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         MdxEngine.source_type = ('csv', 'db')
-        MdxEngine.engine = sqlalchemy.create_engine("sqlite://")
-        create_insert(MdxEngine.engine)
+        MdxEngine.sqlengine = sqlalchemy.create_engine("sqlite://")
+        create_insert(MdxEngine.sqlengine)
         yield MdxEngine('main', fact_table_name='facts')
