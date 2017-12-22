@@ -10,6 +10,8 @@ python:
 
 install:
   - pip install -U pip setuptools tox wheel
+  - pip install mysqlclient
+  - pip install psycopg2
 
 script:
   - tox
