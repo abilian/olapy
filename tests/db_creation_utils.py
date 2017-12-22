@@ -70,7 +70,7 @@ def create_insert(con):
     con.execute(statement)
 
     statement = """
-    CREATE TABLE IF NOT EXISTS "time" (
+    CREATE TABLE IF NOT EXISTS time (
     year integer,
     quarter text,
     month text,
@@ -112,6 +112,6 @@ def drop_tables(con):
     con.execute(statement)
 
     statement = """
-    DROP TABLE "time";
+    DROP TABLE time;
     """
     con.execute(statement)
