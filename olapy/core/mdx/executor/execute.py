@@ -54,7 +54,7 @@ def get_default_cube_directory():
 class MdxEngine(object):
     """The main class for executing a query.
 
-    :param cube_name: It must be under ~/olapy-data/cubes/cube_name.
+    :param cube_name: It must be under ~/olapy-data/cubes/{cube_name}.
 
         example cube_name = sales
 
@@ -70,10 +70,6 @@ class MdxEngine(object):
     """
 
     # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
-    # ----
-    # DATA_FOLDER useful for olapy web (flask instance_path)
-    # get olapy-data path with instance_path instead of 'expanduser'
-    # DATA_FOLDER = None
     CUBE_FOLDER_NAME = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
@@ -81,10 +77,10 @@ class MdxEngine(object):
     olapy_data_location = get_default_cube_directory()
     cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
     source_type = 'csv'
-    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
+    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
-    engine = None
+    sqlengine = None
 
     def __init__(
             self,
@@ -109,7 +105,7 @@ class MdxEngine(object):
         else:
             self.olapy_data_location = olapy_data_location
             MdxEngine.olapy_data_location = olapy_data_location
-            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config'))
+            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
         if cubes_path is None:
             self.cube_path = MdxEngine.cube_path
         else:
@@ -128,7 +124,8 @@ class MdxEngine(object):
         self.load_star_schema_dataframe = self.get_star_schema_dataframe()
         self.tables_names = self._get_tables_name()
         # default measure is the first one
-        self.selected_measures = [self.measures[0]]
+        if self.measures:
+            self.selected_measures = [self.measures[0]]
 
     @property
     def mdx_query(self):
@@ -247,7 +244,7 @@ class MdxEngine(object):
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
             if not tables:
-                raise Exception('unable to load tables, check that the datase is not empty')
+                raise Exception('unable to load tables, check that the database is not empty')
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)
@@ -273,11 +270,12 @@ class MdxEngine(object):
                         return cubes.facts[0].measures
 
         # col.lower()[-2:] != 'id' to ignore any id column
-        return [
-            col
-            for col in self.tables_loaded[self.facts].select_dtypes(
-                include=[np.number], ).columns if col.lower()[-2:] != 'id'
-        ]
+        if self.facts in list(self.tables_loaded.keys()):
+            return [
+                col
+                for col in self.tables_loaded[self.facts].select_dtypes(
+                    include=[np.number], ).columns if col.lower()[-2:] != 'id'
+            ]
 
     def _construct_star_schema_from_config(self, config_file_parser):
         """

@@ -18,7 +18,7 @@ class MyDB(object):
         :param db_config: olapy config file obj
         :param db: database name to connect to
         """
-        if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
+        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
             self.engine, self.dbms = self.connect_with_env_var(db)
         else:
@@ -103,7 +103,6 @@ class MyDB(object):
         Create the SqlAlchemy object which will use it to connect to database.
 
         :param db: database to connect to
-        :param db_credentials: olapy database config parser obj
         :return: SqlAlchemy engine
         """
         eng, con_db = self.get_init_table()
@@ -146,20 +145,10 @@ class MyOracleDB(MyDB):
         return [self.username]
 
     def gen_all_databases_query(self):
-        """
-        Each dbms has different query to get user databases names
-        :param dbms: postgres | mysql | oracle | mssql
-        :return: sql query to fetch all databases
-        """
         # You can think of a mysql "database" as a schema/user in Oracle.
         return 'select username from dba_users;'
 
     def get_init_table(self):
-        """
-        some dbms have default database so we can connect to the dbms without connecting to a specific database
-        :param dbms: postgres, oracle....
-        :return: default database name
-        """
         con_db = ''
         engine = 'oracle+cx_oracle'
         return engine, con_db
@@ -171,13 +160,6 @@ class MySqliteDB(MyDB):
         MyDB.__init__(self, db_config, db=db)
 
     def construct_engine(self, db=None):
-        """
-        Create the SqlAlchemy object which will use it to connect to database.
-
-        :param db: database to connect to
-        :param db_credentials: olapy database config parser obj
-        :return: SqlAlchemy engine
-        """
         # eng, con_db = self.get_init_table()
         return create_engine('sqlite:///' + self.db_credentials['path'])
 
@@ -204,11 +186,6 @@ class MyMssqlDB(MyDB):
         MyDB.__init__(self, db_config, db=db)
 
     def get_init_table(self):
-        """
-        some dbms have default database so we can connect to the dbms without connecting to a specific database
-        :param dbms: postgres, oracle....
-        :return: default database name
-        """
         con_db = 'msdb'
         engine = 'mssql+pyodbc'
         return engine, con_db
@@ -226,7 +203,6 @@ class MyMssqlDB(MyDB):
         """
         As always, microsoft ruin our life, to access sql server you need to add driver clause to the connection string, we do this here.
 
-        :param db_credentials: olapy database config parser obj
         :param driver: driver to user for sql server, by default mssql+pyodbc
         :param db: database to connect to
         :return: SqlAlchemy engine

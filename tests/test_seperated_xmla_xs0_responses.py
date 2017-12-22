@@ -2,130 +2,128 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import xmlwitch
-from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 from tests.queries import query15
 
 
-def test_xs0_axis_query15():
+def test_xs0_axis_query15(executor):
     """
     select ()()()...
     :return:
     """
-    executor = MdxEngine('sales')
     xml = xmlwitch.Builder()
     with xml.Axis(name="Axis0"):
         with xml.Tuples:
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                        '[product].[product].[licence].[Crazy Development].[olapy].[Personal]'
                     )
                     xml.Caption('Personal')
-                    xml.LName('[Product].[Product].[Licence]')
+                    xml.LName('[product].[product].[licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                        '[geography].[geography].[country].[Europe].[Switzerland]'
                     )
                     xml.Caption('Switzerland')
-                    xml.LName('[Geography].[Geography].[Country]')
+                    xml.LName('[geography].[geography].[country]')
                     xml.LNum('1')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Corporate]'
+                        '[product].[product].[licence].[Crazy Development].[olapy].[Corporate]'
                     )
                     xml.Caption('Corporate')
-                    xml.LName('[Product].[Product].[Licence]')
+                    xml.LName('[product].[product].[licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                        '[geography].[geography].[country].[Europe].[Switzerland]'
                     )
                     xml.Caption('Switzerland')
-                    xml.LName('[Geography].[Geography].[Country]')
+                    xml.LName('[geography].[geography].[country]')
                     xml.LNum('1')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                        '[product].[product].[licence].[Crazy Development].[olapy].[Personal]'
                     )
                     xml.Caption('Personal')
-                    xml.LName('[Product].[Product].[Licence]')
+                    xml.LName('[product].[product].[licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        '[Geography].[Geography].[Country].[Europe].[Spain]')
+                        '[geography].[geography].[country].[Europe].[Spain]')
                     xml.Caption('Spain')
-                    xml.LName('[Geography].[Geography].[Country]')
+                    xml.LName('[geography].[geography].[country]')
                     xml.LNum('1')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Personal]'
+                        '[product].[product].[licence].[Crazy Development].[olapy].[Personal]'
                     )
                     xml.Caption('Personal')
-                    xml.LName('[Product].[Product].[Licence]')
+                    xml.LName('[product].[product].[licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        '[Geography].[Geography].[Country].[Europe].[France]')
+                        '[geography].[geography].[country].[Europe].[France]')
                     xml.Caption('France')
-                    xml.LName('[Geography].[Geography].[Country]')
+                    xml.LName('[geography].[geography].[country]')
                     xml.LNum('1')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')
             with xml.Tuple:
-                with xml.Member(Hierarchy="[Product].[Product]"):
+                with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        '[Product].[Product].[Licence].[Crazy Development].[olapy].[Partnership]'
+                        '[product].[product].[licence].[Crazy Development].[olapy].[partnership]'
                     )
-                    xml.Caption('Partnership')
-                    xml.LName('[Product].[Product].[Licence]')
+                    xml.Caption('partnership')
+                    xml.LName('[product].[product].[licence]')
                     xml.LNum('2')
                     xml.DisplayInfo('131076')
-                with xml.Member(Hierarchy="[Geography].[Geography]"):
+                with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        '[Geography].[Geography].[Country].[Europe].[Switzerland]'
+                        '[geography].[geography].[country].[Europe].[Switzerland]'
                     )
                     xml.Caption('Switzerland')
-                    xml.LName('[Geography].[Geography].[Country]')
+                    xml.LName('[geography].[geography].[country]')
                     xml.LNum('1')
                     xml.DisplayInfo('131076')
                 with xml.Member(Hierarchy="[Measures]"):
-                    xml.UName('[Measures].[Amount]')
-                    xml.Caption('Amount')
+                    xml.UName('[Measures].[amount]')
+                    xml.Caption('amount')
                     xml.LName('[Measures]')
                     xml.LNum('0')
                     xml.DisplayInfo('0')

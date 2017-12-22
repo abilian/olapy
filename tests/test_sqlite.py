@@ -1,110 +1,70 @@
 from __future__ import absolute_import, division, print_function
 
-import os
-
 import pandas as pd
 import pytest
-import sqlalchemy
-from olapy.core.mdx.executor.execute import MdxEngine, \
-    get_default_cube_directory
 from pandas.util.testing import assert_frame_equal
 from tests.queries import query3, query6, query10
 
-CUBE = 'sales_sqlite'
-sqlite_lite_db_path = os.path.join(get_default_cube_directory(),
-                                   MdxEngine.CUBE_FOLDER_NAME, CUBE)
+
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLITE_URI']], indirect=True)
+def test_mysql_execution_queries(executor):
+    check_execution_query1(executor)
+    check_execution_query2(executor)
+    check_execution_query10(executor)
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-def test_conf_file_change():
-    if 'SQLALCHEMY_DATABASE_URI' not in os.environ:
-        # py.test directly #todo fix remove this
-        with open(
-                os.path.join(get_default_cube_directory(), 'olapy-config'),
-                "w") as f:
-            f.write("""
-            dbms : sqlite
-            path : {0}
-            """.format(sqlite_lite_db_path))
-
-
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-@pytest.fixture(scope='function')
-def connect():
-    """Returns a connection and a metadata object"""
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-        return sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'])
-    else:
-        # DEFAULT CONFIG
-        # We connect with the help of the PostgreSQL URL
-        # postgresql://federer:grandestslam@localhost:5432/tennis
-        url = 'sqlite:/' + sqlite_lite_db_path
-
-        # The return value of create_engine() is our connection object
-        return sqlalchemy.create_engine(url)
-
-
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-@pytest.fixture(scope='module')
-def executor():
-    from olapy.core.mdx.executor.execute import MdxEngine
-    MdxEngine.source_type = ('csv', 'db')
-    return MdxEngine(CUBE)
-
-
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-def test_execution_query1(executor):
-    df = executor.execute_mdx(query3)['result']
+def check_execution_query1(executor_sqlite):
+    df = executor_sqlite.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
-        'Country': ['France', 'Spain', 'Switzerland', 'United States'],
-        'Amount': [4, 3, 248, 768],
-    }).groupby(['Country']).sum()
+        'country': ['France', 'Spain', 'Switzerland', 'United States'],
+        'amount': [4, 3, 248, 768],
+    }).groupby(['country']).sum()
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-def test_execution_query2(executor):
-    df = executor.execute_mdx(query6)['result']
+def check_execution_query2(executor_sqlite):
+    df = executor_sqlite.execute_mdx(query6)['result']
     test_df = pd.DataFrame({
-        'Year': [
+        'year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
             2010, 2010
         ],
-        'Quarter': [
+        'quarter': [
             -1, 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010'
         ],
-        'Month': [
+        'month': [
             -1, -1, 'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010'
         ],
-        'Day': [
+        'day': [
             -1, -1, -1, 'May 12,2010', 'May 13,2010', 'May 14,2010',
             'May 15,2010', 'May 16,2010', 'May 17,2010', 'May 18,2010',
             'May 19,2010', 'May 20,2010', 'May 21,2010'
         ],
-        'Amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    }).groupby(['Year', 'Quarter', 'Month', 'Day']).sum()
+        'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif("os.environ['DB_TEST'] != 'SQLITE'")
-def test_execution_query10(executor):
-    df = executor.execute_mdx(query10)['result']
+def check_execution_query10(executor_sqlite):
+    df = executor_sqlite.execute_mdx(query10)['result']
     test_df = pd.DataFrame({
-        'Year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
-        'Quarter': [
+        'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
+        'quarter': [
             'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
             'Q2 2010', 'Q2 2010'
         ],
-        'Month': [
+        'month': [
             'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
             'May 2010', 'May 2010', 'May 2010'
         ],
-        'Day': [
+        'day': [
             'May 19,2010',
             'May 17,2010',
             'May 15,2010',
@@ -114,12 +74,12 @@ def test_execution_query10(executor):
             'May 16,2010',
             'May 18,2010',
         ],
-        'Continent': [
+        'continent': [
             'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
             'Europe', 'Europe'
         ],
-        'Count': [13, 65, 231, 841, 84, 2, 4, 64]
+        'count': [13, 65, 231, 841, 84, 2, 4, 64]
     }).groupby(
-        ['Year', 'Quarter', 'Month', 'Day', 'Continent'], sort=False).sum()
+        ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None

@@ -45,7 +45,7 @@ class ETL(object):
         """
 
         :param source_type: file | csv | db (if db , make sure that you put database connection credentials in the
-        /home/user/olapy-data/olapy-config file
+        /home/user/olapy-data/olapy-config.yml file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
         :param separator: input file separator (, ; : ...)

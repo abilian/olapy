@@ -1,14 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import threading
+
 import pytest
 from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
-
-from olapy.core.services.xmla import XmlaProviderService
 
 from .xs0_responses import TEST_QUERY_AXIS0
 
@@ -74,7 +73,9 @@ class WSGIServer:
 
 
 @pytest.fixture(scope="module")
-def conn():
+def conn(executor):
+    from olapy.core.services.xmla import XmlaProviderService
+    XmlaProviderService.discover_tools.executor = executor
     print("spawning server")
     application = Application(
         [XmlaProviderService],
@@ -100,7 +101,7 @@ def test_discover_properties(conn):
     discover = conn.Discover(
         'DISCOVER_PROPERTIES',
         properties={'LocaleIdentifier': '1036'},
-        restrictions={'PropertyName': 'Catalog'},)[0]
+        restrictions={'PropertyName': 'Catalog'}, )[0]
     assert discover['PropertyName'] == "Catalog"
     assert discover['PropertyDescription'] == "Catalog"
     assert discover['PropertyType'] == "string"
@@ -112,29 +113,29 @@ def test_discover_properties(conn):
 def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
-        restrictions={'CUBE_NAME': 'sales'},
-        properties={'Catalog': 'sales'},)[0]
-    assert discover['CATALOG_NAME'] == "sales"
-    assert discover['CUBE_NAME'] == "sales"
+        restrictions={'CUBE_NAME': 'main'},
+        properties={'Catalog': 'main'}, )[0]
+    assert discover['CATALOG_NAME'] == "main"
+    assert discover['CUBE_NAME'] == "main"
     assert discover['CUBE_TYPE'] == "CUBE"
     assert discover['IS_DRILLTHROUGH_ENABLED'] == "true"
-    assert discover['CUBE_CAPTION'] == "sales"
+    assert discover['CUBE_CAPTION'] == "main"
 
 
 def test_query1(conn):
     # only one measure selected
     # Result :
 
-    # Amount
+    # amount
     # 1023
 
     cmd = """
     SELECT
-    FROM [sales]
-    WHERE ([Measures].[Amount])
+    FROM [main]
+    WHERE ([Measures].[amount])
      CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     assert res.cellmap[0]['_CellOrdinal'] == '0'
     assert res.cellmap[0]['Value'] == 1023
 
@@ -143,8 +144,8 @@ def test_query2(conn):
     # drill down on one Dimension
     # Result :
 
-    # Row Labels	       Amount
-    # All Continent	        1023
+    # Row Labels	       amount
+    # All continent	        1023
     # America	            768
     # United States	    768
     # New York	    768
@@ -159,18 +160,18 @@ def test_query2(conn):
     cmd = """
     SELECT
     NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember(
-        {{DrilldownMember({{{[Geography].[Geography].[All Continent].Members}}},
-        {[Geography].[Geography].[Continent].[America],
-        [Geography].[Geography].[Continent].[Europe]})}},
-        {[Geography].[Geography].[Continent].[America].[United States],
-        [Geography].[Geography].[Continent].[Europe].[Spain]})))
+        {{DrilldownMember({{{[geography].[geography].[All continent].Members}}},
+        {[geography].[geography].[continent].[America],
+        [geography].[geography].[continent].[Europe]})}},
+        {[geography].[geography].[continent].[America].[United States],
+        [geography].[geography].[continent].[Europe].[Spain]})))
     DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [sales]
-    WHERE ([Measures].[Amount])
+    FROM [main]
+    WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -181,94 +182,94 @@ def test_query2(conn):
     expected = []
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Continent].[America]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[continent].[America]",
             Caption="America",
-            LName="[Geography].[Geography].[Continent]",
+            LName="[geography].[geography].[continent]",
             LNum="0",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Country].[America].[United States]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[country].[America].[United States]",
             Caption="United States",
-            LName="[Geography].[Geography].[Country]",
+            LName="[geography].[geography].[country]",
             LNum="1",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[America]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[America]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[City].[America].[United States].[New York]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[city].[America].[United States].[New York]",
             Caption="New York",
-            LName="[Geography].[Geography].[City]",
+            LName="[geography].[geography].[city]",
             LNum="2",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[America].[United States]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[America].[United States]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Continent].[Europe]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[continent].[Europe]",
             Caption="Europe",
-            LName="[Geography].[Geography].[Continent]",
+            LName="[geography].[geography].[continent]",
             LNum="0",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Country].[Europe].[France]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[country].[Europe].[France]",
             Caption="France",
-            LName="[Geography].[Geography].[Country]",
+            LName="[geography].[geography].[country]",
             LNum="1",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Country].[Europe].[Spain]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[country].[Europe].[Spain]",
             Caption="Spain",
-            LName="[Geography].[Geography].[Country]",
+            LName="[geography].[geography].[country]",
             LNum="1",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[City].[Europe].[Spain].[Barcelona]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[city].[Europe].[Spain].[Barcelona]",
             Caption="Barcelona",
-            LName="[Geography].[Geography].[City]",
+            LName="[geography].[geography].[city]",
             LNum="2",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe].[Spain]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe].[Spain]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[City].[Europe].[Spain].[Madrid]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[city].[Europe].[Spain].[Madrid]",
             Caption="Madrid",
-            LName="[Geography].[Geography].[City]",
+            LName="[geography].[geography].[city]",
             LNum="2",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe].[Spain]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe].[Spain]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     expected.append(
         Member(
-            _Hierarchy="[Geography].[Geography]",
-            UName="[Geography].[Geography].[Country].[Europe].[Switzerland]",
+            _Hierarchy="[geography].[geography]",
+            UName="[geography].[geography].[country].[Europe].[Switzerland]",
             Caption="Switzerland",
-            LName="[Geography].[Geography].[Country]",
+            LName="[geography].[geography].[country]",
             LNum="1",
             DisplayInfo="131076",
-            PARENT_UNIQUE_NAME="[Geography].[Geography].[Continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[Geography].[Geography]"))
+            PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
     assert [Member(**dict(co)) for co in columns] == expected
 
 
@@ -276,8 +277,8 @@ def test_query3(conn):
     # Many Dimensions selected
     # Result :
 
-    # Row Labels               Amount
-    # All Continent
+    # Row Labels               amount
+    # All continent
     # America
     #     Crazy Development
     #         2010
@@ -291,16 +292,16 @@ def test_query3(conn):
     cmd = """
         SELECT NON EMPTY
         CrossJoin(CrossJoin(Hierarchize(AddCalculatedMembers({
-        [Geography].[Geography].[All Continent].Members})),
+        [geography].[geography].[All continent].Members})),
         Hierarchize(AddCalculatedMembers({
-        [Product].[Product].[Company].Members}))),
-        Hierarchize(AddCalculatedMembers({[Time].[Time].[Year].Members})))
+        [product].[product].[company].Members}))),
+        Hierarchize(AddCalculatedMembers({[time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS
-        FROM [sales]
-        WHERE ([Measures].[Amount])
+        FROM [main]
+        WHERE ([Measures].[amount])
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -310,61 +311,61 @@ def test_query3(conn):
     expected = []
     expected.append([
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Continent].[America]',
+            _Hierarchy='[geography].[geography]',
+            UName='[geography].[geography].[continent].[America]',
             Caption='America',
-            LName='[Geography].[Geography].[Continent]',
+            LName='[geography].[geography].[continent]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
+            PARENT_UNIQUE_NAME='[geography].[geography].[continent]',
+            HIERARCHY_UNIQUE_NAME='[geography].[geography]'),
         Member(
-            _Hierarchy='[Product].[Product]',
-            UName='[Product].[Product].[Company].[Crazy Development]',
+            _Hierarchy='[product].[product]',
+            UName='[product].[product].[company].[Crazy Development]',
             Caption='Crazy Development',
-            LName='[Product].[Product].[Company]',
+            LName='[product].[product].[company]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Product].[Product].[Company]',
-            HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
+            PARENT_UNIQUE_NAME='[product].[product].[company]',
+            HIERARCHY_UNIQUE_NAME='[product].[product]'),
         Member(
-            _Hierarchy='[Time].[Time]',
-            UName='[Time].[Time].[Year].[2010]',
+            _Hierarchy='[time].[time]',
+            UName='[time].[time].[year].[2010]',
             Caption='2010',
-            LName='[Time].[Time].[Year]',
+            LName='[time].[time].[year]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Time].[Time].[Year]',
-            HIERARCHY_UNIQUE_NAME='[Time].[Time]')
+            PARENT_UNIQUE_NAME='[time].[time].[year]',
+            HIERARCHY_UNIQUE_NAME='[time].[time]')
     ])
     expected.append([
         Member(
-            _Hierarchy='[Geography].[Geography]',
-            UName='[Geography].[Geography].[Continent].[Europe]',
+            _Hierarchy='[geography].[geography]',
+            UName='[geography].[geography].[continent].[Europe]',
             Caption='Europe',
-            LName='[Geography].[Geography].[Continent]',
+            LName='[geography].[geography].[continent]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Geography].[Geography].[Continent]',
-            HIERARCHY_UNIQUE_NAME='[Geography].[Geography]'),
+            PARENT_UNIQUE_NAME='[geography].[geography].[continent]',
+            HIERARCHY_UNIQUE_NAME='[geography].[geography]'),
         Member(
-            _Hierarchy='[Product].[Product]',
-            UName='[Product].[Product].[Company].[Crazy Development]',
+            _Hierarchy='[product].[product]',
+            UName='[product].[product].[company].[Crazy Development]',
             Caption='Crazy Development',
-            LName='[Product].[Product].[Company]',
+            LName='[product].[product].[company]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Product].[Product].[Company]',
-            HIERARCHY_UNIQUE_NAME='[Product].[Product]'),
+            PARENT_UNIQUE_NAME='[product].[product].[company]',
+            HIERARCHY_UNIQUE_NAME='[product].[product]'),
         Member(
-            _Hierarchy='[Time].[Time]',
-            UName='[Time].[Time].[Year].[2010]',
+            _Hierarchy='[time].[time]',
+            UName='[time].[time].[year].[2010]',
             Caption='2010',
-            LName='[Time].[Time].[Year]',
+            LName='[time].[time].[year]',
             LNum='0',
             DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[Time].[Time].[Year]',
-            HIERARCHY_UNIQUE_NAME='[Time].[Time]')
+            PARENT_UNIQUE_NAME='[time].[time].[year]',
+            HIERARCHY_UNIQUE_NAME='[time].[time]')
     ])
 
     for idx, item in enumerate(columns):
@@ -377,10 +378,10 @@ def test_query4(conn):
     # Result :
 
     # Row Labels
-    # Amount
+    # amount
     #     Crazy Development
     #         olapy
-    #             All Continent
+    #             All continent
     #                 America
     #                     2010        768
     #             Europe
@@ -390,10 +391,10 @@ def test_query4(conn):
     #                     2010        3
     #                 Switzerland
     #                     2010        248
-    # Count
+    # count
     #     Crazy Development
     #         olapy
-    #             All Continent
+    #             All continent
     #                 America
     #                     2010        576
     #             Europe
@@ -407,22 +408,22 @@ def test_query4(conn):
     # This kind of query is generated by excel once you select a dimension a you do drill dow
     cmd = """
     SELECT NON EMPTY CrossJoin(CrossJoin(CrossJoin({
-        [Measures].[Amount],
-        [Measures].[Count]},
+        [Measures].[amount],
+        [Measures].[count]},
         Hierarchize(AddCalculatedMembers(DrilldownMember({{
-        [Product].[Product].[Company].Members}}, {
-        [Product].[Product].[Company].[Crazy Development]
+        [product].[product].[company].Members}}, {
+        [product].[product].[company].[Crazy Development]
         })))), Hierarchize(AddCalculatedMembers(DrilldownMember({{{
-        [Geography].[Geography].[All Continent].Members}}}, {
-        [Geography].[Geography].[Continent].[Europe]})))), Hierarchize(AddCalculatedMembers({
-        [Time].[Time].[Year].Members})))
+        [geography].[geography].[All continent].Members}}}, {
+        [geography].[geography].[continent].[Europe]})))), Hierarchize(AddCalculatedMembers({
+        [time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [sales]
+    FROM [main]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="sales")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():

@@ -14,156 +14,156 @@ def parser():
 
 def test_parsing_query1(parser):
     query_parts = parser.decorticate_query(query1)
-    assert query_parts['all'] == [['Measures', 'Amount']]
+    assert query_parts['all'] == [['Measures', 'amount']]
     assert query_parts['rows'] == []
     assert query_parts['where'] == []
-    assert query_parts['columns'] == [['Measures', 'Amount']]
+    assert query_parts['columns'] == [['Measures', 'amount']]
 
     query_parts = parser.decorticate_query(query1 + '\n' + where)
     assert query_parts['all'] == [
-        ['Measures', 'Amount'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['Measures', 'amount'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == []
     assert query_parts['where'] == [
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Measures', 'Amount'],
+        ['Measures', 'amount'],
     ]
 
 
 def test_parsing_query2(parser):
     query_parts = parser.decorticate_query(query2)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership'],
+        ['geography', 'economy', 'partnership'],
     ]
     assert query_parts['rows'] == []
     assert query_parts['where'] == []
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership'],
+        ['geography', 'economy', 'partnership'],
     ]
 
     query_parts = parser.decorticate_query(query2 + '\n' + where)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['geography', 'economy', 'partnership'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == []
     assert query_parts['where'] == [
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership'],
+        ['geography', 'economy', 'partnership'],
     ]
 
 
 def test_parsing_query3(parser):
     query_parts = parser.decorticate_query(query3)
     assert query_parts['all'] == [
-        ['Geography', 'Geo', 'Country'],
-        ['Measures', 'Amount'],
+        ['geography', 'geo', 'country'],
+        ['Measures', 'amount'],
     ]
     assert query_parts['rows'] == [
-        ['Measures', 'Amount'],
+        ['Measures', 'amount'],
     ]
     assert query_parts['where'] == []
     assert query_parts['columns'] == [
-        ['Geography', 'Geo', 'Country'],
+        ['geography', 'geo', 'country'],
     ]
 
     query_parts = parser.decorticate_query(query3 + '\n' + where)
     assert query_parts['all'] == [
-        ['Geography', 'Geo', 'Country'],
-        ['Measures', 'Amount'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['geography', 'geo', 'country'],
+        ['Measures', 'amount'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == [
-        ['Measures', 'Amount'],
+        ['Measures', 'amount'],
     ]
     assert query_parts['where'] == [
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Geography', 'Geo', 'Country'],
+        ['geography', 'geo', 'country'],
     ]
 
 
 def test_parsing_query4(parser):
     query_parts = parser.decorticate_query(query4)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership'],
-        ['Geography', 'Geo', 'Country'],
+        ['geography', 'economy', 'partnership'],
+        ['geography', 'geo', 'country'],
     ]
     assert query_parts['rows'] == [
-        ['Geography', 'Geo', 'Country'],
+        ['geography', 'geo', 'country'],
     ]
     assert query_parts['where'] == []
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership'],
+        ['geography', 'economy', 'partnership'],
     ]
 
     query_parts = parser.decorticate_query(query4 + '\n' + where)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership'],
-        ['Geography', 'Geo', 'Country'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['geography', 'economy', 'partnership'],
+        ['geography', 'geo', 'country'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == [
-        ['Geography', 'Geo', 'Country'],
+        ['geography', 'geo', 'country'],
     ]
     assert query_parts['where'] == [
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership'],
+        ['geography', 'economy', 'partnership'],
     ]
 
 
 def test_parsing_query5(parser):
     query_parts = parser.decorticate_query(query5)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership', 'EU'],
-        ['Geography', 'Economy', 'Partnership', 'None'],
-        ['Geography', 'Economy', 'Partnership', 'NAFTA'],
-        ['Product', 'Prod', 'Company', 'Crazy Development'],
-        ['Product', 'Prod', 'Company', 'Company_test'],
-        ['Product', 'Prod', 'Company', 'test_Development'],
+        ['geography', 'economy', 'partnership', 'EU'],
+        ['geography', 'economy', 'partnership', 'None'],
+        ['geography', 'economy', 'partnership', 'NAFTA'],
+        ['product', 'prod', 'company', 'Crazy Development'],
+        ['product', 'prod', 'company', 'company_test'],
+        ['product', 'prod', 'company', 'test_Development'],
     ]
     assert query_parts['rows'] == [
-        ['Product', 'Prod', 'Company', 'Crazy Development'],
-        ['Product', 'Prod', 'Company', 'Company_test'],
-        ['Product', 'Prod', 'Company', 'test_Development'],
+        ['product', 'prod', 'company', 'Crazy Development'],
+        ['product', 'prod', 'company', 'company_test'],
+        ['product', 'prod', 'company', 'test_Development'],
     ]
     assert query_parts['where'] == []
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership', 'EU'],
-        ['Geography', 'Economy', 'Partnership', 'None'],
-        ['Geography', 'Economy', 'Partnership', 'NAFTA'],
+        ['geography', 'economy', 'partnership', 'EU'],
+        ['geography', 'economy', 'partnership', 'None'],
+        ['geography', 'economy', 'partnership', 'NAFTA'],
     ]
 
     query_parts = parser.decorticate_query(query5 + '\n' + where)
     assert query_parts['all'] == [
-        ['Geography', 'Economy', 'Partnership', 'EU'],
-        ['Geography', 'Economy', 'Partnership', 'None'],
-        ['Geography', 'Economy', 'Partnership', 'NAFTA'],
-        ['Product', 'Prod', 'Company', 'Crazy Development'],
-        ['Product', 'Prod', 'Company', 'Company_test'],
-        ['Product', 'Prod', 'Company', 'test_Development'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['geography', 'economy', 'partnership', 'EU'],
+        ['geography', 'economy', 'partnership', 'None'],
+        ['geography', 'economy', 'partnership', 'NAFTA'],
+        ['product', 'prod', 'company', 'Crazy Development'],
+        ['product', 'prod', 'company', 'company_test'],
+        ['product', 'prod', 'company', 'test_Development'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == [
-        ['Product', 'Prod', 'Company', 'Crazy Development'],
-        ['Product', 'Prod', 'Company', 'Company_test'],
-        ['Product', 'Prod', 'Company', 'test_Development'],
+        ['product', 'prod', 'company', 'Crazy Development'],
+        ['product', 'prod', 'company', 'company_test'],
+        ['product', 'prod', 'company', 'test_Development'],
     ]
     assert query_parts['where'] == [
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Geography', 'Economy', 'Partnership', 'EU'],
-        ['Geography', 'Economy', 'Partnership', 'None'],
-        ['Geography', 'Economy', 'Partnership', 'NAFTA'],
+        ['geography', 'economy', 'partnership', 'EU'],
+        ['geography', 'economy', 'partnership', 'None'],
+        ['geography', 'economy', 'partnership', 'NAFTA'],
     ]
 
 
@@ -172,38 +172,38 @@ def test_parsing_query6(parser):
 
     query_parts = parser.decorticate_query(query6)
     assert query_parts['all'] == [
-        ['Time', 'Time', 'Year'],
-        ['Time', 'Time', 'Year', '2010'],
-        ['Time', 'Time', 'Quarter', '2010', 'Q2 2010'],
-        ['Time', 'Time', 'Month', '2010', 'Q2 2010', 'May 2010'],
-        ['Measures', 'Amount'],
+        ['time', 'time', 'year'],
+        ['time', 'time', 'year', '2010'],
+        ['time', 'time', 'quarter', '2010', 'Q2 2010'],
+        ['time', 'time', 'month', '2010', 'Q2 2010', 'May 2010'],
+        ['Measures', 'amount'],
     ]
     assert query_parts['rows'] == []
-    assert query_parts['where'] == [['Measures', 'Amount']]
+    assert query_parts['where'] == [['Measures', 'amount']]
     assert query_parts['columns'] == [
-        ['Time', 'Time', 'Year'],
-        ['Time', 'Time', 'Year', '2010'],
-        ['Time', 'Time', 'Quarter', '2010', 'Q2 2010'],
-        ['Time', 'Time', 'Month', '2010', 'Q2 2010', 'May 2010'],
+        ['time', 'time', 'year'],
+        ['time', 'time', 'year', '2010'],
+        ['time', 'time', 'quarter', '2010', 'Q2 2010'],
+        ['time', 'time', 'month', '2010', 'Q2 2010', 'May 2010'],
     ]
 
     query_parts = parser.decorticate_query(query6 + '\n' + where)
     assert query_parts['all'] == [
-        ['Time', 'Time', 'Year'],
-        ['Time', 'Time', 'Year', '2010'],
-        ['Time', 'Time', 'Quarter', '2010', 'Q2 2010'],
-        ['Time', 'Time', 'Month', '2010', 'Q2 2010', 'May 2010'],
-        ['Measures', 'Amount'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['time', 'time', 'year'],
+        ['time', 'time', 'year', '2010'],
+        ['time', 'time', 'quarter', '2010', 'Q2 2010'],
+        ['time', 'time', 'month', '2010', 'Q2 2010', 'May 2010'],
+        ['Measures', 'amount'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['rows'] == []
     assert query_parts['where'] == [
-        ['Measures', 'Amount'],
-        ['Time', 'Calendar', 'Day', 'May 12,2010'],
+        ['Measures', 'amount'],
+        ['time', 'calendar', 'day', 'May 12,2010'],
     ]
     assert query_parts['columns'] == [
-        ['Time', 'Time', 'Year'],
-        ['Time', 'Time', 'Year', '2010'],
-        ['Time', 'Time', 'Quarter', '2010', 'Q2 2010'],
-        ['Time', 'Time', 'Month', '2010', 'Q2 2010', 'May 2010'],
+        ['time', 'time', 'year'],
+        ['time', 'time', 'year', '2010'],
+        ['time', 'time', 'quarter', '2010', 'Q2 2010'],
+        ['time', 'time', 'month', '2010', 'Q2 2010', 'May 2010'],
     ]

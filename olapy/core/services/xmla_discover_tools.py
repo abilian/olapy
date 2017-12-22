@@ -27,7 +27,10 @@ class XmlaDiscoverTools():
 
     def __init__(self):
         # right now the catalogue_name and cube name are the same
-        self.catalogues = MdxEngine.get_cubes_names()
+        if MdxEngine.from_db_cubes:
+            self.catalogues = MdxEngine.from_db_cubes
+        else:
+            self.catalogues = MdxEngine.get_cubes_names()
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
             self.executor = MdxEngine(self.selected_catalogue)

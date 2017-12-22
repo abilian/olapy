@@ -22,6 +22,7 @@ dependencies:
     - pyenv local 2.7.11 3.6.2
     - pip install -q -r requirements.txt
 
+
 test:
   override:
     - tox

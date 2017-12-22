@@ -36,9 +36,11 @@ def load_table_config_file(executor_instance, cube_obj):
     """
     Load tables from config file.
 
-    :param cube_obj: cubes object
+    :param executor_instance: MdxEngine instance
+    :param cube_obj: cubes parser object
     :return: tables dict with table name as key and DataFrame as value
     """
+
     tables = {}
     # just one facts table right now
     executor_instance.facts = cube_obj.facts[0].table_name
@@ -72,7 +74,7 @@ def load_table_config_file(executor_instance, cube_obj):
 def construct_star_schema_config_file(executor_instance, cubes_obj):
     """Construct star schema DataFrame from configuration file for excel client.
 
-    :param cube_name:  cube name (or database name)
+    :param executor_instance:  MdxEngine instance
     :param cubes_obj: cubes object
     :return: star schema DataFrame
     """
@@ -119,9 +121,9 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
 
 def get_columns_n_tables(cubes_obj, executor_instance):
     """
-    Get all tables and their columns (and renames columns, if yu specify this in the config file)
-    :param tables_cubes_obj: config file parser obj
-    :param connector: db engine
+    Get all tables and their columns (and renames columns, if you specify this in the config file)
+    :param cubes_obj: config file parser obj
+    :param executor_instance: MdxEngine instance
     :return:
     """
 
@@ -158,8 +160,8 @@ def get_columns_n_tables(cubes_obj, executor_instance):
 def construct_web_star_schema_config_file(executor_instance, cubes_obj):
     """Construct star schema DataFrame from configuration file for web client.
 
-    :param cube_name:  cube name (or database name)
-    :param cubes_obj: cubes object
+    :param executor_instance: MdxEngine instance
+    :param cubes_obj: cubes parser object
     :return: star schema DataFrame
     """
 

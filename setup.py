@@ -22,10 +22,10 @@ setup(
     description="OLAP Engine",
     url='https://github.com/abilian/olapy',
     long_description=open('README.rst').read(),
-    package_data={"olapy": ['config/olapy-config']},
+    package_data={"olapy": ['config/olapy-config.yml']},
     include_package_data=True,
     install_requires=install_requires,
-    data_files=[('config', ['config/olapy-config'])],
+    data_files=[('config', ['config/olapy-config.yml'])],
     classifiers=[
         "Programming Language :: Python",
         'Development Status :: 3 - Alpha',
