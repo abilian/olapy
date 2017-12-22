@@ -6,12 +6,12 @@ from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 from tests.queries import query11, query12, query13, query14
 
 
-
 def test_slicer_axis(executor):
     slicer_axis_query11(executor)
     slicer_axis_query12(executor)
     slicer_axis_query13(executor)
     slicer_axis_query14(executor)
+
 
 def slicer_axis_query11(executor):
     """
