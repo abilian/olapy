@@ -13,8 +13,8 @@ pytest-cov
 #cx_oracle
 #mysql-python # don't work in py3
 #pymysql
-#mysqlclient
-#psycopg2
+mysqlclient
+psycopg2
 
 # linting
 mastool
