@@ -1,42 +1,21 @@
 from __future__ import absolute_import, division, print_function
 
-import os
-
+from tests.queries import query_posgres1, query_posgres2, query_postgres3
 import pandas as pd
 import pytest
-import sqlalchemy
 from pandas.util.testing import assert_frame_equal
-from tests.db_creation_utils import create_insert, drop_tables
-from tests.queries import query_posgres1, query_posgres2, query_postgres3
-
-CUBE = 'sales_postgres'
 
 
 @pytest.mark.skipif(
     "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-# create tables in the postgres database
-# def test_create_tables():
-@pytest.fixture(scope="module", autouse=True)
-def create_tables():
-    sqlalchemy_engine = sqlalchemy.create_engine(os.environ['POSTGRES_URI'], client_encoding='utf8')
-    create_insert(sqlalchemy_engine)
+def test_mysql_execution_queries(executor_postgres):
+    check_execution_query1(executor_postgres)
+    check_execution_query2(executor_postgres)
+    check_execution_query10(executor_postgres)
 
 
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-@pytest.fixture(scope='module')
-def executor():
-    from olapy.core.mdx.executor.execute import MdxEngine
-    MdxEngine.source_type = ('csv', 'db')
-    os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URI']
-    MdxEngine.engine = None
-    return MdxEngine(CUBE)
-
-
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-def test_execution_query1(executor):
-    df = executor.execute_mdx(query_posgres1)['result']
+def check_execution_query1(executor_postgres):
+    df = executor_postgres.execute_mdx(query_posgres1)['result']
     test_df = pd.DataFrame({
         'country': ['France', 'Spain', 'Switzerland', 'United States'],
         'amount': [4, 3, 248, 768],
@@ -45,10 +24,8 @@ def test_execution_query1(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-def test_execution_query2(executor):
-    df = executor.execute_mdx(query_posgres2)['result']
+def check_execution_query2(executor_postgres):
+    df = executor_postgres.execute_mdx(query_posgres2)['result']
     test_df = pd.DataFrame({
         'year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
@@ -75,10 +52,8 @@ def test_execution_query2(executor):
     assert assert_frame_equal(df, test_df) is None
 
 
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-def test_execution_query10(executor):
-    df = executor.execute_mdx(query_postgres3)['result']
+def check_execution_query10(executor_postgres):
+    df = executor_postgres.execute_mdx(query_postgres3)['result']
     test_df = pd.DataFrame({
         'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'quarter': [
@@ -108,10 +83,3 @@ def test_execution_query10(executor):
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
     assert assert_frame_equal(df, test_df) is None
-
-
-@pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-# drop created tables from postgres database
-def test_drop_tables(connect):
-    drop_tables(connect)
