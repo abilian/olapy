@@ -549,10 +549,10 @@ class XmlaExecuteTools():
             else:
                 value = '{0}.{0}.[{1}]'.format(
                     tupl2list[0],
-                    self.executor.tables_loaded[tupl2list[0].replace(
-                        '[',
-                        '',
-                    ).replace(']', '')].columns[len(tupl2list[4:])],
+                    self.executor.tables_loaded[tupl2list[0]
+                                                .replace('[', '')
+                                                .replace(']', '')]
+                    .columns[len(tupl2list[4:])],
                 )
 
             with xml.Cell(CellOrdinal=str(index)):
@@ -616,29 +616,24 @@ class XmlaExecuteTools():
                 with xml.HierarchyInfo(name=to_write):
                     xml.UName(
                         name=to_write + ".[MEMBER_UNIQUE_NAME]",
-                        **{
-                            'type': 'xs:string',
-                        })
+                        type='xs:string',
+                    )
                     xml.Caption(
                         name=to_write + ".[MEMBER_CAPTION]",
-                        **{
-                            'type': 'xs:string',
-                        })
+                        type='xs:string',
+                    )
                     xml.LName(
                         name=to_write + ".[LEVEL_UNIQUE_NAME]",
-                        **{
-                            'type': 'xs:string',
-                        })
+                        type='xs:string',
+                    )
                     xml.LNum(
                         name=to_write + ".[LEVEL_NUMBER]",
-                        **{
-                            'type': 'xs:int',
-                        })
+                        type='xs:int',
+                    )
                     xml.DisplayInfo(
                         name=to_write + ".[DISPLAY_INFO]",
-                        **{
-                            'type': 'xs:unsignedInt',
-                        })
+                        type='xs:unsignedInt',
+                    )
 
         return str(xml)
 
@@ -711,29 +706,24 @@ class XmlaExecuteTools():
                     with xml.HierarchyInfo(name=to_write):
                         xml.UName(
                             name=to_write + ".[MEMBER_UNIQUE_NAME]",
-                            **{
-                                'type': 'xs:string',
-                            })
+                            type='xs:string',
+                        )
                         xml.Caption(
                             name=to_write + ".[MEMBER_CAPTION]",
-                            **{
-                                'type': 'xs:string',
-                            })
+                            type='xs:string',
+                        )
                         xml.LName(
                             name=to_write + ".[LEVEL_UNIQUE_NAME]",
-                            **{
-                                'type': 'xs:string',
-                            })
+                            type='xs:string',
+                        )
                         xml.LNum(
                             name=to_write + ".[LEVEL_NUMBER]",
-                            **{
-                                'type': 'xs:int',
-                            })
+                            type='xs:int',
+                        )
                         xml.DisplayInfo(
                             name=to_write + ".[DISPLAY_INFO]",
-                            **{
-                                'type': 'xs:unsignedInt',
-                            })
+                            type='xs:unsignedInt',
+                        )
 
         return str(xml)
 
@@ -741,34 +731,31 @@ class XmlaExecuteTools():
         with xml.HierarchyInfo(name='[Measures]'):
             xml.UName(
                 name="[Measures].[MEMBER_UNIQUE_NAME]",
-                **{
-                    'type': 'xs:string',
-                })
+                type='xs:string',
+            )
             xml.Caption(
-                name="[Measures].[MEMBER_CAPTION]", **{
-                    'type': 'xs:string',
-                })
+                name="[Measures].[MEMBER_CAPTION]",
+                type='xs:string',
+            )
             xml.LName(
-                name="[Measures].[LEVEL_UNIQUE_NAME]", **{
-                    'type': 'xs:string',
-                })
-            xml.LNum(name="[Measures].[LEVEL_NUMBER]", **{'type': 'xs:int'})
+                name="[Measures].[LEVEL_UNIQUE_NAME]",
+                type='xs:string',
+            )
+            xml.LNum(name="[Measures].[LEVEL_NUMBER]", type='xs:int')
             xml.DisplayInfo(
-                name="[Measures].[DISPLAY_INFO]", **{
-                    'type': 'xs:unsignedInt',
-                })
+                name="[Measures].[DISPLAY_INFO]",
+                type='xs:unsignedInt',
+            )
             if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
                 xml.PARENT_UNIQUE_NAME(
                     name="[Measures].[PARENT_UNIQUE_NAME]",
-                    **{
-                        'type': 'xs:string',
-                    })
+                    type='xs:string',
+                )
             if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME(
                     name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                    **{
-                        'type': 'xs:string',
-                    })
+                    type='xs:string',
+                )
         return xml
 
     def generate_one_axis_info(self, mdx_query_axis='columns', Axis='Axis0'):
@@ -821,47 +808,40 @@ class XmlaExecuteTools():
                             xml.UName(
                                 name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(
                                     table_name,),
-                                **{
-                                    'type': 'xs:string',
-                                })
+                                type='xs:string',
+                            )
                             xml.Caption(
                                 name="[{0}].[{0}].[MEMBER_CAPTION]".format(
                                     table_name,),
-                                **{
-                                    'type': 'xs:string',
-                                })
+                                type='xs:string',
+                            )
                             xml.LName(
                                 name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(
                                     table_name,),
-                                **{
-                                    'type': 'xs:string',
-                                })
+                                type='xs:string',
+                            )
                             xml.LNum(
                                 name="[{0}].[{0}].[LEVEL_NUMBER]".format(
                                     table_name,),
-                                **{
-                                    'type': 'xs:int',
-                                })
+                                type='xs:int',
+                            )
                             xml.DisplayInfo(
                                 name="[{0}].[{0}].[DISPLAY_INFO]".format(
                                     table_name,),
-                                **{
-                                    'type': 'xs:unsignedInt',
-                                })
+                                type='xs:unsignedInt',
+                            )
 
                             if 'Hierarchize' in self.executor.mdx_query:
                                 xml.PARENT_UNIQUE_NAME(
                                     name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".
                                     format(table_name),
-                                    **{
-                                        'type': 'xs:string',
-                                    })
+                                    type='xs:string',
+                                )
                                 xml.HIERARCHY_UNIQUE_NAME(
                                     name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".
                                     format(table_name),
-                                    **{
-                                        'type': 'xs:string',
-                                    })
+                                    type='xs:string',
+                                )
 
                 # Hierarchize
                 if not self.executor.parser.hierarchized_tuples() and len(
@@ -924,26 +904,24 @@ class XmlaExecuteTools():
             with xml.HierarchyInfo(name='[Measures]'):
                 xml.UName(
                     name="[Measures].[MEMBER_UNIQUE_NAME]",
-                    **{
-                        'type': 'xs:string',
-                    })
+                    type='xs:string',
+                )
                 xml.Caption(
                     name="[Measures].[MEMBER_CAPTION]",
-                    **{
-                        'type': 'xs:string',
-                    })
+                    type='xs:string',
+                )
                 xml.LName(
                     name="[Measures].[LEVEL_UNIQUE_NAME]",
-                    **{
-                        'type': 'xs:string',
-                    })
-                xml.LNum(name="[Measures].[LEVEL_NUMBER]",
-                         **{'type': 'xs:int'})
+                    type='xs:string',
+                )
+                xml.LNum(
+                    name="[Measures].[LEVEL_NUMBER]",
+                    type='xs:int',
+                )
                 xml.DisplayInfo(
                     name="[Measures].[DISPLAY_INFO]",
-                    **{
-                        'type': 'xs:unsignedInt',
-                    })
+                    type='xs:unsignedInt',
+                )
 
         return str(xml)
 
@@ -986,11 +964,11 @@ class XmlaExecuteTools():
         xml = xmlwitch.Builder()
         with xml.CellInfo:
             xml.Value(name="VALUE")
-            xml.FormatString(name="FORMAT_STRING", **{'type': 'xs:string'})
-            xml.Language(name="LANGUAGE", **{'type': 'xs:unsignedInt'})
-            xml.BackColor(name="BACK_COLOR", **{'type': 'xs:unsignedInt'})
-            xml.ForeColor(name="FORE_COLOR", **{'type': 'xs:unsignedInt'})
-            xml.FontFlags(name="FONT_FLAGS", **{'type': 'xs:int'})
+            xml.FormatString(name="FORMAT_STRING", type='xs:string')
+            xml.Language(name="LANGUAGE", type='xs:unsignedInt')
+            xml.BackColor(name="BACK_COLOR", type='xs:unsignedInt')
+            xml.ForeColor(name="FORE_COLOR", type='xs:unsignedInt')
+            xml.FontFlags(name="FONT_FLAGS", type='xs:int')
 
         return str(xml)
 
