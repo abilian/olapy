@@ -8,6 +8,7 @@ from os.path import expanduser
 
 import numpy as np
 import pandas as pd
+
 from olapy.core.mdx.executor.execute import MdxEngine
 
 CUBE_NAME = "temp_cube"

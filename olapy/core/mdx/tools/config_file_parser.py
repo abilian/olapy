@@ -1,7 +1,9 @@
 """
-Parse cube configuration file and create cube parser object which can be passed to the MdxEngine
+Parse cube configuration file and create cube parser object which
+can be passed to the MdxEngine.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
 from collections import OrderedDict
@@ -45,87 +47,70 @@ class ConfigParser:
     Excel Config file Structure example::
 
         <?xml version="1.0" encoding="UTF-8"?>
+        <cubes>
+            <!-- if you want to set an authentication mechanism for excel to access cube,
+                user must set a token with login url like 'http://127.0.0.1/admin  -->
+            <!-- default password = admin -->
 
-            <cubes>
+            <!-- enable/disable xmla authentication -->
+            <xmla_authentication>False</xmla_authentication>
 
-                <!-- if you want to set an authentication mechanism for excel to access cube,
-                    user must set a token with login url like 'http://127.0.0.1/admin  -->
-                <!-- default password = admin -->
+            <cube>
+                <!-- cube name => csv folder name or database name -->
+                <name>labster</name>
 
-                <!-- enable/disable xmla authentication -->
-                <xmla_authentication>False</xmla_authentication>
+                <!-- source : csv | postgres | mysql | oracle | mssql -->
+                <source>csv</source>
 
-                <cube>
+                <!-- start building customized star schema -->
+                <facts>
+                    <!-- facts table name -->
+                    <table_name>stats_line</table_name>
 
-                    <!-- cube name => csv folder name or database name -->
-                    <name>labster</name>
+                    <keys>
+                        <!--
+                        <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name>
+                        -->
+                        <column_name ref="orgunit.id">departement_id</column_name>
+                    </keys>
 
-                    <!-- source : csv | postgres | mysql | oracle | mssql -->
-                    <source>csv</source>
+                    <!-- specify measures explicitly -->
+                    <measures>
+                        <!-- by default, all number type columns in facts table, or you can specify them here -->
+                        <name>montant</name>
+                        <name>salaire_brut_mensuel</name>
+                        <name>cout_total_mensuel</name>
+                    </measures>
+                </facts>
+                <!-- end building customized star schema -->
 
+                <!-- star building customized dimensions display in excel from the star schema -->
+                <dimensions>
+                    <dimension>
+                        <!-- if you want to keep the same name for excel display, just use the
+                             same name in name and displayName -->
+                        <name>orgunit</name>
+                        <displayName>Organisation</displayName>
 
-                    <!-- star building customized star schema -->
-
-                    <facts>
-
-                        <!-- facts table name -->
-                        <table_name>stats_line</table_name>
-
-                        <keys>
-                            <!-- <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name> -->
-                            <column_name ref="orgunit.id">departement_id</column_name>
-
-                        </keys>
-
-                        <!-- specify measures explicitly -->
-                        <measures>
-
-                            <!-- by default, all number type columns in facts table, or you can specify them here -->
-                            <name>montant</name>
-                            <name>salaire_brut_mensuel</name>
-                            <name>cout_total_mensuel</name>
-                        </measures>
-
-                    </facts>
-                    <!-- end building customized star schema -->
-
-
-                    <!-- star building customized dimensions display in excel from the star schema -->
-                    <dimensions>
-
-
-                        <dimension>
-
-                            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                            <name>orgunit</name>
-                            <displayName>Organisation</displayName>
-
-                            <columns>
-
-                                <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
-                                <name>type</name>
-                                <name>nom</name>
-                                <name>sigle</name>
-                            </columns>
-
-                        </dimension>
-
-                    </dimensions>
-
-                    <!-- end building customized dimensions display in excel from the star schema -->
-
-
-                </cube>
-
-            </cubes>
-
+                        <columns>
+                            <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
+                            <name>type</name>
+                            <name>nom</name>
+                            <name>sigle</name>
+                        </columns>
+                    </dimension>
+                </dimensions>
+                <!-- end building customized dimensions display in excel from the star schema -->
+            </cube>
+        </cubes>
     """
 
     def __init__(
             self,
             cube_path=None,
             file_name='cubes-config.xml',
-            web_config_file_name='web_cube_config.xml', ):
+            web_config_file_name='web_cube_config.xml',
+    ):
         """
 
         :param cube_path: path to cube (csv folders) where config file is located by default
@@ -148,9 +133,13 @@ class ConfigParser:
             from os.path import expanduser
             home_directory = expanduser("~")
 
-        return os.path.join(home_directory, 'olapy-data', 'cubes', )
+        return os.path.join(
+            home_directory,
+            'olapy-data',
+            'cubes',
+        )
 
-    # todo one function
+    # TODO: one function
     def get_config_file_path(self):
         return os.path.join(self.cube_path, self.file_name)
 
@@ -159,6 +148,7 @@ class ConfigParser:
     #     return os.path.join(self.cube_path, self.web_config_file_name)
 
     def config_file_exist(self):
+        # type: () -> bool
         """
         Check whether the config file exists or not.
 
@@ -171,6 +161,7 @@ class ConfigParser:
         return os.path.isfile(self.get_config_file_path())
 
     def xmla_authentication(self):
+        # type: () -> bool
         """Check if excel need authentication to access cubes or not.
 
         (xmla_authentication tag in the config file).
@@ -185,7 +176,8 @@ class ConfigParser:
                 tree = etree.parse(config_file, parser)
 
                 try:
-                    return tree.xpath('/cubes/xmla_authentication')[0].text == 'True'
+                    return tree.xpath('/cubes/xmla_authentication')[
+                        0].text == 'True'
                 except BaseException:
                     return False
         else:
@@ -234,7 +226,9 @@ class ConfigParser:
                     measures=[
                         mes.text
                         for mes in xml_facts.findall('measures/name')
-                    ], ) for xml_facts in tree.xpath('/cubes/cube/facts')
+                    ],
+                )
+                for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
             dimensions = [
@@ -244,12 +238,14 @@ class ConfigParser:
                     columns=OrderedDict(
                         (
                             column_name.text,
-                            column_name.text if not column_name.attrib else column_name.attrib['column_new_name']
+                            column_name.text if not column_name.attrib else
+                            column_name.attrib['column_new_name'],
                         )
                         for column_name in xml_dimension.findall(
-                            'columns/name', )), )
+                            'columns/name',)),
+                )
                 for xml_dimension in tree.xpath(
-                    '/cubes/cube/dimensions/dimension')
+                    '/cubes/cube/dimensions/dimension',)
             ]
 
         return [
@@ -257,8 +253,8 @@ class ConfigParser:
                 name=xml_cube.find('name').text,
                 source=xml_cube.find('source').text,
                 facts=facts,
-                dimensions=dimensions, )
-            for xml_cube in tree.xpath('/cubes/cube')
+                dimensions=dimensions,
+            ) for xml_cube in tree.xpath('/cubes/cube')
         ]
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')

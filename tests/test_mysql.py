@@ -3,11 +3,15 @@ from __future__ import absolute_import, division, print_function
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
+
 from .queries import query1, query3, query6, query7, query8, query9, query10
 
 
-@pytest.mark.skipif("'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ")
-@pytest.mark.parametrize('executor', [['MYSQL_URI', 'sales_mysql']], indirect=True)
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'MYSQL' or 'MYSQL_URI' not in os.environ"
+)
+@pytest.mark.parametrize(
+    'executor', [['MYSQL_URI', 'sales_mysql']], indirect=True)
 def test_mysql_execution_queries(executor):
     check_query1(executor)
     check_execution_query2(executor)
@@ -29,7 +33,7 @@ def check_execution_query2(executor_mysql):
         'amount': [4, 3, 248, 768],
     }).groupby(['country']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query6(executor_mysql):
@@ -57,7 +61,7 @@ def check_execution_query6(executor_mysql):
         'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query7(executor_mysql):
@@ -96,7 +100,7 @@ def check_execution_query7(executor_mysql):
         ['company', 'year', 'quarter', 'month', 'day', 'continent'],
         sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query8(executor_mysql):
@@ -108,7 +112,7 @@ def check_execution_query8(executor_mysql):
     }).groupby(
         ['continent', 'country'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query9(executor_mysql):
@@ -141,7 +145,7 @@ def check_execution_query9(executor_mysql):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query10(executor_mysql):
@@ -174,4 +178,4 @@ def check_execution_query10(executor_mysql):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)

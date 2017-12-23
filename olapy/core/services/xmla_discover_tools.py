@@ -3,15 +3,17 @@ Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=s
 """
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
 import uuid
 
 import xmlwitch
 
-from olapy.core.services.xmla_discover_tools_utils import discover_schema_rowsets_response_rows, \
-    discover_literals_response_rows
+from olapy.core.services.xmla_discover_tools_utils import discover_literals_response_rows, \
+    discover_schema_rowsets_response_rows
+
 from ..mdx.executor.execute import MdxEngine
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
@@ -34,10 +36,12 @@ class XmlaDiscoverTools():
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
             self.executor = MdxEngine(self.selected_catalogue)
-            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[[
-                col for col in self.executor.load_star_schema_dataframe.columns
-                if col[-3:] != "_id"
-            ]]
+            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[
+                [
+                    col
+                    for col in self.executor.load_star_schema_dataframe.columns
+                    if col[-3:] != "_id"
+                ]]
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
@@ -92,7 +96,8 @@ class XmlaDiscoverTools():
             PropertyType,
             PropertyAccessType,
             IsRequired,
-            Value,):
+            Value,
+    ):
 
         xml = xmlwitch.Builder()
 
@@ -156,7 +161,11 @@ class XmlaDiscoverTools():
 
         if request.Restrictions.RestrictionList.PropertyName == 'Catalog':
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog.replace('[', '').replace(']', ''))
+                self.change_catalogue(
+                    request.Properties.PropertyList.Catalog.replace(
+                        '[',
+                        '',
+                    ).replace(']', ''),)
                 value = self.selected_catalogue
             else:
                 value = "olapy Unspecified Catalog"
@@ -168,7 +177,8 @@ class XmlaDiscoverTools():
                 'string',
                 'ReadWrite',
                 'false',
-                value,)
+                value,
+            )
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ServerName':
             return self._get_props(
@@ -178,7 +188,8 @@ class XmlaDiscoverTools():
                 'string',
                 'Read',
                 'false',
-                'Mouadh',)
+                'Mouadh',
+            )
 
         elif request.Restrictions.RestrictionList.PropertyName == 'ProviderVersion':
             return self._get_props(
@@ -188,7 +199,8 @@ class XmlaDiscoverTools():
                 'string',
                 'Read',
                 'false',
-                '0.02  08-Mar-2016 08:41:28 GMT',)
+                '0.02  08-Mar-2016 08:41:28 GMT',
+            )
 
         elif (request.Restrictions.RestrictionList.PropertyName ==
               'MdpropMdxSubqueries'):
@@ -202,7 +214,8 @@ class XmlaDiscoverTools():
                 'int',
                 'Read',
                 'false',
-                '15',)
+                '15',
+            )
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxDrillFunctions':
 
@@ -215,7 +228,8 @@ class XmlaDiscoverTools():
                 'int',
                 'Read',
                 'false',
-                '3',)
+                '3',
+            )
 
         elif request.Restrictions.RestrictionList.PropertyName == 'MdpropMdxNamedSets':
             return self._get_props(
@@ -225,7 +239,8 @@ class XmlaDiscoverTools():
                 'int',
                 'Read',
                 'false',
-                '15',)
+                '15',
+            )
 
         return self._get_props(discover_preperties_xsd, '', '', '', '', '', '')
 
@@ -660,7 +675,8 @@ class XmlaDiscoverTools():
                                     '[{0}].[{0}].[{1}].[{2}]'.format(
                                         table_name,
                                         df.columns[0],
-                                        column_attribut,),)
+                                        column_attribut,
+                                    ),)
                                 xml.STRUCTURE('0')
                                 xml.IS_VIRTUAL('false')
                                 xml.IS_READWRITE('false')
@@ -920,8 +936,11 @@ class XmlaDiscoverTools():
             # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
             # joined -> [Product].[Product].[Company]
 
-            last_attribut = ''.join(att for att in separed_tuple[-1]
-                                    if att not in '[]').replace('&', '&amp;')
+            last_attribut = ''.join(
+                att for att in separed_tuple[-1] if att not in '[]').replace(
+                    '&',
+                    '&amp;',
+            )
             xml = xmlwitch.Builder()
             with xml['return']:
                 with xml.root(
@@ -936,8 +955,8 @@ class XmlaDiscoverTools():
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
                         xml.DIMENSION_UNIQUE_NAME(separed_tuple[0])
-                        xml.HIERARCHY_UNIQUE_NAME(
-                            '{0}.{0}'.format(separed_tuple[0]),)
+                        xml.HIERARCHY_UNIQUE_NAME('{0}.{0}'.format(
+                            separed_tuple[0],),)
                         xml.LEVEL_UNIQUE_NAME(joined)
                         xml.LEVEL_NUMBER('0')
                         xml.MEMBER_ORDINAL('0')

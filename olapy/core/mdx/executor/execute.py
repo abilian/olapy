@@ -9,11 +9,13 @@ Execution need two main objects:
 Those two objects are constructed in three ways:
 
     - manually with a config file, see :mod:`execute_config_file`
-    - automatically from csv files, if they respect olapy's \
-    `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_, see :mod:`execute_csv_files`
+    - automatically from csv files, if they respect olapy's
+      `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
+      see :mod:`execute_csv_files`
     - automatically from database, also if they respect the start schema model, see :mod:`execute_db`
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import itertools
 import os
@@ -25,8 +27,9 @@ import pandas as pd
 
 from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+
 from ..tools.config_file_parser import ConfigParser
-from ..tools.connection import MyDB, MySqliteDB, MyOracleDB, MyMssqlDB
+from ..tools.connection import MyDB, MyMssqlDB, MyOracleDB, MySqliteDB
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -69,7 +72,8 @@ class MdxEngine(object):
     :param fact_table_name: facts table name, Default **Facts**
     """
 
-    # class variable , because spyne application = Application([XmlaProviderService],... throw exception if XmlaProviderService()
+    # class variable , because spyne application = Application([XmlaProviderService],...
+    # throw exception if XmlaProviderService()
     CUBE_FOLDER_NAME = "cubes"
     # (before instantiate MdxEngine I need to access cubes information)
     csv_files_cubes = []
@@ -77,7 +81,8 @@ class MdxEngine(object):
     olapy_data_location = get_default_cube_directory()
     cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
     source_type = 'csv'
-    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
+    db_config = DbConfigParser(
+        os.path.join(olapy_data_location, 'olapy-config.yml'),)
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
     sqlengine = None
@@ -93,7 +98,8 @@ class MdxEngine(object):
             fact_table_name="Facts",
             database_config=db_config,
             cube_config=cube_config_file_parser,
-            parser=mdx_parser):
+            parser=mdx_parser,
+    ):
 
         self.cube = cube_name
         self.sep = sep
@@ -105,7 +111,8 @@ class MdxEngine(object):
         else:
             self.olapy_data_location = olapy_data_location
             MdxEngine.olapy_data_location = olapy_data_location
-            MdxEngine.db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
+            MdxEngine.db_config = DbConfigParser(
+                os.path.join(olapy_data_location, 'olapy-config.yml'),)
         if cubes_path is None:
             self.cube_path = MdxEngine.cube_path
         else:
@@ -140,7 +147,8 @@ class MdxEngine(object):
     @classmethod
     def instantiate_db(cls, db=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-            dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
+            dbms = MyDB.get_dbms_from_conn_string(
+                os.environ['SQLALCHEMY_DATABASE_URI'],).upper()
         else:
             dbms = cls.db_config.get_db_credentials().get('dbms').upper()
         if 'SQLITE' in dbms:
@@ -202,7 +210,9 @@ class MdxEngine(object):
     @classmethod
     def get_cubes_names(cls):
         """
-        list all cubes ( By default from csv folder only), you can explicitly specify csv folder and databases
+        List all cubes (by default from csv folder only).
+
+        You can explicitly specify csv folder and databases
         with *MdxEngine.source_type = ('csv','db')*
 
         :return: list of all cubes
@@ -244,7 +254,9 @@ class MdxEngine(object):
         elif self.cube in self.from_db_cubes:
             tables = load_tables_db(self)
             if not tables:
-                raise Exception('unable to load tables, check that the database is not empty')
+                raise Exception(
+                    'unable to load tables, check that the database is not empty',
+                )
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self)
@@ -274,13 +286,17 @@ class MdxEngine(object):
             return [
                 col
                 for col in self.tables_loaded[self.facts].select_dtypes(
-                    include=[np.number], ).columns if col.lower()[-2:] != 'id'
+                    include=[np.number],).columns
+                if col.lower()[-2:] != 'id'
             ]
 
     def _construct_star_schema_from_config(self, config_file_parser):
         """
-        There is two different configuration, one for excel 'cubes-config.xml', \
-        and the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
+        There is two different configurations:
+
+        - one for excel 'cubes-config.xml',
+        - the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
+
         :param config_file_parser: star schema Dataframe
         :return:
         """
@@ -304,7 +320,8 @@ class MdxEngine(object):
         """
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
-        if self.cube_config.config_file_exist() and self.cube in self.cube_config.get_cubes_names():
+        if self.cube_config.config_file_exist(
+        ) and self.cube in self.cube_config.get_cubes_names():
             fusion = self._construct_star_schema_from_config(self.cube_config)
 
         elif self.cube in self.from_db_cubes:
@@ -397,8 +414,9 @@ class MdxEngine(object):
                 else:
                     tables_columns.update({
                         tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(
-                                tupl[2:None if self.parser.hierarchized_tuples() else -1], )],
+                        self.tables_loaded[tupl[0]].columns[:len(
+                            tupl[2:None if self.parser.hierarchized_tuples()
+                                 else -1],)],
                     })
 
             axes.update({axis: tables_columns})
@@ -456,7 +474,8 @@ class MdxEngine(object):
                 if tup_att.isdigit():
                     tup_att = int(tup_att)
 
-                df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)]
+                df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
+                         == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -593,7 +612,7 @@ class MdxEngine(object):
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[columns:], )]
+                tuple_as_list[columns:],)]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -656,7 +675,8 @@ class MdxEngine(object):
                 self.execute_one_tuple(
                     tupl,
                     start_df,
-                    columns_to_keep.values(), ), )
+                    columns_to_keep.values(),
+                ),)
 
         return df_to_fusion
 
@@ -679,7 +699,8 @@ class MdxEngine(object):
 
         :return: True | False
         """
-        return not self.parser.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2
+        return not self.parser.hierarchized_tuples() and len(
+            self.parser.get_nested_select(),) >= 2
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
@@ -699,7 +720,11 @@ class MdxEngine(object):
                 if tuple[0].upper() != 'MEASURES':
                     transformed_tuple_groups.append(tuple)
 
-            dfs.append(self.tuples_to_dataframes(transformed_tuple_groups, columns_to_keep)[0])
+            dfs.append(
+                self.tuples_to_dataframes(
+                    transformed_tuple_groups,
+                    columns_to_keep,
+                )[0],)
 
         return dfs
 
@@ -738,36 +763,47 @@ class MdxEngine(object):
             for table, columns in tables_n_columns['all'].items()
             if table != self.facts)
 
-        tuples_on_mdx_query = [tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES']
+        tuples_on_mdx_query = [
+            tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
+        ]
 
         if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
         # if we have tuples in axes
-        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
+        # to avoid prob with query like this:
+        # SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
 
             if self.check_nested_select():
-                df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
+                df_to_fusion = self.nested_tuples_to_dataframes(
+                    columns_to_keep,)
             else:
-                df_to_fusion = self.tuples_to_dataframes(tuples_on_mdx_query, columns_to_keep)
+                df_to_fusion = self.tuples_to_dataframes(
+                    tuples_on_mdx_query,
+                    columns_to_keep,
+                )
 
             df = self.fusion_dataframes(df_to_fusion)
 
-            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
+            cols = list(
+                itertools.chain.from_iterable(columns_to_keep.values(),),)
 
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             return {
                 'result':
-                    df.groupby(cols, sort=sort).sum()[self.selected_measures],
+                df.groupby(cols, sort=sort).sum()[self.selected_measures],
                 'columns_desc':
-                    tables_n_columns,
+                tables_n_columns,
             }
 
         else:
             return {
-                'result': self.load_star_schema_dataframe[self.selected_measures].sum().to_frame().T,
-                'columns_desc': tables_n_columns,
+                'result':
+                self.load_star_schema_dataframe[self.selected_measures].sum()
+                .to_frame().T,
+                'columns_desc':
+                tables_n_columns,
             }

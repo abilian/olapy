@@ -15,14 +15,19 @@ from ..tools.connection import MyDB
 
 def load_one_table(cubes_obj, executor_instance, table_name):
     if cubes_obj.source.upper() == 'CSV':
-        facts = os.path.join(executor_instance.get_cube_path(),
-                             table_name + '.csv')
+        facts = os.path.join(
+            executor_instance.get_cube_path(),
+            table_name + '.csv',
+        )
         # with extension or not
         if not os.path.isfile(facts):
             facts.replace('.csv', '')
         table = pd.read_csv(facts, sep=executor_instance.sep)
     else:
-        db = MyDB(executor_instance.database_config, db_name=executor_instance.cube)
+        db = MyDB(
+            executor_instance.database_config,
+            db_name=executor_instance.cube,
+        )
         # load facts table
 
         table = psql.read_sql_query(
@@ -80,21 +85,28 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
     """
     executor_instance.facts = cubes_obj.facts[0].table_name
 
-    fusion = load_one_table(cubes_obj, executor_instance,
-                            executor_instance.facts)
+    fusion = load_one_table(
+        cubes_obj,
+        executor_instance,
+        executor_instance.facts,
+    )
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
 
         if cubes_obj.source.upper() == 'CSV':
-            file = os.path.join(executor_instance.get_cube_path(),
-                                dimension_and_key.split('.')[0] + '.csv')
+            file = os.path.join(
+                executor_instance.get_cube_path(),
+                dimension_and_key.split('.')[0] + '.csv',
+            )
             # with extension or not
             if not os.path.isfile(file):
                 file.replace('.csv', '')
             df = pd.read_csv(file, sep=executor_instance.sep)
         else:
             db = MyDB(
-                executor_instance.database_config, db_name=executor_instance.cube)
+                executor_instance.database_config,
+                db_name=executor_instance.cube,
+            )
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
                 db.engine,
@@ -167,8 +179,11 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
 
     executor_instance.facts = cubes_obj.facts[0].table_name
 
-    fusion = load_one_table(cubes_obj, executor_instance,
-                            executor_instance.facts)
+    fusion = load_one_table(
+        cubes_obj,
+        executor_instance,
+        executor_instance.facts,
+    )
 
     all_columns, tables = get_columns_n_tables(cubes_obj, executor_instance)
 
@@ -186,8 +201,11 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
         if dimension_name in list(tables.keys()):
             df = tables[dimension_name]
         else:
-            df = load_one_table(cubes_obj, executor_instance,
-                                dimension_and_key.split('.')[0])
+            df = load_one_table(
+                cubes_obj,
+                executor_instance,
+                dimension_and_key.split('.')[0],
+            )
 
         fusion = fusion.merge(
             df,

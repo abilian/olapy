@@ -1,10 +1,10 @@
 # -*- encoding: utf8 -*-
-
 """
 This module Parse Mdx Query, And Break it in parts
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import re
 
@@ -83,10 +83,13 @@ class Parser(object):
         return [
             [
                 tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                for tup_att in tup[0].replace('.Members', '').replace('.MEMBERS', '', ).split('].[') if tup_att
+                for tup_att in tup[0].replace('.Members', '').replace(
+                    '.MEMBERS',
+                    '',
+                ).split('].[')
+                if tup_att
             ]
-            for tup in re.compile(cls.regex).findall(
-                query[start:stop], )
+            for tup in re.compile(cls.regex).findall(query[start:stop],)
             if len(tup[0].split('].[')) > 1
             # for tup in re.compile(MdxEngine.regex).findall(
             #     query.encode("utf-8", 'replace')[start:stop],)
@@ -199,7 +202,8 @@ class Parser(object):
         :return: Separated tuples as list.
         """
         splitted_group = group.replace('\n', '').replace('\t', '').split('],')
-        return list(map(lambda tupl: self.add_tuple_brackets(tupl), splitted_group))
+        return list(
+            map(lambda tupl: self.add_tuple_brackets(tupl), splitted_group),)
 
     def get_nested_select(self):
         """

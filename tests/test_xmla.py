@@ -1,4 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import threading
 
@@ -76,6 +77,7 @@ class WSGIServer:
 def conn(executor):
     from olapy.core.services.xmla import XmlaProviderService
     XmlaProviderService.discover_tools.executor = executor
+
     print("spawning server")
     application = Application(
         [XmlaProviderService],
@@ -101,7 +103,8 @@ def test_discover_properties(conn):
     discover = conn.Discover(
         'DISCOVER_PROPERTIES',
         properties={'LocaleIdentifier': '1036'},
-        restrictions={'PropertyName': 'Catalog'}, )[0]
+        restrictions={'PropertyName': 'Catalog'},
+    )[0]
     assert discover['PropertyName'] == "Catalog"
     assert discover['PropertyDescription'] == "Catalog"
     assert discover['PropertyType'] == "string"
@@ -114,7 +117,8 @@ def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
         restrictions={'CUBE_NAME': 'main'},
-        properties={'Catalog': 'main'}, )[0]
+        properties={'Catalog': 'main'},
+    )[0]
     assert discover['CATALOG_NAME'] == "main"
     assert discover['CUBE_NAME'] == "main"
     assert discover['CUBE_TYPE'] == "CUBE"
@@ -133,7 +137,7 @@ def test_query1(conn):
     SELECT
     FROM [main]
     WHERE ([Measures].[amount])
-     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
     res = conn.Execute(cmd, Catalog="main")
     assert res.cellmap[0]['_CellOrdinal'] == '0'

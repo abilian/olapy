@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from olapy.core.mdx.parser.parse import Parser
 from pytest import fixture
+
+from olapy.core.mdx.parser.parse import Parser
 
 from .queries import query1, query2, query3, query4, query5, query6, where
 

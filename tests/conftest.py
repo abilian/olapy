@@ -1,9 +1,12 @@
+from __future__ import absolute_import, unicode_literals
+
 import os
+
 import pytest
 import sqlalchemy
+from tests.db_creation_utils import create_insert, drop_tables
 
 from olapy.core.mdx.executor.execute import MdxEngine
-from tests.db_creation_utils import create_insert, drop_tables
 
 
 # todo fixture with params
@@ -16,7 +19,8 @@ def executor(request):
             MdxEngine.sqlengine = None
             yield MdxEngine('sales_sqlite', fact_table_name='facts')
         else:
-            MdxEngine.sqlengine = sqlalchemy.create_engine(os.environ[request.param[0]])
+            MdxEngine.sqlengine = sqlalchemy.create_engine(
+                os.environ[request.param[0]])
             create_insert(MdxEngine.sqlengine)
             yield MdxEngine(request.param[1], fact_table_name='facts')
             drop_tables(MdxEngine.sqlengine)

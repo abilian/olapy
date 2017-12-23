@@ -9,4 +9,8 @@ if __name__ == '__main__':
 
     facts_ids = ['geography_key', 'product_key']
     # source_type = 'csv' | 'file' | 'db'
-    run_olapy_etl(source_type='csv', dims_infos=dims_infos, facts_table='sales_facts', facts_ids=facts_ids)
+    run_olapy_etl(
+        source_type='csv',
+        dims_infos=dims_infos,
+        facts_table='sales_facts',
+        facts_ids=facts_ids)

@@ -1,6 +1,7 @@
 """
-Part of :mod:`execute.py` module, here olapy construct cube from DATABASE automatically \
-based on `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
+Part of :mod:`execute.py` module, here olapy construct cube from DATABASE
+automatically based on
+`start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
 """
 
 from __future__ import absolute_import, division, print_function, \
@@ -28,9 +29,10 @@ def load_tables_db(executor_instance):
     # todo remove executor_instance.sqlengine
     if not executor_instance.sqlengine:
         executor_instance.sqlengine = executor_instance.instantiate_db(
-            executor_instance.cube).engine
+            executor_instance.cube,).engine
     print('Connection string = ' + str(executor_instance.sqlengine))
     inspector = inspect(executor_instance.sqlengine)
+
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.dbms.upper() == 'POSTGRES':
@@ -40,12 +42,13 @@ def load_tables_db(executor_instance):
             table_name = table_name.title()
 
         results = executor_instance.sqlengine.execution_options(
-            stream_results=True).execute('SELECT * FROM {0}'.format(table_name),
-                                         )
+            stream_results=True,
+        ).execute('SELECT * FROM {0}'.format(table_name),)
         # Fetch all the results of the query
         value = pd.DataFrame(
             iter(results),
-            columns=results.keys())  # Pass results as an iterator
+            columns=results.keys(),
+        )  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
         tables[table_name] = value[[
@@ -65,10 +68,12 @@ def construct_star_schema_db(executor_instance):
 
     if not executor_instance.sqlengine:
         executor_instance.sqlengine = executor_instance.instantiate_db(
-            executor_instance.cube)
+            executor_instance.cube,)
 
-    fusion = psql.read_sql_query('SELECT * FROM {0}'.format(
-        executor_instance.facts), executor_instance.sqlengine)
+    fusion = psql.read_sql_query(
+        'SELECT * FROM {0}'.format(executor_instance.facts,),
+        executor_instance.sqlengine,
+    )
     inspector = inspect(executor_instance.sqlengine)
 
     for db_table_name in inspector.get_table_names():
@@ -79,11 +84,15 @@ def construct_star_schema_db(executor_instance):
                 db_table_name = db_table_name[0]
         try:
             fusion = fusion.merge(
-                psql.read_sql_query("SELECT * FROM {0}".format(db_table_name),
-                                    executor_instance.sqlengine),)
+                psql.read_sql_query(
+                    "SELECT * FROM {0}".format(db_table_name),
+                    executor_instance.sqlengine,
+                ),)
         except BaseException:
             print('No common column between {0} and {1}'.format(
-                executor_instance.facts, db_table_name))
+                executor_instance.facts,
+                db_table_name,
+            ))
             pass
 
     return fusion

@@ -7,8 +7,9 @@ from __future__ import absolute_import, division, print_function, \
 import os
 from collections import defaultdict
 
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from sqlalchemy import create_engine
+
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 
 db_config = DbConfigParser()
 config = db_config.get_db_credentials()

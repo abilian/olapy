@@ -7,12 +7,7 @@ import os
 import pstats
 
 import cpuinfo
-from micro_bench import MicBench
 from olap.xmla import xmla
-# do not remove this (used in profiler)
-from olapy.core.services.models import Command, ExecuteRequest, \
-    Propertielist, Property
-from olapy.core.services.xmla import XmlaProviderService
 from prettytable import PrettyTable
 from spyne import Application
 from spyne.protocol.soap import Soap11
@@ -20,6 +15,11 @@ from spyne.server.wsgi import WsgiApplication
 from tests.test_xmla import WSGIServer
 
 from cube_generator import CUBE_NAME, CubeGen
+from micro_bench import MicBench
+# do not remove this (used in profiler)
+from olapy.core.services.models import Command, ExecuteRequest, \
+    Propertielist, Property
+from olapy.core.services.xmla import XmlaProviderService
 
 HOST = "127.0.0.1"
 PORT = 8230

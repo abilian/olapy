@@ -7,16 +7,17 @@ import sys
 from os.path import expanduser
 
 from cpuinfo import cpuinfo, os
-from micro_bench import MicBench
 from olap.xmla import xmla
-from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 from prettytable import PrettyTable
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
+
+from micro_bench import MicBench
+from olapy.core.services.xmla import XmlaProviderService
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 
 HOST = "127.0.0.1"
 PORT = 8230

@@ -8,7 +8,8 @@ from .queries import query3, query6, query10
 
 
 @pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ")
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'SQLITE' or 'SQLITE_URI' not in os.environ"
+)
 @pytest.mark.parametrize('executor', [['SQLITE_URI']], indirect=True)
 def test_mysql_execution_queries(executor):
     check_execution_query1(executor)
@@ -22,7 +23,7 @@ def check_execution_query1(executor_sqlite):
         'country': ['France', 'Spain', 'Switzerland', 'United States'],
         'amount': [4, 3, 248, 768],
     }).groupby(['country']).sum()
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query2(executor_sqlite):
@@ -50,7 +51,7 @@ def check_execution_query2(executor_sqlite):
         'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query10(executor_sqlite):
@@ -83,4 +84,4 @@ def check_execution_query10(executor_sqlite):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)

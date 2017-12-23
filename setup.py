@@ -32,12 +32,8 @@ setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.6"
+        "Programming Language :: Python :: 3.6",
         # "Topic :: Business intelligence",
     ],
-    entry_points={
-        'console_scripts': [
-            'olapy = olapy.__main__:cli'
-        ]
-    },
+    entry_points={'console_scripts': ['olapy = olapy.__main__:cli']},
 )

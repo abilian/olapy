@@ -4,7 +4,7 @@
 SRC=olapy
 PKG=$(SRC)
 
-default: test
+default: test lint
 
 
 #
@@ -36,7 +36,7 @@ lint: lint-python
 
 lint-python:
 	@echo "--> Linting Python files"
-	flake8 $(SRC) tests
+	flake8
 
 	@echo "Checking Py3k (basic) compatibility"
 	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
@@ -67,11 +67,11 @@ tidy: clean
 	rm -rf .tox
 
 format:
-	isort -rc $(SRC) tests micro_bench *.py
+	isort -rc $(SRC) tests micro_bench demos *.py
 	-add-trailing-comma `find olapy -name '*.py'`
-	yapf --style google -r -i $(SRC) tests micro_bench *.py
-	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench
-	isort -rc $(SRC) tests micro_bench *.py
+	yapf --style google -r -i $(SRC) tests micro_bench demos *.py
+	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench demos
+	isort -rc $(SRC) tests micro_bench demos *.py
 
 update-deps:
 	pip-compile -U > /dev/null

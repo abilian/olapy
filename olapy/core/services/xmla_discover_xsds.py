@@ -136,7 +136,8 @@ xmlns:sql="urn:schemas-microsoft-com:xml-sql">
       <xsd:element minOccurs="0" name="LiteralName" sql:field="LiteralName" type="string"/>
       <xsd:element minOccurs="0" name="LiteralValue" sql:field="LiteralValue" type="string"/>
       <xsd:element minOccurs="0" name="LiteralInvalidChars" sql:field="LiteralInvalidChars" type="string"/>
-      <xsd:element minOccurs="0" name="LiteralInvalidStartingChars" sql:field="LiteralInvalidStartingChars" type="string"/>
+      <xsd:element minOccurs="0" name="LiteralInvalidStartingChars" sql:field="LiteralInvalidStartingChars"
+        type="string"/>
       <xsd:element minOccurs="0" name="LiteralMaxLength" sql:field="LiteralMaxLength" type="int"/>
       <xsd:element minOccurs="0" name="LiteralNameEnumValue" sql:field="LiteralNameEnumValue" type="int"/>
     </xsd:sequence>
@@ -385,8 +386,10 @@ mdschema_measures_xsd = """
       <xsd:element minOccurs="0" name="EXPRESSION" sql:field="EXPRESSION" type="string"/>
       <xsd:element minOccurs="0" name="MEASURE_IS_VISIBLE" sql:field="MEASURE_IS_VISIBLE" type="boolean"/>
       <xsd:element minOccurs="0" name="LEVELS_LIST" sql:field="LEVELS_LIST" type="string"/>
-      <xsd:element minOccurs="0" name="MEASURE_NAME_SQL_COLUMN_NAME" sql:field="MEASURE_NAME_SQL_COLUMN_NAME" type="string"/>
-      <xsd:element minOccurs="0" name="MEASURE_UNQUALIFIED_CAPTION" sql:field="MEASURE_UNQUALIFIED_CAPTION" type="string"/>
+      <xsd:element minOccurs="0" name="MEASURE_NAME_SQL_COLUMN_NAME" sql:field="MEASURE_NAME_SQL_COLUMN_NAME"
+        type="string"/>
+      <xsd:element minOccurs="0" name="MEASURE_UNQUALIFIED_CAPTION" sql:field="MEASURE_UNQUALIFIED_CAPTION"
+        type="string"/>
       <xsd:element minOccurs="0" name="MEASUREGROUP_NAME" sql:field="MEASUREGROUP_NAME" type="string"/>
       <xsd:element minOccurs="0" name="MEASURE_DISPLAY_FOLDER" sql:field="MEASURE_DISPLAY_FOLDER" type="string"/>
       <xsd:element minOccurs="0" name="DEFAULT_FORMAT_STRING" sql:field="DEFAULT_FORMAT_STRING" type="string"/>
@@ -480,7 +483,8 @@ mdschema_hierarchies_xsd = """
       <xsd:element minOccurs="0" name="IS_VIRTUAL" sql:field="IS_VIRTUAL" type="boolean"/>
       <xsd:element minOccurs="0" name="IS_READWRITE" sql:field="IS_READWRITE" type="boolean"/>
       <xsd:element minOccurs="0" name="DIMENSION_UNIQUE_SETTINGS" sql:field="DIMENSION_UNIQUE_SETTINGS" type="int"/>
-      <xsd:element minOccurs="0" name="DIMENSION_MASTER_UNIQUE_NAME" sql:field="DIMENSION_MASTER_UNIQUE_NAME" type="string"/>
+      <xsd:element minOccurs="0" name="DIMENSION_MASTER_UNIQUE_NAME" sql:field="DIMENSION_MASTER_UNIQUE_NAME"
+        type="string"/>
       <xsd:element minOccurs="0" name="DIMENSION_IS_VISIBLE" sql:field="DIMENSION_IS_VISIBLE" type="boolean"/>
       <xsd:element minOccurs="0" name="HIERARCHY_ORDINAL" sql:field="HIERARCHY_ORDINAL" type="unsignedInt"/>
       <xsd:element minOccurs="0" name="DIMENSION_IS_SHARED" sql:field="DIMENSION_IS_SHARED" type="boolean"/>
@@ -536,10 +540,13 @@ mdschema_levels_xsd = """
       <xsd:element minOccurs="0" name="LEVEL_ORDERING_PROPERTY" sql:field="LEVEL_ORDERING_PROPERTY" type="string"/>
       <xsd:element minOccurs="0" name="LEVEL_DBTYPE" sql:field="LEVEL_DBTYPE" type="int"/>
       <xsd:element minOccurs="0" name="LEVEL_MASTER_UNIQUE_NAME" sql:field="LEVEL_MASTER_UNIQUE_NAME" type="string"/>
-      <xsd:element minOccurs="0" name="LEVEL_NAME_SQL_COLUMN_NAME" sql:field="LEVEL_NAME_SQL_COLUMN_NAME" type="string"/>
+      <xsd:element minOccurs="0" name="LEVEL_NAME_SQL_COLUMN_NAME" sql:field="LEVEL_NAME_SQL_COLUMN_NAME"
+        type="string"/>
       <xsd:element minOccurs="0" name="LEVEL_KEY_SQL_COLUMN_NAME" sql:field="LEVEL_KEY_SQL_COLUMN_NAME" type="string"/>
-      <xsd:element minOccurs="0" name="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME" sql:field="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME" type="string"/>
-      <xsd:element minOccurs="0" name="LEVEL_ATTRIBUTE_HIERARCHY_NAME" sql:field="LEVEL_ATTRIBUTE_HIERARCHY_NAME" type="string"/>
+      <xsd:element minOccurs="0" name="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME"
+        sql:field="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME" type="string"/>
+      <xsd:element minOccurs="0" name="LEVEL_ATTRIBUTE_HIERARCHY_NAME" sql:field="LEVEL_ATTRIBUTE_HIERARCHY_NAME"
+        type="string"/>
       <xsd:element minOccurs="0" name="LEVEL_KEY_CARDINALITY" sql:field="LEVEL_KEY_CARDINALITY" type="unsignedShort"/>
       <xsd:element minOccurs="0" name="LEVEL_ORIGIN" sql:field="LEVEL_ORIGIN" type="unsignedShort"/>
     </xsd:sequence>
@@ -613,7 +620,8 @@ mdschema_measuresgroups_dimensions_xsd = """
       <xsd:element minOccurs="0" name="DIMENSION_UNIQUE_NAME" sql:field="DIMENSION_UNIQUE_NAME" type="string"/>
       <xsd:element minOccurs="0" name="DIMENSION_CARDINALITY" sql:field="DIMENSION_CARDINALITY" type="string"/>
       <xsd:element minOccurs="0" name="DIMENSION_IS_VISIBLE" sql:field="DIMENSION_IS_VISIBLE" type="boolean"/>
-      <xsd:element minOccurs="0" name="DIMENSION_IS_FACT_DIMENSION" sql:field="DIMENSION_IS_FACT_DIMENSION" type="boolean"/>
+      <xsd:element minOccurs="0" name="DIMENSION_IS_FACT_DIMENSION" sql:field="DIMENSION_IS_FACT_DIMENSION"
+        type="boolean"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="DIMENSION_PATH" sql:field="DIMENSION_PATH">
       <xsd:complexType>
         <xsd:sequence>
@@ -661,7 +669,8 @@ mdschema_properties_properties_xsd = """
       <xsd:element minOccurs="0" name="PROPERTY_NAME" sql:field="PROPERTY_NAME" type="string"/>
       <xsd:element minOccurs="0" name="PROPERTY_CAPTION" sql:field="PROPERTY_CAPTION" type="string"/>
       <xsd:element minOccurs="0" name="DATA_TYPE" sql:field="DATA_TYPE" type="unsignedShort"/>
-      <xsd:element minOccurs="0" name="CHARACTER_MAXIMUM_LENGTH" sql:field="CHARACTER_MAXIMUM_LENGTH" type="unsignedInt"/>
+      <xsd:element minOccurs="0" name="CHARACTER_MAXIMUM_LENGTH" sql:field="CHARACTER_MAXIMUM_LENGTH"
+        type="unsignedInt"/>
       <xsd:element minOccurs="0" name="CHARACTER_OCTET_LENGTH" sql:field="CHARACTER_OCTET_LENGTH" type="unsignedInt"/>
       <xsd:element minOccurs="0" name="NUMERIC_PRECISION" sql:field="NUMERIC_PRECISION" type="unsignedShort"/>
       <xsd:element minOccurs="0" name="NUMERIC_SCALE" sql:field="NUMERIC_SCALE" type="short"/>
@@ -670,7 +679,8 @@ mdschema_properties_properties_xsd = """
       <xsd:element minOccurs="0" name="SQL_COLUMN_NAME" sql:field="SQL_COLUMN_NAME" type="string"/>
       <xsd:element minOccurs="0" name="LANGUAGE" sql:field="LANGUAGE" type="unsignedShort"/>
       <xsd:element minOccurs="0" name="PROPERTY_ORIGIN" sql:field="PROPERTY_ORIGIN" type="unsignedShort"/>
-      <xsd:element minOccurs="0" name="PROPERTY_ATTRIBUTE_HIERARCHY_NAME" sql:field="PROPERTY_ATTRIBUTE_HIERARCHY_NAME" type="string"/>
+      <xsd:element minOccurs="0" name="PROPERTY_ATTRIBUTE_HIERARCHY_NAME"
+        sql:field="PROPERTY_ATTRIBUTE_HIERARCHY_NAME" type="string"/>
       <xsd:element minOccurs="0" name="PROPERTY_CARDINALITY" sql:field="PROPERTY_CARDINALITY" type="string"/>
       <xsd:element minOccurs="0" name="MIME_TYPE" sql:field="MIME_TYPE" type="string"/>
       <xsd:element minOccurs="0" name="PROPERTY_IS_VISIBLE" sql:field="PROPERTY_IS_VISIBLE" type="boolean"/>

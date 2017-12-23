@@ -6,13 +6,13 @@ requests and responses, and managing Spyne soap server.
 """
 from __future__ import absolute_import, division, print_function
 
-from wsgiref.simple_server import make_server
 import imp
 import logging
 import os
 import sys
 from datetime import datetime
 from os.path import expanduser
+from wsgiref.simple_server import make_server
 
 import click
 import xmlwitch
@@ -22,7 +22,9 @@ from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
+
 from olapy.core.mdx.executor.execute import MdxEngine
+
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -69,7 +71,8 @@ class XmlaProviderService(ServiceBase):
         _returns=AnyXml,
         _body_style="bare",
         _out_header=Session,
-        _throws=InvalidCredentialsError,)
+        _throws=InvalidCredentialsError,
+    )
     def Discover(ctx, request):
         """The first principle function of xmla protocol.
 
@@ -89,7 +92,8 @@ class XmlaProviderService(ServiceBase):
 
             raise InvalidCredentialsError(
                 fault_string='You do not have permission to access this resource',
-                fault_object=None)
+                fault_object=None,
+            )
 
         method_name = request.RequestType.lower() + '_response'
         method = getattr(discover_tools, method_name)
@@ -104,7 +108,8 @@ class XmlaProviderService(ServiceBase):
         ExecuteRequest,
         _returns=AnyXml,
         _body_style="bare",
-        _out_header=Session,)
+        _out_header=Session,
+    )
     def Execute(ctx, request):
         """The second principle function of xmla protocol.
 
@@ -188,7 +193,8 @@ def get_wsgi_application():
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
-        out_protocol=XmlaSoap11(validator='soft'), )
+        out_protocol=XmlaSoap11(validator='soft'),
+    )
 
     # validator='soft' or nothing, this is important because spyne doesn't
     # support encodingStyle until now !!!!
@@ -199,19 +205,52 @@ def get_wsgi_application():
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip address.')
 @click.option('--port', '-p', default=8000, help='Host port.')
-@click.option('--write_on_file', '-wf', default=False, help='Write logs into a file or display them into the console. \
-(True : on file)(False : on console)')
-@click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
-@click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
-@click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
-@click.option('--source_type', '-st', default=None, help="Get cubes from where ( db | csv ), DEFAULT : csv")
-def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type):
+@click.option(
+    '--write_on_file',
+    '-wf',
+    default=False,
+    help='Write logs into a file or display them into the console. \
+(True : on file)(False : on console)',
+)
+@click.option(
+    '--log_file_path',
+    '-lf',
+    default=conf_file,
+    help='Log file path. DEFAUL : ' + conf_file,
+)
+@click.option(
+    '--sql_alchemy_uri',
+    '-sa',
+    default=None,
+    help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ",
+)
+@click.option(
+    '--olapy_data',
+    '-od',
+    default=None,
+    help="Olapy Data folder location, Default : ~/olapy-data",
+)
+@click.option(
+    '--source_type',
+    '-st',
+    default=None,
+    help="Get cubes from where ( db | csv ), DEFAULT : csv",
+)
+def runserver(
+        host,
+        port,
+        write_on_file,
+        log_file_path,
+        sql_alchemy_uri,
+        olapy_data,
+        source_type,
+):
     """
     Start the xmla server.
     """
 
     if sql_alchemy_uri is not None:
-        # example olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
+        # Example: olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
 
     MdxEngine.olapy_data_location = olapy_data
@@ -231,7 +270,8 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
     if write_on_file:
-        if not os.path.isdir(os.path.join(home_directory, 'olapy-data', 'logs')):
+        if not os.path.isdir(
+                os.path.join(home_directory, 'olapy-data', 'logs'),):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:

@@ -14,7 +14,8 @@ class MyDB(object):
     def __init__(self, db_config, db_name=None):
         """
         Connection can be made either with connection string provided from
-        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config file parser obj.
+        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config
+        file parser obj.
 
         :param db_config: olapy config file obj
         :param db_name: database name to connect to
@@ -40,7 +41,8 @@ class MyDB(object):
     @staticmethod
     def get_dbms_from_conn_string(conn_string):
         """
-        get the dbms from the connection string
+        Get the dbms from the connection string.
+
         example:
         connection string => oracle://scott:tiger@127.0.0.1:1521/sidname
         it returns oracle
@@ -85,7 +87,8 @@ class MyDB(object):
 
     def get_init_table(self):
         """
-        Some dbms have default database so we can connect to the dbms without connecting to a specific database.
+        Some dbms have default database so we can connect to the dbms
+        without connecting to a specific database.
 
         :return: default database name
         """
@@ -203,7 +206,8 @@ class MyMssqlDB(MyDB):
 
     def _connect_to_mssql(self, driver='mssql+pyodbc', db=None):
         """
-        As always, microsoft ruin our life, to access sql server you need to add driver clause to the connection string, we do this here.
+        As always, microsoft ruin our life, to access sql server you need
+        to add driver clause to the connection string, we do this here.
 
         :param driver: driver to user for sql server, by default mssql+pyodbc
         :param db: database to connect to
@@ -211,10 +215,14 @@ class MyMssqlDB(MyDB):
         """
         # todo recheck + clean
         sql_server_driver = self.db_credentials['sql_server_driver'].replace(
-            ' ', '+')
+            ' ',
+            '+',
+        )
         if db is not None:
             url = driver + '://(local)/{0}?driver={1}'.format(
-                db, sql_server_driver)
+                db,
+                sql_server_driver,
+            )
             return create_engine(url, encoding='utf-8')
 
         if 'LOCALHOST' in self.db_credentials['user'].upper(

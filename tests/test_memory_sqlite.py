@@ -12,7 +12,7 @@ def test_execution_query1(executor):
         'country': ['France', 'Spain', 'Switzerland', 'United States'],
         'amount': [4, 3, 248, 768],
     }).groupby(['country']).sum()
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query2(executor):
@@ -40,7 +40,7 @@ def test_execution_query2(executor):
         'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query10(executor):
@@ -73,4 +73,4 @@ def test_execution_query10(executor):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)

@@ -1,10 +1,14 @@
 """
-To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that data \
-(for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files. \
-or if tables id columns don't contains _id, this will cause some bugs sometimes)
+To use olapy correctly with your source file (tables), some data structure
+cleaning operation must be applied to that data.
 
-This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data structure rules \
-and load them to olapy-data folder *(as csv files right now)*
+For example , if you want to use olapy with csv files, you must use semicolon
+separator for those csv files.
+Or if tables id columns don't contains _id, this will cause some bugs sometimes.
+
+This module will do the work for you, here olapy will extract data from
+your source, transform it with olapy's data structure rules
+and load them to olapy-data folder *(as csv files right now)*.
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -19,6 +23,7 @@ import bonobo
 import dotenv
 from bonobo.commands.run import get_default_services
 from bonobo_sqlalchemy import Select
+
 from olapy.core.mdx.executor.execute import MdxEngine
 
 dotenv.load_dotenv(dotenv.find_dotenv())
@@ -30,8 +35,9 @@ INPUT_DIR = 'input_dir'
 
 class ETL(object):
     """
-    Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
-    that data, and then load them into olapy-data directory
+    Extract-transform-load for Olapy, It take a source (folder or database),
+    make all necessary transformation to that data, and then load them into
+    the olapy-data directory
     """
 
     def __init__(
@@ -178,7 +184,8 @@ class ETL(object):
 
     def copy_2_olapy_dir(self):
         """
-        right now, bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
+        Right now, bonobo can't export (save) to path (bonobo bug)
+        so we copy all generated tables directly to olapy dir.
         """
         if not os.path.isdir(
                 os.path.join(self.olapy_cube_path, self.target_cube),):

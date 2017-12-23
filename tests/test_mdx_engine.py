@@ -4,8 +4,7 @@ from __future__ import absolute_import, division, print_function, \
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from .queries import query1, query3, query6, query7, query8, query9, \
-    query10
+from .queries import query1, query3, query6, query7, query8, query9, query10
 
 
 def test_execution_query1(executor):
@@ -19,7 +18,7 @@ def test_execution_query2(executor):
         'amount': [4, 3, 248, 768],
     }).groupby(['country']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query6(executor):
@@ -47,7 +46,7 @@ def test_execution_query6(executor):
         'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query7(executor):
@@ -86,7 +85,7 @@ def test_execution_query7(executor):
         ['company', 'year', 'quarter', 'month', 'day', 'continent'],
         sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query8(executor):
@@ -98,7 +97,7 @@ def test_execution_query8(executor):
     }).groupby(
         ['continent', 'country'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query9(executor):
@@ -131,7 +130,7 @@ def test_execution_query9(executor):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def test_execution_query10(executor):
@@ -164,4 +163,4 @@ def test_execution_query10(executor):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)

@@ -1,14 +1,16 @@
 from __future__ import absolute_import, division, print_function
 
-from tests.queries import query_posgres1, query_posgres2, query_postgres3
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
+from tests.queries import query_posgres1, query_posgres2, query_postgres3
 
 
 @pytest.mark.skipif(
-    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ")
-@pytest.mark.parametrize('executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ"
+)
+@pytest.mark.parametrize(
+    'executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
 def test_mysql_execution_queries(executor):
     check_execution_query1(executor)
     check_execution_query2(executor)
@@ -22,7 +24,7 @@ def check_execution_query1(executor_postgres):
         'amount': [4, 3, 248, 768],
     }).groupby(['country']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query2(executor_postgres):
@@ -50,7 +52,7 @@ def check_execution_query2(executor_postgres):
         'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
     }).groupby(['year', 'quarter', 'month', 'day']).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)
 
 
 def check_execution_query10(executor_postgres):
@@ -83,4 +85,4 @@ def check_execution_query10(executor_postgres):
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
-    assert assert_frame_equal(df, test_df) is None
+    assert_frame_equal(df, test_df)

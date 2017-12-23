@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, \
 import sys
 
 import click
+
 from olapy.cli import init
 from olapy.core.services.xmla import runserver
 

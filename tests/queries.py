@@ -237,7 +237,9 @@ SELECT {
 [geography].[geography].[country].[Europe].[France],[Measures].[amount]),
 ([product].[product].[licence].[Crazy Development].[olapy].[partnership],
 [geography].[geography].[country].[Europe].[Switzerland],[Measures].[amount])}
- ON 0 FROM [sales] CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+ON 0
+FROM [sales]
+CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
 where = "WHERE [time].[calendar].[day].[May 12,2010]"
@@ -258,7 +260,8 @@ query_posgres2 = """
     ON COLUMNS
     FROM [sales_postgres]
     WHERE ([Measures].[amount])
-    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+"""
 
 query_postgres3 = """
     SELECT {(
