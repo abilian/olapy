@@ -11,24 +11,25 @@ from sqlalchemy import create_engine
 class MyDB(object):
     """Connect to sql database."""
 
-    def __init__(self, db_config, db=None):
+    def __init__(self, db_config, db_name=None):
         """
-        Connection can be made either with connection string provided from \
-        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config file parser obj
+        Connection can be made either with connection string provided from
+        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config file parser obj.
+
         :param db_config: olapy config file obj
-        :param db: database name to connect to
+        :param db_name: database name to connect to
         """
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            self.engine, self.dbms = self.connect_with_env_var(db)
+            self.engine, self.dbms = self.connect_with_env_var(db_name)
         else:
             self.db_credentials = db_config.get_db_credentials()
-            self.engine, self.dbms = self.connect_without_env_var(db)
+            self.engine, self.dbms = self.connect_without_env_var(db_name)
 
     def gen_all_databases_query(self):
         """
-        Each dbms has different query to get user databases names
-        :param dbms: postgres | mysql | oracle | mssql
+        Each dbms has different query to get user databases names.
+
         :return: sql query to fetch all databases
         """
         if self.dbms.upper() == 'POSTGRES':
@@ -43,6 +44,7 @@ class MyDB(object):
         example:
         connection string => oracle://scott:tiger@127.0.0.1:1521/sidname
         it returns oracle
+
         :param conn_string: connection string
         :return: dbms
         """
@@ -83,8 +85,8 @@ class MyDB(object):
 
     def get_init_table(self):
         """
-        some dbms have default database so we can connect to the dbms without connecting to a specific database
-        :param dbms: postgres, oracle....
+        Some dbms have default database so we can connect to the dbms without connecting to a specific database.
+
         :return: default database name
         """
         if self.db_credentials['dbms'].upper() == 'POSTGRES':
@@ -130,8 +132,8 @@ class MyDB(object):
 
 class MyOracleDB(MyDB):
 
-    def __init__(self, db_config, db=None):
-        MyDB.__init__(self, db_config, db=db)
+    def __init__(self, db_config, db_name=None):
+        MyDB.__init__(self, db_config, db_name=db_name)
 
     @property
     def username(self):
@@ -156,8 +158,8 @@ class MyOracleDB(MyDB):
 
 class MySqliteDB(MyDB):
 
-    def __init__(self, db_config, db=None):
-        MyDB.__init__(self, db_config, db=db)
+    def __init__(self, db_config, db_name=None):
+        MyDB.__init__(self, db_config, db_name=db_name)
 
     def construct_engine(self, db=None):
         # eng, con_db = self.get_init_table()
@@ -182,8 +184,8 @@ class MySqliteDB(MyDB):
 
 class MyMssqlDB(MyDB):
 
-    def __init__(self, db_config, db=None):
-        MyDB.__init__(self, db_config, db=db)
+    def __init__(self, db_config, db_name=None):
+        MyDB.__init__(self, db_config, db_name=db_name)
 
     def get_init_table(self):
         con_db = 'msdb'
@@ -192,8 +194,8 @@ class MyMssqlDB(MyDB):
 
     def gen_all_databases_query(self):
         """
-        Each dbms has different query to get user databases names
-        :param dbms: postgres | mysql | oracle | mssql
+        Each dbms has different query to get user databases names.
+
         :return: sql query to fetch all databases
         """
 

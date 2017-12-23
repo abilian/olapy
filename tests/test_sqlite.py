@@ -3,7 +3,8 @@ from __future__ import absolute_import, division, print_function
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
-from tests.queries import query3, query6, query10
+
+from .queries import query3, query6, query10
 
 
 @pytest.mark.skipif(

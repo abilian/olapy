@@ -45,8 +45,14 @@ class DbConfigParser:
             # try:
             config = yaml.load(config_file)
             dbms = config['dbms']
+
             if dbms.upper() == 'SQLITE':
                 path = config['path'] if 'path' in config.keys() and dbms.upper() == 'SQLITE' else None
+                credentials = {
+                    'dbms': dbms,
+                    'path': path,
+                }
+
             else:
                 user = config['user'] if 'user' in config.keys() else ''
                 password = config['password'] if 'LOCALHOST' not in config['user'].upper() else ''
@@ -56,12 +62,6 @@ class DbConfigParser:
                 db_name = config['db_name'] if 'db_name' in config.keys() else ''
                 driver = config['driver'] if 'driver' in config.keys() else ''
 
-            if dbms.upper() == 'SQLITE':
-                credentials = {
-                    'dbms': dbms,
-                    'path': path,
-                }
-            else:
                 credentials = {
                     'dbms': dbms,
                     'user': user,
@@ -74,7 +74,3 @@ class DbConfigParser:
                 }
 
         return credentials
-        #
-        # except OSError:
-        #     print('olapy db_config not valid')
-        #     # raise OSError()

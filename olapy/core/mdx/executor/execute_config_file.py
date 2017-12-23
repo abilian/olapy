@@ -22,7 +22,7 @@ def load_one_table(cubes_obj, executor_instance, table_name):
             facts.replace('.csv', '')
         table = pd.read_csv(facts, sep=executor_instance.sep)
     else:
-        db = MyDB(executor_instance.database_config, db=executor_instance.cube)
+        db = MyDB(executor_instance.database_config, db_name=executor_instance.cube)
         # load facts table
 
         table = psql.read_sql_query(
@@ -94,7 +94,7 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
             df = pd.read_csv(file, sep=executor_instance.sep)
         else:
             db = MyDB(
-                executor_instance.database_config, db=executor_instance.cube)
+                executor_instance.database_config, db_name=executor_instance.cube)
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
                 db.engine,

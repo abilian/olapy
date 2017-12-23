@@ -3,7 +3,8 @@ from __future__ import absolute_import, division, print_function, \
 
 import xmlwitch
 from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
-from tests.queries import query15
+
+from .queries import query15
 
 
 def test_xs0_axis_query15(executor):

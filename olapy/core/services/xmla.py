@@ -30,7 +30,7 @@ from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaSoap11(Soap11):
-    """xhr does not work over https without this patch"""
+    """XHR does not work over https without this patch"""
 
     def create_in_document(self, ctx, charset=None):
         if isinstance(ctx.transport, HttpTransportContext):
@@ -42,7 +42,7 @@ class XmlaSoap11(Soap11):
         return Soap11.create_in_document(self, ctx, charset)
 
 
-# todo find a solution for spyne ctx
+# TODO: find a solution for spyne ctx
 class XmlaProviderService(ServiceBase):
     """
     The main class to activate SOAP services between xmla clients and olapy.

@@ -3,20 +3,13 @@ from __future__ import absolute_import, division, print_function, \
 
 import xmlwitch
 from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
-from tests.queries import query11, query12, query13, query14
+
+from .queries import query11, query12, query13, query14
 
 
-def test_slicer_axis(executor):
-    slicer_axis_query11(executor)
-    slicer_axis_query12(executor)
-    slicer_axis_query13(executor)
-    slicer_axis_query14(executor)
-
-
-def slicer_axis_query11(executor):
+def test_slicer_axis_query11(executor):
     """
     One measure.
-    :return:
     """
     xml = xmlwitch.Builder()
     with xml.Axis(name="SlicerAxis"):
@@ -53,10 +46,9 @@ def slicer_axis_query11(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def slicer_axis_query12(executor):
+def test_slicer_axis_query12(executor):
     """
-    Many measure.
-    :return:
+    Many measures.
     """
     xml = xmlwitch.Builder()
     with xml.Axis(name="SlicerAxis"):
@@ -89,10 +81,9 @@ def slicer_axis_query12(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def slicer_axis_query13(executor):
+def test_slicer_axis_query13(executor):
     """
     Dimension without measures.
-    :return:
     """
     xml = xmlwitch.Builder()
     with xml.Axis(name="SlicerAxis"):
@@ -119,10 +110,9 @@ def slicer_axis_query13(executor):
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
-def slicer_axis_query14(executor):
+def test_slicer_axis_query14(executor):
     """
     Dimension with all measures.
-    :return:
     """
     xml = xmlwitch.Builder()
     with xml.Axis(name="SlicerAxis"):

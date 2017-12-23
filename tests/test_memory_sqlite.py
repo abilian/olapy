@@ -2,7 +2,8 @@ from __future__ import absolute_import, division, print_function
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
-from tests.queries import query3, query6, query10
+
+from .queries import query3, query6, query10
 
 
 def test_execution_query1(executor):
