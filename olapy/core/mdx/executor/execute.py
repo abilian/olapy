@@ -43,8 +43,6 @@ def get_default_cube_directory():
     # toxworkdir does not expanduser properly under tox
     if 'OLAPY_PATH' in os.environ:
         home_directory = os.environ.get('OLAPY_PATH')
-    elif RUNNING_TOX:
-        home_directory = os.environ.get('HOME_DIR')
     else:
         home_directory = expanduser("~")
 

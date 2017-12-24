@@ -15,8 +15,6 @@ RUNNING_TOX = 'RUNNING_TOX' in os.environ
 def init():
     if 'OLAPY_PATH' in os.environ:
         home_directory = os.environ['OLAPY_PATH']
-    elif RUNNING_TOX:
-        home_directory = os.environ.get('HOME_DIR')
     else:
         home_directory = expanduser("~")
 
