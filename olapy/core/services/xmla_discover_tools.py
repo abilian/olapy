@@ -64,7 +64,6 @@ class XmlaDiscoverTools():
 
     @staticmethod
     def discover_datasources_response():
-
         xml = xmlwitch.Builder()
         with xml['return']:
             with xml.root(
@@ -98,7 +97,6 @@ class XmlaDiscoverTools():
             IsRequired,
             Value,
     ):
-
         xml = xmlwitch.Builder()
 
         if PropertyName is not '':

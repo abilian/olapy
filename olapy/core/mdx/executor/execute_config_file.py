@@ -1,6 +1,7 @@
 """
-Part of :mod:`execute.py` module, here we can customize olapy's cube with a config file, \
-by default located in /home/user/olapy-data/cubes/cubes-config.xml (you can take a look to this file as an example)
+Part of :mod:`execute.py` module, here we can customize olapy's cube with a config file,
+by default located in /home/user/olapy-data/cubes/cubes-config.xml
+(you can take a look to this file as an example)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -13,20 +14,20 @@ import pandas.io.sql as psql
 from ..tools.connection import MyDB
 
 
-def load_one_table(cubes_obj, executor_instance, table_name):
+def load_one_table(cubes_obj, executor, table_name):
     if cubes_obj.source.upper() == 'CSV':
         facts = os.path.join(
-            executor_instance.get_cube_path(),
+            executor.get_cube_path(),
             table_name + '.csv',
         )
         # with extension or not
         if not os.path.isfile(facts):
             facts.replace('.csv', '')
-        table = pd.read_csv(facts, sep=executor_instance.sep)
+        table = pd.read_csv(facts, sep=executor.sep)
     else:
         db = MyDB(
-            executor_instance.database_config,
-            db_name=executor_instance.cube,
+            executor.database_config,
+            db_name=executor.cube,
         )
         # load facts table
 
@@ -37,22 +38,22 @@ def load_one_table(cubes_obj, executor_instance, table_name):
     return table
 
 
-def load_table_config_file(executor_instance, cube_obj):
+def load_table_config_file(executor, cube_obj):
     """
     Load tables from config file.
 
-    :param executor_instance: MdxEngine instance
+    :param executor: MdxEngine instance
     :param cube_obj: cubes parser object
     :return: tables dict with table name as key and DataFrame as value
     """
 
     tables = {}
     # just one facts table right now
-    executor_instance.facts = cube_obj.facts[0].table_name
+    executor.facts = cube_obj.facts[0].table_name
 
     for dimension in cube_obj.dimensions:
 
-        df = load_one_table(cube_obj, executor_instance, dimension.name)
+        df = load_one_table(cube_obj, executor, dimension.name)
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
 
@@ -76,36 +77,36 @@ def load_table_config_file(executor_instance, cube_obj):
 
 
 # excel client
-def construct_star_schema_config_file(executor_instance, cubes_obj):
+def construct_star_schema_config_file(executor, cubes_obj):
     """Construct star schema DataFrame from configuration file for excel client.
 
-    :param executor_instance:  MdxEngine instance
+    :param executor:  MdxEngine instance
     :param cubes_obj: cubes object
     :return: star schema DataFrame
     """
-    executor_instance.facts = cubes_obj.facts[0].table_name
+    executor.facts = cubes_obj.facts[0].table_name
 
     fusion = load_one_table(
         cubes_obj,
-        executor_instance,
-        executor_instance.facts,
+        executor,
+        executor.facts,
     )
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
 
         if cubes_obj.source.upper() == 'CSV':
             file = os.path.join(
-                executor_instance.get_cube_path(),
+                executor.get_cube_path(),
                 dimension_and_key.split('.')[0] + '.csv',
             )
             # with extension or not
             if not os.path.isfile(file):
                 file.replace('.csv', '')
-            df = pd.read_csv(file, sep=executor_instance.sep)
+            df = pd.read_csv(file, sep=executor.sep)
         else:
             db = MyDB(
-                executor_instance.database_config,
-                db_name=executor_instance.cube,
+                executor.database_config,
+                db_name=executor.cube,
             )
             df = psql.read_sql_query(
                 "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
@@ -127,15 +128,15 @@ def construct_star_schema_config_file(executor_instance, cubes_obj):
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
-        executor_instance.measures = cubes_obj.facts[0].measures
+        executor.measures = cubes_obj.facts[0].measures
     return fusion
 
 
-def get_columns_n_tables(cubes_obj, executor_instance):
+def get_columns_n_tables(cubes_obj, executor):
     """
     Get all tables and their columns (and renames columns, if you specify this in the config file)
     :param cubes_obj: config file parser obj
-    :param executor_instance: MdxEngine instance
+    :param executor: MdxEngine instance
     :return:
     """
 
@@ -144,7 +145,7 @@ def get_columns_n_tables(cubes_obj, executor_instance):
 
     for table in cubes_obj.tables:
 
-        tab = load_one_table(cubes_obj, executor_instance, table.name)
+        tab = load_one_table(cubes_obj, executor, table.name)
 
         try:
             if table.columns:
@@ -169,23 +170,23 @@ def get_columns_n_tables(cubes_obj, executor_instance):
 
 
 # web client
-def construct_web_star_schema_config_file(executor_instance, cubes_obj):
+def construct_web_star_schema_config_file(executor, cubes_obj):
     """Construct star schema DataFrame from configuration file for web client.
 
-    :param executor_instance: MdxEngine instance
+    :param executor: MdxEngine instance
     :param cubes_obj: cubes parser object
     :return: star schema DataFrame
     """
 
-    executor_instance.facts = cubes_obj.facts[0].table_name
+    executor.facts = cubes_obj.facts[0].table_name
 
     fusion = load_one_table(
         cubes_obj,
-        executor_instance,
-        executor_instance.facts,
+        executor,
+        executor.facts,
     )
 
-    all_columns, tables = get_columns_n_tables(cubes_obj, executor_instance)
+    all_columns, tables = get_columns_n_tables(cubes_obj, executor)
 
     # load facts table columns
     if cubes_obj.facts[0].columns:
@@ -193,7 +194,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
 
     # measures in config-file only
     if cubes_obj.facts[0].measures:
-        executor_instance.measures = cubes_obj.facts[0].measures
+        executor.measures = cubes_obj.facts[0].measures
         all_columns += cubes_obj.facts[0].measures
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
@@ -203,7 +204,7 @@ def construct_web_star_schema_config_file(executor_instance, cubes_obj):
         else:
             df = load_one_table(
                 cubes_obj,
-                executor_instance,
+                executor,
                 dimension_and_key.split('.')[0],
             )
 

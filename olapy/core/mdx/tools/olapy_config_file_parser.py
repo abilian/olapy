@@ -32,7 +32,7 @@ class DbConfigParser:
         else:
             self.config_file_path = config_file_path
 
-    def config_file_exist(self):
+    def config_file_exists(self):
         """
         Check whether the config file exists or not.
 

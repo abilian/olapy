@@ -147,7 +147,7 @@ class ConfigParser:
     # def get_web_confile_file_path(self):
     #     return os.path.join(self.cube_path, self.web_config_file_name)
 
-    def config_file_exist(self):
+    def config_file_exists(self):
         # type: () -> bool
         """
         Check whether the config file exists or not.
@@ -170,7 +170,7 @@ class ConfigParser:
         """
 
         # xmla authentication only in excel
-        if self.config_file_exist():
+        if self.config_file_exists():
             with open(self.get_config_file_path()) as config_file:
                 parser = etree.XMLParser()
                 tree = etree.parse(config_file, parser)
@@ -262,11 +262,10 @@ class ConfigParser:
     def construct_cubes(self):
         """Construct cube based on config file.
 
-        :param client_type: excel | web
         :return: list of Cubes instance
         """
 
-        if self.config_file_exist():
+        if self.config_file_exists():
             return self._construct_cubes_excel()
             # elif client_type == 'web':
             #     return self._construct_cubes_web()

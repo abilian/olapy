@@ -70,7 +70,6 @@ class MyDB(object):
 
     def connect_with_env_var(self, db):
         if db is not None:
-
             self.conn_string = self.conn_string.rstrip('/')
             engine = create_engine(self.conn_string + '/' + db)
         else:
@@ -105,7 +104,7 @@ class MyDB(object):
 
     def construct_engine(self, db):
         """
-        Create the SqlAlchemy object which will use it to connect to database.
+        Create the SqlAlchemy engine object which will use it to connect to database.
 
         :param db: database to connect to
         :return: SqlAlchemy engine

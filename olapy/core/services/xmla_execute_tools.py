@@ -10,6 +10,7 @@ from collections import OrderedDict
 
 import numpy as np
 import xmlwitch
+from six import text_type
 
 from olapy.core.mdx.parser.parse import Parser
 from six.moves import zip
@@ -174,7 +175,7 @@ class XmlaExecuteTools():
 
         # query with on columns and on rows (without measure)
         elif self.columns_desc['columns'] and self.columns_desc['rows']:
-            # ['Geography','America']
+            # Ex: ['Geography','America']
             tuples = [
                 zip(*[[[key] + list(row)
                        for row in splited_df[key].itertuples(index=False)]
@@ -184,9 +185,9 @@ class XmlaExecuteTools():
 
             first_att = 2
 
-        # query with on columns and on rows (many measures selected)
+        # query with 'on columns' and 'on rows' (many measures selected)
         else:
-            # ['Geography','Amount','America']
+            # Ex: ['Geography','Amount','America']
             tuples = [
                 zip(*[[[key] + [mes] + list(row)
                        for row in splited_df[key].itertuples(index=False)]
@@ -436,7 +437,7 @@ class XmlaExecuteTools():
         """
         Example of xs0::
 
-             <Axis name="Axis0">
+            <Axis name="Axis0">
                 <Tuples>
                     <Tuple>
                         <Member Hierarchy="[Geography].[Geography]">
@@ -478,7 +479,7 @@ class XmlaExecuteTools():
                         </Member>
                     </Tuple>
                 </Tuples>
-             </Axis>
+            </Axis>
 
         :return: xs0 xml as string
         """
@@ -549,10 +550,9 @@ class XmlaExecuteTools():
             else:
                 value = '{0}.{0}.[{1}]'.format(
                     tupl2list[0],
-                    self.executor.tables_loaded[tupl2list[0]
-                                                .replace('[', '')
-                                                .replace(']', '')]
-                    .columns[len(tupl2list[4:])],
+                    self.executor.tables_loaded[tupl2list[0].replace('[', '')
+                                                .replace(']', '')].columns[len(
+                                                    tupl2list[4:])],
                 )
 
             with xml.Cell(CellOrdinal=str(index)):
@@ -562,6 +562,7 @@ class XmlaExecuteTools():
         return str(xml)
 
     def generate_cell_data(self):
+        # type: () -> text_type
         """
         Example of CellData::
 

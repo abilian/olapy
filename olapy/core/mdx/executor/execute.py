@@ -245,7 +245,7 @@ class MdxEngine(object):
         """
         # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.client == 'excel' and self.cube_config.config_file_exist() \
+        if self.client == 'excel' and self.cube_config.config_file_exists() \
                 and self.cube in self.cube_config.get_cubes_names():
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.construct_cubes():
@@ -271,7 +271,7 @@ class MdxEngine(object):
         # update config file path IMPORTANT
         self.cube_config.cube_path = self.cube_path
 
-        if self.client == 'web' and self.cube_config.config_file_exist():
+        if self.client == 'web' and self.cube_config.config_file_exists():
             for cubes in self.cube_config.construct_cubes():
                 if cubes.facts:
                     # update facts table name
@@ -320,7 +320,7 @@ class MdxEngine(object):
         """
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
-        if self.cube_config.config_file_exist(
+        if self.cube_config.config_file_exists(
         ) and self.cube in self.cube_config.get_cubes_names():
             fusion = self._construct_star_schema_from_config(self.cube_config)
 

@@ -14,34 +14,33 @@ import pandas.io.sql as psql
 from sqlalchemy import inspect
 
 
-def load_tables_db(executor_instance):
+def load_tables_db(executor):
     """
     Load tables from database.
 
-    :param executor_instance: MdxEngine instance
+    :param executor: MdxEngine instance
     :return: tables dict with table name as key and dataframe as value
     """
 
     tables = {}
 
     # todo db from executro instance
-    db = executor_instance.instantiate_db(executor_instance.cube)
+    db = executor.instantiate_db(executor.cube)
     # todo remove executor_instance.sqlengine
-    if not executor_instance.sqlengine:
-        executor_instance.sqlengine = executor_instance.instantiate_db(
-            executor_instance.cube,).engine
-    print('Connection string = ' + str(executor_instance.sqlengine))
-    inspector = inspect(executor_instance.sqlengine)
+    if not executor.sqlengine:
+        executor.sqlengine = executor.instantiate_db(executor.cube,).engine
+    print('Connection string = ' + str(executor.sqlengine))
+    inspector = inspect(executor.sqlengine)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
     if db.dbms.upper() == 'POSTGRES':
-        executor_instance.facts = executor_instance.facts.lower()
+        executor.facts = executor.facts.lower()
     for table_name in inspector.get_table_names():
         if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             table_name = table_name.title()
 
-        results = executor_instance.sqlengine.execution_options(
+        results = executor.sqlengine.execution_options(
             stream_results=True,
         ).execute('SELECT * FROM {0}'.format(table_name),)
         # Fetch all the results of the query
@@ -58,23 +57,22 @@ def load_tables_db(executor_instance):
     return tables
 
 
-def construct_star_schema_db(executor_instance):
+def construct_star_schema_db(executor):
     """
     Construct star schema DataFrame from database.
 
-    :param executor_instance: MdxEngine instance
+    :param executor: MdxEngine instance
     :return: star schema DataFrame
     """
 
-    if not executor_instance.sqlengine:
-        executor_instance.sqlengine = executor_instance.instantiate_db(
-            executor_instance.cube,)
+    if not executor.sqlengine:
+        executor.sqlengine = executor.instantiate_db(executor.cube,)
 
     fusion = psql.read_sql_query(
-        'SELECT * FROM {0}'.format(executor_instance.facts,),
-        executor_instance.sqlengine,
+        'SELECT * FROM {0}'.format(executor.facts,),
+        executor.sqlengine,
     )
-    inspector = inspect(executor_instance.sqlengine)
+    inspector = inspect(executor.sqlengine)
 
     for db_table_name in inspector.get_table_names():
         try:
@@ -86,11 +84,11 @@ def construct_star_schema_db(executor_instance):
             fusion = fusion.merge(
                 psql.read_sql_query(
                     "SELECT * FROM {0}".format(db_table_name),
-                    executor_instance.sqlengine,
+                    executor.sqlengine,
                 ),)
         except BaseException:
             print('No common column between {0} and {1}'.format(
-                executor_instance.facts,
+                executor.facts,
                 db_table_name,
             ))
             pass
