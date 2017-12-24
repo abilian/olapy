@@ -11,7 +11,7 @@ def test_execution_query1(executor):
     assert executor.execute_mdx(query1)['result']['amount'][0] == 1023
 
 
-def test_execution_query2(executor):
+def test_execution_query3(executor):
     df = executor.execute_mdx(query3)['result']
     test_df = pd.DataFrame({
         'country': ['France', 'Spain', 'Switzerland', 'United States'],

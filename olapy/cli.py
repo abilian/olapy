@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function
 
 import os
 from distutils.dir_util import copy_tree
@@ -7,8 +6,6 @@ from os.path import dirname, expanduser
 from shutil import copyfile
 
 import click
-
-RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
 
 @click.command()

@@ -552,7 +552,7 @@ class XmlaExecuteTools():
                     tupl2list[0],
                     self.executor.tables_loaded[tupl2list[0].replace('[', '')
                                                 .replace(']', '')].columns[len(
-                                                    tupl2list[4:])],
+                                                    tupl2list[4:],)],
                 )
 
             with xml.Cell(CellOrdinal=str(index)):

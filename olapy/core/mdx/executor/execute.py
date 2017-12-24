@@ -21,9 +21,11 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
+from typing import List
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
@@ -36,15 +38,9 @@ from .execute_csv_files import construct_star_schema_csv_files, \
     load_tables_csv_files
 from .execute_db import construct_star_schema_db, load_tables_db
 
-RUNNING_TOX = 'RUNNING_TOX' in os.environ
-
 
 def get_default_cube_directory():
-    # toxworkdir does not expanduser properly under tox
-    if 'OLAPY_PATH' in os.environ:
-        home_directory = os.environ.get('OLAPY_PATH')
-    else:
-        home_directory = expanduser("~")
+    home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
     if 'olapy-data' not in home_directory:
         home_directory = os.path.join(home_directory, 'olapy-data')
@@ -57,9 +53,8 @@ class MdxEngine(object):
 
     :param cube_name: It must be under ~/olapy-data/cubes/{cube_name}.
 
-        example cube_name = sales
-
-        the full path -> *home_directory/olapy-data/cubes/sales*
+        example: if cube_name = 'sales'
+        then full path -> *home_directory/olapy-data/cubes/sales*
     :param client_type: excel | web , by default excel, so you can use olapy as xmla server with excel spreadsheet,
         web if you want to use olapy with `olapy-web <https://github.com/abilian/olapy-web>`_,
     :param cubes_path: Olapy cubes path, which is under olapy-data,
@@ -104,6 +99,7 @@ class MdxEngine(object):
         self.facts = fact_table_name
         self.parser = parser
         self._mdx_query = mdx_query
+
         if olapy_data_location is None:
             self.olapy_data_location = MdxEngine.olapy_data_location
         else:
@@ -163,8 +159,6 @@ class MdxEngine(object):
     def _get_db_cubes_names(cls):
         """
         Get databases cubes names
-
-        :return:
         """
         # get databases names first , and them instantiate MdxEngine with this database, thus \
         # MdxEngine will try to construct the star schema either automatically or manually
@@ -239,7 +233,7 @@ class MdxEngine(object):
     def load_tables(self):
         """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
-        :return: dict with key as table name and DataFrame as value
+        :return: dict with table names as keys and DataFrames as values
         """
         # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
@@ -361,7 +355,6 @@ class MdxEngine(object):
 
              [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
 
-
         :return: measures column's names *(Amount for the example)*
         """
 
@@ -425,7 +418,6 @@ class MdxEngine(object):
         Filter a DataFrame (Dataframe_in) with one tuple.
 
             Example ::
-
 
                 tuple = ['Geography','Geography','Continent','Europe','France','olapy']
 
@@ -538,7 +530,6 @@ class MdxEngine(object):
         | Europe      | -1           |41239    |
         +-------------+--------------+---------+
 
-
         :return: Two DataFrames with same columns
         """
         df_with_less_columns = dataframe1
@@ -568,13 +559,12 @@ class MdxEngine(object):
 
                 Time -> Year,Month,Day
 
-
         we have to use only dimension's columns of current dimension that exist
-        in tuple_as_list and keep other dimensions columns
+        in tuple_as_list and keep other dimensions columns.
 
-        so if tuple_as_list = ['Geography','Geography','Continent']
+        So if tuple_as_list = ['Geography','Geography','Continent']
 
-        columns_to_keep will be:
+        then columns_to_keep will be:
 
             columns_to_keep :
 
@@ -584,10 +574,11 @@ class MdxEngine(object):
 
                 Time -> Year,Month,Day
 
-
         we need columns_to_keep for grouping our columns in the DataFrame
 
-        :param tuple_as_list:  example::
+        :param tuple_as_list:
+
+            example::
 
                 ['Geography','Geography','Continent']
 
@@ -618,6 +609,7 @@ class MdxEngine(object):
     def _uniquefy_tuples(tuples):
         """
         Remove redundant tuples.
+
         :param tuples: list of string of tuples.
         :return: list of string of unique tuples.
         """
@@ -679,11 +671,11 @@ class MdxEngine(object):
         return df_to_fusion
 
     def fusion_dataframes(self, df_to_fusion):
-        """
-        Concat chunks of DataFrames.
+        # type: (List[DataFrame]) -> DataFrame
+        """Concat chunks of DataFrames.
 
         :param df_to_fusion: List of Pandas DataFrame.
-        :return: Pandas DataFrame.
+        :return: a Pandas DataFrame.
         """
 
         df = df_to_fusion[0]
@@ -692,10 +684,9 @@ class MdxEngine(object):
         return df
 
     def check_nested_select(self):
+        # type: () -> bool
         """
         Check if the MDX Query is Hierarchized and contains many tuples groups.
-
-        :return: True | False
         """
         return not self.parser.hierarchized_tuples() and len(
             self.parser.get_nested_select(),) >= 2
@@ -704,8 +695,9 @@ class MdxEngine(object):
         """
         Construct DataFrame of many groups.
 
-        :param columns_to_keep: :func:`columns_to_keep` (useful for executing many tuples, for instance execute_mdx).
-        :return: Pandas DataFrame.
+        :param columns_to_keep: :func:`columns_to_keep`
+            (useful for executing many tuples, for instance execute_mdx).
+        :return: a list of Pandas DataFrame.
         """
         dfs = []
         grouped_tuples = self.parser.get_nested_select()
@@ -732,7 +724,7 @@ class MdxEngine(object):
         Usage ::
 
             executor = MdxEngine('sales')
-            query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
+            query = "SELECT FROM [sales] WHERE ([Measures].[Amount])"
             executor.execute_mdx(query)
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
@@ -740,12 +732,11 @@ class MdxEngine(object):
         example::
 
             {
-            'result' : DataFrame result
-            'columns_desc' : dict of dimension and columns used
+            'result': DataFrame result
+            'columns_desc': dict of dimension and columns used
             }
 
         """
-
         # todo temp  self.mdx_query is used in many places
         self.mdx_query = mdx_query
 
@@ -790,18 +781,13 @@ class MdxEngine(object):
 
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
-            return {
-                'result':
-                df.groupby(cols, sort=sort).sum()[self.selected_measures],
-                'columns_desc':
-                tables_n_columns,
-            }
+            result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
 
         else:
-            return {
-                'result':
-                self.load_star_schema_dataframe[self.selected_measures].sum()
-                .to_frame().T,
-                'columns_desc':
-                tables_n_columns,
-            }
+            result = self.load_star_schema_dataframe[self.selected_measures] \
+                .sum().to_frame().T
+
+        return {
+            'result': result,
+            'columns_desc': tables_n_columns,
+        }

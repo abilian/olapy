@@ -2,11 +2,11 @@ def create_insert(con):
 
     statement = """
     CREATE TABLE IF NOT EXISTS facts (
-    day text,
-    city text,
-    licence text,
-    amount integer,
-    count integer);
+        day text,
+        city text,
+        licence text,
+        amount integer,
+        count integer);
     """
     con.execute(statement)
 
@@ -21,15 +21,16 @@ def create_insert(con):
     ('May 18,2010','Zurich','Partnership',64,64),
     ('May 19,2010','Geneva','Corporate',128,13),
     ('May 20,2010','New York','Corporate',256,12),
-    ('May 21,2010','New York','Corporate',512,564);"""
+    ('May 21,2010','New York','Corporate',512,564);
+    """
 
     con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS geography (
-    continent text,
-    country text,
-    city text);
+        continent text,
+        country text,
+        city text);
     """
     con.execute(statement)
 
@@ -48,15 +49,15 @@ def create_insert(con):
     ('Europe','Spain','Valencia'),
     ('Europe','Switzerland','Geneva'),
     ('Europe','Switzerland','Lausanne'),
-    ('Europe','Switzerland','Zurich');"""
-
+    ('Europe','Switzerland','Zurich');
+    """
     con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS product (
-    company text,
-    article text,
-    licence text);
+        company text,
+        article text,
+        licence text);
     """
     con.execute(statement)
 
@@ -65,16 +66,16 @@ def create_insert(con):
         ('Crazy Development','olapy','Corporate'),
         ('Crazy Development','olapy','Partnership'),
         ('Crazy Development','olapy','Personal'),
-        ('Crazy Development','olapy','Startup');"""
-
+        ('Crazy Development','olapy','Startup');
+    """
     con.execute(statement)
 
     statement = """
     CREATE TABLE IF NOT EXISTS time (
-    year integer,
-    quarter text,
-    month text,
-    day text
+        year integer,
+        quarter text,
+        month text,
+        day text
     );
     """
     con.execute(statement)

@@ -13,14 +13,17 @@ from olapy.core.mdx.executor.execute import MdxEngine
 @pytest.fixture(scope='module')
 def executor(request):
     MdxEngine.source_type = ('csv', 'db')
-    if 'param' in request.__dict__.keys():
-        os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ[request.param[0]]
+
+    if hasattr(request, 'param'):
+        sqlalchemy_database_uri = os.environ[request.param[0]]
+
+        os.environ['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_database_uri
         if request.param[0] == 'SQLITE_URI':
             MdxEngine.sqlengine = None
             yield MdxEngine('sales_sqlite', fact_table_name='facts')
         else:
             MdxEngine.sqlengine = sqlalchemy.create_engine(
-                os.environ[request.param[0]])
+                sqlalchemy_database_uri)
             create_insert(MdxEngine.sqlengine)
             yield MdxEngine(request.param[1], fact_table_name='facts')
             drop_tables(MdxEngine.sqlengine)
