@@ -24,6 +24,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     mdschema_properties_properties_xsd, mdschema_sets_xsd
 
 
+# noinspection PyPep8Naming
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
@@ -695,7 +696,7 @@ class XmlaDiscoverTools():
                             xml.HIERARCHY_CAPTION('Measures')
                             xml.DIMENSION_TYPE('2')
                             xml.HIERARCHY_CARDINALITY('0')
-                            xml.DEFAULT_MEMBER('[Measures].[{0}]'.format(
+                            xml.DEFAULT_MEMBER('[Measures].[{}]'.format(
                                 self.executor.measures[0],))
                             xml.STRUCTURE('0')
                             xml.IS_VIRTUAL('false')

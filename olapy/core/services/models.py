@@ -39,15 +39,15 @@ class Tuple(object):
 
     def __str__(self):
         return """
-        Hierarchy : {0}
-        UName : {1}
-        Caption : {2}
-        LName : {3}
-        LNum : {4}
-        DisplayInfo : {5}
-        PARENT_UNIQUE_NAME : {6}
-        HIERARCHY_UNIQUE_NAME : {7}
-        Value : {8}
+        Hierarchy : {}
+        UName : {}
+        Caption : {}
+        LName : {}
+        LNum : {}
+        DisplayInfo : {}
+        PARENT_UNIQUE_NAME : {}
+        HIERARCHY_UNIQUE_NAME : {}
+        Value : {}
         """.format(self.hierarchy, self.uname, self.caption, self.lname,
                    self.lnum, self.display_info, self.parent_unique_name,
                    self.hierarchy_unique_name, self.value)

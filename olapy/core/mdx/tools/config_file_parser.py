@@ -151,9 +151,6 @@ class ConfigParser:
         # type: () -> bool
         """
         Check whether the config file exists or not.
-
-        :param client_type: excel config file or web
-        :return: True | False
         """
 
         # if client_type == 'web':
@@ -165,8 +162,6 @@ class ConfigParser:
         """Check if excel need authentication to access cubes or not.
 
         (xmla_authentication tag in the config file).
-
-        :return: True | False
         """
 
         # xmla authentication only in excel
@@ -209,6 +204,7 @@ class ConfigParser:
     def _construct_cubes_excel(self):
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
+
         :return: Cube obj
         """
         # try:

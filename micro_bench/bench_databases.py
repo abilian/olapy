@@ -15,9 +15,10 @@ from spyne.server.wsgi import WsgiApplication
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
 
-from micro_bench import MicBench
 from olapy.core.services.xmla import XmlaProviderService
 from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
+
+from .micro_bench import MicBench
 
 HOST = "127.0.0.1"
 PORT = 8230

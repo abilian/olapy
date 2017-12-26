@@ -32,7 +32,7 @@ def load_one_table(cubes_obj, executor, table_name):
         # load facts table
 
         table = psql.read_sql_query(
-            "SELECT * FROM {0}".format(table_name),
+            "SELECT * FROM {}".format(table_name),
             db.engine,
         )
     return table
@@ -65,7 +65,7 @@ def load_table_config_file(executor, cube_obj):
 
         # rename columns if value not None
         df.rename(
-            columns=(dict((k, v) for k, v in dimension.columns.items() if v)),
+            columns=({k: v for k, v in dimension.columns.items() if v}),
             inplace=True,
         )
 
@@ -109,7 +109,7 @@ def construct_star_schema_config_file(executor, cubes_obj):
                 db_name=executor.cube,
             )
             df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
+                "SELECT * FROM {}".format(dimension_and_key.split('.')[0]),
                 db.engine,
             )
 

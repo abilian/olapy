@@ -116,7 +116,7 @@ class MyDB(object):
             db_to_connect_to = '' if self.db_credentials[
                 'dbms'].upper() == 'ORACLE' else db
 
-        url = '{0}://{1}:{2}@{3}:{4}/{5}'.format(
+        url = '{}://{}:{}@{}:{}/{}'.format(
             eng,
             self.db_credentials['user'],
             self.db_credentials['password'],
@@ -218,7 +218,7 @@ class MyMssqlDB(MyDB):
             '+',
         )
         if db is not None:
-            url = driver + '://(local)/{0}?driver={1}'.format(
+            url = driver + '://(local)/{}?driver={}'.format(
                 db,
                 sql_server_driver,
             )
@@ -227,9 +227,9 @@ class MyMssqlDB(MyDB):
         if 'LOCALHOST' in self.db_credentials['user'].upper(
         ) or not self.db_credentials['user']:
             url = driver + \
-                '://(local)/msdb?driver={0}'.format(sql_server_driver)
+                '://(local)/msdb?driver={}'.format(sql_server_driver)
         else:
-            url = driver + '://{0}:{1}@{2}:{3}/msdb?driver={4}'.format(
+            url = driver + '://{}:{}@{}:{}/msdb?driver={}'.format(
                 self.db_credentials['user'],
                 self.db_credentials['password'],
                 self.db_credentials['host'],

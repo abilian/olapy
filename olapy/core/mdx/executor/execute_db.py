@@ -42,7 +42,7 @@ def load_tables_db(executor):
 
         results = executor.sqlengine.execution_options(
             stream_results=True,
-        ).execute('SELECT * FROM {0}'.format(table_name),)
+        ).execute('SELECT * FROM {}'.format(table_name),)
         # Fetch all the results of the query
         value = pd.DataFrame(
             iter(results),
@@ -69,7 +69,7 @@ def construct_star_schema_db(executor):
         executor.sqlengine = executor.instantiate_db(executor.cube,)
 
     fusion = psql.read_sql_query(
-        'SELECT * FROM {0}'.format(executor.facts,),
+        'SELECT * FROM {}'.format(executor.facts,),
         executor.sqlengine,
     )
     inspector = inspect(executor.sqlengine)
@@ -83,11 +83,11 @@ def construct_star_schema_db(executor):
         try:
             fusion = fusion.merge(
                 psql.read_sql_query(
-                    "SELECT * FROM {0}".format(db_table_name),
+                    "SELECT * FROM {}".format(db_table_name),
                     executor.sqlengine,
                 ),)
         except BaseException:
-            print('No common column between {0} and {1}'.format(
+            print('No common column between {} and {}'.format(
                 executor.facts,
                 db_table_name,
             ))

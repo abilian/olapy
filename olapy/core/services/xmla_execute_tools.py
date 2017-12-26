@@ -33,7 +33,7 @@ class XmlaExecuteTools():
 
     def _execute_convert_formulas_query(self):
         """
-        <Cell CellOrdinal="0">
+            <Cell CellOrdinal="0">
                 <Value>[Measures].[Amount]</Value>
             </Cell>
             <Cell CellOrdinal="1">
@@ -201,8 +201,8 @@ class XmlaExecuteTools():
 
     def _gen_measures_xs0(self, xml, tupls):
         with xml.Member(Hierarchy="[Measures]"):
-            xml.UName('[Measures].[{0}]'.format(tupls[0][1]),)
-            xml.Caption('{0}'.format(tupls[0][1]))
+            xml.UName('[Measures].[{}]'.format(tupls[0][1]),)
+            xml.Caption('{}'.format(tupls[0][1]))
             xml.LName('[Measures]')
             xml.LNum('0')
             xml.DisplayInfo('0')
@@ -294,14 +294,14 @@ class XmlaExecuteTools():
                             else:
                                 hierarchy = '[{0}].[{0}]'.format(
                                     splited_tupl[0],)
-                                l_name = "[{0}]".format('].['.join(
+                                l_name = "[{}]".format('].['.join(
                                     splited_tupl[:3],))
                                 lvl = len(splited_tupl[4:])
                                 displayinfo = '131076'
 
                             with xml.Member(Hierarchy=hierarchy):
-                                xml.UName('{0}'.format(tupl.strip(' \t\n')))
-                                xml.Caption('{0}'.format(splited_tupl[-1]))
+                                xml.UName('{}'.format(tupl.strip(' \t\n')))
+                                xml.Caption('{}'.format(splited_tupl[-1]))
                                 xml.LName(l_name)
                                 xml.LNum(str(lvl))
                                 xml.DisplayInfo(displayinfo)
@@ -313,12 +313,6 @@ class XmlaExecuteTools():
             mdx_query_axis='all',
             axis="Axis0",
     ):
-        """
-
-        :param splited_df:
-        :return:
-        """
-
         # patch 4 select (...) (...) (...) from bla bla bla
         if self.executor.check_nested_select():
             return self._gen_xs0_grouped_tuples(
@@ -339,7 +333,7 @@ class XmlaExecuteTools():
                 with xml.Tuples:
                     with xml.Tuple:
                         with xml.Member(Hierarchy="[Measures]"):
-                            xml.UName('[Measures].[{0}]'.format(
+                            xml.UName('[Measures].[{}]'.format(
                                 self.executor.selected_measures[0],))
                             xml.Caption(
                                 str(self.executor.selected_measures[0]),)
@@ -356,7 +350,7 @@ class XmlaExecuteTools():
                     for idx in range(len(self.mdx_execution_result) * 3):
                         with xml.Tuple:
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName('[Measures].[{0}]'.format(
+                                xml.UName('[Measures].[{}]'.format(
                                     'XL_SD' + str(idx),))
                                 xml.Caption('XL_SD' + str(idx))
                                 xml.LName('[Measures]')
@@ -491,8 +485,8 @@ class XmlaExecuteTools():
         dfs = self.split_dataframe()
         if self.columns_desc['rows'] and self.columns_desc['columns']:
             return """
-            {0}
-            {1}
+            {}
+            {}
             """.format(
                 self.generate_xs0_one_axis(
                     dfs,
@@ -678,7 +672,7 @@ class XmlaExecuteTools():
         slicer_list = sorted(
             list(
                 set(all_dimensions_names) -
-                set(table_name for table_name in self.columns_desc['all']),),)
+                {table_name for table_name in self.columns_desc['all']},),)
 
         if 'Measures' in slicer_list:
             slicer_list.insert(
@@ -936,8 +930,8 @@ class XmlaExecuteTools():
 
         if self.columns_desc['rows']:
             return """
-            {0}
-            {1}
+            {}
+            {}
             """.format(
                 self.generate_one_axis_info(
                     mdx_query_axis='columns',
@@ -1008,7 +1002,7 @@ class XmlaExecuteTools():
         unused_dimensions = sorted(
             list(
                 set(self.executor.get_all_tables_names(ignore_fact=True)) -
-                set(table_name for table_name in self.columns_desc['all']),),)
+                {table_name for table_name in self.columns_desc['all']},),)
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
@@ -1040,9 +1034,9 @@ class XmlaExecuteTools():
                                 self.executor.facts in
                                 self.columns_desc['where']):
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName('[Measures].[{0}]'.format(
+                                xml.UName('[Measures].[{}]'.format(
                                     self.executor.measures[0],))
-                                xml.Caption('{0}'.format(
+                                xml.Caption('{}'.format(
                                     self.executor.measures[0],))
                                 xml.LName('[Measures]')
                                 xml.LNum('0')

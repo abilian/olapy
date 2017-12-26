@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, \
 
 from timeit import Timer
 
-from cube_generator import CUBE_NAME
+from .cube_generator import CUBE_NAME
 
 
 class MicBench:

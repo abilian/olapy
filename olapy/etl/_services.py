@@ -36,7 +36,7 @@ def create_db_engine(driver='SQL Server Native Client', version='11.0'):
         if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
             dsn += '?client_encoding=utf8'
         elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
-            dsn += '?driver={0}'.format(driver + ' ' + version)
+            dsn += '?driver={}'.format(driver + ' ' + version)
     return create_engine(dsn)
 
 
