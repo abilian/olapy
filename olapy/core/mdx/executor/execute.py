@@ -275,9 +275,11 @@ class MdxEngine(object):
 
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
+            not_id_columns = [column for column in self.tables_loaded[self.facts].columns if 'id' not in column]
+            cleaned_facts = self.clean_data(self.tables_loaded[self.facts], not_id_columns)
             return [
                 col
-                for col in self.tables_loaded[self.facts].select_dtypes(
+                for col in cleaned_facts.select_dtypes(
                     include=[np.number], ).columns
                 if col.lower()[-2:] != 'id'
             ]
@@ -306,14 +308,14 @@ class MdxEngine(object):
 
         return fusion
 
-    def clean_data(self, start_schema_df):
+    def clean_data(self, start_schema_df, measures):
         """
         measure like this : 1 349 is not numeric so we try to transform it to 1349
         :param start_schema_df: start schema dataframe
         :return: cleaned columns
         """
-        if self.measures:
-            for measure in self.measures:
+        if measures:
+            for measure in measures:
                 if start_schema_df[measure].dtype == object:
                     start_schema_df[measure] = start_schema_df[measure].str.replace(" ", "")
                     try:
@@ -339,7 +341,7 @@ class MdxEngine(object):
         elif self.cube in self.csv_files_cubes:
             fusion = construct_star_schema_csv_files(self)
 
-        start_schema_df = self.clean_data(fusion)
+        start_schema_df = self.clean_data(fusion, self.measures)
 
         return start_schema_df[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
