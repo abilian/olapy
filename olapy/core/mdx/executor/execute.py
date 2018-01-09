@@ -423,11 +423,8 @@ class MdxEngine(object):
                         continue
                 else:
                     tables_columns.update({
-                        tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(
-                                tupl[2:None if self.parser.hierarchized_tuples()
-                                else -1], )],
-                    })
+                        tupl[0]: self.tables_loaded[tupl[0]].columns[
+                            :len(tupl[2:None if self.parser.hierarchized_tuples() else -1], )], })
 
             axes.update({axis: tables_columns})
         return axes
