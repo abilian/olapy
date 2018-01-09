@@ -117,7 +117,8 @@ class XmlaProviderService(ServiceBase):
         :return: XML Execute response as string
         """
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
-        if request.Command.Statement == '':
+        mdx_query = request.Command.Statement.decode('utf8')
+        if mdx_query == '':
             # check if command contains a query
 
             xml = xmlwitch.Builder()
@@ -132,10 +133,11 @@ class XmlaProviderService(ServiceBase):
 
             xml = xmlwitch.Builder()
             executor = XmlaProviderService.discover_tools.executor
-            executor.mdx_query = request.Command.Statement
+            # todo back and check this
+            executor.mdx_query = mdx_query
 
             # Hierarchize
-            if all(key in request.Command.Statement
+            if all(key in mdx_query
                    for key in
                    ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
                 convert2formulas = True
@@ -208,7 +210,7 @@ def get_wsgi_application():
 @click.option(
     '--write_on_file',
     '-wf',
-    default=False,
+    default=True,
     help='Write logs into a file or display them into the console. \
 (True : on file)(False : on console)',
 )

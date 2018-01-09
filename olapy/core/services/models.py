@@ -1,3 +1,4 @@
+# -*- encoding: utf8 -*-
 """
 Models to construct xmla responses with Spyne
 """
