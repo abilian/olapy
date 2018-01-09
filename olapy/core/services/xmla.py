@@ -117,7 +117,7 @@ class XmlaProviderService(ServiceBase):
         :return: XML Execute response as string
         """
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
-        mdx_query = request.Command.Statement.decode('utf8')
+        mdx_query = request.Command.Statement.encode().decode('utf8')
         if mdx_query == '':
             # check if command contains a query
 
