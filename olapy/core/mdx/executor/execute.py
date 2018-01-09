@@ -312,13 +312,14 @@ class MdxEngine(object):
         :param start_schema_df: start schema dataframe
         :return: cleaned columns
         """
-        for measure in self.measures:
-            if start_schema_df[measure].dtype == object:
-                start_schema_df[measure] = start_schema_df[measure].str.replace(" ", "")
-                try:
-                    start_schema_df[measure] = start_schema_df[measure].astype('float')
-                except:
-                    start_schema_df = start_schema_df.drop(measure, 1)
+        if self.measures:
+            for measure in self.measures:
+                if start_schema_df[measure].dtype == object:
+                    start_schema_df[measure] = start_schema_df[measure].str.replace(" ", "")
+                    try:
+                        start_schema_df[measure] = start_schema_df[measure].astype('float')
+                    except:
+                        start_schema_df = start_schema_df.drop(measure, 1)
         return start_schema_df
 
     def get_star_schema_dataframe(self):
@@ -338,11 +339,11 @@ class MdxEngine(object):
         elif self.cube in self.csv_files_cubes:
             fusion = construct_star_schema_csv_files(self)
 
-        start_schema_df = fusion[[
+        start_schema_df = self.clean_data(fusion)
+
+        return start_schema_df[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
         ]]
-
-        return self.clean_data(start_schema_df)
 
     def get_all_tables_names(self, ignore_fact=False):
         """
