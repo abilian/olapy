@@ -6,8 +6,8 @@ This module Parse Mdx Query, And Break it in parts
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-import re
-
+# import re
+import regex
 
 class Parser(object):
     """
@@ -15,8 +15,9 @@ class Parser(object):
     """
     # french characters
     # or use new regex 2017.02.08
-    regex = "(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€" \
-            "\’\à\â\æ\ç\é\è\ê\ë\ï\î\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
+    # regex = "(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€" \
+    #         "\’\à\â\æ\ç\é\è\ê\ë\ï\î\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
+    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\"\’\€\&\$ ]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
@@ -88,7 +89,7 @@ class Parser(object):
                 ).split('].[')
                 if tup_att
             ]
-            for tup in re.compile(cls.regex).findall(query[start:stop],)
+            for tup in regex.compile(cls.REG).findall(query[start:stop],)
             if len(tup[0].split('].[')) > 1
             # for tup in re.compile(MdxEngine.regex).findall(
             #     query.encode("utf-8", 'replace')[start:stop],)
@@ -231,7 +232,7 @@ class Parser(object):
         :return: All groups as list of strings.
 
         """
-        return re.findall(r'\(([^()]+)\)', self.mdx_query)
+        return regex.findall(r'\(([^()]+)\)', self.mdx_query)
 
     def hierarchized_tuples(self):
         """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
