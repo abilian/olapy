@@ -9,6 +9,7 @@ from __future__ import absolute_import, division, print_function, \
 # import re
 import regex
 
+
 class Parser(object):
     """
     Class for Parsing MdxQuery
@@ -17,7 +18,8 @@ class Parser(object):
     # or use new regex 2017.02.08
     # regex = "(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€" \
     #         "\’\à\â\æ\ç\é\è\ê\ë\ï\î\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
-    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\"\’\€\&\$ ]+\])*\.?((Members)|(\[Q\d\]))?)"
+    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\"\’\€\&\$ " \
+          "]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
