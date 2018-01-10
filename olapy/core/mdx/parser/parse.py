@@ -73,10 +73,6 @@ class Parser(object):
 
         :return:  nested list of tuples (see the example)
         """
-        try:
-            query = query.decode('utf-8')
-        except AttributeError:
-            pass
         if start is not None:
             start = query.index(start)
         if stop is not None:
@@ -133,7 +129,10 @@ class Parser(object):
 
         # Hierarchize -> ON COLUMNS , ON ROWS ...
         # without Hierarchize -> ON 0
-
+        try:
+            query = query.decode('utf-8')
+        except AttributeError:
+            pass
         tuples_on_mdx_query = self.get_tuples(query)
         on_rows = []
         on_columns = []
