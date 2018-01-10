@@ -73,7 +73,9 @@ class Parser(object):
 
         :return:  nested list of tuples (see the example)
         """
-
+        if not type(query) == str:
+            # py2
+            query = query.decode('utf-8')
         if start is not None:
             start = query.index(start)
         if stop is not None:
