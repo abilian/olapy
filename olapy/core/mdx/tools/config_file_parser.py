@@ -170,7 +170,7 @@ class ConfigParser:
                 config = yaml.load(config_file)
 
                 try:
-                    return config['xmla_authentication'] == True
+                    return config['xmla_authentication']
                 except BaseException:
                     return False
         else:
