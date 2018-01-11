@@ -225,7 +225,7 @@ class ConfigParser:
                             column['name'] if 'column_new_name' not in column else
                             column['column_new_name'],
                         ) for column in dimension['dimension']['columns']
-                    ) if 'columns' in dimension['dimension'] else None
+                    ) if 'columns' in dimension['dimension'] else {}
                 ) for dimension in config['dimensions']
             ]
 
