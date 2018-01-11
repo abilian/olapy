@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function, \
 import os
 from collections import OrderedDict
 
-from lxml import etree
+import yaml
 
 from .models import Cube, Dimension, Facts
 
@@ -108,7 +108,7 @@ class ConfigParser:
     def __init__(
             self,
             cube_path=None,
-            file_name='cubes-config.xml',
+            file_name='cubes-config.yml',
             web_config_file_name='web_cube_config.xml',
     ):
         """
@@ -167,12 +167,10 @@ class ConfigParser:
         # xmla authentication only in excel
         if self.config_file_exists():
             with open(self.get_config_file_path()) as config_file:
-                parser = etree.XMLParser()
-                tree = etree.parse(config_file, parser)
+                config = yaml.load(config_file)
 
                 try:
-                    return tree.xpath('/cubes/xmla_authentication')[
-                        0].text == 'True'
+                    return config['xmla_authentication'] == True
                 except BaseException:
                     return False
         else:
@@ -190,14 +188,10 @@ class ConfigParser:
         # else:
         #     raise ValueError("Unknown client_type: {}".format(client_type))
         with open(file_path) as config_file:
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
+            config = yaml.load(config_file)
 
             try:
-                return {
-                    cube.find('name').text: cube.find('source').text
-                    for cube in tree.xpath('/cubes/cube')
-                }
+                return {config['name']: config['source']}
             except BaseException:  # pragma: no cover
                 raise ValueError('missed name or source tags')
 
@@ -209,48 +203,39 @@ class ConfigParser:
         """
         # try:
         with open(self.get_config_file_path()) as config_file:
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
+            config = yaml.load(config_file)
 
             facts = [
                 Facts(
-                    table_name=xml_facts.find('table_name').text,
-                    keys={
-                        key.text: key.attrib['ref']
-                        for key in xml_facts.findall('keys/column_name')
-                    },
-                    measures=[
-                        mes.text
-                        for mes in xml_facts.findall('measures/name')
-                    ],
+                    table_name=config['facts']['table_name'],
+                    keys=dict(zip(config['facts']['keys']['columns_names'],
+                                  config['facts']['keys']['refs']))
+                    ,
+                    measures=config['facts']['measures']
                 )
-                for xml_facts in tree.xpath('/cubes/cube/facts')
             ]
 
             dimensions = [
                 Dimension(
-                    name=xml_dimension.find('name').text,
-                    displayName=xml_dimension.find('displayName').text,
+                    name=dimension['dimension']['name'],
+                    displayName=dimension['dimension']['displayName'],
                     columns=OrderedDict(
                         (
-                            column_name.text,
-                            column_name.text if not column_name.attrib else
-                            column_name.attrib['column_new_name'],
-                        )
-                        for column_name in xml_dimension.findall(
-                            'columns/name',)),
-                )
-                for xml_dimension in tree.xpath(
-                    '/cubes/cube/dimensions/dimension',)
+                            column['name'],
+                            column['name'] if 'column_new_name' not in column else
+                            column['column_new_name'],
+                        ) for column in dimension['dimension']['columns']
+                    ) if 'columns' in dimension['dimension'] else None
+                ) for dimension in config['dimensions']
             ]
 
         return [
             Cube(
-                name=xml_cube.find('name').text,
-                source=xml_cube.find('source').text,
+                name=config['name'],
+                source=config['source'],
                 facts=facts,
                 dimensions=dimensions,
-            ) for xml_cube in tree.xpath('/cubes/cube')
+            )
         ]
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')
