@@ -209,8 +209,8 @@ class ConfigParser:
                 Facts(
                     table_name=config['facts']['table_name'],
                     keys=dict(zip(config['facts']['keys']['columns_names'],
-                                  config['facts']['keys']['refs']))
-                    ,
+                                  config['facts']['keys']['refs'])
+                              ),
                     measures=config['facts']['measures']
                 )
             ]
