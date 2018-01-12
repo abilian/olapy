@@ -8,57 +8,56 @@ xmla_authentication : False
 
 facts :
   table_name : food_facts
-  key:
-    column_name :
+  keys:
+    columns_names :
       - product_id
-    ref :
+      - warehouse_id
+      - store_id
+    refs :
       - Product.id
-  key:
-    column_name : warehouse_id
-    ref : Warehouse.id
-  key:
-    column_name : store_id
-    ref : Store.id
+      - Warehouse.id
+      - Store.id
 
   measures :
 #   by default, all number type columns in facts table, or you can specify them here
-    name : units_ordered
-    name : units_shipped
-    name : supply_time
+    - units_ordered
+    - units_shipped
+    - supply_time
 
 # star building customized dimensions display in excel from the star schema
-dimension :
-#  IMPORTANT , put here facts table also (little bug)
-  name : food_facts
-  displayName : food_facts
+dimensions:
+  - dimension :
+    #  IMPORTANT , put here facts table also (little bug)
+      name : food_facts
+      displayName : food_facts
 
-dimension :
-  name : Product
-  displayName : Product
-  columns :
-    name : id
-    name : brand_name
-    name : product_name
-    name : SKU
-      column_new_name : Stock_keeping_unit
+  - dimension :
+      name : Product
+      displayName : Product
+      columns :
+        - name : id
+        - name : brand_name
+        - name : product_name
+        - name : SKU
+          column_new_name : Stock_keeping_unit
 
 
-dimension :
-  name : Store
-  displayName : Store
-  columns :
-    name : id
-    name : store_type
-    name : store_name
-    name : store_city
-    name : store_country
-      column_new_name : country
+  - dimension :
+      name : Store
+      displayName : Store
+      columns :
+        - name : id
+        - name : store_type
+        - name : store_name
+        - name : store_city
+        - name : store_country
+          column_new_name : country
 
-dimension :
-  name : Warehouse
-  displayName : Warehouse
-  columns :
-    name : id
-    name : warehouse_name
-    name : warehouse_city
-    name : warehouse_country
+  - dimension :
+      name : Warehouse
+      displayName : Warehouse
+      columns :
+        - name : id
+        - name : warehouse_name
+        - name : warehouse_city
+        - name : warehouse_country

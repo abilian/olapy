@@ -21,8 +21,8 @@ Dashboard :
     - Year
     - Category
 
-  LineCharts :
-    table : Year
-    columns :
-      - 2010
-      - 2011
+#  LineCharts :
+#    table : Year
+#    columns :
+#      - 2010
+#      - 2011
