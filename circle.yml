@@ -21,8 +21,6 @@ dependencies:
     # Just to fill up the cache (to speed up later builds)
     - pyenv local 2.7.11 3.6.2
     - pip install -q -r requirements.txt
-    - pip install mysqlclient
-    - pip install psycopg2
 
 test:
   override:
