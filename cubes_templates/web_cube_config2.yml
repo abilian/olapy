@@ -1,0 +1,22 @@
+#cube name <=> db name
+name : sales
+#csv | postgres | mysql| mssql | oracle
+source : csv
+
+Dashboard :
+  Global_table:
+    columns :
+      - Continent
+      - Country
+    rows :
+      - Licence
+      - Year
+
+  PieCharts :
+    - Country
+    - Licence
+    - Continent
+
+  BarCharts :
+    - Licence
+    - Continent
