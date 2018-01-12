@@ -93,7 +93,7 @@ class XmlaExecuteTools():
         # todo check
         return [
             tup[0]
-            for tup in re.compile(Parser.regex).findall(self.executor.mdx_query)
+            for tup in re.compile(Parser.REG).findall(self.executor.mdx_query)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
