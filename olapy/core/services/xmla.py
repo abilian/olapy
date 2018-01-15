@@ -23,8 +23,6 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
-from olapy.core.mdx.executor.execute import MdxEngine
-
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -42,6 +40,14 @@ class XmlaSoap11(Soap11):
                 ctx.transport.respond(HTTP_200)
                 raise Fault("")
         return Soap11.create_in_document(self, ctx, charset)
+
+# class MyApplication(Application):
+#     def __init__(self, *args, **kargs):
+#         Application.__init__(self, *args, **kargs)
+#         # self.executor = MdxEngine('sales')
+#
+#     def get_session(self):
+#         return self.executor
 
 
 # TODO: find a solution for spyne ctx
@@ -63,8 +69,13 @@ class XmlaProviderService(ServiceBase):
     # and then, xmla requests from excel can be reached
     # thus make life easier.
 
-    discover_tools = XmlaDiscoverTools()
-    sessio_id = discover_tools.session_id
+    # discover_tools = XmlaDiscoverTools(None,None)
+    # sessio_id = discover_tools.session_id
+
+    # instead of initializer
+    discover_tools = None
+    sessio_id = None
+
 
     @rpc(
         DiscoverRequest,
@@ -187,15 +198,23 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
-def get_wsgi_application():
+def get_wsgi_application(olapy_data,source_type):
     # [XmlaProviderService()], __name__ error ???
     # to refresh mdxengine with their class data
-    XmlaProviderService.discover_tools = XmlaDiscoverTools()
+
+    # MdxEngine.olapy_data_location = olapy_data
+    # if source_type is not None:
+    #     MdxEngine.source_type = source_type
+
+
+    # todo pass here mdx_eng params
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data,source_type)
+    XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
-        out_protocol=XmlaSoap11(validator='soft'),
+        out_protocol=XmlaSoap11(validator='soft')
     )
 
     # validator='soft' or nothing, this is important because spyne doesn't
@@ -207,46 +226,13 @@ def get_wsgi_application():
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip address.')
 @click.option('--port', '-p', default=8000, help='Host port.')
-@click.option(
-    '--write_on_file',
-    '-wf',
-    default=True,
-    help='Write logs into a file or display them into the console. \
-(True : on file)(False : on console)',
-)
-@click.option(
-    '--log_file_path',
-    '-lf',
-    default=conf_file,
-    help='Log file path. DEFAUL : ' + conf_file,
-)
-@click.option(
-    '--sql_alchemy_uri',
-    '-sa',
-    default=None,
-    help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ",
-)
-@click.option(
-    '--olapy_data',
-    '-od',
-    default=None,
-    help="Olapy Data folder location, Default : ~/olapy-data",
-)
-@click.option(
-    '--source_type',
-    '-st',
-    default=None,
-    help="Get cubes from where ( db | csv ), DEFAULT : csv",
-)
-def runserver(
-        host,
-        port,
-        write_on_file,
-        log_file_path,
-        sql_alchemy_uri,
-        olapy_data,
-        source_type,
-):
+@click.option('--write_on_file', '-wf', default=True,
+              help='Write logs into a file or display them into the console. (True : on file)(False : on console)', )
+@click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
+@click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
+@click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
+@click.option('--source_type', '-st', default=None, help="Get cubes from where ( db | csv ), DEFAULT : csv")
+def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type):
     """
     Start the xmla server.
     """
@@ -255,10 +241,6 @@ def runserver(
         # Example: olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
 
-    MdxEngine.olapy_data_location = olapy_data
-    if source_type is not None:
-        MdxEngine.source_type = source_type
-
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
@@ -266,7 +248,7 @@ def runserver(
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application()
+    wsgi_application = get_wsgi_application(olapy_data, source_type)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")
