@@ -28,13 +28,12 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self,olapy_data,source_type):
+    def __init__(self, olapy_data, source_type):
         # right now the catalogue_name and cube name are the same
 
         MdxEngine.olapy_data_location = olapy_data
         if source_type is not None:
             MdxEngine.source_type = source_type
-
 
         if MdxEngine.from_db_cubes:
             self.catalogues = MdxEngine.from_db_cubes

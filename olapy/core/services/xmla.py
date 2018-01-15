@@ -76,7 +76,6 @@ class XmlaProviderService(ServiceBase):
     discover_tools = None
     sessio_id = None
 
-
     @rpc(
         DiscoverRequest,
         _returns=AnyXml,
@@ -198,7 +197,7 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
-def get_wsgi_application(olapy_data,source_type):
+def get_wsgi_application(olapy_data, source_type):
     # [XmlaProviderService()], __name__ error ???
     # to refresh mdxengine with their class data
 
@@ -206,9 +205,8 @@ def get_wsgi_application(olapy_data,source_type):
     # if source_type is not None:
     #     MdxEngine.source_type = source_type
 
-
     # todo pass here mdx_eng params
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data,source_type)
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data, source_type)
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
     application = Application(
         [XmlaProviderService],
