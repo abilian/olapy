@@ -10,6 +10,7 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -76,7 +77,10 @@ class WSGIServer:
 @pytest.fixture(scope="module")
 def conn(executor):
     from olapy.core.services.xmla import XmlaProviderService
+
+    XmlaProviderService.discover_tools = XmlaDiscoverTools()
     XmlaProviderService.discover_tools.executor = executor
+    XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     print("spawning server")
     application = Application(
