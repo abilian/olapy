@@ -1009,8 +1009,7 @@ class XmlaExecuteTools():
                 with xml.Tuples:
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
-                            column_attribut = self.executor.tables_loaded[
-                                dim_diff].iloc[0][0]
+                            column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][0]
                             with xml.Member(
                                     Hierarchy="[{0}].[{0}]".format(dim_diff),):
                                 xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(
