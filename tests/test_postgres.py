@@ -11,14 +11,8 @@ from tests.queries import query_posgres1, query_posgres2, query_postgres3
 )
 @pytest.mark.parametrize(
     'executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
-def test_mysql_execution_queries(executor):
-    check_execution_query1(executor)
-    check_execution_query2(executor)
-    check_execution_query10(executor)
-
-
-def check_execution_query1(executor_postgres):
-    df = executor_postgres.execute_mdx(query_posgres1)['result']
+def test_check_execution_query1(executor):
+    df = executor.execute_mdx(query_posgres1)['result']
     test_df = pd.DataFrame({
         'country': ['France', 'Spain', 'Switzerland', 'United States'],
         'amount': [4, 3, 248, 768],
@@ -27,8 +21,13 @@ def check_execution_query1(executor_postgres):
     assert_frame_equal(df, test_df)
 
 
-def check_execution_query2(executor_postgres):
-    df = executor_postgres.execute_mdx(query_posgres2)['result']
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ"
+)
+@pytest.mark.parametrize(
+    'executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
+def test_check_execution_query2(executor):
+    df = executor.execute_mdx(query_posgres2)['result']
     test_df = pd.DataFrame({
         'year': [
             2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
@@ -55,8 +54,13 @@ def check_execution_query2(executor_postgres):
     assert_frame_equal(df, test_df)
 
 
-def check_execution_query10(executor_postgres):
-    df = executor_postgres.execute_mdx(query_postgres3)['result']
+@pytest.mark.skipif(
+    "'DB_TEST' not in os.environ or os.environ['DB_TEST'] != 'POSTGRES' or 'POSTGRES_URI' not in os.environ"
+)
+@pytest.mark.parametrize(
+    'executor', [['POSTGRES_URI', 'sales_postgres']], indirect=True)
+def test_check_execution_query10(executor):
+    df = executor.execute_mdx(query_postgres3)['result']
     test_df = pd.DataFrame({
         'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'quarter': [
