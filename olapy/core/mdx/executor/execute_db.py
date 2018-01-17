@@ -13,6 +13,8 @@ import pandas as pd
 import pandas.io.sql as psql
 from sqlalchemy import inspect
 
+from olapy.core.mdx.tools.connection import MyDB
+
 
 def load_tables_db(executor):
     """
@@ -23,18 +25,19 @@ def load_tables_db(executor):
     """
 
     tables = {}
-    print('Connection string = ' + str(executor.db))
-    inspector = inspect(executor.db.engine)
+    print('Connection string = ' + str(executor.sql_alchemy))
+    inspector = inspect(executor.sql_alchemy)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
-    if executor.db and executor.db.dbms.upper() == 'POSTGRES':
+    if 'POSTGRES' in MyDB.get_dbms_from_conn_string(str(executor.sql_alchemy)).upper():
         executor.facts = executor.facts.lower()
     for table_name in inspector.get_table_names():
-        if executor.db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
+        if 'ORACLE' in MyDB.get_dbms_from_conn_string(
+                str(executor.sql_alchemy)).upper() and table_name.upper() == 'FACTS':
             table_name = table_name.title()
 
-        results = executor.db.engine.execution_options(
+        results = executor.sql_alchemy.execution_options(
             stream_results=True,
         ).execute('SELECT * FROM {}'.format(table_name),)
         # Fetch all the results of the query
@@ -61,9 +64,9 @@ def construct_star_schema_db(executor):
 
     fusion = psql.read_sql_query(
         'SELECT * FROM {}'.format(executor.facts,),
-        executor.db.engine,
+        executor.sql_alchemy,
     )
-    inspector = inspect(executor.db.engine)
+    inspector = inspect(executor.sql_alchemy)
 
     for db_table_name in inspector.get_table_names():
         try:
@@ -75,7 +78,7 @@ def construct_star_schema_db(executor):
             fusion = fusion.merge(
                 psql.read_sql_query(
                     "SELECT * FROM {}".format(db_table_name),
-                    executor.db.engine,
+                    executor.sql_alchemy,
                 ),)
         except BaseException:
             print('No common column between {} and {}'.format(

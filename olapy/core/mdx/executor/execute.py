@@ -101,10 +101,9 @@ class MdxEngine(object):
         self._ = self.get_cubes_names()
         if sql_engine:
             # todo change db = sql_alchemy and clean
-            self.db = sql_engine
-            self.db.dbms = MyDB.get_dbms_from_conn_string(str(sql_engine))
+            self.sql_alchemy = sql_engine
         else:
-            self.db = self.instantiate_db()
+            self.sql_alchemy = self.instantiate_db().engine
         self._mdx_query = mdx_query
 
         if olapy_data_location is None:
