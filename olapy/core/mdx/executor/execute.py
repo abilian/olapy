@@ -227,7 +227,7 @@ class MdxEngine(object):
         """
         return list(self.tables_loaded.keys())
 
-    def load_cube(self, cube_name, fact_table_name="Facts"):
+    def load_cube(self, cube_name, fact_table_name="Facts", measures=None):
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
@@ -236,6 +236,10 @@ class MdxEngine(object):
         self.tables_loaded = self.load_tables()
         # construct star_schema
         self.load_star_schema_dataframe = self.get_star_schema_dataframe()
+        if measures:
+            self.measures = measures
+        else:
+            self.measures = self.get_measures()
 
     def load_tables(self):
         """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
