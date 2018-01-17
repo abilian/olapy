@@ -38,6 +38,7 @@ from .execute_csv_files import construct_star_schema_csv_files, \
     load_tables_csv_files
 from .execute_db import construct_star_schema_db, load_tables_db
 
+
 # to remove
 def get_default_cube_directory():
     home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
@@ -46,6 +47,7 @@ def get_default_cube_directory():
         home_directory = os.path.join(home_directory, 'olapy-data')
 
     return home_directory
+
 
 class MdxEngine(object):
     """The main class for executing a query.
@@ -170,7 +172,7 @@ class MdxEngine(object):
         # try:
         db = self.instantiate_db()
         self.sql_alchemy = db.engine
-        return  db.get_all_databases()
+        return db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)
@@ -179,7 +181,7 @@ class MdxEngine(object):
         #     print('no database connexion')
         #     pass
 
-    def _get_csv_cubes_names(self,cubes_location):
+    def _get_csv_cubes_names(self, cubes_location):
         """
         Get csv folder names
 
