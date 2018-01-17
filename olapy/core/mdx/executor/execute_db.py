@@ -23,24 +23,18 @@ def load_tables_db(executor):
     """
 
     tables = {}
-
-    # todo db from executro instance
-    db = executor.instantiate_db(executor.cube)
-    # todo remove executor_instance.sqlengine
-    if not executor.sqlengine:
-        executor.sqlengine = executor.instantiate_db(executor.cube,).engine
-    print('Connection string = ' + str(executor.sqlengine))
-    inspector = inspect(executor.sqlengine)
+    print('Connection string = ' + str(executor.db))
+    inspector = inspect(executor.db.engine)
 
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
-    if db.dbms.upper() == 'POSTGRES':
+    if executor.db and executor.db.dbms.upper() == 'POSTGRES':
         executor.facts = executor.facts.lower()
     for table_name in inspector.get_table_names():
-        if db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
+        if executor.db.dbms.upper() == 'ORACLE' and table_name.upper() == 'FACTS':
             table_name = table_name.title()
 
-        results = executor.sqlengine.execution_options(
+        results = executor.db.engine.execution_options(
             stream_results=True,
         ).execute('SELECT * FROM {}'.format(table_name),)
         # Fetch all the results of the query
@@ -65,14 +59,11 @@ def construct_star_schema_db(executor):
     :return: star schema DataFrame
     """
 
-    if not executor.sqlengine:
-        executor.sqlengine = executor.instantiate_db(executor.cube,)
-
     fusion = psql.read_sql_query(
         'SELECT * FROM {}'.format(executor.facts,),
-        executor.sqlengine,
+        executor.db.engine,
     )
-    inspector = inspect(executor.sqlengine)
+    inspector = inspect(executor.db.engine)
 
     for db_table_name in inspector.get_table_names():
         try:
@@ -84,7 +75,7 @@ def construct_star_schema_db(executor):
             fusion = fusion.merge(
                 psql.read_sql_query(
                     "SELECT * FROM {}".format(db_table_name),
-                    executor.sqlengine,
+                    executor.db.engine,
                 ),)
         except BaseException:
             print('No common column between {} and {}'.format(

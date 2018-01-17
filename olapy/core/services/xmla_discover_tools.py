@@ -28,7 +28,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self, olapy_data=None, source_type=None):
+    def __init__(self, executor=None, olapy_data=None, source_type=None):
         # right now the catalogue_name and cube name are the same
 
         MdxEngine.olapy_data_location = olapy_data
@@ -39,9 +39,13 @@ class XmlaDiscoverTools():
             self.catalogues = MdxEngine.from_db_cubes
         else:
             self.catalogues = MdxEngine.get_cubes_names()
+
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
-            self.executor = MdxEngine(self.selected_catalogue)
+            if executor:
+                self.executor = executor
+            else:
+                self.executor = MdxEngine(self.selected_catalogue)
             self.star_schema_dataframe = self.executor.load_star_schema_dataframe[
                 [
                     col

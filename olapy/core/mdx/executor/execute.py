@@ -78,7 +78,6 @@ class MdxEngine(object):
         os.path.join(olapy_data_location, 'olapy-config.yml'), )
     cube_config_file_parser = ConfigParser(cube_path)
     mdx_parser = Parser()
-    sqlengine = None
 
     def __init__(
             self,
@@ -92,12 +91,20 @@ class MdxEngine(object):
             database_config=db_config,
             cube_config=cube_config_file_parser,
             parser=mdx_parser,
+            sql_engine=None
     ):
 
         self.cube = cube_name
         self.sep = sep
         self.facts = fact_table_name
         self.parser = parser
+        self._ = self.get_cubes_names()
+        if sql_engine:
+            # todo change db = sql_alchemy and clean
+            self.db = sql_engine
+            self.db.dbms = MyDB.get_dbms_from_conn_string(str(sql_engine))
+        else:
+            self.db = self.instantiate_db()
         self._mdx_query = mdx_query
 
         if olapy_data_location is None:
@@ -117,7 +124,6 @@ class MdxEngine(object):
         self.database_config = database_config
         self.cube_config = cube_config
         # to get cubes from db
-        self._ = self.get_cubes_names()
         self.client = client_type
         self.tables_loaded = self.load_tables()
         # all measures
@@ -138,11 +144,11 @@ class MdxEngine(object):
         self.parser.mdx_query = clean_query
         self._mdx_query = clean_query
 
+    # todo in the instance (mdxengine() without cube)
     @classmethod
-    def instantiate_db(cls, db=None):
+    def instantiate_db(cls, db_name=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-            dbms = MyDB.get_dbms_from_conn_string(
-                os.environ['SQLALCHEMY_DATABASE_URI'], ).upper()
+            dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
             dbms = cls.db_config.get_db_credentials().get('dbms').upper()
         if 'SQLITE' in dbms:
@@ -150,9 +156,11 @@ class MdxEngine(object):
         elif 'ORACLE' in dbms:
             db = MyOracleDB(cls.db_config)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(cls.db_config, db)
-        else:
+            db = MyMssqlDB(cls.db_config, db_name)
+        elif 'POSTGRES' or 'MYSQL' in dbms:
             db = MyDB(cls.db_config)
+        else:
+            db = None
         return db
 
     @classmethod

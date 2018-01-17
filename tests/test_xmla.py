@@ -77,9 +77,7 @@ class WSGIServer:
 @pytest.fixture(scope="module")
 def conn(executor):
     from olapy.core.services.xmla import XmlaProviderService
-
-    XmlaProviderService.discover_tools = XmlaDiscoverTools()
-    XmlaProviderService.discover_tools.executor = executor
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor)
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     print("spawning server")
