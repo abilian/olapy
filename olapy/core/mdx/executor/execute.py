@@ -249,8 +249,7 @@ class MdxEngine(object):
         """
         # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.client == 'excel' and self.cube_config.config_file_exists() \
-                and self.cube in self.cube_config.get_cubes_names():
+        if self.cube_config and self.client == 'excel' and self.cube in self.cube_config.get_cubes_names():
             # for web (config file) we need only star_schema_dataframes, not all tables
             for cubes in self.cube_config.get_cube_config():
                 tables = load_table_config_file(self, cubes)
@@ -274,7 +273,8 @@ class MdxEngine(object):
         # from postgres and oracle databases , all tables names are lowercase
 
         # update config file path IMPORTANT
-        self.cube_config.cube_config_file = self.cube_path
+        # todo back here and check
+        # self.cube_config.cube_config_file = self.cube_path
 
         if self.client == 'web' and self.cube_config.config_file_exists():
             for cubes in self.cube_config.get_cube_config():
@@ -344,8 +344,7 @@ class MdxEngine(object):
         """
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
-        if self.cube_config.config_file_exists(
-        ) and self.cube in self.cube_config.get_cubes_names():
+        if self.cube_config and self.cube in self.cube_config.get_cubes_names():
             fusion = self._construct_star_schema_from_config(self.cube_config)
 
         elif self.cube in self.db_cubes:
