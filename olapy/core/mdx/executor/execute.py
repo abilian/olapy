@@ -91,11 +91,8 @@ class MdxEngine(object):
         self.csv_files_cubes = []
         self.db_cubes = []
         # self._ = self.get_cubes_names()
-        if sql_engine:
-            # todo change db = sql_alchemy and clean
-            self.sql_alchemy = sql_engine
-        else:
-            self.sql_alchemy = None
+
+        self.sql_alchemy = sql_engine
         self._mdx_query = mdx_query
 
         if olapy_data_location is None:
@@ -170,8 +167,10 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
+
         db = self.instantiate_db(self.cube)
-        self.sql_alchemy = db.engine
+        if not self.sql_alchemy:
+            self.sql_alchemy = db.engine
         return db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
