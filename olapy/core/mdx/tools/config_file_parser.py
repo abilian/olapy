@@ -214,13 +214,12 @@ class ConfigParser:
                 ) for dimension in config['dimensions']
             ]
 
-        return [
-            Cube(
+        # only one cube right now
+        return Cube(
                 name=config['name'],
                 source=config['source'],
                 facts=facts,
                 dimensions=dimensions,
             )
-        ]
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')

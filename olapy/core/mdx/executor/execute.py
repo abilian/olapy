@@ -248,10 +248,10 @@ class MdxEngine(object):
         """
         # config_file_parser = ConfigParser(self.cube_path)
         tables = {}
-        if self.cube_config and self.client == 'excel' and self.cube in self.cube_config.get_cubes_names():
+
+        if self.cube_config and self.client == 'excel' and self.cube == self.cube_config.name:
             # for web (config file) we need only star_schema_dataframes, not all tables
-            for cubes in self.cube_config.get_cube_config():
-                tables = load_table_config_file(self, cubes)
+            tables = load_table_config_file(self, self.cube_config)
 
         elif self.cube in self.db_cubes:
             tables = load_tables_db(self)
@@ -307,16 +307,15 @@ class MdxEngine(object):
         :return:
         """
         fusion = None
-        for cubes in config_file_parser.get_cube_config():
-            if self.client == 'web':
-                if cubes.facts:
-                    fusion = construct_web_star_schema_config_file(self, cubes)
-                elif cubes.name in self.csv_files_cubes:
-                    fusion = construct_star_schema_csv_files(self)
-                elif cubes.name in self.db_cubes:
-                    fusion = construct_star_schema_db(self)
-            else:
-                fusion = construct_star_schema_config_file(self, cubes)
+        if self.client == 'web':
+            if config_file_parser.facts:
+                fusion = construct_web_star_schema_config_file(self, config_file_parser)
+            elif config_file_parser.name in self.csv_files_cubes:
+                fusion = construct_star_schema_csv_files(self)
+            elif config_file_parser.name in self.db_cubes:
+                fusion = construct_star_schema_db(self)
+        else:
+            fusion = construct_star_schema_config_file(self, config_file_parser)
 
         return fusion
 
@@ -343,7 +342,7 @@ class MdxEngine(object):
         """
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
-        if self.cube_config and self.cube in self.cube_config.get_cubes_names():
+        if self.cube_config and self.cube == self.cube_config.name:
             fusion = self._construct_star_schema_from_config(self.cube_config)
 
         elif self.cube in self.db_cubes:
