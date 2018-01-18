@@ -145,7 +145,10 @@ class MdxEngine(object):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
-            dbms = self.database_config.get('dbms').upper()
+            try:
+                dbms = self.database_config.get('dbms').upper()
+            except AttributeError:
+                raise AttributeError('database config object doesn"t contains dbms key')
         if 'SQLITE' in dbms:
             db = MySqliteDB(self.database_config)
         elif 'ORACLE' in dbms:
