@@ -24,7 +24,7 @@ class MyDB(object):
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
             self.engine, self.dbms = self.connect_with_env_var(db_name)
         else:
-            self.db_credentials = db_config.get_db_credentials()
+            self.db_credentials = db_config
             self.engine, self.dbms = self.connect_without_env_var(db_name)
 
     def gen_all_databases_query(self):

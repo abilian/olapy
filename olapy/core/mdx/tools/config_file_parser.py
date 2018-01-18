@@ -105,12 +105,7 @@ class ConfigParser:
         </cubes>
     """
 
-    def __init__(
-            self,
-            cube_path=None,
-            file_name='cubes-config.yml',
-            web_config_file_name='web_cube_config.xml',
-    ):
+    def __init__(self, cube_config_file=None):
         """
 
         :param cube_path: path to cube (csv folders) where config file is located by default
@@ -118,13 +113,10 @@ class ConfigParser:
         :param web_config_file_name: web config file name (DEFAULT = web_cube_config.xml)
         """
 
-        if cube_path:
-            self.cube_path = cube_path
+        if cube_config_file:
+            self.cube_config_file = cube_config_file
         else:
-            self.cube_path = self._get_cube_path()
-
-        self.file_name = file_name
-        self.web_config_file_name = web_config_file_name
+            self.cube_config_file = self._get_cube_path()
 
     def _get_cube_path(self):
         if 'OLAPY_PATH' in os.environ:
@@ -133,19 +125,7 @@ class ConfigParser:
             from os.path import expanduser
             home_directory = expanduser("~")
 
-        return os.path.join(
-            home_directory,
-            'olapy-data',
-            'cubes',
-        )
-
-    # TODO: one function
-    def get_config_file_path(self):
-        return os.path.join(self.cube_path, self.file_name)
-
-    #
-    # def get_web_confile_file_path(self):
-    #     return os.path.join(self.cube_path, self.web_config_file_name)
+        return os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml')
 
     def config_file_exists(self):
         # type: () -> bool
@@ -155,7 +135,7 @@ class ConfigParser:
 
         # if client_type == 'web':
         #     return os.path.isfile(self.get_web_confile_file_path())
-        return os.path.isfile(self.get_config_file_path())
+        return os.path.isfile(self.cube_config_file)
 
     def xmla_authentication(self):
         # type: () -> bool
@@ -166,7 +146,7 @@ class ConfigParser:
 
         # xmla authentication only in excel
         if self.config_file_exists():
-            with open(self.get_config_file_path()) as config_file:
+            with open(self.cube_config_file) as config_file:
                 config = yaml.load(config_file)
 
                 try:
@@ -182,12 +162,11 @@ class ConfigParser:
         :return: dict with dict name as key and cube source as value (csv | postgres | mysql | oracle | mssql)
         """
         # if client_type == 'excel':
-        file_path = self.get_config_file_path()
         # elif client_type == 'web':
         #     file_path = self.get_web_confile_file_path()
         # else:
         #     raise ValueError("Unknown client_type: {}".format(client_type))
-        with open(file_path) as config_file:
+        with open(self.cube_config_file) as config_file:
             config = yaml.load(config_file)
 
             try:
@@ -195,14 +174,20 @@ class ConfigParser:
             except BaseException:  # pragma: no cover
                 raise ValueError('missed name or source tags')
 
-    def _construct_cubes_excel(self):
+    def get_cube_config(self, conf_file=None):
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
 
         :return: Cube obj
         """
+
+        if conf_file:
+            file_path = conf_file
+        else:
+            file_path = self.cube_config_file
+
         # try:
-        with open(self.get_config_file_path()) as config_file:
+        with open(file_path) as config_file:
             config = yaml.load(config_file)
 
             facts = [
@@ -239,17 +224,3 @@ class ConfigParser:
         ]
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')
-
-    def construct_cubes(self):
-        """Construct cube based on config file.
-
-        :return: list of Cubes instance
-        """
-
-        if self.config_file_exists():
-            return self._construct_cubes_excel()
-            # elif client_type == 'web':
-            #     return self._construct_cubes_web()
-
-        else:
-            raise ValueError("Config file doesn't exist")

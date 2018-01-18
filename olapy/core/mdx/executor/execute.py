@@ -68,13 +68,12 @@ class MdxEngine(object):
 
     # class variable , because spyne application = Application([XmlaProviderService],...
     # throw exception if XmlaProviderService()
-    CUBE_FOLDER_NAME = "cubes"
-    # (before instantiate MdxEngine I need to access cubes information)
-    olapy_data_location = get_default_cube_directory()
-    cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
-    db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
-    cube_config_file_parser = ConfigParser(cube_path)
-    mdx_parser = Parser()
+    # CUBE_FOLDER_NAME = "cubes"
+    # # (before instantiate MdxEngine I need to access cubes information)
+    # olapy_data_location = get_default_cube_directory()
+    # cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
+    # db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
+    # cube_config_file_parser = ConfigParser(cube_path)
 
     def __init__(
             self,
@@ -84,9 +83,8 @@ class MdxEngine(object):
             mdx_query=None,
             olapy_data_location=None,
             sep=';',
-            database_config=db_config,
-            cube_config=cube_config_file_parser,
-            parser=mdx_parser,
+            database_config=None,
+            cube_config=None,
             sql_engine=None,
             source_type=None,
             cubes_folder_name='cubes'
@@ -95,7 +93,7 @@ class MdxEngine(object):
         self.cube = cube_name
         self.sep = sep
         self.facts = None
-        self.parser = parser
+        self.parser = Parser()
         if source_type:
             self.source_type = source_type
         else:
@@ -147,15 +145,15 @@ class MdxEngine(object):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
-            dbms = self.db_config.get_db_credentials().get('dbms').upper()
+            dbms = self.database_config.get('dbms').upper()
         if 'SQLITE' in dbms:
-            db = MySqliteDB(self.db_config)
+            db = MySqliteDB(self.database_config)
         elif 'ORACLE' in dbms:
-            db = MyOracleDB(self.db_config)
+            db = MyOracleDB(self.database_config)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(self.db_config, db_name)
+            db = MyMssqlDB(self.database_config, db_name)
         elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = MyDB(self.db_config)
+            db = MyDB(self.database_config)
         else:
             db = None
         return db
@@ -251,7 +249,7 @@ class MdxEngine(object):
         if self.client == 'excel' and self.cube_config.config_file_exists() \
                 and self.cube in self.cube_config.get_cubes_names():
             # for web (config file) we need only star_schema_dataframes, not all tables
-            for cubes in self.cube_config.construct_cubes():
+            for cubes in self.cube_config.get_cube_config():
                 tables = load_table_config_file(self, cubes)
 
         elif self.cube in self.db_cubes:
@@ -273,10 +271,10 @@ class MdxEngine(object):
         # from postgres and oracle databases , all tables names are lowercase
 
         # update config file path IMPORTANT
-        self.cube_config.cube_path = self.cube_path
+        self.cube_config.cube_config_file = self.cube_path
 
         if self.client == 'web' and self.cube_config.config_file_exists():
-            for cubes in self.cube_config.construct_cubes():
+            for cubes in self.cube_config.get_cube_config():
                 if cubes.facts:
                     # update facts table name
                     self.facts = cubes.facts[0].table_name
@@ -307,7 +305,7 @@ class MdxEngine(object):
         :return:
         """
         fusion = None
-        for cubes in config_file_parser.construct_cubes():
+        for cubes in config_file_parser.get_cube_config():
             if self.client == 'web':
                 if cubes.facts:
                     fusion = construct_web_star_schema_config_file(self, cubes)
