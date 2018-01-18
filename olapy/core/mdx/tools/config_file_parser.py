@@ -137,43 +137,6 @@ class ConfigParser:
         #     return os.path.isfile(self.get_web_confile_file_path())
         return os.path.isfile(self.cube_config_file)
 
-    def xmla_authentication(self):
-        # type: () -> bool
-        """Check if excel need authentication to access cubes or not.
-
-        (xmla_authentication tag in the config file).
-        """
-
-        # xmla authentication only in excel
-        if self.config_file_exists():
-            with open(self.cube_config_file) as config_file:
-                config = yaml.load(config_file)
-
-                try:
-                    return config['xmla_authentication']
-                except BaseException:
-                    return False
-        else:
-            return False
-
-    def get_cubes_names(self):
-        """Get all cubes names in the config file.
-
-        :return: dict with dict name as key and cube source as value (csv | postgres | mysql | oracle | mssql)
-        """
-        # if client_type == 'excel':
-        # elif client_type == 'web':
-        #     file_path = self.get_web_confile_file_path()
-        # else:
-        #     raise ValueError("Unknown client_type: {}".format(client_type))
-        with open(self.cube_config_file) as config_file:
-            config = yaml.load(config_file)
-
-            try:
-                return {config['name']: config['source']}
-            except BaseException:  # pragma: no cover
-                raise ValueError('missed name or source tags')
-
     def get_cube_config(self, conf_file=None):
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
@@ -216,10 +179,11 @@ class ConfigParser:
 
         # only one cube right now
         return Cube(
-                name=config['name'],
-                source=config['source'],
-                facts=facts,
-                dimensions=dimensions,
-            )
+            xmla_authentication=bool(config['xmla_authentication']),
+            name=config['name'],
+            source=config['source'],
+            facts=facts,
+            dimensions=dimensions,
+        )
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')
