@@ -156,7 +156,7 @@ class MdxEngine(object):
         elif 'MSSQL' in dbms:
             db = MyMssqlDB(self.database_config, db_name)
         elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = MyDB(self.database_config)
+            db = MyDB(self.database_config, db_name)
         else:
             db = None
         return db
@@ -171,7 +171,7 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        db = self.instantiate_db()
+        db = self.instantiate_db(self.cube)
         self.sql_alchemy = db.engine
         return db.get_all_databases()
         # except Exception:
