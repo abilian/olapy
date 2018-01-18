@@ -39,16 +39,6 @@ from .execute_csv_files import construct_star_schema_csv_files, \
 from .execute_db import construct_star_schema_db, load_tables_db
 
 
-# to remove
-def get_default_cube_directory():
-    home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
-
-    if 'olapy-data' not in home_directory:
-        home_directory = os.path.join(home_directory, 'olapy-data')
-
-    return home_directory
-
-
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -109,7 +99,7 @@ class MdxEngine(object):
         self._mdx_query = mdx_query
 
         if olapy_data_location is None:
-            self.olapy_data_location = get_default_cube_directory()
+            self.olapy_data_location = self.get_default_cube_directory()
         else:
             self.olapy_data_location = olapy_data_location
         if cubes_path is None:
@@ -160,6 +150,15 @@ class MdxEngine(object):
         else:
             db = None
         return db
+
+    @staticmethod
+    def get_default_cube_directory():
+        home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
+
+        if 'olapy-data' not in home_directory:
+            home_directory = os.path.join(home_directory, 'olapy-data')
+
+        return home_directory
 
     def _get_db_cubes_names(self):
         """
