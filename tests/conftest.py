@@ -20,7 +20,7 @@ def executor(request):
         if request.param[0] == 'SQLITE_URI':
 
             mdx_engine = MdxEngine(source_type='db')
-            mdx_engine.load_cube('sales_sqlite',fact_table_name='facts')
+            mdx_engine.load_cube('sales_sqlite', fact_table_name='facts')
             yield mdx_engine
         else:
             engine = sqlalchemy.create_engine(sqlalchemy_database_uri)
@@ -39,5 +39,3 @@ def executor(request):
         mdx_engine = MdxEngine(sql_engine=engine, source_type='db')
         mdx_engine.load_cube('main', fact_table_name='facts')
         yield mdx_engine
-
-        # yield MdxEngine('main', sql_engine=engine, fact_table_name='facts')
