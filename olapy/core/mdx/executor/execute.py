@@ -275,15 +275,14 @@ class MdxEngine(object):
         # todo back here and check
         # self.cube_config.cube_config_file = self.cube_path
 
-        if self.client == 'web' and self.cube_config.config_file_exists():
-            for cubes in self.cube_config.get_cube_config():
-                if cubes.facts:
-                    # update facts table name
-                    self.facts = cubes.facts[0].table_name
+        if self.client == 'web' and self.cube_config:
+            if self.cube_config.facts:
+                # update facts table name
+                self.facts = self.cube_config.facts[0].table_name
 
-                    # if measures are specified in the config file
-                    if cubes.facts[0].measures:
-                        return cubes.facts[0].measures
+                # if measures are specified in the config file
+                if self.cube_config.facts[0].measures:
+                    return self.cube_config.facts[0].measures
 
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
