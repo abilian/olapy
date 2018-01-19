@@ -347,8 +347,8 @@ class MdxEngine(object):
         :return: all tables names
         """
         if ignore_fact:
-            return [tab for tab in self.tables_names if self.facts not in tab]
-        return self.tables_names
+            return [tab for tab in self.tables_loaded.keys() if self.facts not in tab]
+        return self.tables_loaded.keys()
 
     def get_cube_path(self):
         """

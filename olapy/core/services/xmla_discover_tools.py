@@ -78,13 +78,6 @@ class XmlaDiscoverTools():
         if self.selected_catalogue != new_catalogue:
             self.selected_catalogue = new_catalogue
             self.executor.load_cube(new_catalogue)
-            # self.executor = MdxEngine(new_catalogue)
-            # self.star_schema_dataframe = self.executor.star_schema_dataframe[
-            #     [
-            #         col
-            #         for col in self.executor.star_schema_dataframe.columns
-            #         if col[-3:] != "_id"
-            #     ]]
 
     @staticmethod
     def discover_datasources_response():
@@ -534,7 +527,7 @@ class XmlaDiscoverTools():
                         xml.LAST_SCHEMA_UPDATE('2016-07-22T10:41:38')
                         xml.LAST_DATA_UPDATE('2016-07-22T10:41:38')
                         xml.DESCRIPTION(
-                            'MDX ' + self.selected_catalogue + 'results',)
+                            'MDX ' + self.selected_catalogue + ' results',)
                         xml.IS_DRILLTHROUGH_ENABLED('true')
                         xml.IS_LINKABLE('false')
                         xml.IS_WRITE_ENABLED('false')
