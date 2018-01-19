@@ -19,15 +19,14 @@ from six.moves import zip
 class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
 
-    def __init__(self, executor, convert2formulas=False):
+    def __init__(self, executor, mdx_query, convert2formulas=False):
         self.executor = executor
         self.convert2formulas = convert2formulas
+        self.mdx_query = mdx_query
         if convert2formulas:
             self.mdx_execution_result = self._execute_convert_formulas_query()
         else:
-            # todo remove executor.mdx_query
-            self.mdx_execution_result = executor.execute_mdx(
-                executor.mdx_query,)
+            self.mdx_execution_result = executor.execute_mdx(self.mdx_query)
         if isinstance(self.mdx_execution_result, dict):
             self.columns_desc = self.mdx_execution_result.get('columns_desc')
 
@@ -93,7 +92,7 @@ class XmlaExecuteTools():
         # todo check
         return [
             tup[0]
-            for tup in re.compile(Parser.REG).findall(self.executor.mdx_query)
+            for tup in re.compile(Parser.REG).findall(self.mdx_query)
             if '[Measures].[XL_SD' not in tup[0] and tup[1]
         ][::3]
 
@@ -206,7 +205,7 @@ class XmlaExecuteTools():
             xml.LName('[Measures]')
             xml.LNum('0')
             xml.DisplayInfo('0')
-            if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
+            if 'HIERARCHY_UNIQUE_NAME' in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME('[Measures]')
 
     def tuples_2_xs0(self, tuples, splited_df, first_att, axis):
@@ -249,7 +248,7 @@ class XmlaExecuteTools():
                                 )
                                 xml.DisplayInfo('131076')
 
-                                if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query.upper(
+                                if 'PARENT_UNIQUE_NAME' in self.mdx_query.upper(
                                 ):
                                     parent = '.'.join(
                                         map(
@@ -266,7 +265,7 @@ class XmlaExecuteTools():
                                             .columns[0],
                                             parent,
                                         ),)
-                                if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query.upper(
+                                if 'HIERARCHY_UNIQUE_NAME' in self.mdx_query.upper(
                                 ):
                                     xml.HIERARCHY_UNIQUE_NAME(
                                         '[{0}].[{0}]'.format(
@@ -741,12 +740,12 @@ class XmlaExecuteTools():
                 name="[Measures].[DISPLAY_INFO]",
                 type='xs:unsignedInt',
             )
-            if 'PARENT_UNIQUE_NAME' in self.executor.mdx_query:
+            if 'PARENT_UNIQUE_NAME' in self.mdx_query:
                 xml.PARENT_UNIQUE_NAME(
                     name="[Measures].[PARENT_UNIQUE_NAME]",
                     type='xs:string',
                 )
-            if 'HIERARCHY_UNIQUE_NAME' in self.executor.mdx_query:
+            if 'HIERARCHY_UNIQUE_NAME' in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME(
                     name="[Measures].[HIERARCHY_UNIQUE_NAME]",
                     type='xs:string',
@@ -826,7 +825,7 @@ class XmlaExecuteTools():
                                 type='xs:unsignedInt',
                             )
 
-                            if 'Hierarchize' in self.executor.mdx_query:
+                            if 'Hierarchize' in self.mdx_query:
                                 xml.PARENT_UNIQUE_NAME(
                                     name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".
                                     format(table_name),

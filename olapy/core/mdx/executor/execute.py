@@ -67,7 +67,6 @@ class MdxEngine(object):
             cube_name=None,
             client_type='excel',
             cubes_path=None,
-            mdx_query=None,
             olapy_data_location=None,
             database_config=None,
             cube_config=None,
@@ -89,11 +88,7 @@ class MdxEngine(object):
             self.source_type = ('csv')
         self.csv_files_cubes = []
         self.db_cubes = []
-        # self._ = self.get_cubes_names()
-
         self.sql_alchemy = sql_engine
-        self._mdx_query = mdx_query
-
         if olapy_data_location is None:
             self.olapy_data_location = self.get_default_cube_directory()
         else:
@@ -116,16 +111,6 @@ class MdxEngine(object):
         # default measure is the first one
         if self.measures:
             self.selected_measures = [self.measures[0]]
-
-    @property
-    def mdx_query(self):
-        return self._mdx_query
-
-    @mdx_query.setter
-    def mdx_query(self, value):
-        clean_query = value.strip().replace('\n', '').replace('\t', '')
-        self.parser.mdx_query = clean_query
-        self._mdx_query = clean_query
 
     def instantiate_db(self, db_name=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
@@ -244,7 +229,7 @@ class MdxEngine(object):
 
         :return: dict with table names as keys and DataFrames as values
         """
-        # config_file_parser = ConfigParser(self.cube_path)
+
         tables = {}
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config.name:
@@ -743,6 +728,12 @@ class MdxEngine(object):
 
         return dfs
 
+    def clean_mdx_query(self, mdx_query):
+        clean_query = mdx_query.strip().replace('\n', '').replace('\t', '')
+        # todo property in parser
+        self.parser.mdx_query = clean_query
+        return clean_query
+
     def execute_mdx(self, mdx_query):
         """Execute an MDX Query.
 
@@ -763,10 +754,10 @@ class MdxEngine(object):
 
         """
         # todo temp  self.mdx_query is used in many places
-        self.mdx_query = mdx_query
+        query = self.clean_mdx_query(mdx_query)
 
         # use measures that exists on where or insides axes
-        query_axes = self.parser.decorticate_query(mdx_query)
+        query_axes = self.parser.decorticate_query(query)
         if self.change_measures(query_axes['all']):
             self.selected_measures = self.change_measures(query_axes['all'])
 

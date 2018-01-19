@@ -152,7 +152,7 @@ class XmlaProviderService(ServiceBase):
             else:
                 convert2formulas = False
 
-            xmla_tools = XmlaExecuteTools(executor, convert2formulas)
+            xmla_tools = XmlaExecuteTools(executor, mdx_query, convert2formulas)
 
             with xml['return']:
                 with xml.root(
