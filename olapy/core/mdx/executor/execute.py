@@ -103,7 +103,6 @@ class MdxEngine(object):
         # to get cubes from db
         self.client = client_type
         self.tables_loaded = None
-        self.tables_names = None
         self.star_schema_dataframe = None
         # all measures
         self.measures = None
