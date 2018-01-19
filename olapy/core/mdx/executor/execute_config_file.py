@@ -77,7 +77,7 @@ def load_table_config_file(executor, cube_obj, sep):
 
 
 # excel client
-def construct_star_schema_config_file(executor, cubes_obj,sep):
+def construct_star_schema_config_file(executor, cubes_obj, sep):
     """Construct star schema DataFrame from configuration file for excel client.
 
     :param executor:  MdxEngine instance

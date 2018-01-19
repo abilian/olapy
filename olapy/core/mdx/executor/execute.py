@@ -74,7 +74,7 @@ class MdxEngine(object):
             sql_engine=None,
             source_type=None,
             cubes_folder_name='cubes',
-            mdx_q_parser = None
+            mdx_q_parser=None
     ):
 
         self.cube = cube_name
@@ -249,7 +249,7 @@ class MdxEngine(object):
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config.name:
             # for web (config file) we need only star_schema_dataframes, not all tables
-            tables = load_table_config_file(self, self.cube_config,sep)
+            tables = load_table_config_file(self, self.cube_config, sep)
 
         elif self.cube in self.db_cubes:
             tables = load_tables_db(self)
@@ -293,7 +293,7 @@ class MdxEngine(object):
                 if col.lower()[-2:] != 'id'
             ]
 
-    def _construct_star_schema_from_config(self, config_file_parser,sep):
+    def _construct_star_schema_from_config(self, config_file_parser, sep):
         """
         There is two different configurations:
 
@@ -308,11 +308,11 @@ class MdxEngine(object):
             if config_file_parser.facts:
                 fusion = construct_web_star_schema_config_file(self, config_file_parser)
             elif config_file_parser.name in self.csv_files_cubes:
-                fusion = construct_star_schema_csv_files(self,sep)
+                fusion = construct_star_schema_csv_files(self, sep)
             elif config_file_parser.name in self.db_cubes:
                 fusion = construct_star_schema_db(self)
         else:
-            fusion = construct_star_schema_config_file(self, config_file_parser,sep)
+            fusion = construct_star_schema_config_file(self, config_file_parser, sep)
 
         return fusion
 
@@ -340,13 +340,13 @@ class MdxEngine(object):
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
         if self.cube_config and self.cube == self.cube_config.name:
-            fusion = self._construct_star_schema_from_config(self.cube_config,sep)
+            fusion = self._construct_star_schema_from_config(self.cube_config, sep)
 
         elif self.cube in self.db_cubes:
             fusion = construct_star_schema_db(self)
 
         elif self.cube in self.csv_files_cubes:
-            fusion = construct_star_schema_csv_files(self,sep)
+            fusion = construct_star_schema_csv_files(self, sep)
 
         start_schema_df = self.clean_data(fusion, self.measures)
 
