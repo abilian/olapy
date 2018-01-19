@@ -23,6 +23,8 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
+from olapy.core.mdx.tools.config_file_parser import ConfigParser
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaDiscoverTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -97,7 +99,7 @@ class XmlaProviderService(ServiceBase):
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
         # config_parser = ConfigParser(discover_tools.executor.cube_path)
         config_parser = discover_tools.executor.cube_config
-        if config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
+        if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
                 fault_string='You do not have permission to access this resource',
                 fault_object=None,
@@ -136,9 +138,9 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            XmlaProviderService.discover_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog,)
-
+            # XmlaProviderService.discover_tools.change_catalogue(
+            #     request.Properties.PropertyList.Catalog,)
+            XmlaProviderService.discover_tools.executor.load_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = XmlaProviderService.discover_tools.executor
             # todo back and check this
@@ -194,17 +196,30 @@ class XmlaProviderService(ServiceBase):
 home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
-
-def get_wsgi_application(olapy_data, source_type):
+# todo path config db config
+def get_wsgi_application(olapy_data, source_type,db_config_file,cube_config_file):
     # [XmlaProviderService()], __name__ error ???
     # to refresh mdxengine with their class data
 
     # MdxEngine.olapy_data_location = olapy_data
     # if source_type is not None:
     #     MdxEngine.source_type = source_type
+    db_conf = None
+    cube_conf = None
+    if 'db' in source_type:
+        db_config = DbConfigParser()
+        db_conf = db_config.get_db_credentials(db_config_file)
+
+
+    # try:
+    cube_config_file_parser = ConfigParser()
+    cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
+    # except:
+    #     print('not found or bad cubes config file')
 
     # todo pass here mdx_eng params
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data, source_type)
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
+                                                           db_config=db_conf, cubes_config=cube_conf)
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
     application = Application(
         [XmlaProviderService],
@@ -227,8 +242,16 @@ def get_wsgi_application(olapy_data, source_type):
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
-@click.option('--source_type', '-st', default=None, help="Get cubes from where ( db | csv ), DEFAULT : csv")
-def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type):
+@click.option('--source_type', '-st', default='csv', help="Get cubes from where ( db | csv ), DEFAULT : csv")
+@click.option('--db_config_file', '-dbc', default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
+              help="Database configuration file path, DEFAULT : " +
+                   os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'))
+@click.option('--cube_config_file', '-cbf',
+              default=os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'),
+              help="Cube config file path, DEFAULT : " +
+                   os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'))
+def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type, db_config_file,
+              cube_config_file):
     """
     Start the xmla server.
     """
@@ -244,7 +267,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application(olapy_data, source_type)
+    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")

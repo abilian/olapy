@@ -28,30 +28,39 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self, executor=None, olapy_data=None, source_type=None):
+    def __init__(self, source_type, executor=None, olapy_data=None, db_config=None, cubes_config=None, **kwargs):
         # right now the catalogue_name and cube name are the same
 
-        MdxEngine.olapy_data_location = olapy_data
-        if source_type is not None:
-            MdxEngine.source_type = source_type
-
-        if MdxEngine.from_db_cubes:
-            self.catalogues = MdxEngine.from_db_cubes
-        else:
-            self.catalogues = MdxEngine.get_cubes_names()
-
+        execu = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
+                          cube_config=cubes_config)
+        self.catalogues = execu.get_cubes_names()
+        #
+        #
+        # MdxEngine.olapy_data_location = olapy_data
+        # if source_type is not None:
+        #     MdxEngine.source_type = source_type
+        #
+        # if MdxEngine.from_db_cubes:
+        #     self.catalogues = MdxEngine.from_db_cubes
+        # else:
+        #     self.catalogues = MdxEngine.get_cubes_names()
+        # todo directy from xmla.py
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
             if executor:
+                executor.load_cube(self.selected_catalogue)
                 self.executor = executor
             else:
-                self.executor = MdxEngine(self.selected_catalogue)
-            self.star_schema_dataframe = self.executor.star_schema_dataframe[
-                [
-                    col
-                    for col in self.executor.star_schema_dataframe.columns
-                    if col[-3:] != "_id"
-                ]]
+                # self.executor = MdxEngine(self.selected_catalogue)
+                execu.load_cube(self.selected_catalogue)
+                self.executor = execu
+
+            # self.star_schema_dataframe = self.executor.star_schema_dataframe[
+            #     [
+            #         col
+            #         for col in self.executor.star_schema_dataframe.columns
+            #         if col[-3:] != "_id"
+            #     ]]
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
@@ -62,15 +71,20 @@ class XmlaDiscoverTools():
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
+
+        if self.executor.cube_config:
+            if new_catalogue != self.executor.cube_config.name:
+                self.executor.cube_config = None
         if self.selected_catalogue != new_catalogue:
             self.selected_catalogue = new_catalogue
-            self.executor = MdxEngine(new_catalogue)
-            self.star_schema_dataframe = self.executor.star_schema_dataframe[
-                [
-                    col
-                    for col in self.executor.star_schema_dataframe.columns
-                    if col[-3:] != "_id"
-                ]]
+            self.executor.load_cube(new_catalogue)
+            # self.executor = MdxEngine(new_catalogue)
+            # self.star_schema_dataframe = self.executor.star_schema_dataframe[
+            #     [
+            #         col
+            #         for col in self.executor.star_schema_dataframe.columns
+            #         if col[-3:] != "_id"
+            #     ]]
 
     @staticmethod
     def discover_datasources_response():

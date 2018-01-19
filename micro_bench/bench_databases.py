@@ -98,7 +98,7 @@ def main():
             copy_2_olapy_dir(config_file)
 
             # to refresh cubes from database
-            XmlaProviderService.discover_tools = XmlaDiscoverTools()
+            XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
 
             provider = xmla.XMLAProvider()
             conn = provider.connect(location=server.url)
