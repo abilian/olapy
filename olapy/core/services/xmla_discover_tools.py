@@ -69,7 +69,7 @@ class XmlaDiscoverTools():
                 facts = 'Facts'
 
             self.selected_catalogue = new_catalogue
-            self.executor.load_cube(new_catalogue,fact_table_name=facts)
+            self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
     def discover_datasources_response():
