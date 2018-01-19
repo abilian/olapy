@@ -14,7 +14,7 @@ import pandas.io.sql as psql
 from ..tools.connection import MyDB
 
 
-def load_one_table(cubes_obj, executor, table_name):
+def load_one_table(cubes_obj, executor, table_name, sep):
     if cubes_obj.source.upper() == 'CSV':
         facts = os.path.join(
             executor.get_cube_path(),
@@ -23,7 +23,7 @@ def load_one_table(cubes_obj, executor, table_name):
         # with extension or not
         if not os.path.isfile(facts):
             facts.replace('.csv', '')
-        table = pd.read_csv(facts, sep=executor.sep)
+        table = pd.read_csv(facts, sep=sep)
     else:
         db = MyDB(
             executor.database_config,
@@ -38,7 +38,7 @@ def load_one_table(cubes_obj, executor, table_name):
     return table
 
 
-def load_table_config_file(executor, cube_obj):
+def load_table_config_file(executor, cube_obj, sep):
     """
     Load tables from config file.
 
@@ -53,7 +53,7 @@ def load_table_config_file(executor, cube_obj):
 
     for dimension in cube_obj.dimensions:
 
-        df = load_one_table(cube_obj, executor, dimension.name)
+        df = load_one_table(cube_obj, executor, dimension.name, sep)
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
 
@@ -77,7 +77,7 @@ def load_table_config_file(executor, cube_obj):
 
 
 # excel client
-def construct_star_schema_config_file(executor, cubes_obj):
+def construct_star_schema_config_file(executor, cubes_obj,sep):
     """Construct star schema DataFrame from configuration file for excel client.
 
     :param executor:  MdxEngine instance
@@ -90,6 +90,7 @@ def construct_star_schema_config_file(executor, cubes_obj):
         cubes_obj,
         executor,
         executor.facts,
+        sep
     )
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
@@ -102,7 +103,7 @@ def construct_star_schema_config_file(executor, cubes_obj):
             # with extension or not
             if not os.path.isfile(file):
                 file.replace('.csv', '')
-            df = pd.read_csv(file, sep=executor.sep)
+            df = pd.read_csv(file, sep=sep)
         else:
             db = MyDB(
                 executor.database_config,

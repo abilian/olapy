@@ -46,10 +46,10 @@ class XmlaDiscoverTools():
                 self.executor = executor
             else:
                 self.executor = MdxEngine(self.selected_catalogue)
-            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[
+            self.star_schema_dataframe = self.executor.star_schema_dataframe[
                 [
                     col
-                    for col in self.executor.load_star_schema_dataframe.columns
+                    for col in self.executor.star_schema_dataframe.columns
                     if col[-3:] != "_id"
                 ]]
         self.session_id = uuid.uuid1()
@@ -65,10 +65,10 @@ class XmlaDiscoverTools():
         if self.selected_catalogue != new_catalogue:
             self.selected_catalogue = new_catalogue
             self.executor = MdxEngine(new_catalogue)
-            self.star_schema_dataframe = self.executor.load_star_schema_dataframe[
+            self.star_schema_dataframe = self.executor.star_schema_dataframe[
                 [
                     col
-                    for col in self.executor.load_star_schema_dataframe.columns
+                    for col in self.executor.star_schema_dataframe.columns
                     if col[-3:] != "_id"
                 ]]
 

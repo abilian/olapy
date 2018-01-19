@@ -28,9 +28,6 @@ import pandas as pd
 from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
-
-from ..tools.config_file_parser import ConfigParser
 from ..tools.connection import MyDB, MyMssqlDB, MyOracleDB, MySqliteDB
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
@@ -72,18 +69,20 @@ class MdxEngine(object):
             cubes_path=None,
             mdx_query=None,
             olapy_data_location=None,
-            sep=';',
             database_config=None,
             cube_config=None,
             sql_engine=None,
             source_type=None,
-            cubes_folder_name='cubes'
+            cubes_folder_name='cubes',
+            mdx_q_parser = None
     ):
 
         self.cube = cube_name
-        self.sep = sep
         self.facts = None
-        self.parser = Parser()
+        if mdx_q_parser:
+            self.parser = mdx_q_parser
+        else:
+            self.parser = Parser()
         if source_type:
             self.source_type = source_type
         else:
@@ -110,7 +109,7 @@ class MdxEngine(object):
         self.client = client_type
         self.tables_loaded = None
         self.tables_names = None
-        self.load_star_schema_dataframe = None
+        self.star_schema_dataframe = None
         # all measures
         self.measures = None
         # todo remove this
@@ -226,21 +225,21 @@ class MdxEngine(object):
         """
         return list(self.tables_loaded.keys())
 
-    def load_cube(self, cube_name, fact_table_name="Facts", measures=None):
+    def load_cube(self, cube_name, fact_table_name="Facts", sep=';', measures=None):
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
         self.get_cubes_names()
         # load tables
-        self.tables_loaded = self.load_tables()
+        self.tables_loaded = self.load_tables(sep=sep)
         # construct star_schema
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe()
+        self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
         if measures:
             self.measures = measures
         else:
             self.measures = self.get_measures()
 
-    def load_tables(self):
+    def load_tables(self, sep):
         """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
         :return: dict with table names as keys and DataFrames as values
@@ -250,7 +249,7 @@ class MdxEngine(object):
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config.name:
             # for web (config file) we need only star_schema_dataframes, not all tables
-            tables = load_table_config_file(self, self.cube_config)
+            tables = load_table_config_file(self, self.cube_config,sep)
 
         elif self.cube in self.db_cubes:
             tables = load_tables_db(self)
@@ -260,7 +259,7 @@ class MdxEngine(object):
                 )
 
         elif self.cube in self.csv_files_cubes:
-            tables = load_tables_csv_files(self)
+            tables = load_tables_csv_files(self, sep)
 
         return tables
 
@@ -294,7 +293,7 @@ class MdxEngine(object):
                 if col.lower()[-2:] != 'id'
             ]
 
-    def _construct_star_schema_from_config(self, config_file_parser):
+    def _construct_star_schema_from_config(self, config_file_parser,sep):
         """
         There is two different configurations:
 
@@ -309,11 +308,11 @@ class MdxEngine(object):
             if config_file_parser.facts:
                 fusion = construct_web_star_schema_config_file(self, config_file_parser)
             elif config_file_parser.name in self.csv_files_cubes:
-                fusion = construct_star_schema_csv_files(self)
+                fusion = construct_star_schema_csv_files(self,sep)
             elif config_file_parser.name in self.db_cubes:
                 fusion = construct_star_schema_db(self)
         else:
-            fusion = construct_star_schema_config_file(self, config_file_parser)
+            fusion = construct_star_schema_config_file(self, config_file_parser,sep)
 
         return fusion
 
@@ -333,7 +332,7 @@ class MdxEngine(object):
                         start_schema_df = start_schema_df.drop(measure, 1)
         return start_schema_df
 
-    def get_star_schema_dataframe(self):
+    def get_star_schema_dataframe(self, sep):
         """Merge all DataFrames as star schema.
 
         :return: star schema DataFrame
@@ -341,13 +340,13 @@ class MdxEngine(object):
         fusion = None
         # config_file_parser = ConfigParser(self.cube_path)
         if self.cube_config and self.cube == self.cube_config.name:
-            fusion = self._construct_star_schema_from_config(self.cube_config)
+            fusion = self._construct_star_schema_from_config(self.cube_config,sep)
 
         elif self.cube in self.db_cubes:
             fusion = construct_star_schema_db(self)
 
         elif self.cube in self.csv_files_cubes:
-            fusion = construct_star_schema_csv_files(self)
+            fusion = construct_star_schema_csv_files(self,sep)
 
         start_schema_df = self.clean_data(fusion, self.measures)
 
@@ -664,7 +663,7 @@ class MdxEngine(object):
         :return: Pandas DataFrame.
         """
         # get only used columns and dimensions for all query
-        start_df = self.load_star_schema_dataframe
+        start_df = self.star_schema_dataframe
         df_to_fusion = []
         table_name = tuples_on_mdx_query[0][0]
         # in every tuple
@@ -810,7 +809,7 @@ class MdxEngine(object):
             result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
 
         else:
-            result = self.load_star_schema_dataframe[self.selected_measures] \
+            result = self.star_schema_dataframe[self.selected_measures] \
                 .sum().to_frame().T
 
         return {
