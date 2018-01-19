@@ -196,8 +196,9 @@ class XmlaProviderService(ServiceBase):
 home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
+
 # todo path config db config
-def get_wsgi_application(olapy_data, source_type,db_config_file,cube_config_file):
+def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file):
     # [XmlaProviderService()], __name__ error ???
     # to refresh mdxengine with their class data
 
@@ -209,7 +210,6 @@ def get_wsgi_application(olapy_data, source_type,db_config_file,cube_config_file
     if 'db' in source_type:
         db_config = DbConfigParser()
         db_conf = db_config.get_db_credentials(db_config_file)
-
 
     # try:
     cube_config_file_parser = ConfigParser()

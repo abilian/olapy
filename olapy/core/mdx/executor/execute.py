@@ -224,7 +224,6 @@ class MdxEngine(object):
             self.measures = self.get_measures()
         self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
-
     def load_tables(self, sep):
         """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
