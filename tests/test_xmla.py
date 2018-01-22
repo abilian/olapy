@@ -8,7 +8,6 @@ from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
-from sqlalchemy import inspect
 from werkzeug.serving import make_server
 
 from olapy.core.services.xmla import XmlaProviderService
@@ -78,8 +77,8 @@ class WSGIServer:
 
 @pytest.fixture(scope="module")
 def conn(executor):
-    from olapy.core.services.xmla import XmlaProviderService
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None, cubes_config=None)
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None,
+                                                           cubes_config=None)
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     print("spawning server")
@@ -91,7 +90,6 @@ def conn(executor):
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
-
 
     server.start()
 

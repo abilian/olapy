@@ -75,7 +75,6 @@ class MdxEngine(object):
             cubes_folder_name='cubes',
             mdx_q_parser=None
     ):
-
         self.cube = cube_name
         self.facts = None
         if mdx_q_parser:
