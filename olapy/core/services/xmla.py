@@ -144,8 +144,6 @@ class XmlaProviderService(ServiceBase):
             # XmlaProviderService.discover_tools.executor.load_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = XmlaProviderService.discover_tools.executor
-            # todo back and check this
-            executor.mdx_query = mdx_query
 
             # Hierarchize
             if all(key in mdx_query
