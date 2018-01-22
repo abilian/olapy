@@ -107,8 +107,7 @@ class MdxEngine(object):
         self.measures = None
         # todo remove this
         # default measure is the first one
-        if self.measures:
-            self.selected_measures = [self.measures[0]]
+        self.selected_measures = None
 
     def instantiate_db(self, db_name=None):
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
@@ -220,6 +219,8 @@ class MdxEngine(object):
             self.measures = measures
         else:
             self.measures = self.get_measures()
+        if self.measures:
+            self.selected_measures = [self.measures[0]]
         self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
@@ -751,7 +752,6 @@ class MdxEngine(object):
             }
 
         """
-        # todo temp  self.mdx_query is used in many places
         query = self.clean_mdx_query(mdx_query)
 
         # use measures that exists on where or insides axes
