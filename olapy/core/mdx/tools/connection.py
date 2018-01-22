@@ -22,7 +22,8 @@ class MyDB(object):
         """
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            self.engine, self.dbms = self.connect_with_env_var(db_name)
+            self.engine, self.dbms = self.connect_with_env_var(None)
+            # self.engine, self.dbms = self.connect_with_env_var(db_name)
         else:
             self.db_credentials = db_config
             self.engine, self.dbms = self.connect_without_env_var(db_name)
