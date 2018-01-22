@@ -139,9 +139,9 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            # XmlaProviderService.discover_tools.change_catalogue(
-            #     request.Properties.PropertyList.Catalog,)
-            XmlaProviderService.discover_tools.executor.load_cube(request.Properties.PropertyList.Catalog)
+            XmlaProviderService.discover_tools.change_catalogue(
+                request.Properties.PropertyList.Catalog,)
+            # XmlaProviderService.discover_tools.executor.load_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = XmlaProviderService.discover_tools.executor
             # todo back and check this

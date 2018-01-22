@@ -45,7 +45,7 @@ class XmlaDiscoverTools():
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
             if executor:
-                executor.load_cube(self.selected_catalogue, fact_table_name=facts)
+                # executor.load_cube(self.selected_catalogue, fact_table_name=facts)
                 self.executor = executor
             else:
                 execu.load_cube(self.selected_catalogue, fact_table_name=facts)

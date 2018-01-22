@@ -8,8 +8,10 @@ from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+from sqlalchemy import inspect
 from werkzeug.serving import make_server
 
+from olapy.core.services.xmla import XmlaProviderService
 from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 from .xs0_responses import TEST_QUERY_AXIS0
 
@@ -77,7 +79,7 @@ class WSGIServer:
 @pytest.fixture(scope="module")
 def conn(executor):
     from olapy.core.services.xmla import XmlaProviderService
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor=executor, source_type='db')
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None, cubes_config=None)
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     print("spawning server")
@@ -86,8 +88,11 @@ def conn(executor):
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'))
+
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
+
+
     server.start()
 
     provider = xmla.XMLAProvider()
@@ -134,13 +139,13 @@ def test_query1(conn):
 
     # amount
     # 1023
-
     cmd = """
     SELECT
     FROM [main]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
+
     res = conn.Execute(cmd, Catalog="main")
     assert res.cellmap[0]['_CellOrdinal'] == '0'
     assert res.cellmap[0]['Value'] == 1023
