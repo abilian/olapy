@@ -5,7 +5,7 @@ import xmlwitch
 
 from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
 
-from .queries import query11, query12, query13, query14
+from .queries import query11, query12, query14
 
 
 def test_slicer_axis_query11(executor):
@@ -42,8 +42,7 @@ def test_slicer_axis_query11(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('0')
 
-    executor.mdx_query = query11
-    xmla_tools = XmlaExecuteTools(executor, False)
+    xmla_tools = XmlaExecuteTools(executor, query11, False)
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
@@ -75,37 +74,9 @@ def test_slicer_axis_query12(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
-    executor.mdx_query = query12
-
-    xmla_tools = XmlaExecuteTools(executor, False)
+    xmla_tools = XmlaExecuteTools(executor, query12, False)
 
     assert str(xml) == xmla_tools.generate_slicer_axis()
-#
-#
-# def test_slicer_axis_query13(executor):
-#     """
-#     Dimension without measures.
-#     """
-#     xml = xmlwitch.Builder()
-#     with xml.Axis(name="SlicerAxis"):
-#         with xml.Tuples:
-#             with xml.Tuple:
-#                 with xml.Member(Hierarchy="[product].[product]"):
-#                     xml.UName('[product].[product].[company].[Crazy Development]')
-#                     xml.Caption('Crazy Development')
-#                     xml.LName('[product].[product].[company]')
-#                     xml.LNum('0')
-#                     xml.DisplayInfo('2')
-#                 with xml.Member(Hierarchy="[time].[time]"):
-#                     xml.UName('[time].[time].[year].[2010]')
-#                     xml.Caption('2010')
-#                     xml.LName('[time].[time].[year]')
-#                     xml.LNum('0')
-#                     xml.DisplayInfo('2')
-#
-#     executor.mdx_query = query13
-#     xmla_tools = XmlaExecuteTools(executor, False)
-#     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
 def test_slicer_axis_query14(executor):
@@ -130,8 +101,6 @@ def test_slicer_axis_query14(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
-    executor.mdx_query = query14
-
-    xmla_tools = XmlaExecuteTools(executor, False)
+    xmla_tools = XmlaExecuteTools(executor, query14, False)
 
     assert str(xml) == xmla_tools.generate_slicer_axis()
