@@ -12,6 +12,7 @@ import os
 import sys
 from datetime import datetime
 from os.path import expanduser
+from traceback import print_tb
 from wsgiref.simple_server import make_server
 
 import click
@@ -211,11 +212,15 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
         db_config = DbConfigParser()
         db_conf = db_config.get_db_credentials(db_config_file)
 
-    # try:
-    cube_config_file_parser = ConfigParser()
-    cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
-    # except:
-    #     print('not found or bad cubes config file')
+    try:
+        cube_config_file_parser = ConfigParser()
+        cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
+    except (KeyError, IOError):
+        type, value, traceback = sys.exc_info()
+        print(type)
+        print(value)
+        print_tb(traceback)
+        db_conf = None
 
     # todo pass here mdx_eng params
     XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
