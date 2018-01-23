@@ -28,12 +28,15 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaDiscoverTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self, source_type, db_config, cubes_config, executor=None, olapy_data=None, **kwargs):
+    def __init__(self, source_type, db_config, cubes_config, **kwargs):
         # right now the catalogue_name and cube name are the same
+        executor = kwargs.get('executor', None)
+        olapy_data = kwargs.get('olapy_data', None)
 
-        execu = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
-                          cube_config=cubes_config)
-        self.catalogues = execu.get_cubes_names()
+        # todo change
+        mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
+                                 cube_config=cubes_config)
+        self.catalogues = mdx_executor.get_cubes_names()
 
         # todo change catalogue here
         if executor and cubes_config:
@@ -47,8 +50,8 @@ class XmlaDiscoverTools():
             if executor:
                 self.executor = executor
             else:
-                execu.load_cube(self.selected_catalogue, fact_table_name=facts)
-                self.executor = execu
+                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts)
+                self.executor = mdx_executor
 
         self.session_id = uuid.uuid1()
 
