@@ -197,7 +197,7 @@ class MdxEngine(object):
         """
         return list(self.tables_loaded.keys())
 
-    def load_cube(self, cube_name, fact_table_name="Facts", sep=';', measures=None):
+    def load_cube(self, cube_name, **kwargs):
         """
         After instantiating MdxEngine(), load_cube construct the cube and load all tables
         :param cube_name: cube name
@@ -206,6 +206,11 @@ class MdxEngine(object):
         :param measures: if you want to explicitly specify measures
         :return:
         """
+
+        fact_table_name = kwargs.get('fact_table_name', 'Facts')
+        sep = kwargs.get('sep', ';')
+        measures = kwargs.get('measures', None)
+
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
