@@ -139,6 +139,33 @@ class ConfigParser:
         """
         return os.path.isfile(self.cube_config_file)
 
+    def _get_dimension(self, config):
+        return [
+            Dimension(
+                name=dimension['dimension']['name'],
+                displayName=dimension['dimension']['displayName'],
+                columns=OrderedDict(
+                    (
+                        column['name'],
+                        column['name'] if 'column_new_name' not in column else
+                        column['column_new_name'],
+                    ) for column in dimension['dimension']['columns']
+                ) if 'columns' in dimension['dimension'] else {}
+            ) for dimension in config['dimensions']
+        ]
+
+    def _get_facts(self, config):
+        return [
+            Facts(
+                table_name=config['facts']['table_name'],
+                keys=dict(zip(config['facts']['keys']['columns_names'],
+                              config['facts']['keys']['refs'])
+                          ),
+                measures=config['facts']['measures']
+            )
+        ]
+
+
     def get_cube_config(self, conf_file=None):
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
@@ -155,37 +182,13 @@ class ConfigParser:
         with open(file_path) as config_file:
             config = yaml.load(config_file)
 
-            facts = [
-                Facts(
-                    table_name=config['facts']['table_name'],
-                    keys=dict(zip(config['facts']['keys']['columns_names'],
-                                  config['facts']['keys']['refs'])
-                              ),
-                    measures=config['facts']['measures']
-                )
-            ]
-
-            dimensions = [
-                Dimension(
-                    name=dimension['dimension']['name'],
-                    displayName=dimension['dimension']['displayName'],
-                    columns=OrderedDict(
-                        (
-                            column['name'],
-                            column['name'] if 'column_new_name' not in column else
-                            column['column_new_name'],
-                        ) for column in dimension['dimension']['columns']
-                    ) if 'columns' in dimension['dimension'] else {}
-                ) for dimension in config['dimensions']
-            ]
-
         # only one cube right now
         return Cube(
             xmla_authentication=bool(config['xmla_authentication']),
             name=config['name'],
             source=config['source'],
-            facts=facts,
-            dimensions=dimensions,
+            facts=self._get_facts(config),
+            dimensions=self._get_dimension(config),
         )
         # except BaseException:
         #     raise ValueError('Bad configuration in the configuration file')
