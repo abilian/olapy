@@ -46,63 +46,68 @@ class ConfigParser:
 
     Excel Config file Structure example::
 
-        <?xml version="1.0" encoding="UTF-8"?>
-        <cubes>
-            <!-- if you want to set an authentication mechanism for excel to access cube,
-                user must set a token with login url like 'http://127.0.0.1/admin  -->
-            <!-- default password = admin -->
 
-            <!-- enable/disable xmla authentication -->
-            <xmla_authentication>False</xmla_authentication>
 
-            <cube>
-                <!-- cube name => csv folder name or database name -->
-                <name>labster</name>
+        name : foodmart_with_config            # csv folder name or db name
+        source : csv                           # csv | postgres | mysql ...
 
-                <!-- source : csv | postgres | mysql | oracle | mssql -->
-                <source>csv</source>
+        xmla_authentication : False            need to enter special token with xmla url or not \
+                                              (example http://127.0.0.1:8000/xmla?admin)  admin just an example
 
-                <!-- start building customized star schema -->
-                <facts>
-                    <!-- facts table name -->
-                    <table_name>stats_line</table_name>
+        facts :
+          table_name : food_facts              # facts table name
+          keys:
+            columns_names :                    # primary keys
+              - product_id
+              - warehouse_id
+              - store_id
+            refs :                             # keys refs (example : product_id ref to column id from table Product...)
+              - Product.id
+              - Warehouse.id
+              - Store.id
 
-                    <keys>
-                        <!--
-                        <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name>
-                        -->
-                        <column_name ref="orgunit.id">departement_id</column_name>
-                    </keys>
+          measures :                           # list of measures
+                                               # by default, all number type columns in facts table
+            - units_ordered
+            - units_shipped
+            - supply_time
 
-                    <!-- specify measures explicitly -->
-                    <measures>
-                        <!-- by default, all number type columns in facts table, or you can specify them here -->
-                        <name>montant</name>
-                        <name>salaire_brut_mensuel</name>
-                        <name>cout_total_mensuel</name>
-                    </measures>
-                </facts>
-                <!-- end building customized star schema -->
+        dimensions:                          # star building customized dimensions display in excel from the star schema
+          - dimension :
+            #  IMPORTANT , put here facts table also (little bug)
+              name : food_facts
+              displayName : food_facts
 
-                <!-- star building customized dimensions display in excel from the star schema -->
-                <dimensions>
-                    <dimension>
-                        <!-- if you want to keep the same name for excel display, just use the
-                             same name in name and displayName -->
-                        <name>orgunit</name>
-                        <displayName>Organisation</displayName>
+          - dimension :
+              name : Product
+              displayName : Product
+              columns :
+                - name : id
+                - name : brand_name
+                - name : product_name
+                - name : SKU
+                  column_new_name : Stock_keeping_unit
 
-                        <columns>
-                            <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
-                            <name>type</name>
-                            <name>nom</name>
-                            <name>sigle</name>
-                        </columns>
-                    </dimension>
-                </dimensions>
-                <!-- end building customized dimensions display in excel from the star schema -->
-            </cube>
-        </cubes>
+
+          - dimension :
+              name : Store
+              displayName : Store
+              columns :
+                - name : id
+                - name : store_type
+                - name : store_name
+                - name : store_city
+                - name : store_country
+                  column_new_name : country
+
+          - dimension :
+              name : Warehouse
+              displayName : Warehouse
+              columns :
+                - name : id
+                - name : warehouse_name
+                - name : warehouse_city
+                - name : warehouse_country
     """
 
     def __init__(self, cube_config_file=None):

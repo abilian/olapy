@@ -47,10 +47,13 @@ class MdxEngine(object):
         web if you want to use olapy with `olapy-web <https://github.com/abilian/olapy-web>`_,
     :param cubes_path: Olapy cubes path, which is under olapy-data,
         by default *~/olapy-data/cube_name*
-    :param mdx_query: mdx query to execute
     :param olapy_data_location: By default *~/olapy-data/*
-    :param sep: separator used in csv files
-    :param fact_table_name: facts table name, Default **Facts**
+    :param database_config: olapy-config.yml parsing file result (dict for connecting to database)
+    :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
+    :param sql_engine: sql_alchemy engine if you don't want to use any database config file
+    :param source_type: source data input, Default csv
+    :param cubes_folder_name: csv files, folder name, Default *cubes*
+
     """
 
     def __init__(
@@ -195,6 +198,14 @@ class MdxEngine(object):
         return list(self.tables_loaded.keys())
 
     def load_cube(self, cube_name, fact_table_name="Facts", sep=';', measures=None):
+        """
+        After instantiating MdxEngine(), load_cube construct the cube and load all tables
+        :param cube_name: cube name
+        :param fact_table_name:  facts table name, Default **Facts**
+        :param sep: separator used in csv files
+        :param measures: if you want to explicitly specify measures
+        :return:
+        """
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
@@ -220,7 +231,6 @@ class MdxEngine(object):
         tables = {}
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config.name:
-            # for web (config file) we need only star_schema_dataframes, not all tables
             tables = load_table_config_file(self, self.cube_config, sep)
 
         elif self.cube in self.db_cubes:
@@ -288,6 +298,7 @@ class MdxEngine(object):
         """
         measure like this : 1 349 is not numeric so we try to transform it to 1349
         :param start_schema_df: start schema dataframe
+        :param measures: list of measures columns names
         :return: cleaned columns
         """
         if measures:
@@ -721,7 +732,8 @@ class MdxEngine(object):
 
         Usage ::
 
-            executor = MdxEngine('sales')
+            executor = MdxEngine()
+            executor.load_cube('sales')
             query = "SELECT FROM [sales] WHERE ([Measures].[Amount])"
             executor.execute_mdx(query)
 

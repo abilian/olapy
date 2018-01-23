@@ -15,6 +15,7 @@ def load_tables_csv_files(executor, sep):
     Load tables from csv files.
 
     :param executor: MdxEngine instance
+    :param sep: csv file separator
     :return: tables dict with table name as key and dataframe as value
     """
 
@@ -39,6 +40,7 @@ def construct_star_schema_csv_files(executor, sep):
     Construct star schema DataFrame from csv files.
 
     :param executor: MdxEngine instance
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
     cube = executor.get_cube_path()

@@ -44,6 +44,7 @@ def load_table_config_file(executor, cube_obj, sep):
 
     :param executor: MdxEngine instance
     :param cube_obj: cubes parser object
+    :param sep: csv file separator
     :return: tables dict with table name as key and DataFrame as value
     """
 
@@ -82,6 +83,7 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
 
     :param executor:  MdxEngine instance
     :param cubes_obj: cubes object
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
     executor.facts = cubes_obj.facts[0].table_name
@@ -176,6 +178,7 @@ def construct_web_star_schema_config_file(executor, cubes_obj, sep):
 
     :param executor: MdxEngine instance
     :param cubes_obj: cubes parser object
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
 
