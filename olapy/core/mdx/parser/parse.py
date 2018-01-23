@@ -71,7 +71,6 @@ class Parser(object):
 
         :return:  nested list of tuples (see the example)
         """
-        print(query)
         if start is not None:
             start = query.index(start)
         if stop is not None:

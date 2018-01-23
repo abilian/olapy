@@ -165,7 +165,6 @@ class ConfigParser:
             )
         ]
 
-
     def get_cube_config(self, conf_file=None):
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
