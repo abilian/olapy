@@ -35,17 +35,16 @@ class XmlaDiscoverTools():
                           cube_config=cubes_config)
         self.catalogues = execu.get_cubes_names()
 
-        # todo change catalogue hehre
+        # todo change catalogue here
         if executor and cubes_config:
             facts = cubes_config.facts[0].table_name
         else:
             facts = 'Facts'
 
-        # todo directy from xmla.py
+        # todo directly from xmla.py
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
             if executor:
-                # executor.load_cube(self.selected_catalogue, fact_table_name=facts)
                 self.executor = executor
             else:
                 execu.load_cube(self.selected_catalogue, fact_table_name=facts)

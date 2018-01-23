@@ -72,9 +72,6 @@ class XmlaProviderService(ServiceBase):
     # and then, xmla requests from excel can be reached
     # thus make life easier.
 
-    # discover_tools = XmlaDiscoverTools(None,None)
-    # sessio_id = discover_tools.session_id
-
     # instead of initializer
     discover_tools = None
     sessio_id = None
@@ -98,7 +95,6 @@ class XmlaProviderService(ServiceBase):
         # (which cause problems when we want to access xmla_provider instantiation variables)
         discover_tools = XmlaProviderService.discover_tools
         ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
-        # config_parser = ConfigParser(discover_tools.executor.cube_path)
         config_parser = discover_tools.executor.cube_config
         if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
@@ -141,14 +137,11 @@ class XmlaProviderService(ServiceBase):
         else:
             XmlaProviderService.discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog,)
-            # XmlaProviderService.discover_tools.executor.load_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = XmlaProviderService.discover_tools.executor
 
             # Hierarchize
-            if all(key in mdx_query
-                   for key in
-                   ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
+            if all(key in mdx_query for key in ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
                 convert2formulas = True
             else:
                 convert2formulas = False
@@ -196,14 +189,8 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
-# todo path config db config
 def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file):
-    # [XmlaProviderService()], __name__ error ???
-    # to refresh mdxengine with their class data
 
-    # MdxEngine.olapy_data_location = olapy_data
-    # if source_type is not None:
-    #     MdxEngine.source_type = source_type
     db_conf = None
     cube_conf = None
     if 'db' in source_type:
@@ -220,9 +207,9 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
         print_tb(traceback)
         db_conf = None
 
-    # todo pass here mdx_eng params
     XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
                                                            db_config=db_conf, cubes_config=cube_conf)
+
     XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
     application = Application(
         [XmlaProviderService],

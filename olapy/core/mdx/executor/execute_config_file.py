@@ -171,7 +171,7 @@ def get_columns_n_tables(cubes_obj, executor):
 
 
 # web client
-def construct_web_star_schema_config_file(executor, cubes_obj):
+def construct_web_star_schema_config_file(executor, cubes_obj, sep):
     """Construct star schema DataFrame from configuration file for web client.
 
     :param executor: MdxEngine instance
@@ -185,6 +185,7 @@ def construct_web_star_schema_config_file(executor, cubes_obj):
         cubes_obj,
         executor,
         executor.facts,
+        sep
     )
 
     all_columns, tables = get_columns_n_tables(cubes_obj, executor)
@@ -207,6 +208,7 @@ def construct_web_star_schema_config_file(executor, cubes_obj):
                 cubes_obj,
                 executor,
                 dimension_and_key.split('.')[0],
+                sep
             )
 
         fusion = fusion.merge(

@@ -53,15 +53,6 @@ class MdxEngine(object):
     :param fact_table_name: facts table name, Default **Facts**
     """
 
-    # class variable , because spyne application = Application([XmlaProviderService],...
-    # throw exception if XmlaProviderService()
-    # CUBE_FOLDER_NAME = "cubes"
-    # # (before instantiate MdxEngine I need to access cubes information)
-    # olapy_data_location = get_default_cube_directory()
-    # cube_path = os.path.join(olapy_data_location, CUBE_FOLDER_NAME)
-    # db_config = DbConfigParser(os.path.join(olapy_data_location, 'olapy-config.yml'))
-    # cube_config_file_parser = ConfigParser(cube_path)
-
     def __init__(
             self,
             cube_name=None,
@@ -99,14 +90,11 @@ class MdxEngine(object):
 
         self.database_config = database_config
         self.cube_config = cube_config
-        # to get cubes from db
         self.client = client_type
         self.tables_loaded = None
         self.star_schema_dataframe = None
         # all measures
         self.measures = None
-        # todo remove this
-        # default measure is the first one
         self.selected_measures = None
 
     def instantiate_db(self, db_name=None):
@@ -148,7 +136,6 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-
         db = self.instantiate_db(self.cube)
         if not self.sql_alchemy:
             self.sql_alchemy = db.engine
@@ -214,13 +201,14 @@ class MdxEngine(object):
         self.get_cubes_names()
         # load tables
         self.tables_loaded = self.load_tables(sep=sep)
-        # construct star_schema
         if measures:
             self.measures = measures
         else:
             self.measures = self.get_measures()
         if self.measures:
+            # default measure is the first one
             self.selected_measures = [self.measures[0]]
+        # construct star_schema
         self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
@@ -252,10 +240,6 @@ class MdxEngine(object):
 
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
-
-        # update config file path IMPORTANT
-        # todo back here and check
-        # self.cube_config.cube_config_file = self.cube_path
 
         if self.client == 'web' and self.cube_config:
             if self.cube_config.facts:
@@ -290,7 +274,7 @@ class MdxEngine(object):
         fusion = None
         if self.client == 'web':
             if config_file_parser.facts:
-                fusion = construct_web_star_schema_config_file(self, config_file_parser)
+                fusion = construct_web_star_schema_config_file(self, config_file_parser, sep)
             elif config_file_parser.name in self.csv_files_cubes:
                 fusion = construct_star_schema_csv_files(self, sep)
             elif config_file_parser.name in self.db_cubes:
@@ -322,7 +306,6 @@ class MdxEngine(object):
         :return: star schema DataFrame
         """
         fusion = None
-        # config_file_parser = ConfigParser(self.cube_path)
         if self.cube_config and self.cube == self.cube_config.name:
             fusion = self._construct_star_schema_from_config(self.cube_config, sep)
 

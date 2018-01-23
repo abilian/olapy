@@ -9,7 +9,6 @@ from tests.db_creation_utils import create_insert, drop_tables
 from olapy.core.mdx.executor.execute import MdxEngine
 
 
-# todo fixture with params
 @pytest.fixture(scope='module')
 def executor(request):
     MdxEngine.source_type = ('csv', 'db')

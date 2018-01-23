@@ -6,7 +6,6 @@ This module Parse Mdx Query, And Break it in parts
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-# import re
 import regex
 
 
@@ -14,11 +13,7 @@ class Parser(object):
     """
     Class for Parsing MdxQuery
     """
-    # french characters
-    # or use new regex 2017.02.08
-    # regex = "(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\é\ù\è\ù\û\ü\ÿ\€" \
-    #         "\’\à\â\æ\ç\é\è\ê\ë\ï\î\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
-    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\_\-\:\"\’\€\&\$ " \
+    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\(\)\_\-\:\"\’\€\&\$ " \
           "]+\])*\.?((Members)|(\[Q\d\]))?)"
 
     def __init__(self, mdx_query=None):
@@ -76,6 +71,7 @@ class Parser(object):
 
         :return:  nested list of tuples (see the example)
         """
+        print(query)
         if start is not None:
             start = query.index(start)
         if stop is not None:
@@ -93,9 +89,6 @@ class Parser(object):
             ]
             for tup in regex.compile(cls.REG).findall(query[start:stop],)
             if len(tup[0].split('].[')) > 1
-            # for tup in re.compile(MdxEngine.regex).findall(
-            #     query.encode("utf-8", 'replace')[start:stop],)
-            # if len(tup[0].split('].[')) > 1
         ]
 
     def decorticate_query(self, query):

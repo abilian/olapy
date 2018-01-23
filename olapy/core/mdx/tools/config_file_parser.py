@@ -132,9 +132,6 @@ class ConfigParser:
         """
         Check whether the config file exists or not.
         """
-
-        # if client_type == 'web':
-        #     return os.path.isfile(self.get_web_confile_file_path())
         return os.path.isfile(self.cube_config_file)
 
     def get_cube_config(self, conf_file=None):
