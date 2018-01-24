@@ -9,15 +9,13 @@ from os.path import expanduser
 from cpuinfo import cpuinfo, os
 from olap.xmla import xmla
 from prettytable import PrettyTable
-from spyne import Application
-from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
 
-from olapy.core.services.xmla import XmlaProviderService
+from olapy.core.services.xmla import get_spyne_app
 from olapy.core.services.xmla_discover_tools import XmlaTools
 
 from .micro_bench import MicBench
@@ -89,14 +87,7 @@ def main():
 
     xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='db',
                            db_config=db_conf, cubes_config=None)
-
-    application = Application(
-        [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'),
-        config={'discover_tools': xmla_tools}
-    )
+    application = get_spyne_app(xmla_tools)
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
 

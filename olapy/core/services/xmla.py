@@ -178,8 +178,17 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
-def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file):
+def get_spyne_app(xmla_tools):
+    return Application(
+        [XmlaProviderService],
+        'urn:schemas-microsoft-com:xml-analysis',
+        in_protocol=XmlaSoap11(validator='soft'),
+        out_protocol=XmlaSoap11(validator='soft'),
+        config={'xmla_tools': xmla_tools}
+    )
 
+
+def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file):
     db_conf = None
     cube_conf = None
     if 'db' in source_type:
@@ -199,13 +208,7 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
     xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
                            db_config=db_conf, cubes_config=cube_conf)
 
-    application = Application(
-        [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=XmlaSoap11(validator='soft'),
-        out_protocol=XmlaSoap11(validator='soft'),
-        config={'xmla_tools': xmla_tools}
-    )
+    application = get_spyne_app(xmla_tools)
 
     # validator='soft' or nothing, this is important because spyne doesn't
     # support encodingStyle until now !!!!

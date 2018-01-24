@@ -10,8 +10,6 @@ from os.path import expanduser
 import cpuinfo
 from olap.xmla import xmla
 from prettytable import PrettyTable
-from spyne import Application
-from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.mdx.executor.execute import MdxEngine
@@ -21,7 +19,7 @@ from tests.test_xmla import WSGIServer
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property
-from olapy.core.services.xmla import XmlaProviderService
+from olapy.core.services.xmla import get_spyne_app
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -442,13 +440,8 @@ def main():
     mbench = MicBench()
     file.write("Benchmarks are made with cpu :\n")
     file.write(cpuinfo.get_cpu_info()['brand'] + "\n\n")
-    application = Application(
-        [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'),
-        config={'xmla_tools': _get_xmla_tools()})
-
+    xmla_tools = _get_xmla_tools()
+    application = get_spyne_app(xmla_tools)
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
     server.start()
