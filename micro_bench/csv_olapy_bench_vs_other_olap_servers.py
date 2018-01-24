@@ -324,31 +324,24 @@ def olapy_vs_iccube(file, mbench, conn):
 
 def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
     t = PrettyTable(['Query', 'olapy execution time'])
-    cmd = """SELECT FROM [""" + CUBE_NAME + """]
-            WHERE ([Measures].[Amount])
+    cmd = """SELECT FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])
             CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
     file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
-    cmd = """SELECT
-        NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
+    cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
         [table0].[table0].[table0A].[""" + str(xmla_tools.executor.star_schema_dataframe.table0A[1]) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
-        ON COLUMNS FROM [""" + CUBE_NAME + """]
-        WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-        """
+        ON COLUMNS FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])"""
     file.write("Query 2 :\n" + cmd + "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
     tup = "[table0].[table0].[table0A].[" + str(xmla_tools.executor.star_schema_dataframe.table0A[0]) + "]"
     for d in range(REFINEMENT_LVL):
         tup += ",\n[table0].[table0].[table0A].[" + str(xmla_tools.executor.star_schema_dataframe.table0A[d + 1]) + "]"
-
     cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {""" + tup + """})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
-        ON COLUMNS FROM [""" + CUBE_NAME + """]
-        WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-        """
+        ON COLUMNS FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])"""
     file.write("Query 3 :\n" + cmd + "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
     file.write(str(t) + "\n\n")
