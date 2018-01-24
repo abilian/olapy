@@ -322,7 +322,7 @@ def olapy_vs_iccube(file, mbench, conn):
         pass
 
 
-def olapy_query_excution_bench(file, mbench, conn, xmla_tools):
+def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
     t = PrettyTable(['Query', 'olapy execution time'])
 
     cmd = """
@@ -458,7 +458,7 @@ def main():
     server.start()
     provider = xmla.XMLAProvider()
     conn = provider.connect(location=server.url)
-    olapy_query_excution_bench(file, mbench, conn, xmla_tools)
+    olapy_query_execution_bench(file, mbench, conn, xmla_tools)
     olapy_vs_mondrian(file, mbench, conn)
     olapy_vs_iccube(file, mbench, conn)
     olapy_profile(file)
