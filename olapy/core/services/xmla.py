@@ -72,9 +72,18 @@ class XmlaProviderService(ServiceBase):
     # and then, xmla requests from excel can be reached
     # thus make life easier.
 
-    # instead of initializer
-    discover_tools = None
-    sessio_id = None
+    # def __init__(self, db, app, consumer_id):
+    #     ServerBase.__init__(self, app)
+    #
+    #     self.session = sessionmaker(bind=db)()
+    #     self.id = consumer_id
+    #
+
+    # def __init__(self):
+    #     self.test = 'aaaaaaaaaa'
+    # # instead of initializer
+    # discover_tools = None
+    # sessio_id = None
 
     @rpc(
         DiscoverRequest,
@@ -93,8 +102,9 @@ class XmlaProviderService(ServiceBase):
         """
         # ctx is the 'context' parameter used by Spyne
         # (which cause problems when we want to access xmla_provider instantiation variables)
-        discover_tools = XmlaProviderService.discover_tools
-        ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
+
+        discover_tools = ctx.app.config['discover_tools']
+        ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
         config_parser = discover_tools.executor.cube_config
         if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
@@ -123,8 +133,9 @@ class XmlaProviderService(ServiceBase):
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string
         """
-        ctx.out_header = Session(SessionId=str(XmlaProviderService.sessio_id))
+        ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
         mdx_query = request.Command.Statement.encode().decode('utf8')
+        discover_tools = ctx.app.config['discover_tools']
         if mdx_query == '':
             # check if command contains a query
 
@@ -135,10 +146,10 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            XmlaProviderService.discover_tools.change_catalogue(
+            discover_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog,)
             xml = xmlwitch.Builder()
-            executor = XmlaProviderService.discover_tools.executor
+            executor = discover_tools.executor
 
             # Hierarchize
             if all(key in mdx_query for key in ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
@@ -207,15 +218,22 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
         print_tb(traceback)
         db_conf = None
 
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
-                                                           db_config=db_conf, cubes_config=cube_conf)
+    # XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
+    #                                                        db_config=db_conf, cubes_config=cube_conf)
+    # 
+    # XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
-    XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
+    dtools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
+                               db_config=db_conf, cubes_config=cube_conf)
+
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
-        out_protocol=XmlaSoap11(validator='soft')
+        out_protocol=XmlaSoap11(validator='soft'),
+        config={'discover_tools': dtools,
+                'session_id': dtools.session_id
+                }
     )
 
     # validator='soft' or nothing, this is important because spyne doesn't
