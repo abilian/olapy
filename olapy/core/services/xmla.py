@@ -27,7 +27,7 @@ from spyne.server.wsgi import WsgiApplication
 from olapy.core.mdx.tools.config_file_parser import ConfigParser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
-from .xmla_discover_tools import XmlaDiscoverTools
+from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools
 from .xmla_execute_xsds import execute_xsd
 
@@ -103,9 +103,9 @@ class XmlaProviderService(ServiceBase):
         # ctx is the 'context' parameter used by Spyne
         # (which cause problems when we want to access xmla_provider instantiation variables)
 
-        discover_tools = ctx.app.config['discover_tools']
+        xmla_tools = ctx.app.config['xmla_tools']
         ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
-        config_parser = discover_tools.executor.cube_config
+        config_parser = xmla_tools.executor.cube_config
         if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
                 fault_string='You do not have permission to access this resource',
@@ -113,7 +113,7 @@ class XmlaProviderService(ServiceBase):
             )
 
         method_name = request.RequestType.lower() + '_response'
-        method = getattr(discover_tools, method_name)
+        method = getattr(xmla_tools, method_name)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return method()
@@ -135,7 +135,7 @@ class XmlaProviderService(ServiceBase):
         """
         ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
         mdx_query = request.Command.Statement.encode().decode('utf8')
-        discover_tools = ctx.app.config['discover_tools']
+        xmla_tools = ctx.app.config['xmla_tools']
         if mdx_query == '':
             # check if command contains a query
 
@@ -146,10 +146,10 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            discover_tools.change_catalogue(
+            xmla_tools.change_catalogue(
                 request.Properties.PropertyList.Catalog,)
             xml = xmlwitch.Builder()
-            executor = discover_tools.executor
+            executor = xmla_tools.executor
 
             # Hierarchize
             if all(key in mdx_query for key in ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
@@ -222,16 +222,16 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
     #                                                        db_config=db_conf, cubes_config=cube_conf)
     # XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
-    dtools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
-                               db_config=db_conf, cubes_config=cube_conf)
+    xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
+                       db_config=db_conf, cubes_config=cube_conf)
 
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
         out_protocol=XmlaSoap11(validator='soft'),
-        config={'discover_tools': dtools,
-                'session_id': dtools.session_id
+        config={'xmla_tools': xmla_tools,
+                'session_id': xmla_tools.session_id
                 }
     )
 

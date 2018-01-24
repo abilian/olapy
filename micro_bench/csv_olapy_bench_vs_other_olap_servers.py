@@ -14,12 +14,13 @@ from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
+from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.core.services.xmla_discover_tools import XmlaTools
 from tests.test_xmla import WSGIServer
 
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, \
-    Propertielist, Property
+    Propertieslist, Property
 from olapy.core.services.xmla import XmlaProviderService
 
 from .cube_generator import CUBE_NAME, CubeGen
@@ -318,7 +319,7 @@ def olapy_vs_iccube(file, mbench, conn):
         pass
 
 
-def olapy_query_excution_bench(file, mbench, conn):
+def olapy_query_excution_bench(file, mbench, conn, xmla_tools):
     t = PrettyTable(['Query', 'olapy execution time'])
 
     cmd = """
@@ -336,7 +337,7 @@ def olapy_query_excution_bench(file, mbench, conn):
         NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
         [table0].[table0].[table0A].[""" + str(
-        XmlaProviderService.discover_tools.executor.star_schema_dataframe.table0A[1]
+        xmla_tools.executor.star_schema_dataframe.table0A[1]
     ) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS
@@ -351,11 +352,11 @@ def olapy_query_excution_bench(file, mbench, conn):
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
 
     tup = "[table0].[table0].[table0A].[" + str(
-        XmlaProviderService.discover_tools.executor.star_schema_dataframe.table0A[0]
+        xmla_tools.executor.star_schema_dataframe.table0A[0]
     ) + "]"
     for d in range(REFINEMENT_LVL):
         tup += ",\n[table0].[table0].[table0A].[" + str(
-            XmlaProviderService.discover_tools.executor.star_schema_dataframe.
+            xmla_tools.executor.star_schema_dataframe.
             table0A[d + 1]) + "]"
 
     cmd = """
@@ -406,7 +407,7 @@ def olapy_profile(file):
 
 request = ExecuteRequest()
 request.Command = Command(Statement = cmd)
-request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
+request.Properties = Propertieslist(PropertyList = Property(Catalog='sales'))
 
 XmlaProviderService().Execute(XmlaProviderService(),request)""",
                  "{}.profile".format(__file__))
@@ -431,9 +432,13 @@ def main():
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type='csv', db_config=None,
-                                                           cubes_config=None)
-    XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+    # XmlaProviderService.discover_tools = XmlaTools(olapy_data=olapy_data, source_type='csv', db_config=None,
+    #                                                cubes_config=None)
+    # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+    mdx_executor = MdxEngine()
+    mdx_executor.load_cube(CUBE_NAME)
+    xmla_tools = XmlaTools(executor=mdx_executor, olapy_data=olapy_data, source_type='csv',
+                           db_config=None, cubes_config=None)
     mbench = MicBench()
 
     file.write("Benchmarks are made with cpu :\n")
@@ -443,7 +448,11 @@ def main():
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'))
+        out_protocol=Soap11(validator='soft'),
+        config={'xmla_tools': xmla_tools,
+                'session_id': xmla_tools.session_id
+                })
+
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
     server.start()

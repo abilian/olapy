@@ -12,11 +12,13 @@ from prettytable import PrettyTable
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
 
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
+from olapy.core.services.xmla_discover_tools import XmlaTools
 
 from .micro_bench import MicBench
 
@@ -80,11 +82,26 @@ def main():
             "Query {0} :\n".format(str(idx + 1)) + query +
             "\n----------------------------------------------------------\n\n")
 
+    # XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
+    # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+
+    olapy_data = os.path.join(expanduser('~'), 'olapy-data')
+    db_config = DbConfigParser()
+    # todo conn string
+    db_conf = db_config.get_db_credentials(os.path.join(olapy_data, 'olapy-config.yml'))
+
+    xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='db',
+                       db_config=db_conf, cubes_config=None)
+
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'))
+        out_protocol=Soap11(validator='soft'),
+        config={'discover_tools': xmla_tools,
+                'session_id': xmla_tools.session_id
+                }
+    )
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
 
@@ -98,13 +115,13 @@ def main():
             copy_2_olapy_dir(config_file)
 
             # to refresh cubes from database
-            XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
+            # XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
 
             provider = xmla.XMLAProvider()
             conn = provider.connect(location=server.url)
 
             mbench = MicBench()
-            XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+            # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
 
             t = PrettyTable(
                 ['Query', '{0} - olapy execution time'.format(dbms)])

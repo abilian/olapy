@@ -11,7 +11,7 @@ from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
+from olapy.core.services.xmla_discover_tools import XmlaTools
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -77,8 +77,8 @@ class WSGIServer:
 
 @pytest.fixture(scope="module")
 def conn(executor):
-    dtools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None,
-                               cubes_config=None)
+    xmla_tools = XmlaTools(executor=executor, source_type='db', db_config=None,
+                       cubes_config=None)
 
     print("spawning server")
     application = Application(
@@ -86,8 +86,8 @@ def conn(executor):
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'discover_tools': dtools,
-                'session_id': dtools.session_id
+        config={'xmla_tools': xmla_tools,
+                'session_id': xmla_tools.session_id
                 }
     )
 
