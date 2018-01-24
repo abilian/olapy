@@ -432,9 +432,7 @@ def main():
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
-    # XmlaProviderService.discover_tools = XmlaTools(olapy_data=olapy_data, source_type='csv', db_config=None,
-    #                                                cubes_config=None)
-    # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
+
     mdx_executor = MdxEngine()
     mdx_executor.load_cube(CUBE_NAME)
     xmla_tools = XmlaTools(executor=mdx_executor, olapy_data=olapy_data, source_type='csv',

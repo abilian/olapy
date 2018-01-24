@@ -82,9 +82,6 @@ def main():
             "Query {0} :\n".format(str(idx + 1)) + query +
             "\n----------------------------------------------------------\n\n")
 
-    # XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
-    # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
-
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
     db_config = DbConfigParser()
     # todo conn string
@@ -113,14 +110,11 @@ def main():
             copy_2_olapy_dir(config_file)
 
             # to refresh cubes from database
-            # XmlaProviderService.discover_tools = XmlaDiscoverTools(source_type='csv')
 
             provider = xmla.XMLAProvider()
             conn = provider.connect(location=server.url)
 
             mbench = MicBench()
-            # XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
-
             t = PrettyTable(
                 ['Query', '{0} - olapy execution time'.format(dbms)])
 
