@@ -5,6 +5,7 @@ import cProfile
 import datetime
 import os
 import pstats
+from os.path import expanduser
 
 import cpuinfo
 from olap.xmla import xmla
@@ -12,6 +13,8 @@ from prettytable import PrettyTable
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverTools
 from tests.test_xmla import WSGIServer
 
 # do not remove this (used in profiler)
@@ -329,12 +332,11 @@ def olapy_query_excution_bench(file, mbench, conn):
         "\n----------------------------------------------------------\n\n")
 
     t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
-
     cmd = """SELECT
         NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
         [table0].[table0].[table0A].[""" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[1]
+        XmlaProviderService.discover_tools.executor.star_schema_dataframe.table0A[1]
     ) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS
@@ -349,11 +351,11 @@ def olapy_query_excution_bench(file, mbench, conn):
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
 
     tup = "[table0].[table0].[table0A].[" + str(
-        XmlaProviderService.discover_tools.star_schema_dataframe.table0A[0]
+        XmlaProviderService.discover_tools.executor.star_schema_dataframe.table0A[0]
     ) + "]"
     for d in range(REFINEMENT_LVL):
         tup += ",\n[table0].[table0].[table0A].[" + str(
-            XmlaProviderService.discover_tools.star_schema_dataframe.
+            XmlaProviderService.discover_tools.executor.star_schema_dataframe.
             table0A[d + 1]) + "]"
 
     cmd = """
@@ -402,11 +404,11 @@ def olapy_profile(file):
                 WHERE ([Measures].[Amount])
                 CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
 
-    request = ExecuteRequest()
-    request.Command = Command(Statement = cmd)
-    request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
+request = ExecuteRequest()
+request.Command = Command(Statement = cmd)
+request.Properties = Propertielist(PropertyList = Property(Catalog='sales'))
 
-    XmlaProviderService().Execute(XmlaProviderService(),request)""",
+XmlaProviderService().Execute(XmlaProviderService(),request)""",
                  "{}.profile".format(__file__))
 
     s = pstats.Stats("{}.profile".format(__file__), stream=file)
@@ -428,6 +430,9 @@ def main():
                 str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
+    olapy_data = os.path.join(expanduser('~'), 'olapy-data')
+    XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type='csv', db_config=None,
+                                                           cubes_config=None)
     XmlaProviderService.discover_tools.change_catalogue(CUBE_NAME)
     mbench = MicBench()
 

@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function
 
 import os
 import shutil
@@ -8,8 +7,6 @@ from os.path import expanduser
 
 import numpy as np
 import pandas as pd
-
-from olapy.core.mdx.executor.execute import MdxEngine
 
 CUBE_NAME = "temp_cube"
 
@@ -29,8 +26,7 @@ class CubeGen:
         self.number_dimensions = number_dimensions
         self.rows_length = rows_length
         self.columns_length = columns_length
-        self.cube_path = os.path.join(
-            expanduser('~'), 'olapy-data', MdxEngine.CUBE_FOLDER_NAME)
+        self.cube_path = os.path.join(expanduser('~'), 'olapy-data', 'cubes')
 
     def generate_cube(self, min_val=5, max_val=100):
         """Generate dimension and fact that follows star schema.
