@@ -104,7 +104,7 @@ class XmlaProviderService(ServiceBase):
         # (which cause problems when we want to access xmla_provider instantiation variables)
 
         xmla_tools = ctx.app.config['xmla_tools']
-        ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
+        ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
         config_parser = xmla_tools.executor.cube_config
         if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
@@ -133,9 +133,9 @@ class XmlaProviderService(ServiceBase):
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string
         """
-        ctx.out_header = Session(SessionId=str(ctx.app.config['session_id']))
-        mdx_query = request.Command.Statement.encode().decode('utf8')
         xmla_tools = ctx.app.config['xmla_tools']
+        ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
+        mdx_query = request.Command.Statement.encode().decode('utf8')
         if mdx_query == '':
             # check if command contains a query
 
@@ -223,16 +223,14 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
     # XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                       db_config=db_conf, cubes_config=cube_conf)
+                           db_config=db_conf, cubes_config=cube_conf)
 
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
         out_protocol=XmlaSoap11(validator='soft'),
-        config={'xmla_tools': xmla_tools,
-                'session_id': xmla_tools.session_id
-                }
+        config={'xmla_tools': xmla_tools}
     )
 
     # validator='soft' or nothing, this is important because spyne doesn't

@@ -449,9 +449,8 @@ def main():
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'xmla_tools': xmla_tools,
-                'session_id': xmla_tools.session_id
-                })
+        config={'xmla_tools': xmla_tools}
+    )
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)

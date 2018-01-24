@@ -91,16 +91,14 @@ def main():
     db_conf = db_config.get_db_credentials(os.path.join(olapy_data, 'olapy-config.yml'))
 
     xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='db',
-                       db_config=db_conf, cubes_config=None)
+                           db_config=db_conf, cubes_config=None)
 
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'discover_tools': xmla_tools,
-                'session_id': xmla_tools.session_id
-                }
+        config={'discover_tools': xmla_tools}
     )
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)

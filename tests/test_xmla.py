@@ -78,7 +78,7 @@ class WSGIServer:
 @pytest.fixture(scope="module")
 def conn(executor):
     xmla_tools = XmlaTools(executor=executor, source_type='db', db_config=None,
-                       cubes_config=None)
+                           cubes_config=None)
 
     print("spawning server")
     application = Application(
@@ -86,9 +86,7 @@ def conn(executor):
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'xmla_tools': xmla_tools,
-                'session_id': xmla_tools.session_id
-                }
+        config={'xmla_tools': xmla_tools}
     )
 
     wsgi_application = WsgiApplication(application)
