@@ -77,16 +77,19 @@ class WSGIServer:
 
 @pytest.fixture(scope="module")
 def conn(executor):
-    XmlaProviderService.discover_tools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None,
-                                                           cubes_config=None)
-    XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
+    dtools = XmlaDiscoverTools(executor=executor, source_type='db', db_config=None,
+                               cubes_config=None)
 
     print("spawning server")
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'))
+        out_protocol=Soap11(validator='soft'),
+        config={'discover_tools': dtools,
+                'session_id': dtools.session_id
+                }
+    )
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)

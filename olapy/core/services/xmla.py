@@ -220,7 +220,6 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
 
     # XmlaProviderService.discover_tools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
     #                                                        db_config=db_conf, cubes_config=cube_conf)
-    # 
     # XmlaProviderService.sessio_id = XmlaProviderService.discover_tools.session_id
 
     dtools = XmlaDiscoverTools(olapy_data=olapy_data, source_type=source_type,
