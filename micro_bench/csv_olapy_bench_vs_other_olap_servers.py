@@ -426,47 +426,39 @@ XmlaProviderService().Execute(XmlaProviderService(),request)""",
     os.remove('csv_olapy_bench_vs_other_olap_servers.py.profile')
 
 
-def main():
-    file = open('bench_result' +
-                str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
-    gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
-    gen.generate_csv(gen.generate_cube(3, 1000))
+def _get_xmla_tools():
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
-
     mdx_executor = MdxEngine()
     mdx_executor.load_cube(CUBE_NAME)
     xmla_tools = XmlaTools(executor=mdx_executor, olapy_data=olapy_data, source_type='csv',
                            db_config=None, cubes_config=None)
-    mbench = MicBench()
+    return xmla_tools
 
+
+def main():
+    file = open('bench_result' + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
+    gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
+    gen.generate_csv(gen.generate_cube(3, 1000))
+    mbench = MicBench()
     file.write("Benchmarks are made with cpu :\n")
     file.write(cpuinfo.get_cpu_info()['brand'] + "\n\n")
-
     application = Application(
         [XmlaProviderService],
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'xmla_tools': xmla_tools}
-    )
+        config={'xmla_tools': _get_xmla_tools()})
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
     server.start()
-
     provider = xmla.XMLAProvider()
     conn = provider.connect(location=server.url)
-
     olapy_query_excution_bench(file, mbench, conn)
-
     olapy_vs_mondrian(file, mbench, conn)
-
     olapy_vs_iccube(file, mbench, conn)
-
     olapy_profile(file)
-
     gen.remove_temp_cube()
-
     file.close()
     server.stop()
 
