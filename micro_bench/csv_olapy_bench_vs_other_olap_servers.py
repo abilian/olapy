@@ -34,6 +34,7 @@ class Config(object):
     def __init__(self, xmla_tools):
         self.config = {"xmla_tools": xmla_tools}
 
+
 def olapy_vs_mondrian(file, mbench, conn):
     try:
         file.write(
@@ -406,7 +407,7 @@ def olapy_profile(file):
                 FROM [sales]
                 WHERE ([Measures].[Amount])
                 CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
-        
+
 request = ExecuteRequest()
 request.Command = Command(Statement=cmd)
 request.Properties = Propertieslist(PropertyList=Property(Catalog='sales'))
