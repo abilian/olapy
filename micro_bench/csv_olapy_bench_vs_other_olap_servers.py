@@ -19,7 +19,7 @@ from tests.test_xmla import WSGIServer
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property
-from olapy.core.services.xmla import get_spyne_app
+from olapy.core.services.xmla import get_spyne_app, XmlaProviderService
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -29,6 +29,10 @@ PORT = 8230
 REFINEMENT_LVL = 5
 PROFILING_LINES = 15
 
+
+class Config(object):
+    def __init__(self, xmla_tools):
+        self.config = {"xmla_tools": xmla_tools}
 
 def olapy_vs_mondrian(file, mbench, conn):
     try:
@@ -402,12 +406,18 @@ def olapy_profile(file):
                 FROM [sales]
                 WHERE ([Measures].[Amount])
                 CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
-
+        
 request = ExecuteRequest()
-request.Command = Command(Statement = cmd)
-request.Properties = Propertieslist(PropertyList = Property(Catalog='sales'))
+request.Command = Command(Statement=cmd)
+request.Properties = Propertieslist(PropertyList=Property(Catalog='sales'))
+olapy_data = os.path.join(expanduser('~'), 'olapy-data')
+xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='csv',
+                       db_config=None, cubes_config=None)
 
-XmlaProviderService().Execute(XmlaProviderService(),request)""",
+xmla_p_server = XmlaProviderService()
+setattr(xmla_p_server,"app", Config(xmla_tools))
+xmla_p_server.Execute(xmla_p_server, request)
+""",
                  "{}.profile".format(__file__))
 
     s = pstats.Stats("{}.profile".format(__file__), stream=file)
@@ -447,7 +457,7 @@ def main():
     server.start()
     provider = xmla.XMLAProvider()
     conn = provider.connect(location=server.url)
-    olapy_query_excution_bench(file, mbench, conn)
+    olapy_query_excution_bench(file, mbench, conn, xmla_tools)
     olapy_vs_mondrian(file, mbench, conn)
     olapy_vs_iccube(file, mbench, conn)
     olapy_profile(file)
