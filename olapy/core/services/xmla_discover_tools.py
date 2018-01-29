@@ -34,6 +34,8 @@ class XmlaTools():
         executor = kwargs.get('executor', None)
         olapy_data = kwargs.get('olapy_data', None)
         direct_table_or_file = kwargs.get('direct_table_or_file', None)
+        columns = kwargs.get('columns', None)
+        measures = kwargs.get('measures', None)
         if direct_table_or_file:
             mdx_executor = MdxEngineLite()
             self.catalogues = [direct_table_or_file]
@@ -54,7 +56,8 @@ class XmlaTools():
             if executor:
                 self.executor = executor
             else:
-                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts)
+                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
+                                       measures=measures)
                 self.executor = mdx_executor
 
         self.session_id = uuid.uuid1()
