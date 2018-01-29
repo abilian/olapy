@@ -5,6 +5,10 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 
 class MdxEngineLite(MdxEngine):
+    """
+    olapy runserver -tf=/home/moddoy/olapy-data/cubes/sales/Facts.csv -c City,Licence,Amount,Count
+    """
+
     def __init__(self):
         MdxEngine.__init__(self)
 
@@ -15,13 +19,12 @@ class MdxEngineLite(MdxEngine):
         measures = kwargs.get('measures', None)
         sep = kwargs.get('sep', ';')
         columns = kwargs.get('columns', None)
-
         if self.sql_alchemy:
             self.tables_loaded = self.load_tables_db(columns)
         else:
             self.tables_loaded = self.load_tables_csv_files(sep, columns)
         if measures:
-            self.measures = measures
+            self.measures = measures.split(',')
         else:
             self.measures = self.get_measures()
         if self.measures:
@@ -50,7 +53,7 @@ class MdxEngineLite(MdxEngine):
         results = self.sql_alchemy.execution_options(stream_results=True).execute('SELECT * FROM {}'.format(self.cube))
         # Fetch all the results of the query
         if columns:
-            value = pd.DataFrame(iter(results), columns=results.keys())[columns]
+            value = pd.DataFrame(iter(results), columns=results.keys())[columns.split(',')]
         else:
             value = pd.DataFrame(iter(results), columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
@@ -60,18 +63,10 @@ class MdxEngineLite(MdxEngine):
         return tables
 
     def load_tables_csv_files(self, sep, columns):
-        """
-        Load tables from csv files.
-
-        :param self: MdxEngine instance
-        :param sep: csv file separator
-        :return: tables dict with table name as key and dataframe as value
-        """
-
         tables = {}
         table_name = self.cube.split('/')[-1].replace('.csv', '')
         if columns:
-            value = pd.read_csv(self.cube, sep=sep)[columns]
+            value = pd.read_csv(self.cube, sep=sep)[columns.split(',')]
         else:
             value = pd.read_csv(self.cube, sep=sep)
 
