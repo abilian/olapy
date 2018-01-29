@@ -240,7 +240,7 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
 @click.option('--direct_table_or_file', '-tf', default=None,
               help="File path or db table name if you want to construct cube from a single file (table)")
 def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type, db_config_file,
-              cube_config_file,direct_table_or_file):
+              cube_config_file, direct_table_or_file):
     """
     Start the xmla server.
     """
@@ -255,7 +255,8 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,direct_table_or_file)
+    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,
+                                            direct_table_or_file)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")

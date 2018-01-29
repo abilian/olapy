@@ -86,4 +86,3 @@ class MdxEngineLite(MdxEngine):
             return [self.cube]
         else:
             return [self.cube.split('/')[-1].replace('.csv', '')]
-
