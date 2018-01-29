@@ -157,7 +157,7 @@ class XmlaExecuteTools():
 
         return tuple
 
-    def _generate_tuples_xs0(self, splited_df, mdx_query_axis):
+    def _generate_tuples_xs0(self, split_df, mdx_query_axis):
 
         first_att = None
         # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
@@ -178,8 +178,8 @@ class XmlaExecuteTools():
             # Ex: ['Geography','America']
             tuples = [
                 zip(*[[[key] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
+                       for row in split_df[key].itertuples(index=False)]
+                      for key in split_df.keys()
                       if key is not self.executor.facts]),
             ]
 
@@ -190,8 +190,8 @@ class XmlaExecuteTools():
             # Ex: ['Geography','Amount','America']
             tuples = [
                 zip(*[[[key] + [mes] + list(row)
-                       for row in splited_df[key].itertuples(index=False)]
-                      for key in splited_df.keys()
+                       for row in split_df[key].itertuples(index=False)]
+                      for key in split_df.keys()
                       if key is not self.executor.facts])
                 for mes in self.executor.selected_measures
             ]
@@ -212,7 +212,7 @@ class XmlaExecuteTools():
     def _gen_xs0_parent(self, xml, **kwargs):
 
         first_att = kwargs.get('first_att')
-        splited_df = kwargs.get('splited_df')
+        split_df = kwargs.get('split_df')
         tuple = kwargs.get('tuple')
 
         parent = '.'.join(map(lambda x: '[' + str(x) + ']', tuple[first_att - 1:-1]))
@@ -220,14 +220,14 @@ class XmlaExecuteTools():
             parent = '.' + parent
         xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}]{2}'.format(
             tuple[0],
-            splited_df[tuple[0]].columns[0], parent))
+            split_df[tuple[0]].columns[0], parent))
 
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):
         first_att = kwargs.get('first_att')
-        splited_df = kwargs.get('splited_df')
+        split_df = kwargs.get('split_df')
         for tupl in tupls:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
-            d_tup = splited_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
+            d_tup = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
             with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0], )):
                 xml.UName('[{0}].[{0}].[{1}].{2}'.format(
                     tuple_without_minus_1[0],
@@ -239,11 +239,11 @@ class XmlaExecuteTools():
                 xml.DisplayInfo('131076')
 
                 if 'PARENT_UNIQUE_NAME' in self.mdx_query.upper():
-                    self._gen_xs0_parent(xml, tuple=tuple_without_minus_1, splited_df=splited_df, first_att=first_att)
+                    self._gen_xs0_parent(xml, tuple=tuple_without_minus_1, split_df=split_df, first_att=first_att)
                 if 'HIERARCHY_UNIQUE_NAME' in self.mdx_query.upper():
                     xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
 
-    def tuples_2_xs0(self, tuples, splited_df, first_att, axis):
+    def tuples_2_xs0(self, tuples, split_df, first_att, axis):
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
@@ -253,7 +253,7 @@ class XmlaExecuteTools():
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
-                        self._gen_xs0_tuples(xml, tupls, splited_df=splited_df, first_att=first_att)
+                        self._gen_xs0_tuples(xml, tupls, split_df=split_df, first_att=first_att)
                         # Hierarchize'
                         if not self.executor.parser.hierarchized_tuples():
                             self._gen_measures_xs0(xml, tupls)
@@ -266,24 +266,24 @@ class XmlaExecuteTools():
                 for group in tuples_groups:
                     with xml.Tuple:
                         for tupl in self.executor.parser.split_group(group):
-                            splited_tupl = self.executor.parser.split_tuple(
+                            split_tupl = self.executor.parser.split_tuple(
                                 tupl,)
-                            if splited_tupl[0].upper() == 'MEASURES':
+                            if split_tupl[0].upper() == 'MEASURES':
                                 hierarchy = '[Measures]'
-                                l_name = '[' + splited_tupl[0] + ']'
+                                l_name = '[' + split_tupl[0] + ']'
                                 lvl = 0
                                 displayinfo = '0'
                             else:
                                 hierarchy = '[{0}].[{0}]'.format(
-                                    splited_tupl[0],)
+                                    split_tupl[0],)
                                 l_name = "[{}]".format('].['.join(
-                                    splited_tupl[:3],))
-                                lvl = len(splited_tupl[4:])
+                                    split_tupl[:3],))
+                                lvl = len(split_tupl[4:])
                                 displayinfo = '131076'
 
                             with xml.Member(Hierarchy=hierarchy):
                                 xml.UName('{}'.format(tupl.strip(' \t\n')))
-                                xml.Caption('{}'.format(splited_tupl[-1]))
+                                xml.Caption('{}'.format(split_tupl[-1]))
                                 xml.LName(l_name)
                                 xml.LNum(str(lvl))
                                 xml.DisplayInfo(displayinfo)
@@ -291,7 +291,7 @@ class XmlaExecuteTools():
 
     def generate_xs0_one_axis(
             self,
-            splited_df,
+            split_df,
             mdx_query_axis='all',
             axis="Axis0",
     ):
@@ -305,11 +305,11 @@ class XmlaExecuteTools():
         xml = xmlwitch.Builder()
 
         tuples, first_att = self._generate_tuples_xs0(
-            splited_df,
+            split_df,
             mdx_query_axis,
         )
         if tuples:
-            xml = self.tuples_2_xs0(tuples, splited_df, first_att, axis)
+            xml = self.tuples_2_xs0(tuples, split_df, first_att, axis)
         elif self.columns_desc['columns'].keys() == [self.executor.facts]:
             with xml.Axis(name=axis):
                 with xml.Tuples:

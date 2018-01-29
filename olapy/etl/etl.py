@@ -60,7 +60,7 @@ class ETL(object):
         self.source_type = source_type
         self.facts_table = facts_table
         self.cube_path = MdxEngine.olapy_data_location
-        self.seperator = self._get_default_seperator(
+        self.separator = self._get_default_separator(
         ) if not separator else separator
         self.target_cube = target_cube
         if source_folder != INPUT_DIR and source_type.upper() != 'DB':
@@ -84,7 +84,7 @@ class ETL(object):
             os.mkdir(GEN_FOLDER)
         self.services = get_default_services(__file__)
 
-    def _get_default_seperator(self):
+    def _get_default_separator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
             return ','
 
@@ -100,25 +100,25 @@ class ETL(object):
 
         if self.dim_first_row_headers:
             # split headers
-            splited = line.split(self.seperator)
-            self.dim_headers = splited
+            splitted = line.split(self.separator)
+            self.dim_headers = splitted
             self.dim_first_row_headers = False
-            for idx, column_header in enumerate(splited):
+            for idx, column_header in enumerate(splitted):
                 if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
-                    splited[idx] = column_header + '_id'
+                    splitted[idx] = column_header + '_id'
 
         else:
             if self.dim_headers:
-                splited = line.split(
-                    self.seperator,
+                splitted = line.split(
+                    self.separator,
                     maxsplit=len(self.dim_headers),
                 )
             else:
                 # columns = self.current_dim_id_column
-                splited = line.split(self.seperator)
+                splitted = line.split(self.separator)
 
             for idx, head in enumerate(self.dim_headers):
-                transformed.update({head: splited[idx]})
+                transformed.update({head: splitted[idx]})
 
         return transformed
 
@@ -126,6 +126,7 @@ class ETL(object):
         """
         :func:`extract` return dict as kwargs if :func:`extract` from csv file
         :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
+
         :return: transformed kwargs
         """
         if self.dim_first_row_headers:
@@ -221,16 +222,16 @@ def run_olapy_etl(dims_infos,
                   in_delimiter=',',
                   **kwargs):
     """
-    Run ETl Process on each table pass to it.
+    Run ETl Process on each table passed to it, and generates files to olapy dir.
 
     :param dims_infos: dict of Dimension name as key, column id name as value
 
     example::
 
         dims_infos = {
-                    'Geography': ['geography_key'],
-                    'Product': ['product_key']
-                     }
+            'Geography': ['geography_key'],
+            'Product': ['product_key'],
+        }
 
     :param facts_ids: list of facts ids
 
@@ -241,7 +242,8 @@ def run_olapy_etl(dims_infos,
     :param facts_table: facts table name
     :param source_type: file -> .txt files in input || csv -> .csv files in input
     :param source_folder: from where you get your files (if source is csv or text files)
-    :return: generate files to olapy dir
+
+    :return: nothing
     """
 
     # source_type -> file : .txt files in input
