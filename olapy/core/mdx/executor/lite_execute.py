@@ -10,7 +10,8 @@ class MdxEngineLite(MdxEngine):
 
     def load_cube(self, table_or_file, sql_alchemy_uri=None, **kwargs):
         self.cube = table_or_file
-        self.sql_alchemy = create_engine(sql_alchemy_uri)
+        if sql_alchemy_uri:
+            self.sql_alchemy = create_engine(sql_alchemy_uri)
         measures = kwargs.get('measures', None)
         sep = kwargs.get('sep', ';')
         columns = kwargs.get('columns', None)
