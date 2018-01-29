@@ -33,10 +33,10 @@ class Parser(object):
         :param tupl: MDX Tuple as String
         :return: Tuple items in list
         """
-        splitted_tupl = tupl.strip(' \t\n').split('].[')
-        splitted_tupl[0] = splitted_tupl[0].replace('[', '')
-        splitted_tupl[-1] = splitted_tupl[-1].replace(']', '')
-        return splitted_tupl
+        split_tupl = tupl.strip(' \t\n').split('].[')
+        split_tupl[0] = split_tupl[0].replace('[', '')
+        split_tupl[-1] = split_tupl[-1].replace(']', '')
+        return split_tupl
 
     @classmethod
     def get_tuples(cls, query, start=None, stop=None):
@@ -173,7 +173,7 @@ class Parser(object):
     @staticmethod
     def add_tuple_brackets(tupl):
         """
-        After splitting tuple with :func:`splitted_group`, you got some tuple like **aa].[bb].[cc].[dd**
+        After splitting tuple with :func:`split_group`, you got some tuple like **aa].[bb].[cc].[dd**
         so add_tuple_brackets fix this by adding missed brackets **[aa].[bb].[cc].[dd]**.
 
         :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
@@ -198,9 +198,9 @@ class Parser(object):
         :param group: Group of tuple as string.
         :return: Separated tuples as list.
         """
-        splitted_group = group.replace('\n', '').replace('\t', '').split('],')
+        split_group = group.replace('\n', '').replace('\t', '').split('],')
         return list(
-            map(lambda tupl: self.add_tuple_brackets(tupl), splitted_group),)
+            map(lambda tupl: self.add_tuple_brackets(tupl), split_group),)
 
     def get_nested_select(self):
         """
