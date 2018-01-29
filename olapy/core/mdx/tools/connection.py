@@ -22,9 +22,10 @@ class MyDB(object):
         """
         if 'SQLALCHEMY_DATABASE_URI' in os.environ:
             self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
-            self.engine, self.dbms = self.connect_with_env_var(db_name)
+            self.engine, self.dbms = self.connect_with_env_var(None)
+            # self.engine, self.dbms = self.connect_with_env_var(db_name)
         else:
-            self.db_credentials = db_config.get_db_credentials()
+            self.db_credentials = db_config
             self.engine, self.dbms = self.connect_without_env_var(db_name)
 
     def gen_all_databases_query(self):
@@ -164,7 +165,6 @@ class MySqliteDB(MyDB):
         MyDB.__init__(self, db_config, db_name=db_name)
 
     def construct_engine(self, db=None):
-        # eng, con_db = self.get_init_table()
         return create_engine('sqlite:///' + self.db_credentials['path'])
 
     def get_all_databases(self):
@@ -212,22 +212,13 @@ class MyMssqlDB(MyDB):
         :param db: database to connect to
         :return: SqlAlchemy engine
         """
-        # todo recheck + clean
-        sql_server_driver = self.db_credentials['sql_server_driver'].replace(
-            ' ',
-            '+',
-        )
+        sql_server_driver = self.db_credentials['sql_server_driver'].replace(' ', '+')
         if db is not None:
-            url = driver + '://(local)/{}?driver={}'.format(
-                db,
-                sql_server_driver,
-            )
+            url = driver + '://(local)/{}?driver={}'.format(db, sql_server_driver)
             return create_engine(url, encoding='utf-8')
 
-        if 'LOCALHOST' in self.db_credentials['user'].upper(
-        ) or not self.db_credentials['user']:
-            url = driver + \
-                '://(local)/msdb?driver={}'.format(sql_server_driver)
+        if 'LOCALHOST' in self.db_credentials['user'].upper() or not self.db_credentials['user']:
+            url = driver + '://(local)/msdb?driver={}'.format(sql_server_driver)
         else:
             url = driver + '://{}:{}@{}:{}/msdb?driver={}'.format(
                 self.db_credentials['user'],

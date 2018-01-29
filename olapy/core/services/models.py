@@ -114,7 +114,7 @@ class Restrictionlist(ComplexModel):
     RestrictionList = Restriction
 
 
-class Propertielist(ComplexModel):
+class Propertieslist(ComplexModel):
     """Properties description (used by spyne)."""
 
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
@@ -134,7 +134,7 @@ class ExecuteRequest(ComplexModel):
     """Execute description (used by spyne)."""
 
     Command = Command
-    Properties = Propertielist
+    Properties = Propertieslist
 
 
 class DiscoverRequest(ComplexModel):
@@ -142,4 +142,4 @@ class DiscoverRequest(ComplexModel):
 
     RequestType = Unicode
     Restrictions = Restrictionlist
-    Properties = Propertielist
+    Properties = Propertieslist

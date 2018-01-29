@@ -14,7 +14,7 @@ import pandas.io.sql as psql
 from ..tools.connection import MyDB
 
 
-def load_one_table(cubes_obj, executor, table_name):
+def load_one_table(cubes_obj, executor, table_name, sep):
     if cubes_obj.source.upper() == 'CSV':
         facts = os.path.join(
             executor.get_cube_path(),
@@ -23,7 +23,7 @@ def load_one_table(cubes_obj, executor, table_name):
         # with extension or not
         if not os.path.isfile(facts):
             facts.replace('.csv', '')
-        table = pd.read_csv(facts, sep=executor.sep)
+        table = pd.read_csv(facts, sep=sep)
     else:
         db = MyDB(
             executor.database_config,
@@ -38,12 +38,13 @@ def load_one_table(cubes_obj, executor, table_name):
     return table
 
 
-def load_table_config_file(executor, cube_obj):
+def load_table_config_file(executor, cube_obj, sep):
     """
     Load tables from config file.
 
     :param executor: MdxEngine instance
     :param cube_obj: cubes parser object
+    :param sep: csv file separator
     :return: tables dict with table name as key and DataFrame as value
     """
 
@@ -53,7 +54,7 @@ def load_table_config_file(executor, cube_obj):
 
     for dimension in cube_obj.dimensions:
 
-        df = load_one_table(cube_obj, executor, dimension.name)
+        df = load_one_table(cube_obj, executor, dimension.name, sep)
         if dimension.columns.keys():
             df = df[dimension.columns.keys()]
 
@@ -77,11 +78,12 @@ def load_table_config_file(executor, cube_obj):
 
 
 # excel client
-def construct_star_schema_config_file(executor, cubes_obj):
+def construct_star_schema_config_file(executor, cubes_obj, sep):
     """Construct star schema DataFrame from configuration file for excel client.
 
     :param executor:  MdxEngine instance
     :param cubes_obj: cubes object
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
     executor.facts = cubes_obj.facts[0].table_name
@@ -90,6 +92,7 @@ def construct_star_schema_config_file(executor, cubes_obj):
         cubes_obj,
         executor,
         executor.facts,
+        sep
     )
 
     for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
@@ -102,7 +105,7 @@ def construct_star_schema_config_file(executor, cubes_obj):
             # with extension or not
             if not os.path.isfile(file):
                 file.replace('.csv', '')
-            df = pd.read_csv(file, sep=executor.sep)
+            df = pd.read_csv(file, sep=sep)
         else:
             db = MyDB(
                 executor.database_config,
@@ -170,11 +173,12 @@ def get_columns_n_tables(cubes_obj, executor):
 
 
 # web client
-def construct_web_star_schema_config_file(executor, cubes_obj):
+def construct_web_star_schema_config_file(executor, cubes_obj, sep):
     """Construct star schema DataFrame from configuration file for web client.
 
     :param executor: MdxEngine instance
     :param cubes_obj: cubes parser object
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
 
@@ -184,6 +188,7 @@ def construct_web_star_schema_config_file(executor, cubes_obj):
         cubes_obj,
         executor,
         executor.facts,
+        sep
     )
 
     all_columns, tables = get_columns_n_tables(cubes_obj, executor)
@@ -206,6 +211,7 @@ def construct_web_star_schema_config_file(executor, cubes_obj):
                 cubes_obj,
                 executor,
                 dimension_and_key.split('.')[0],
+                sep
             )
 
         fusion = fusion.merge(

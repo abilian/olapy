@@ -10,11 +10,12 @@ import os
 import pandas as pd
 
 
-def load_tables_csv_files(executor):
+def load_tables_csv_files(executor, sep):
     """
     Load tables from csv files.
 
     :param executor: MdxEngine instance
+    :param sep: csv file separator
     :return: tables dict with table name as key and dataframe as value
     """
 
@@ -25,7 +26,7 @@ def load_tables_csv_files(executor):
         table_name = os.path.splitext(file)[0]
         value = pd.read_csv(
             os.path.join(cube, file),
-            sep=executor.sep,
+            sep=sep,
         )
         tables[table_name] = value[[
             col for col in value.columns if col.lower()[-3:] != '_id'
@@ -34,11 +35,12 @@ def load_tables_csv_files(executor):
     return tables
 
 
-def construct_star_schema_csv_files(executor):
+def construct_star_schema_csv_files(executor, sep):
     """
     Construct star schema DataFrame from csv files.
 
     :param executor: MdxEngine instance
+    :param sep: csv file separator
     :return: star schema DataFrame
     """
     cube = executor.get_cube_path()
@@ -46,15 +48,15 @@ def construct_star_schema_csv_files(executor):
     # loading facts table
     fusion = pd.read_csv(
         os.path.join(cube, executor.facts + '.csv'),
-        sep=executor.sep,
+        sep=sep,
     )
     for file_name in os.listdir(cube):
         try:
             fusion = fusion.merge(
                 pd.read_csv(
                     os.path.join(cube, file_name),
-                    sep=executor.sep,
-                ),)
+                    sep=sep,
+                ), )
         except BaseException:
             print('No common column')
             pass

@@ -28,8 +28,8 @@ class Dimension(object):
 @attr.s
 class Cube(object):
     """Cube class used to encapsulate config file attributes."""
-
     name = attr.ib()
     source = attr.ib()
+    xmla_authentication = attr.ib()
     facts = attr.ib()
     dimensions = attr.ib()

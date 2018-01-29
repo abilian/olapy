@@ -32,21 +32,18 @@ class DbConfigParser:
         else:
             self.config_file_path = config_file_path
 
-    def config_file_exists(self):
-        """
-        Check whether the config file exists or not.
-
-        :return: True | False
-        """
-        return os.path.isfile(self.config_file_path)
-
-    def get_db_credentials(self):
+    def get_db_credentials(self, db_config_path=None):
         """
         Get all db credentials in the config file.
 
         :return: dict of database connection credentials.
         """
-        with open(self.config_file_path) as config_file:
+        if db_config_path:
+            file_path = db_config_path
+        else:
+            file_path = self.config_file_path
+
+        with open(file_path) as config_file:
             # try:
             config = yaml.load(config_file)
             dbms = config['dbms']
