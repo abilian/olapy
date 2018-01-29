@@ -30,9 +30,17 @@ class MdxEngineLite(MdxEngine):
         if self.measures:
             # default measure is the first one
             self.selected_measures = [self.measures[0]]
-
-        # construct star_schema
+        # temp fix
+        # todo remove
+        self.remove_measures()
         self.star_schema_dataframe = list(self.tables_loaded.values())[0]
+
+    def remove_measures(self):
+        # todo very bad , remove
+        column_to_remove = [col for col in list(self.tables_loaded.values())[0].columns if col not in self.measures]
+        table_name = self.tables_loaded.keys()[0]
+        self.tables_loaded[table_name] = self.tables_loaded[table_name][
+            [col for col in self.tables_loaded[table_name] if col in column_to_remove]]
 
     def get_measures(self):
         table = list(self.tables_loaded.values())[0]
@@ -58,7 +66,8 @@ class MdxEngineLite(MdxEngine):
             value = pd.DataFrame(iter(results), columns=results.keys())  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-        tables[self.cube] = value[[col for col in value.columns if col.lower()[-3:] != '_id']]
+        tables[self.cube] = value[
+            [col for col in value.columns if col.lower()[-3:] != '_id']]
 
         return tables
 
