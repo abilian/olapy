@@ -111,6 +111,7 @@ class XmlaProviderService(ServiceBase):
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string
         """
+
         xmla_tools = ctx.app.config['xmla_tools']
         ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
         mdx_query = request.Command.Statement.encode().decode('utf8')
@@ -188,25 +189,29 @@ def get_spyne_app(xmla_tools):
     )
 
 
-def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file):
-    db_conf = None
-    cube_conf = None
-    if 'db' in source_type:
-        db_config = DbConfigParser()
-        db_conf = db_config.get_db_credentials(db_config_file)
-
-    try:
-        cube_config_file_parser = ConfigParser()
-        cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
-    except (KeyError, IOError):
-        type, value, traceback = sys.exc_info()
-        print(type)
-        print(value)
-        print_tb(traceback)
+def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file, direct_table_or_file):
+    if direct_table_or_file:
+        xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
+                               direct_table_or_file=direct_table_or_file)
+    else:
         db_conf = None
+        cube_conf = None
+        if 'db' in source_type:
+            db_config = DbConfigParser()
+            db_conf = db_config.get_db_credentials(db_config_file)
 
-    xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                           db_config=db_conf, cubes_config=cube_conf)
+        try:
+            cube_config_file_parser = ConfigParser()
+            cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
+        except (KeyError, IOError):
+            type, value, traceback = sys.exc_info()
+            print(type)
+            print(value)
+            print_tb(traceback)
+            db_conf = None
+
+        xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
+                               db_config=db_conf, cubes_config=cube_conf)
 
     application = get_spyne_app(xmla_tools)
 
@@ -232,12 +237,13 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
               default=os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'),
               help="Cube config file path, DEFAULT : " +
                    os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'))
+@click.option('--direct_table_or_file', '-tf', default=None,
+              help="File path or db table name if you want to construct cube from a single file (table)")
 def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type, db_config_file,
-              cube_config_file):
+              cube_config_file,direct_table_or_file):
     """
     Start the xmla server.
     """
-
     if sql_alchemy_uri is not None:
         # Example: olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
         os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
@@ -249,7 +255,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file)
+    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,direct_table_or_file)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")
