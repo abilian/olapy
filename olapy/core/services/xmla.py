@@ -190,10 +190,11 @@ def get_spyne_app(xmla_tools):
 
 
 def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file, direct_table_or_file, columns,
-                         measures):
+                         measures, sql_alchemy_uri):
     if direct_table_or_file:
         xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
-                               direct_table_or_file=direct_table_or_file, columns=columns, measures=measures)
+                               direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
+                               sql_alchemy_uri=sql_alchemy_uri)
     else:
         db_conf = None
         cube_conf = None
@@ -261,7 +262,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
         pass
 
     wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,
-                                            direct_table_or_file, columns, measures)
+                                            direct_table_or_file, columns, measures, sql_alchemy_uri)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")

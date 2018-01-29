@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from sqlalchemy import create_engine
 from olapy.core.mdx.executor.execute import MdxEngine
 
 
@@ -8,9 +8,9 @@ class MdxEngineLite(MdxEngine):
     def __init__(self):
         MdxEngine.__init__(self)
 
-    def load_cube(self, table_or_file, sql_alchemy_engine=None, **kwargs):
+    def load_cube(self, table_or_file, sql_alchemy_uri=None, **kwargs):
         self.cube = table_or_file
-        self.sql_alchemy = sql_alchemy_engine
+        self.sql_alchemy = create_engine(sql_alchemy_uri)
         measures = kwargs.get('measures', None)
         sep = kwargs.get('sep', ';')
         columns = kwargs.get('columns', None)
