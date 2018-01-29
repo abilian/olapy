@@ -3,7 +3,7 @@ typing
 pandas<1
 lxml
 spyne<3
-SQLAlchemy==1.1.15 # <1.2 required by bonobo
+SQLAlchemy<1.2 # <1.2 required by bonobo
 xmlwitch
 attrs
 pyyaml
@@ -17,7 +17,7 @@ werkzeug
 #pympler
 
 #ETL
-bonobo==0.5.2
-bonobo-sqlalchemy==0.5.1
+bonobo<0.6
+bonobo-sqlalchemy<0.6
 awesome-slugify
 python-dotenv
