@@ -111,9 +111,7 @@ class ConfigParser:
     def __init__(self, cube_config_file=None):
         """
 
-        :param cube_path: path to cube (csv folders) where config file is located by default
-        :param file_name: config file name (DEFAULT = cubes-config.xml)
-        :param web_config_file_name: web config file name (DEFAULT = web_cube_config.xml)
+        :param cube_config_file: full path to cube config file, Default : ~/olapy-data/cube/cubes-config.yml
         """
 
         if cube_config_file:
@@ -129,14 +127,6 @@ class ConfigParser:
             home_directory = expanduser("~")
 
         return os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml')
-
-    # XXX: never used. Do we need this?
-    def config_file_exists(self):
-        # type: () -> bool
-        """
-        Check whether the config file exists or not.
-        """
-        return os.path.isfile(self.cube_config_file)
 
     def _get_dimensions(self, config):
         return [
@@ -168,6 +158,7 @@ class ConfigParser:
         """
         Construct parser cube obj (which can ben passed to MdxEngine) for excel
 
+        :param conf_file: full path to config file, Default : ~/olapy-data/cube/cubes-config.yml
         :return: Cube obj
         """
 

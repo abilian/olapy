@@ -1,3 +1,8 @@
+# -*- encoding: utf8 -*-
+"""
+Do the same thing as MdxEngine, but with onle one file or database table (no need a star schema tables)
+"""
+
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
@@ -5,14 +10,21 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 
 class MdxEngineLite(MdxEngine):
-    """
-    olapy runserver -tf=/home/moddoy/olapy-data/cubes/sales/Facts.csv -c City,Licence,Amount,Count
-    """
+    """The main class for executing a queries in one file."""
 
     def __init__(self):
         MdxEngine.__init__(self)
 
     def load_cube(self, table_or_file, sql_alchemy_uri=None, **kwargs):
+        """
+         After instantiating MdxEngine(), load_cube construct the cube and load all tables.
+
+        :param table_or_file: full file path, or just database table name if sql_alchemy_uri provided
+        :param sql_alchemy_uri: sql alchemy connection string
+        :param measures: explicitly specify measures
+        :param columns: explicitly specify columns, order matters
+        :param sep: csv file separator
+        """
         self.cube = table_or_file
         if sql_alchemy_uri:
             self.sql_alchemy = create_engine(sql_alchemy_uri)
@@ -37,6 +49,10 @@ class MdxEngineLite(MdxEngine):
         self.tables_loaded[table_name] = self.tables_loaded[table_name].drop(self.measures, axis=1)
 
     def get_measures(self):
+        """
+        :return: all numerical columns in Facts table.
+        """
+
         table = list(self.tables_loaded.values())[0]
         not_id_columns = [column for column in table.columns if 'id' not in column]
         cleaned_facts = self.clean_data(table, not_id_columns)
@@ -44,9 +60,9 @@ class MdxEngineLite(MdxEngine):
 
     def load_tables_db(self, columns):
         """
-        Load tables from database.
+        Load table from database.
 
-        :param self: MdxEngine instance
+        :param columns: list of columns names
         :return: tables dict with table name as key and dataframe as value
         """
 
@@ -66,6 +82,12 @@ class MdxEngineLite(MdxEngine):
         return tables
 
     def load_tables_csv_files(self, sep, columns):
+        """
+        load the csv file
+        :param sep: csv file separator
+        :param columns: list of columns names
+        :return: pandas DataFrame
+        """
         tables = {}
         table_name = self.cube.split('/')[-1].replace('.csv', '')
         if columns:

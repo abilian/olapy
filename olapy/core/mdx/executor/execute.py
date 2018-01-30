@@ -53,6 +53,7 @@ class MdxEngine(object):
     :param sql_engine: sql_alchemy engine if you don't want to use any database config file
     :param source_type: source data input, Default csv
     :param cubes_folder_name: csv files, folder name, Default *cubes*
+    :param mdx_q_parser: mdx query parser
 
     """
 
@@ -155,7 +156,7 @@ class MdxEngine(object):
         """
         Get csv folder names
 
-        :param cubes_location: Olapy cubes path, which is under olapy-data, by default ~/olapy-data/cubes_location
+        :param cubes_location: OlaPy cubes path, which is under olapy-data, by default ~/olapy-data/cubes_location
         :return:
         """
 
@@ -184,11 +185,11 @@ class MdxEngine(object):
         """
 
         # by default , and before passing values to class with olapy runserver .... it executes this with csv
-        if 'csv' in self.source_type and os.path.exists(self.cube_path):
-            self.csv_files_cubes = self._get_csv_cubes_names(self.cube_path)
         if 'db' in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
-        return self.csv_files_cubes + self.db_cubes
+        if 'csv' in self.source_type and os.path.exists(self.cube_path):
+            self.csv_files_cubes = self._get_csv_cubes_names(self.cube_path)
+        return self.db_cubes + self.csv_files_cubes
 
     def _get_tables_name(self):
         """Get all tables names.
@@ -225,9 +226,11 @@ class MdxEngine(object):
         self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
-        """Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
+        """
+        Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
-        :return: dict with table names as keys and DataFrames as values
+        :param sep: csv files separator.
+        :return: dict with table names as keys and DataFrames as values.
         """
 
         tables = {}
@@ -280,7 +283,8 @@ class MdxEngine(object):
         - one for excel 'cubes-config.xml',
         - the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
 
-        :param config_file_parser: star schema Dataframe
+        :param config_file_parser: dict result of cube config parsing
+        :param sep: csv files separator.
         :return:
         """
         fusion = None
@@ -316,10 +320,13 @@ class MdxEngine(object):
         return star_schema_df
 
     def get_star_schema_dataframe(self, sep):
-        """Merge all DataFrames as star schema.
+        """
+        Merge all DataFrames as star schema.
 
+        :param sep: csv files separator.
         :return: star schema DataFrame
         """
+
         fusion = None
         if self.cube_config and self.cube == self.cube_config.name:
             fusion = self._construct_star_schema_from_config(self.cube_config, sep)
@@ -420,7 +427,7 @@ class MdxEngine(object):
             axes.update({axis: tables_columns})
         return axes
 
-    def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
+    def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
         Filter a DataFrame (Dataframe_in) with one tuple.
 
@@ -450,12 +457,12 @@ class MdxEngine(object):
 
 
         :param tuple_as_list: tuple as list
-        :param Dataframe_in: DataFrame in with you want to execute tuple
+        :param dataframe_in: DataFrame in with you want to execute tuple
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
             other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
-        df = Dataframe_in
+        df = dataframe_in
         #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
         if len(tuple_as_list) == 3:
@@ -536,6 +543,9 @@ class MdxEngine(object):
         +-------------+--------------+---------+
         | Europe      | -1           |41239    |
         +-------------+--------------+---------+
+
+        :param dataframe1: first DataFrame
+        :param dataframe2: second DataFrame
 
         :return: Two DataFrames with same columns
         """
@@ -740,6 +750,8 @@ class MdxEngine(object):
             executor.load_cube('sales')
             query = "SELECT FROM [sales] WHERE ([Measures].[Amount])"
             executor.execute_mdx(query)
+
+        :param mdx_query: Mdx Query
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
 

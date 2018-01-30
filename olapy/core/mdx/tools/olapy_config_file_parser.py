@@ -17,8 +17,7 @@ class DbConfigParser:
 
     def __init__(self, config_file_path=None):
         """
-
-        :param config_file_path:  config file path (DEFAULT = cubes-config)
+        :param config_file_path: full path to olapy config file, Default : ~/olapy-data/olapy-config.yml
         """
 
         if config_file_path is None:
@@ -36,6 +35,7 @@ class DbConfigParser:
         """
         Get all db credentials in the config file.
 
+        :param db_config_path: full path to olapy config file, Default : ~/olapy-data/olapy-config.yml
         :return: dict of database connection credentials.
         """
         if db_config_path:

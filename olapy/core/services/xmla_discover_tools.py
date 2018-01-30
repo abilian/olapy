@@ -30,7 +30,17 @@ class XmlaTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
     def __init__(self, source_type, db_config, cubes_config, **kwargs):
-        # right now the catalogue_name and cube name are the same
+        """
+
+        :param source_type: csv,db
+        :param db_config: olapy-config.yml file parsing result
+        :param cubes_config: cube-config.yml file parsing result
+        :param executor: MdxEngine instance
+        :param olapy_data: olapy-data path
+        :param direct_table_or_file: if you want to use olapy with only a simple csv file or database table
+        :param sql_alchemy_uri: sql alchemy connection string if you want to use olapy with only a simple database table
+
+        """
         executor = kwargs.get('executor', None)
         olapy_data = kwargs.get('olapy_data', None)
         direct_table_or_file = kwargs.get('direct_table_or_file', None)
