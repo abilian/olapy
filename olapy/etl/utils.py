@@ -1,12 +1,6 @@
-"""
-Bonobo etl require this file to access databases (and files)
-"""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-import os
 from collections import defaultdict
 
+import os
 from sqlalchemy import create_engine
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
@@ -27,7 +21,7 @@ DSN_TEMPLATE = '{driver}://{user}:{pass}@{host}:{port}/{name}'
 
 
 def create_db_engine(driver='SQL Server Native Client', version='11.0'):
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ.keys():
         dsn = os.environ['SQLALCHEMY_DATABASE_URI']
     else:
         config = defaultdict(**DB_CONFIG_DEFAULTS)
@@ -36,11 +30,10 @@ def create_db_engine(driver='SQL Server Native Client', version='11.0'):
         if DB_CONFIG_DEFAULTS['driver'].upper() == 'POSTGRES':
             dsn += '?client_encoding=utf8'
         elif 'MSSQL' in DB_CONFIG_DEFAULTS['driver'].upper():
-            dsn += '?driver={}'.format(driver + ' ' + version)
+            dsn += '?driver={0}'.format(driver + ' ' + version)
     return create_engine(dsn)
 
-
-def get_services():
-    return {
-        'sqlalchemy.engine': create_db_engine(),
-    }
+# def get_services(**options):
+#     return {
+#         'sqlalchemy.engine': create_db_engine()
+#     }

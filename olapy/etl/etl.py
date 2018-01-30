@@ -1,30 +1,24 @@
 """
-To use olapy correctly with your source file (tables), some data structure
-cleaning operation must be applied to that data.
+To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that data \
+(for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files. \
+or if tables id columns don't contains _id, this will cause some bugs sometimes)
 
-For example , if you want to use olapy with csv files, you must use semicolon
-separator for those csv files.
-Or if tables id columns don't contains _id, this will cause some bugs sometimes.
-
-This module will do the work for you, here olapy will extract data from
-your source, transform it with olapy's data structure rules
-and load them to olapy-data folder *(as csv files right now)*.
+This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data structure rules \
+and load them to olapy-data folder *(as csv files right now)*
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
+from shutil import copyfile
 
-import logging
-import os
 import shutil
 from distutils.dir_util import copy_tree
-from shutil import copyfile
+from olapy.core.mdx.executor.execute import MdxEngine
 
 import bonobo
 import dotenv
-from bonobo.commands.run import get_default_services
-from bonobo_sqlalchemy import Select
+import logging
+import os
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.etl.utils import create_db_engine
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -35,23 +29,20 @@ INPUT_DIR = 'input_dir'
 
 class ETL(object):
     """
-    Extract-transform-load for Olapy, It take a source (folder or database),
-    make all necessary transformation to that data, and then load them into
-    the olapy-data directory
+    Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
+    that data, and then load them into olapy-data directory
     """
 
-    def __init__(
-            self,
-            source_type,
-            facts_table,
-            source_folder=INPUT_DIR,
-            separator=None,
-            target_cube='etl_cube',
-    ):
+    def __init__(self,
+                 source_type,
+                 facts_table,
+                 source_folder=INPUT_DIR,
+                 separator=None,
+                 target_cube='etl_cube'):
         """
 
         :param source_type: file | csv | db (if db , make sure that you put database connection credentials in the
-        /home/user/olapy-data/olapy-config.yml file
+        /home/user/olapy-data/olapy-config file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
         :param separator: input file separator (, ; : ...)
@@ -60,7 +51,7 @@ class ETL(object):
         self.source_type = source_type
         self.facts_table = facts_table
         self.cube_path = MdxEngine.olapy_data_location
-        self.separator = self._get_default_separator(
+        self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
         if source_folder != INPUT_DIR and source_type.upper() != 'DB':
@@ -74,17 +65,14 @@ class ETL(object):
         else:
             self.source_folder = INPUT_DIR
         self.olapy_cube_path = os.path.join(
-            MdxEngine.olapy_data_location,
-            MdxEngine.CUBE_FOLDER_NAME,
-        )
+            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER_NAME)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
         if not os.path.exists(GEN_FOLDER):
             os.mkdir(GEN_FOLDER)
-        self.services = get_default_services(__file__)
 
-    def _get_default_separator(self):
+    def _get_default_seperator(self):
         if self.source_type.upper() in ['CSV', 'FILE']:
             return ','
 
@@ -100,25 +88,23 @@ class ETL(object):
 
         if self.dim_first_row_headers:
             # split headers
-            splitted = line.split(self.separator)
-            self.dim_headers = splitted
+            splited = line.split(self.seperator)
+            self.dim_headers = splited
             self.dim_first_row_headers = False
-            for idx, column_header in enumerate(splitted):
+            for idx, column_header in enumerate(splited):
                 if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
-                    splitted[idx] = column_header + '_id'
+                    splited[idx] = column_header + '_id'
 
         else:
             if self.dim_headers:
-                splitted = line.split(
-                    self.separator,
-                    maxsplit=len(self.dim_headers),
-                )
+                splited = line.split(
+                    self.seperator, maxsplit=len(self.dim_headers))
             else:
                 # columns = self.current_dim_id_column
-                splitted = line.split(self.separator)
+                splited = line.split(self.seperator)
 
             for idx, head in enumerate(self.dim_headers):
-                transformed.update({head: splitted[idx]})
+                transformed.update({head: splited[idx]})
 
         return transformed
 
@@ -126,7 +112,6 @@ class ETL(object):
         """
         :func:`extract` return dict as kwargs if :func:`extract` from csv file
         :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
-
         :return: transformed kwargs
         """
         if self.dim_first_row_headers:
@@ -144,7 +129,8 @@ class ETL(object):
         :return: Bonobo Reader
         """
         if self.source_type.upper() == 'DB':
-            return Select('SELECT * from {};'.format(table_name))
+            engine = create_db_engine()
+            return engine.execute('SELECT * from {};'.format(table_name))
         elif self.source_type.upper() == 'FILE':
             # delimiter not used with files
             return bonobo.FileReader(table_name)
@@ -179,17 +165,14 @@ class ETL(object):
         if table_name == self.facts_table:
             table_name = 'Facts'
         return bonobo.CsvWriter(
-            os.path.join(GEN_FOLDER, table_name + '.csv'),
-            ioformat='arg0',
-        )
+            os.path.join(GEN_FOLDER, table_name + '.csv'))
 
     def copy_2_olapy_dir(self):
         """
-        Right now, bonobo can't export (save) to path (bonobo bug)
-        so we copy all generated tables directly to olapy dir.
+        right now, bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
         """
         if not os.path.isdir(
-                os.path.join(self.olapy_cube_path, self.target_cube),):
+                os.path.join(self.olapy_cube_path, self.target_cube)):
             os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
@@ -197,8 +180,7 @@ class ETL(object):
         for file in os.listdir(GEN_FOLDER):
             copyfile(
                 os.path.join(GEN_FOLDER, file),
-                os.path.join(self.target_cube, file),
-            )
+                os.path.join(self.target_cube, file))
 
     def get_source_extension(self):
         """
@@ -214,6 +196,15 @@ class ETL(object):
             return ''
 
 
+def get_graph(etl, **options):
+    return bonobo.Graph(
+        etl.extract(options.get("extraction_source"), delimiter=options.get("in_delimiter")),
+        etl.transform,
+        etl.load(options.get("table"))
+
+    )
+
+
 def run_olapy_etl(dims_infos,
                   facts_table,
                   facts_ids,
@@ -222,16 +213,16 @@ def run_olapy_etl(dims_infos,
                   in_delimiter=',',
                   **kwargs):
     """
-    Run ETl Process on each table passed to it, and generates files to olapy dir.
+    Run ETl Process on each table pass to it.
 
     :param dims_infos: dict of Dimension name as key, column id name as value
 
     example::
 
         dims_infos = {
-            'Geography': ['geography_key'],
-            'Product': ['product_key'],
-        }
+                    'Geography': ['geography_key'],
+                    'Product': ['product_key']
+                     }
 
     :param facts_ids: list of facts ids
 
@@ -242,8 +233,7 @@ def run_olapy_etl(dims_infos,
     :param facts_table: facts table name
     :param source_type: file -> .txt files in input || csv -> .csv files in input
     :param source_folder: from where you get your files (if source is csv or text files)
-
-    :return: nothing
+    :return: generate files to olapy dir
     """
 
     # source_type -> file : .txt files in input
@@ -251,15 +241,12 @@ def run_olapy_etl(dims_infos,
     etl = ETL(
         source_type=source_type,
         facts_table=facts_table,
-        source_folder=source_folder,
-    )
+        source_folder=source_folder)
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
         if etl.source_type.upper() != 'DB':
             extraction_source = os.path.join(
-                etl.source_folder,
-                table + etl.get_source_extension(),
-            )
+                etl.source_folder, table + etl.get_source_extension())
         else:
             extraction_source = table
 
@@ -269,12 +256,14 @@ def run_olapy_etl(dims_infos,
             etl.current_dim_id_column = facts_ids
         else:
             etl.current_dim_id_column = dims_infos[table]
-        graph = bonobo.Graph(
-            etl.extract(extraction_source, delimiter=in_delimiter),
-            etl.transform,
-            etl.load(table),
-        )
-        bonobo.run(graph, services=etl.services)
+
+        # parser = bonobo.get_argument_parser()
+        # with bonobo.parse_args(parser):
+        bonobo.run(get_graph(etl,
+                             extraction_source=extraction_source,
+                             in_delimiter=in_delimiter,
+                             table=table)
+                   )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
