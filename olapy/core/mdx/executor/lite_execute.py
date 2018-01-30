@@ -30,17 +30,11 @@ class MdxEngineLite(MdxEngine):
         if self.measures:
             # default measure is the first one
             self.selected_measures = [self.measures[0]]
-        # temp fix
-        # todo remove
-        self.remove_measures()
-        self.star_schema_dataframe = list(self.tables_loaded.values())[0]
 
-    def remove_measures(self):
-        # todo very bad , remove
-        column_to_remove = [col for col in list(self.tables_loaded.values())[0].columns if col not in self.measures]
-        table_name = self.tables_loaded.keys()[0]
-        self.tables_loaded[table_name] = self.tables_loaded[table_name][
-            [col for col in self.tables_loaded[table_name] if col in column_to_remove]]
+        table_name = list(self.tables_loaded.keys())[0]
+        self.star_schema_dataframe = self.tables_loaded[table_name]
+        # remove measures from
+        self.tables_loaded[table_name] = self.tables_loaded[table_name].drop(self.measures, axis=1)
 
     def get_measures(self):
         table = list(self.tables_loaded.values())[0]
