@@ -14,6 +14,7 @@ import xmlwitch
 from olapy.core.services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
+from olapy.core.mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.executor.execute import MdxEngine
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
@@ -32,17 +33,23 @@ class XmlaTools():
         # right now the catalogue_name and cube name are the same
         executor = kwargs.get('executor', None)
         olapy_data = kwargs.get('olapy_data', None)
-
-        # todo change
-        mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
-                                 cube_config=cubes_config)
-        self.catalogues = mdx_executor.get_cubes_names()
-
-        # todo change catalogue here
-        if executor and cubes_config:
-            facts = cubes_config.facts[0].table_name
+        direct_table_or_file = kwargs.get('direct_table_or_file', None)
+        columns = kwargs.get('columns', None)
+        measures = kwargs.get('measures', None)
+        sql_engine = kwargs.get('sql_alchemy_uri', None)
+        if direct_table_or_file:
+            mdx_executor = MdxEngineLite()
+            self.catalogues = [direct_table_or_file]
+            facts = None
         else:
-            facts = 'Facts'
+            mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
+                                     cube_config=cubes_config)
+            self.catalogues = mdx_executor.get_cubes_names()
+            # todo change catalogue here
+            if executor and cubes_config:
+                facts = cubes_config.facts[0].table_name
+            else:
+                facts = 'Facts'
 
         # todo directly from xmla.py
         if self.catalogues:
@@ -50,7 +57,8 @@ class XmlaTools():
             if executor:
                 self.executor = executor
             else:
-                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts)
+                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
+                                       measures=measures, sql_alchemy_uri=sql_engine)
                 self.executor = mdx_executor
 
         self.session_id = uuid.uuid1()
