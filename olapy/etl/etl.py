@@ -147,12 +147,11 @@ class ETL(object):
         :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
         :return: args or kwargs transformed
         """
-
         if self.source_type.upper() == 'FILE':
-            return self._transform_file(args)
+            return self._transform_file(kwargs)
 
         elif self.source_type.upper() == 'CSV':
-            return self._transform_csv(kwargs)
+            return self._transform_csv(args)
         else:
             return args if args else kwargs
 
