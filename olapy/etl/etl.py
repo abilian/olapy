@@ -1,10 +1,10 @@
 """
-To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that data \
-(for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files. \
+To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that \
+ data (for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files.
 or if tables id columns don't contains _id, this will cause some bugs sometimes)
 
-This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data structure rules \
-and load them to olapy-data folder *(as csv files right now)*
+This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data \
+structure rules and load them to olapy-data folder *(as csv files right now)*
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 from shutil import copyfile
