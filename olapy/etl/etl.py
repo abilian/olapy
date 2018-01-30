@@ -38,6 +38,7 @@ class ETL(object):
                  facts_table,
                  source_folder=INPUT_DIR,
                  separator=None,
+                 olay_cubes_path=None,
                  target_cube='etl_cube'):
         """
 
@@ -50,9 +51,11 @@ class ETL(object):
         """
         self.source_type = source_type
         self.facts_table = facts_table
-        self.cube_path = MdxEngine.olapy_data_location
-        self.seperator = self._get_default_seperator(
-        ) if not separator else separator
+        if olay_cubes_path:
+            self.olapy_cube_path = olay_cubes_path
+        else:
+            self.olapy_cube_path = os.path.join(MdxEngine.get_default_cube_directory(), 'cubes')
+        self.seperator = self._get_default_seperator() if not separator else separator
         self.target_cube = target_cube
         if source_folder != INPUT_DIR and source_type.upper() != 'DB':
             # #1 fix bonobo read from file path
@@ -64,8 +67,6 @@ class ETL(object):
             self.source_folder = INPUT_DIR
         else:
             self.source_folder = INPUT_DIR
-        self.olapy_cube_path = os.path.join(
-            MdxEngine.olapy_data_location, MdxEngine.CUBE_FOLDER_NAME)
         self.current_dim_id_column = None
         self.dim_first_row_headers = True
         self.dim_headers = []
