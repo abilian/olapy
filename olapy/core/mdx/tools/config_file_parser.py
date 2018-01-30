@@ -46,68 +46,66 @@ class ConfigParser:
 
     Excel Config file Structure example::
 
-
-
-        name : foodmart_with_config            # csv folder name or db name
-        source : csv                           # csv | postgres | mysql ...
+        name: foodmart_with_config            # csv folder name or db name
+        source: csv                           # csv | postgres | mysql ...
 
         xmla_authentication : False            need to enter special token with xmla url or not \
                                               (example http://127.0.0.1:8000/xmla?admin)  admin just an example
 
-        facts :
-          table_name : food_facts              # facts table name
+        facts:
+          table_name: food_facts              # facts table name
           keys:
-            columns_names :                    # primary keys
+            columns_names:                    # primary keys
               - product_id
               - warehouse_id
               - store_id
-            refs :                             # keys refs (example : product_id ref to column id from table Product...)
+            refs:                             # keys refs (example : product_id ref to column id from table Product...)
               - Product.id
               - Warehouse.id
               - Store.id
 
-          measures :                           # list of measures
-                                               # by default, all number type columns in facts table
+          measures:                           # list of measures
+                                              # by default, all number type columns in facts table
             - units_ordered
             - units_shipped
             - supply_time
 
         dimensions:                          # star building customized dimensions display in excel from the star schema
-          - dimension :
-            #  IMPORTANT , put here facts table also (little bug)
-              name : food_facts
-              displayName : food_facts
+          - dimension:
+            #  IMPORTANT: put here facts table also (little bug)
+              name: food_facts
+              displayName: food_facts
+
+          - dimension:
+              name: Product
+              displayName: Product
+              columns:
+                - name: id
+                - name: brand_name
+                - name: product_name
+                - name: SKU
+                  column_new_name: Stock_keeping_unit
+
 
           - dimension :
-              name : Product
-              displayName : Product
-              columns :
-                - name : id
-                - name : brand_name
-                - name : product_name
-                - name : SKU
-                  column_new_name : Stock_keeping_unit
+              name: Store
+              displayName: Store
+              columns:
+                - name: id
+                - name: store_type
+                - name: store_name
+                - name: store_city
+                - name: store_country
+                  column_new_name: country
 
-
-          - dimension :
-              name : Store
-              displayName : Store
-              columns :
-                - name : id
-                - name : store_type
-                - name : store_name
-                - name : store_city
-                - name : store_country
-                  column_new_name : country
-
-          - dimension :
-              name : Warehouse
-              displayName : Warehouse
-              columns :
-                - name : id
-                - name : warehouse_name
-                - name : warehouse_city
-                - name : warehouse_country
+          - dimension:
+              name: Warehouse
+              displayName: Warehouse
+              columns:
+                - name: id
+                - name: warehouse_name
+                - name: warehouse_city
+                - name: warehouse_country
     """
 
     def __init__(self, cube_config_file=None):
@@ -132,6 +130,7 @@ class ConfigParser:
 
         return os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml')
 
+    # XXX: never used. Do we need this?
     def config_file_exists(self):
         # type: () -> bool
         """
@@ -139,7 +138,7 @@ class ConfigParser:
         """
         return os.path.isfile(self.cube_config_file)
 
-    def _get_dimension(self, config):
+    def _get_dimensions(self, config):
         return [
             Dimension(
                 name=dimension['dimension']['name'],
@@ -177,7 +176,6 @@ class ConfigParser:
         else:
             file_path = self.cube_config_file
 
-        # try:
         with open(file_path) as config_file:
             config = yaml.load(config_file)
 
@@ -187,7 +185,5 @@ class ConfigParser:
             name=config['name'],
             source=config['source'],
             facts=self._get_facts(config),
-            dimensions=self._get_dimension(config),
+            dimensions=self._get_dimensions(config),
         )
-        # except BaseException:
-        #     raise ValueError('Bad configuration in the configuration file')

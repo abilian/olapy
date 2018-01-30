@@ -151,7 +151,7 @@ class MyOracleDB(MyDB):
 
     def gen_all_databases_query(self):
         # You can think of a mysql "database" as a schema/user in Oracle.
-        return 'select username from dba_users;'
+        return 'SELECT username FROM dba_users;'
 
     def get_init_table(self):
         con_db = ''
@@ -196,17 +196,16 @@ class MyMssqlDB(MyDB):
 
     def gen_all_databases_query(self):
         """
-        Each dbms has different query to get user databases names.
+        Each dbms has a different query to get user databases names.
 
-        :return: sql query to fetch all databases
+        :return: SQL query to fetch all databases
         """
-
-        return "select name FROM sys.databases where name not in ('master','tempdb','model','msdb');"
+        return "SELECT name FROM sys.databases WHERE name NOT IN ('master','tempdb','model','msdb');"
 
     def _connect_to_mssql(self, driver='mssql+pyodbc', db=None):
         """
-        As always, microsoft ruin our life, to access sql server you need
-        to add driver clause to the connection string, we do this here.
+        As always, Microsoft ruins our life, to access SQL Server you need
+        to add a driver clause to the connection string; we do this here.
 
         :param driver: driver to user for sql server, by default mssql+pyodbc
         :param db: database to connect to

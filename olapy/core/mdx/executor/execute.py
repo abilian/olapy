@@ -131,7 +131,7 @@ class MdxEngine(object):
 
     def _get_db_cubes_names(self):
         """
-        Get databases cubes names
+        Get databases cubes names.
         """
         # get databases names first , and them instantiate MdxEngine with this database, thus \
         # MdxEngine will try to construct the star schema either automatically or manually
@@ -197,19 +197,16 @@ class MdxEngine(object):
         """
         return list(self.tables_loaded.keys())
 
-    def load_cube(self, cube_name, **kwargs):
+    def load_cube(self, cube_name, fact_table_name='Facts', sep=';', measures=None, **kwargs):
         """
-        After instantiating MdxEngine(), load_cube construct the cube and load all tables
+        After instantiating MdxEngine(), load_cube construct the cube and load all tables.
+
         :param cube_name: cube name
         :param fact_table_name:  facts table name, Default **Facts**
         :param sep: separator used in csv files
         :param measures: if you want to explicitly specify measures
         :return:
         """
-
-        fact_table_name = kwargs.get('fact_table_name', 'Facts')
-        sep = kwargs.get('sep', ';')
-        measures = kwargs.get('measures', None)
 
         self.cube = cube_name
         self.facts = fact_table_name
@@ -299,22 +296,24 @@ class MdxEngine(object):
 
         return fusion
 
-    def clean_data(self, start_schema_df, measures):
+    @staticmethod
+    def clean_data(star_schema_df, measures):
         """
-        measure like this : 1 349 is not numeric so we try to transform it to 1349
-        :param start_schema_df: start schema dataframe
+        measure like this : 1 349 is not numeric so we try to transform it to 1349.
+
+        :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
         :return: cleaned columns
         """
         if measures:
             for measure in measures:
-                if start_schema_df[measure].dtype == object:
-                    start_schema_df[measure] = start_schema_df[measure].str.replace(" ", "")
+                if star_schema_df[measure].dtype == object:
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
                     try:
-                        start_schema_df[measure] = start_schema_df[measure].astype('float')
+                        star_schema_df[measure] = star_schema_df[measure].astype('float')
                     except:
-                        start_schema_df = start_schema_df.drop(measure, 1)
-        return start_schema_df
+                        star_schema_df = star_schema_df.drop(measure, 1)
+        return star_schema_df
 
     def get_star_schema_dataframe(self, sep):
         """Merge all DataFrames as star schema.
@@ -331,9 +330,9 @@ class MdxEngine(object):
         elif self.cube in self.csv_files_cubes:
             fusion = construct_star_schema_csv_files(self, sep)
 
-        start_schema_df = self.clean_data(fusion, self.measures)
+        star_schema_df = self.clean_data(fusion, self.measures)
 
-        return start_schema_df[[
+        return star_schema_df[[
             col for col in fusion.columns if col.lower()[-3:] != '_id'
         ]]
 
@@ -646,7 +645,7 @@ class MdxEngine(object):
         :return: Pandas DataFrame.
         """
         # get only used columns and dimensions for all query
-        start_df = self.star_schema_dataframe
+        star_df = self.star_schema_dataframe
         df_to_fusion = []
         table_name = tuples_on_mdx_query[0][0]
         # in every tuple
@@ -667,12 +666,12 @@ class MdxEngine(object):
 
                 table_name = tupl[0]
                 df_to_fusion = []
-                start_df = df
+                star_df = df
 
             df_to_fusion.append(
                 self.execute_one_tuple(
                     tupl,
-                    start_df,
+                    star_df,
                     columns_to_keep.values(),
                 ), )
 
