@@ -200,7 +200,8 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
     :param direct_table_or_file: csv file pathe or database table name if you want to use olapy for a one simple file
     :param columns: optional if direct_table_or_file provided, explicitly specify columns
     :param measures: optional if direct_table_or_file provided, explicitly specify measures
-    :param sql_alchemy_uri: sql alchemy string connection, optional if direct_table_or_file provided, if you want to use olapy with simple database table
+    :param sql_alchemy_uri: sql alchemy string connection, optional if direct_table_or_file provided, if you want \
+        to use olapy with simple database table
     :return: Wsgi Application
     """
     if direct_table_or_file:

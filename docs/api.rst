@@ -40,6 +40,16 @@ to import the package use::
                 get_measures,
                 execute_mdx
 
+.. automodule:: olapy.core.mdx.executor.lite_execute
+
+    .. autoclass:: MdxEngineLite
+        :members:
+                load_cube,
+                get_measures,
+                load_tables_db,
+                load_tables_csv_files
+
+
 Package ``olapy.etl.etl``
 ------------------------------------
 

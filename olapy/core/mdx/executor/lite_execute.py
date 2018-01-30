@@ -10,8 +10,13 @@ from olapy.core.mdx.executor.execute import MdxEngine
 
 
 class MdxEngineLite(MdxEngine):
-    """The main class for executing a queries in one file."""
+    """The main class for executing a queries in one file.
 
+    example of usage::
+
+            olapy runserver -tf=/home/moddoy/olapy-data/cubes/sales/Facts.csv -c City,Licence,Amount,Count
+
+    """
     def __init__(self):
         MdxEngine.__init__(self)
 
