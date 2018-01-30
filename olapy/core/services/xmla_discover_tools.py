@@ -44,6 +44,7 @@ class XmlaTools():
         else:
             mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
                                      cube_config=cubes_config)
+            mdx_executor.get_cubes_names()
             self.catalogues = mdx_executor.csv_files_cubes if mdx_executor.csv_files_cubes else mdx_executor.db_cubes
             # todo change catalogue here
             if executor and cubes_config:
