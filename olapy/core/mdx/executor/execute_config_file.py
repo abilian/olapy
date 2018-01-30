@@ -56,7 +56,7 @@ def load_table_config_file(executor, cube_obj, sep):
 
         df = load_one_table(cube_obj, executor, dimension.name, sep)
         if dimension.columns.keys():
-            df = df[dimension.columns.keys()]
+            df = df[list(dimension.columns.keys())]
 
         # change table display name
         if dimension.displayName:
