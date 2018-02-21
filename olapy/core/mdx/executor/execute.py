@@ -141,8 +141,8 @@ class MdxEngine(object):
         # from different sources (db, csv...) without interruption
         # try:
         db = self.instantiate_db(self.cube)
-        if not self.sql_alchemy:
-            self.sql_alchemy = db.engine
+        # if not self.sql_alchemy:
+        self.sql_alchemy = db.engine
         return db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
