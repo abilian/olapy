@@ -249,7 +249,7 @@ class XmlaExecuteTools():
             with xml.Tuples:
                 for tupls in itertools.chain(*tuples):
                     with xml.Tuple:
-                        if tupls[0][1] in self.executor.measures and len(self.executor.selected_measures, ) > 1:
+                        if tupls[0][1] in self.executor.measures and len(self.executor.selected_measures) > 1:
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
