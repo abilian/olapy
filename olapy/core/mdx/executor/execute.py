@@ -258,13 +258,13 @@ class MdxEngine(object):
         # from postgres and oracle databases , all tables names are lowercase
 
         if self.client == 'web' and self.cube_config:
-            if self.cube_config.facts:
+            if self.cube_config['facts']:
                 # update facts table name
-                self.facts = self.cube_config.facts[0].table_name
+                self.facts = self.cube_config['facts']['table_name']
 
                 # if measures are specified in the config file
-                if self.cube_config.facts[0].measures:
-                    return self.cube_config.facts[0].measures
+                if self.cube_config['facts']['measures']:
+                    return self.cube_config['facts']['measures']
 
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
@@ -290,11 +290,11 @@ class MdxEngine(object):
         """
         fusion = None
         if self.client == 'web':
-            if config_file_parser.facts:
+            if config_file_parser['facts']:
                 fusion = construct_web_star_schema_config_file(self, config_file_parser, sep)
-            elif config_file_parser.name in self.csv_files_cubes:
+            elif config_file_parser['name'] in self.csv_files_cubes:
                 fusion = construct_star_schema_csv_files(self, sep)
-            elif config_file_parser.name in self.db_cubes:
+            elif config_file_parser['name'] in self.db_cubes:
                 fusion = construct_star_schema_db(self)
         else:
             fusion = construct_star_schema_config_file(self, config_file_parser, sep)
