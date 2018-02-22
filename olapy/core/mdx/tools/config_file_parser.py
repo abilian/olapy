@@ -130,29 +130,27 @@ class ConfigParser:
 
     def _get_dimensions(self, config):
         return [
-            Dimension(
-                name=dimension['dimension']['name'],
-                displayName=dimension['dimension']['displayName'],
-                columns=OrderedDict(
+            {
+                'name': dimension['dimension']['name'],
+                'displayName': dimension['dimension']['displayName'],
+                'columns': OrderedDict(
                     (
                         column['name'],
                         column['name'] if 'column_new_name' not in column else
                         column['column_new_name'],
                     ) for column in dimension['dimension']['columns']
                 ) if 'columns' in dimension['dimension'] else {}
-            ) for dimension in config['dimensions']
+            } for dimension in config['dimensions']
         ]
 
     def _get_facts(self, config):
-        return [
-            Facts(
-                table_name=config['facts']['table_name'],
-                keys=dict(zip(config['facts']['keys']['columns_names'],
-                              config['facts']['keys']['refs'])
-                          ),
-                measures=config['facts']['measures']
-            )
-        ]
+        return {
+            'table_name': config['facts']['table_name'],
+            'keys': dict(zip(config['facts']['keys']['columns_names'],
+                             config['facts']['keys']['refs'])
+                         ),
+            'measures': config['facts']['measures']
+        }
 
     def get_cube_config(self, conf_file=None):
         """
@@ -171,10 +169,10 @@ class ConfigParser:
             config = yaml.load(config_file)
 
         # only one cube right now
-        return Cube(
-            xmla_authentication=bool(config['xmla_authentication']),
-            name=config['name'],
-            source=config['source'],
-            facts=self._get_facts(config),
-            dimensions=self._get_dimensions(config),
-        )
+        return {
+            'xmla_authentication': bool(config['xmla_authentication']),
+            'name': config['name'],
+            'source': config['source'],
+            'facts': self._get_facts(config),
+            'dimensions': self._get_dimensions(config),
+        }

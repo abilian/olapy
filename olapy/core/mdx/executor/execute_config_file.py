@@ -15,7 +15,7 @@ from ..tools.connection import MyDB
 
 
 def load_one_table(cubes_obj, executor, table_name, sep):
-    if cubes_obj.source.upper() == 'CSV':
+    if cubes_obj['source'].upper() == 'CSV':
         facts = os.path.join(
             executor.get_cube_path(),
             table_name + '.csv',
@@ -50,23 +50,24 @@ def load_table_config_file(executor, cube_obj, sep):
 
     tables = {}
     # just one facts table right now
-    executor.facts = cube_obj.facts[0].table_name
+    print(cube_obj)
+    executor.facts = cube_obj['facts']['table_name']
 
-    for dimension in cube_obj.dimensions:
+    for dimension in cube_obj['dimensions']:
 
-        df = load_one_table(cube_obj, executor, dimension.name, sep)
-        if dimension.columns.keys():
-            df = df[list(dimension.columns.keys())]
+        df = load_one_table(cube_obj, executor, dimension['name'], sep)
+        if dimension['columns'].keys():
+            df = df[list(dimension['columns'].keys())]
 
         # change table display name
-        if dimension.displayName:
-            table_name = dimension.displayName
+        if dimension['displayName']:
+            table_name = dimension['displayName']
         else:
-            table_name = dimension.name
+            table_name = dimension['name']
 
         # rename columns if value not None
         df.rename(
-            columns=({k: v for k, v in dimension.columns.items() if v}),
+            columns=({k: v for k, v in dimension['columns'].items() if v}),
             inplace=True,
         )
 
@@ -86,7 +87,7 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
     :param sep: csv file separator
     :return: star schema DataFrame
     """
-    executor.facts = cubes_obj.facts[0].table_name
+    executor.facts = cubes_obj['facts']['table_name']
 
     fusion = load_one_table(
         cubes_obj,
@@ -94,10 +95,9 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
         executor.facts,
         sep
     )
+    for fact_key, dimension_and_key in cubes_obj['facts']['keys'].items():
 
-    for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-
-        if cubes_obj.source.upper() == 'CSV':
+        if cubes_obj['source'].upper() == 'CSV':
             file = os.path.join(
                 executor.get_cube_path(),
                 dimension_and_key.split('.')[0] + '.csv',
@@ -116,9 +116,9 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
                 db.engine,
             )
 
-        for dimension in cubes_obj.dimensions:
-            if dimension_and_key.split('.')[0] == dimension.name:
-                df.rename(columns=dimension.columns, inplace=True)
+        for dimension in cubes_obj['dimensions']:
+            if dimension_and_key.split('.')[0] == dimension['name']:
+                df.rename(columns=dimension['columns'], inplace=True)
 
         fusion = fusion.merge(
             df,
@@ -130,8 +130,8 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
         )
 
     # measures in config-file only
-    if cubes_obj.facts[0].measures:
-        executor.measures = cubes_obj.facts[0].measures
+    if cubes_obj['facts']['measures']:
+        executor.measures = cubes_obj['facts']['measures']
     return fusion
 
 
