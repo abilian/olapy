@@ -83,8 +83,8 @@ class XmlaTools():
         """
 
         if self.selected_catalogue != new_catalogue:
-            if self.executor.cube_config and new_catalogue == self.executor.cube_config.name:
-                facts = self.executor.cube_config.facts[0].table_name
+            if self.executor.cube_config and new_catalogue == self.executor.cube_config['name']:
+                facts = self.executor.cube_config['facts']['table_name']
             else:
                 facts = 'Facts'
 

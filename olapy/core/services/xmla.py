@@ -80,7 +80,7 @@ class XmlaProviderService(ServiceBase):
         xmla_tools = ctx.app.config['xmla_tools']
         ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
         config_parser = xmla_tools.executor.cube_config
-        if config_parser and config_parser.xmla_authentication and ctx.transport.req_env['QUERY_STRING'] != 'admin':
+        if config_parser and config_parser['xmla_authentication'] and ctx.transport.req_env['QUERY_STRING'] != 'admin':
             raise InvalidCredentialsError(
                 fault_string='You do not have permission to access this resource',
                 fault_object=None,
