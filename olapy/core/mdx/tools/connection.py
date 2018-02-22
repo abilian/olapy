@@ -116,7 +116,6 @@ class MyDB(object):
         else:
             db_to_connect_to = '' if self.db_credentials[
                 'dbms'].upper() == 'ORACLE' else db
-
         url = '{}://{}:{}@{}:{}/{}'.format(
             eng,
             self.db_credentials['user'],
@@ -125,7 +124,6 @@ class MyDB(object):
             self.db_credentials['port'],
             db_to_connect_to,
         )
-
         return create_engine(url, encoding='utf-8')
 
     def __del__(self):

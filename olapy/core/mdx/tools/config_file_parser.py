@@ -10,8 +10,6 @@ from collections import OrderedDict
 
 import yaml
 
-from .models import Cube, Dimension, Facts
-
 
 class ConfigParser:
     """Parse olapy config excel file.
