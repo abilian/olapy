@@ -224,7 +224,8 @@ class MdxEngine(object):
             # default measure is the first one
             self.selected_measures = [self.measures[0]]
         # construct star_schema
-        self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
+        if self.tables_loaded:
+            self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
         """
@@ -241,10 +242,10 @@ class MdxEngine(object):
 
         elif self.cube in self.db_cubes:
             tables = load_tables_db(self)
-            if not tables:
-                raise Exception(
-                    'unable to load tables, check that the database is not empty',
-                )
+            # if not tables:
+            #     raise Exception(
+            #         'unable to load tables, check that the database is not empty',
+            #     )
 
         elif self.cube in self.csv_files_cubes:
             tables = load_tables_csv_files(self, sep)
