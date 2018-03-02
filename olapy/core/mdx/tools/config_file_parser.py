@@ -129,15 +129,15 @@ class ConfigParser:
     def _get_dimensions(self, config):
         return [
             {
-                'name': dimension['dimension']['name'],
-                'displayName': dimension['dimension']['displayName'],
+                'name': dimension['name'],
+                'displayName': dimension['displayName'],
                 'columns': OrderedDict(
                     (
                         column['name'],
                         column['name'] if 'column_new_name' not in column else
                         column['column_new_name'],
-                    ) for column in dimension['dimension']['columns']
-                ) if 'columns' in dimension['dimension'] else {}
+                    ) for column in dimension['columns']
+                ) if 'columns' in dimension else {}
             } for dimension in config['dimensions']
         ]
 
