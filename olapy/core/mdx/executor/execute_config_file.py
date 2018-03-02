@@ -50,14 +50,11 @@ def load_table_config_file(executor, cube_obj, sep):
 
     tables = {}
     # just one facts table right now
-    print(cube_obj)
     executor.facts = cube_obj['facts']['table_name']
 
     for dimension in cube_obj['dimensions']:
 
         df = load_one_table(cube_obj, executor, dimension['name'], sep)
-        if dimension['columns'].keys():
-            df = df[list(dimension['columns'].keys())]
 
         # change table display name
         if dimension['displayName']:
@@ -65,11 +62,14 @@ def load_table_config_file(executor, cube_obj, sep):
         else:
             table_name = dimension['name']
 
-        # rename columns if value not None
-        df.rename(
-            columns=({k: v for k, v in dimension['columns'].items() if v}),
-            inplace=True,
-        )
+        if 'columns' in dimension and dimension['columns']:
+            df = df[list(dimension['columns'].keys())]
+
+            # rename columns if value not None
+            df.rename(
+                columns=({k: v for k, v in dimension['columns'].items() if v}),
+                inplace=True,
+            )
 
         tables[table_name] = df[[
             col for col in df.columns if col.lower()[-2:] != 'id'
@@ -96,7 +96,6 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
         sep
     )
     for fact_key, dimension_and_key in cubes_obj['facts']['keys'].items():
-
         if cubes_obj['source'].upper() == 'CSV':
             file = os.path.join(
                 executor.get_cube_path(),
