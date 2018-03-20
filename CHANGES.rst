@@ -8,6 +8,11 @@ Changelog for Olapy
 - improve interoperability with olapy-web
 - No new features
 
+0.6.0 (2018-01-30)
+------------------
+
+- ...
+
 0.5.1 (2017-12-15)
 ------------------
 
