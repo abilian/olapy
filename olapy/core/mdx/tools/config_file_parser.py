@@ -126,27 +126,33 @@ class ConfigParser:
 
         return os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml')
 
+    @staticmethod
+    def _get_columns(dimension):
+        if 'columns' in dimension:
+            return OrderedDict(
+                (
+                    column['name'],
+                    column['name'] if 'column_new_name' not in column else
+                    column['column_new_name'],
+                ) for column in dimension['columns']
+            )
+        else:
+            return {}
+
     def _get_dimensions(self, config):
-        return [
-            {
+        dimensions = []
+        for dimension in config['dimensions']:
+            dimensions.append({
                 'name': dimension['name'],
                 'displayName': dimension['displayName'],
-                'columns': OrderedDict(
-                    (
-                        column['name'],
-                        column['name'] if 'column_new_name' not in column else
-                        column['column_new_name'],
-                    ) for column in dimension['columns']
-                ) if 'columns' in dimension else {}
-            } for dimension in config['dimensions']
-        ]
+                'columns': self._get_columns(dimension)
+            })
+        return dimensions
 
     def _get_facts(self, config):
         return {
             'table_name': config['facts']['table_name'],
-            'keys': dict(zip(config['facts']['keys']['columns_names'],
-                             config['facts']['keys']['refs'])
-                         ),
+            'keys': config['facts']['keys'],
             'measures': config['facts']['measures']
         }
 
@@ -165,7 +171,6 @@ class ConfigParser:
 
         with open(file_path) as config_file:
             config = yaml.load(config_file)
-
         # only one cube right now
         return {
             'xmla_authentication': bool(config['xmla_authentication']),
