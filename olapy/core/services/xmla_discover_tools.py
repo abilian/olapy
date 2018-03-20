@@ -664,21 +664,20 @@ class XmlaTools():
                 and request.Properties.PropertyList.Catalog is not None:
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
-            if restriction_list.HIERARCHY_VISIBILITY == 3 \
-                    or restriction_list.CATALOG_NAME == self.selected_catalogue:
-                xml = xmlwitch.Builder()
-                with xml['return']:
-                    with xml.root(
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
+            xml = xmlwitch.Builder()
+            with xml['return']:
+                with xml.root(
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            'xmlns:xsd':
                                 'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
+                            'xmlns:xsi':
                                 'http://www.w3.org/2001/XMLSchema-instance',
-                            }):
-                        xml.write(mdschema_hierarchies_xsd)
-                        for table_name, df in self.executor.tables_loaded.items(
-                        ):
+                        }):
+                    xml.write(mdschema_hierarchies_xsd)
+                    if restriction_list.HIERARCHY_VISIBILITY == 3 \
+                            or restriction_list.CATALOG_NAME == self.selected_catalogue:
+                        for table_name, df in self.executor.tables_loaded.items():
                             if table_name == self.executor.facts:
                                 continue
 
@@ -734,20 +733,7 @@ class XmlaTools():
                             xml.HIERARCHY_ORIGIN('1')
                             xml.INSTANCE_SELECTION('0')
 
-                return str(xml)
-            elif restriction_list.HIERARCHY_VISIBILITY == 2:
-                xml = xmlwitch.Builder()
-                with xml['return']:
-                    with xml.root(
-                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                            **{
-                                'xmlns:xsd':
-                                    'http://www.w3.org/2001/XMLSchema',
-                                'xmlns:xsi':
-                                    'http://www.w3.org/2001/XMLSchema-instance',
-                            }):
-                        xml.write(mdschema_hierarchies_xsd)
-                return str(xml)
+            return str(xml)
 
     def mdschema_levels_response(self, request):
         if request.Restrictions.RestrictionList.CUBE_NAME == self.selected_catalogue and \
