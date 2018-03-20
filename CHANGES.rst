@@ -1,6 +1,13 @@
 Changelog for Olapy
 ===================
 
+0.5.2 (2018-03-20)
+------------------
+
+- Bugs fixes
+- improve interoperability with olapy-web
+- No new features
+
 0.5.1 (2017-12-15)
 ------------------
 
