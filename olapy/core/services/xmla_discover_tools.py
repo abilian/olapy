@@ -657,7 +657,6 @@ class XmlaTools():
             return str(xml)
 
     def mdschema_hierarchies_response(self, request):
-
         # Enumeration of hierarchies in all dimensions
         restriction_list = request.Restrictions.RestrictionList
 
@@ -667,9 +666,7 @@ class XmlaTools():
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             if restriction_list.HIERARCHY_VISIBILITY == 3 \
                     or restriction_list.CATALOG_NAME == self.selected_catalogue:
-
                 xml = xmlwitch.Builder()
-
                 with xml['return']:
                     with xml.root(
                             xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
@@ -737,6 +734,19 @@ class XmlaTools():
                             xml.HIERARCHY_ORIGIN('1')
                             xml.INSTANCE_SELECTION('0')
 
+                return str(xml)
+            elif restriction_list.HIERARCHY_VISIBILITY == 2:
+                xml = xmlwitch.Builder()
+                with xml['return']:
+                    with xml.root(
+                            xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                            **{
+                                'xmlns:xsd':
+                                    'http://www.w3.org/2001/XMLSchema',
+                                'xmlns:xsi':
+                                    'http://www.w3.org/2001/XMLSchema-instance',
+                            }):
+                        xml.write(mdschema_hierarchies_xsd)
                 return str(xml)
 
     def mdschema_levels_response(self, request):
