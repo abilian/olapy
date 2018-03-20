@@ -8,6 +8,7 @@ xmlwitch
 attrs
 pyyaml
 regex
+click
 
 # Test
 werkzeug
