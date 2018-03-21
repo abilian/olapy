@@ -7,11 +7,8 @@ from tests.queries import query_posgres1, query_posgres2, query_postgres3, query
     query9, query10
 
 
-@pytest.mark.skipif(
-    "'SQLA_URI' not in os.environ"
-)
-@pytest.mark.parametrize(
-    'executor', [['SQLA_URI', 'sales']], indirect=True)
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
 def test_check_execution_query1(executor):
     df = executor.execute_mdx(query_posgres1)['result']
     test_df = pd.DataFrame({
@@ -22,11 +19,8 @@ def test_check_execution_query1(executor):
     assert_frame_equal(df, test_df)
 
 
-@pytest.mark.skipif(
-    "'SQLA_URI' not in os.environ"
-)
-@pytest.mark.parametrize(
-    'executor', [['SQLA_URI', 'sales']], indirect=True)
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
 def test_check_execution_query2(executor):
     df = executor.execute_mdx(query_posgres2)['result']
     test_df = pd.DataFrame({
@@ -55,11 +49,8 @@ def test_check_execution_query2(executor):
     assert_frame_equal(df, test_df)
 
 
-@pytest.mark.skipif(
-    "'SQLA_URI' not in os.environ"
-)
-@pytest.mark.parametrize(
-    'executor', [['SQLA_URI', 'sales']], indirect=True)
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
 def test_check_execution_query10(executor):
     df = executor.execute_mdx(query_postgres3)['result']
     test_df = pd.DataFrame({
