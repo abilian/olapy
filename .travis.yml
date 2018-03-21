@@ -33,7 +33,7 @@ before_install:
   - psql -c 'create database sales;' -U postgres
   - mysql -e 'CREATE DATABASE IF NOT EXISTS sales;'
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
-  - mysql -u root -e "GRANT ALL ON sales_mysql.* TO 'root_db'@'localhost';"
+  - mysql -u root -e "GRANT ALL ON sales.* TO 'root_db'@'localhost';"
 
 notifications:
   slack:
