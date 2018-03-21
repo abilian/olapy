@@ -14,15 +14,14 @@ def executor(request):
     MdxEngine.source_type = ('csv', 'db')
 
     if hasattr(request, 'param'):
-        sqlalchemy_database_uri = os.environ[request.param[0]]
-        os.environ['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_database_uri
-        if request.param[0] == 'SQLITE_URI':
-
+        os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLA_URI']
+        if 'sqlite:///tests' in os.environ['SQLALCHEMY_DATABASE_URI']:
             mdx_engine = MdxEngine(source_type='db')
+            # sales exists with csv
             mdx_engine.load_cube('sales_sqlite', fact_table_name='facts')
             yield mdx_engine
         else:
-            engine = sqlalchemy.create_engine(sqlalchemy_database_uri)
+            engine = sqlalchemy.create_engine(os.environ['SQLALCHEMY_DATABASE_URI'])
             create_insert(engine)
             mdx_engine = MdxEngine(sql_engine=engine, source_type='db')
             mdx_engine.load_cube(cube_name=request.param[1], fact_table_name='facts')
