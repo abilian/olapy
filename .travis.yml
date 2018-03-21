@@ -20,18 +20,18 @@ services:
 
 test:
   adapter: mysql2
-  database: sales_mysql
+  database: sales
   username: root_db
   password: toor
   encoding: utf8
 
 test:
   adapter: postgresql
-  database: sales_postgres
+  database: sales
 
 before_install:
-  - psql -c 'create database sales_postgres;' -U postgres
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_mysql;'
+  - psql -c 'create database sales;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales;'
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
   - mysql -u root -e "GRANT ALL ON sales_mysql.* TO 'root_db'@'localhost';"
 
