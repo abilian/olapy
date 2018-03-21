@@ -14,7 +14,6 @@ def executor(request):
     MdxEngine.source_type = ('csv', 'db')
 
     if hasattr(request, 'param'):
-        os.environ['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLA_URI']
         if 'sqlite:///tests' in os.environ['SQLALCHEMY_DATABASE_URI']:
             mdx_engine = MdxEngine(source_type='db')
             # sales exists with csv
