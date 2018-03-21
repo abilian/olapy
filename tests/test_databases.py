@@ -84,50 +84,16 @@ def test_check_execution_query10(executor):
     assert_frame_equal(df, test_df)
 
 
-def check_query1(executor_mysql):
-    assert executor_mysql.execute_mdx(query1)['result']['amount'][0] == 1023
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
+def check_query1(executor):
+    assert executor.execute_mdx(query1)['result']['amount'][0] == 1023
 
 
-def check_execution_query2(executor_mysql):
-    df = executor_mysql.execute_mdx(query3)['result']
-    test_df = pd.DataFrame({
-        'country': ['France', 'Spain', 'Switzerland', 'United States'],
-        'amount': [4, 3, 248, 768],
-    }).groupby(['country']).sum()
-
-    assert_frame_equal(df, test_df)
-
-
-def check_execution_query6(executor_mysql):
-    df = executor_mysql.execute_mdx(query6)['result']
-    test_df = pd.DataFrame({
-        'year': [
-            2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010,
-            2010, 2010
-        ],
-        'quarter': [
-            -1, 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
-            'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
-            'Q2 2010'
-        ],
-        'month': [
-            -1, -1, 'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
-            'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
-            'May 2010'
-        ],
-        'day': [
-            -1, -1, -1, 'May 12,2010', 'May 13,2010', 'May 14,2010',
-            'May 15,2010', 'May 16,2010', 'May 17,2010', 'May 18,2010',
-            'May 19,2010', 'May 20,2010', 'May 21,2010'
-        ],
-        'amount': [1023, 1023, 1023, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    }).groupby(['year', 'quarter', 'month', 'day']).sum()
-
-    assert_frame_equal(df, test_df)
-
-
-def check_execution_query7(executor_mysql):
-    df = executor_mysql.execute_mdx(query7)['result']
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
+def check_execution_query7(executor):
+    df = executor.execute_mdx(query7)['result']
     test_df = pd.DataFrame({
         'company': [
             'Crazy Development', 'Crazy Development', 'Crazy Development',
@@ -165,8 +131,10 @@ def check_execution_query7(executor_mysql):
     assert_frame_equal(df, test_df)
 
 
-def check_execution_query8(executor_mysql):
-    df = executor_mysql.execute_mdx(query8)['result']
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
+def check_execution_query8(executor):
+    df = executor.execute_mdx(query8)['result']
     test_df = pd.DataFrame({
         'continent': ['Europe', 'Europe', 'Europe'],
         'country': ['Spain', 'France', 'Switzerland'],
@@ -177,8 +145,10 @@ def check_execution_query8(executor_mysql):
     assert_frame_equal(df, test_df)
 
 
-def check_execution_query9(executor_mysql):
-    df = executor_mysql.execute_mdx(query9)['result']
+@pytest.mark.skipif("'SQLA_URI' not in os.environ")
+@pytest.mark.parametrize('executor', [['SQLA_URI', 'sales']], indirect=True)
+def check_execution_query9(executor):
+    df = executor.execute_mdx(query9)['result']
     test_df = pd.DataFrame({
         'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
         'quarter': [
@@ -204,39 +174,6 @@ def check_execution_query9(executor_mysql):
             'Europe', 'Europe'
         ],
         'amount': [128, 32, 8, 2, 1, 4, 16, 64]
-    }).groupby(
-        ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
-
-    assert_frame_equal(df, test_df)
-
-
-def check_execution_query10(executor_mysql):
-    df = executor_mysql.execute_mdx(query10)['result']
-    test_df = pd.DataFrame({
-        'year': [2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010],
-        'quarter': [
-            'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010', 'Q2 2010',
-            'Q2 2010', 'Q2 2010'
-        ],
-        'month': [
-            'May 2010', 'May 2010', 'May 2010', 'May 2010', 'May 2010',
-            'May 2010', 'May 2010', 'May 2010'
-        ],
-        'day': [
-            'May 19,2010',
-            'May 17,2010',
-            'May 15,2010',
-            'May 13,2010',
-            'May 12,2010',
-            'May 14,2010',
-            'May 16,2010',
-            'May 18,2010',
-        ],
-        'continent': [
-            'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
-            'Europe', 'Europe'
-        ],
-        'count': [13, 65, 231, 841, 84, 2, 4, 64]
     }).groupby(
         ['year', 'quarter', 'month', 'day', 'continent'], sort=False).sum()
 
