@@ -49,26 +49,20 @@ class DbConfigParser:
             dbms = config['dbms']
 
             if dbms.upper() == 'SQLITE':
-                path = config['path'] if 'path' in config.keys() and dbms.upper(
-                ) == 'SQLITE' else None
+                path = config['path'] if 'path' in config and dbms.upper() == 'SQLITE' else None
                 credentials = {
                     'dbms': dbms,
                     'path': path,
                 }
 
             else:
-                user = config['user'] if 'user' in config.keys() else ''
-                password = config['password'] if 'LOCALHOST' not in config[
-                    'user'].upper() else ''
-                host = config['host'] if 'LOCALHOST' not in config[
-                    'user'].upper() else ''
-                port = config['port'] if 'port' in config.keys() else ''
-                sql_server_driver = config[
-                    'sql_server_driver'] if 'sql_server_driver' in config.keys(
-                ) else ''
-                db_name = config[
-                    'db_name'] if 'db_name' in config.keys() else ''
-                driver = config['driver'] if 'driver' in config.keys() else ''
+                user = config['user'] if 'user' in config else ''
+                password = config['password'] if 'LOCALHOST' not in config['user'].upper() else ''
+                host = config['host'] if 'LOCALHOST' not in config['user'].upper() else ''
+                port = config['port'] if 'port' in config else ''
+                sql_server_driver = config['sql_server_driver'] if 'sql_server_driver' in config else ''
+                db_name = config['db_name'] if 'db_name' in config else ''
+                driver = config['driver'] if 'driver' in config else ''
 
                 credentials = {
                     'dbms': dbms,
