@@ -7,11 +7,11 @@ machine:
 
 database:
   override:
-    - createdb sales
+    - createdb sales_test
     - echo "CREATE USER IF NOT EXISTS 'root_db'@'localhost' IDENTIFIED BY 'toor'" | mysql -u root
     - echo "GRANT ALL PRIVILEGES ON *.* TO 'root_db'@'localhost' WITH GRANT OPTION" | mysql -u root
     - echo "FLUSH PRIVILEGES" | mysql -u root
-    - echo "CREATE DATABASE IF NOT EXISTS sales" | mysql -u root
+    - echo "CREATE DATABASE IF NOT EXISTS sales_test" | mysql -u root
 
 dependencies:
   cache_directories:

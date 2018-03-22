@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import threading
 
+import os
 import pytest
 from olap.xmla import xmla
 from spyne import Application
@@ -16,6 +17,9 @@ from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230
+
+# when running tox, SQLALCHEMY_DATABASE_URI will be changed
+os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 
 
 class Member(object):
