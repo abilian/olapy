@@ -18,9 +18,6 @@ from .xs0_responses import TEST_QUERY_AXIS0
 HOST = "127.0.0.1"
 PORT = 8230
 
-# when running tox, SQLALCHEMY_DATABASE_URI will be changed
-os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-
 
 class Member(object):
     "Encapsulates xs0 response attributes."
