@@ -16,11 +16,15 @@ matrix:
   include:
     - python: 2.7
       env: TOXENV=py27-postgres
+    - python: 2.7
       env: TOXENV=py27-mysql
+    - python: 2.7
       env: TOXENV=py27-sqlite
     - python: 3.6
       env: TOXENV=py36-postgres
+    - python: 3.6
       env: TOXENV=py36-mysql
+    - python: 3.6
       env: TOXENV=py36-sqlite
 
 script:
