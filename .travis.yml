@@ -24,7 +24,7 @@ matrix:
       env: TOXENV=py36-sqlite
 
 script:
-  - tox -e
+  - tox
 
 services:
   - mysql
