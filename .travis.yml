@@ -4,15 +4,27 @@ group: deprecated-2017Q3
 
 language: python
 cache: pip
+
 python:
   - "2.7"
   - "3.6"
 
 install:
-  - pip install -U pip setuptools tox wheel
+  - pip install -U pip setuptools tox tox-travis wheel
+
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27-postgres
+      env: TOXENV=py27-mysql
+      env: TOXENV=py27-sqlite
+    - python: 3.6
+      env: TOXENV=py36-postgres
+      env: TOXENV=py36-mysql
+      env: TOXENV=py36-sqlite
 
 script:
-  - tox
+  - tox -e
 
 services:
   - mysql
