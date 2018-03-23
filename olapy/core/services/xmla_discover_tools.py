@@ -52,25 +52,27 @@ class XmlaTools():
             self.catalogues = [direct_table_or_file]
             facts = None
         else:
-            mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
-                                     cube_config=cubes_config)
+            # todo recheck !!!!! and change
+            if executor:
+                mdx_executor = executor
+            else:
+                mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
+                                         database_config=db_config,
+                                         cube_config=cubes_config)
             mdx_executor.get_cubes_names()
             self.catalogues = mdx_executor.csv_files_cubes if mdx_executor.csv_files_cubes else mdx_executor.db_cubes
             # todo change catalogue here
             if executor and cubes_config:
                 facts = cubes_config.facts[0].table_name
             else:
-                facts = 'Facts'
+                facts = mdx_executor.facts
 
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
-            if executor:
-                self.executor = executor
-            else:
-                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-                                       measures=measures, sql_alchemy_uri=sql_engine)
-                self.executor = mdx_executor
 
+            mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
+                                   measures=measures, sql_alchemy_uri=sql_engine)
+            self.executor = mdx_executor
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
