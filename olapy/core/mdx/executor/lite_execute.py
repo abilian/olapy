@@ -22,19 +22,19 @@ class MdxEngineLite(MdxEngine):
     def __init__(self):
         MdxEngine.__init__(self)
 
-    def load_cube(self, table_or_file, sqla_alchemy_uri=None, **kwargs):
+    def load_cube(self, table_or_file, sqlalchemy_uri=None, **kwargs):
         """
          After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
         :param table_or_file: full file path, or just database table name if sql_alchemy_uri provided
-        :param sqla_alchemy_uri: sql alchemy connection string
+        :param sqlalchemy_uri: sql alchemy connection string
         :param measures: explicitly specify measures
         :param columns: explicitly specify columns, order matters
         :param sep: csv file separator
         """
         self.cube = table_or_file
-        if sqla_alchemy_uri:
-            self.sql_alchemy = create_engine(sqla_alchemy_uri)
+        if sqlalchemy_uri:
+            self.sql_alchemy = create_engine(sqlalchemy_uri)
         measures = kwargs.get('measures', None)
         sep = kwargs.get('sep', ';')
         columns = kwargs.get('columns', None)

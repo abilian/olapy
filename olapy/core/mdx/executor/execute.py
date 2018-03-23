@@ -101,29 +101,29 @@ class MdxEngine(object):
         self.measures = None
         self.selected_measures = None
 
-    def instantiate_db(self, db_name=None):
+    def get_dialect(self, db_name=None):
         sql_url = None
         if self.sqla_engine:
             # todo fix pass directry sql_alch
             sql_url = str(self.sqla_engine.url)
-            dbms = PostgresDialect.get_dbms_from_conn_string(sql_url).upper()
+            dialect_name = PostgresDialect.get_dialect_name_from_conn_string(sql_url).upper()
             # dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
             try:
-                dbms = self.database_config.get('dbms').upper()
+                dialect_name = self.database_config.get('dbms').upper()
             except AttributeError:
                 raise AttributeError('database config object doesn"t contains dbms key')
-        if 'SQLITE' in dbms:
-            db = SqliteDialect(self.database_config, sql_url)
-        elif 'ORACLE' in dbms:
-            db = OracleDialect(self.database_config, sql_url)
-        elif 'MSSQL' in dbms:
-            db = MssqlDialect(self.database_config, sql_url, db_name)
-        elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = PostgresDialect(self.database_config, sql_url, db_name)
+        if 'SQLITE' in dialect_name:
+            dialect = SqliteDialect(self.database_config, sql_url)
+        elif 'ORACLE' in dialect_name:
+            dialect = OracleDialect(self.database_config, sql_url)
+        elif 'MSSQL' in dialect_name:
+            dialect = MssqlDialect(self.database_config, sql_url, db_name)
+        elif 'POSTGRES' or 'MYSQL' in dialect_name:
+            dialect = PostgresDialect(self.database_config, sql_url, db_name)
         else:
-            db = None
-        return db
+            dialect = None
+        return dialect
 
     @staticmethod
     def get_default_cube_directory():
@@ -144,11 +144,11 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        db = self.instantiate_db(self.cube)
+        dialect = self.get_dialect(self.cube)
         # todo or find another thing
-        if not self.sqla_engine or str(self.sqla_engine) != str(db.engine):
-            self.sqla_engine = db.engine
-        return db.get_all_databases()
+        if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
+            self.sqla_engine = dialect.engine
+        return dialect.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)

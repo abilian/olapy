@@ -41,7 +41,7 @@ class PostgresDialect(object):
             return 'SHOW DATABASES'
 
     @staticmethod
-    def get_dbms_from_conn_string(conn_string):
+    def get_dialect_name_from_conn_string(conn_string):
         """
         Get the dbms from the connection string.
 
@@ -77,9 +77,9 @@ class PostgresDialect(object):
         else:
             engine = create_engine(self.conn_string)
 
-        dbms = PostgresDialect.get_dbms_from_conn_string(self.conn_string)
+        dialect_name = PostgresDialect.get_dialect_name_from_conn_string(self.conn_string)
 
-        return engine, dbms
+        return engine, dialect_name
 
     def connect_without_env_var(self, db):
         dbms = self.db_credentials['dbms']
