@@ -5,10 +5,6 @@ group: deprecated-2017Q3
 language: python
 cache: pip
 
-python:
-  - "2.7"
-  - "3.6"
-
 install:
   - pip install -U pip setuptools tox tox-travis wheel
 
