@@ -4,12 +4,28 @@ group: deprecated-2017Q3
 
 language: python
 cache: pip
+
 python:
   - "2.7"
   - "3.6"
 
 install:
-  - pip install -U pip setuptools tox wheel
+  - pip install -U pip setuptools tox tox-travis wheel
+
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27-postgres
+    - python: 2.7
+      env: TOXENV=py27-mysql
+    - python: 2.7
+      env: TOXENV=py27-sqlite
+    - python: 3.6
+      env: TOXENV=py36-postgres
+    - python: 3.6
+      env: TOXENV=py36-mysql
+    - python: 3.6
+      env: TOXENV=py36-sqlite
 
 script:
   - tox
@@ -20,20 +36,20 @@ services:
 
 test:
   adapter: mysql2
-  database: sales_mysql
+  database: sales_test
   username: root_db
   password: toor
   encoding: utf8
 
 test:
   adapter: postgresql
-  database: sales_postgres
+  database: sales_test
 
 before_install:
-  - psql -c 'create database sales_postgres;' -U postgres
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_mysql;'
+  - psql -c 'create database sales_test;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_test;'
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
-  - mysql -u root -e "GRANT ALL ON sales_mysql.* TO 'root_db'@'localhost';"
+  - mysql -u root -e "GRANT ALL ON sales_test.* TO 'root_db'@'localhost';"
 
 notifications:
   slack:

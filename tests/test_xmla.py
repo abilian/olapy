@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import threading
 
+import os
 import pytest
 from olap.xmla import xmla
 from spyne import Application

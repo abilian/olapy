@@ -354,7 +354,7 @@ class MdxEngine(object):
         """
         if ignore_fact:
             return [tab for tab in self.tables_loaded if self.facts not in tab]
-        return self.tables_loaded.keys()
+        return self.tables_loaded
 
     def get_cube_path(self):
         """
