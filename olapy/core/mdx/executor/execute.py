@@ -102,21 +102,25 @@ class MdxEngine(object):
         self.selected_measures = None
 
     def instantiate_db(self, db_name=None):
-        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-            dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
+        sql_url = None
+        if self.sql_alchemy:
+            # todo fix pass directry sql_alch
+            sql_url = str(self.sql_alchemy.url)
+            dbms = MyDB.get_dbms_from_conn_string(sql_url).upper()
+            # dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
             try:
                 dbms = self.database_config.get('dbms').upper()
             except AttributeError:
                 raise AttributeError('database config object doesn"t contains dbms key')
         if 'SQLITE' in dbms:
-            db = MySqliteDB(self.database_config)
+            db = MySqliteDB(self.database_config, sql_url)
         elif 'ORACLE' in dbms:
-            db = MyOracleDB(self.database_config)
+            db = MyOracleDB(self.database_config, sql_url)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(self.database_config, db_name)
+            db = MyMssqlDB(self.database_config, sql_url, db_name)
         elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = MyDB(self.database_config, db_name)
+            db = MyDB(self.database_config, sql_url, db_name)
         else:
             db = None
         return db

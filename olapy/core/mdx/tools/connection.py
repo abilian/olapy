@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 class MyDB(object):
     """Connect to sql database."""
 
-    def __init__(self, db_config, db_name=None):
+    def __init__(self, db_config, sql_alchemy=None, db_name=None):
         """
         Connection can be made either with connection string provided from
         environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config
@@ -20,8 +20,9 @@ class MyDB(object):
         :param db_config: olapy config file obj
         :param db_name: database name to connect to
         """
-        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-            self.conn_string = os.environ["SQLALCHEMY_DATABASE_URI"]
+        if sql_alchemy:
+            # todo refactor ,( not str)
+            self.conn_string = sql_alchemy
             self.engine, self.dbms = self.connect_with_env_var(None)
             # self.engine, self.dbms = self.connect_with_env_var(db_name)
         else:
@@ -70,7 +71,7 @@ class MyDB(object):
         ]
 
     def connect_with_env_var(self, db):
-        if db is not None:
+        if db:
             self.conn_string = self.conn_string.rstrip('/')
             engine = create_engine(self.conn_string + '/' + db)
         else:
@@ -133,8 +134,8 @@ class MyDB(object):
 
 class MyOracleDB(MyDB):
 
-    def __init__(self, db_config, db_name=None):
-        MyDB.__init__(self, db_config, db_name=db_name)
+    def __init__(self, db_config, sql_alchemy=None, db_name=None):
+        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     @property
     def username(self):
@@ -159,8 +160,8 @@ class MyOracleDB(MyDB):
 
 class MySqliteDB(MyDB):
 
-    def __init__(self, db_config, db_name=None):
-        MyDB.__init__(self, db_config, db_name=db_name)
+    def __init__(self, db_config, sql_alchemy=None, db_name=None):
+        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     def construct_engine(self, db=None):
         return create_engine('sqlite:///' + self.db_credentials['path'])
@@ -184,8 +185,8 @@ class MySqliteDB(MyDB):
 
 class MyMssqlDB(MyDB):
 
-    def __init__(self, db_config, db_name=None):
-        MyDB.__init__(self, db_config, db_name=db_name)
+    def __init__(self, db_config, sql_alchemy=None, db_name=None):
+        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     def get_init_table(self):
         con_db = 'msdb'
