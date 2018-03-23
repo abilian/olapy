@@ -71,7 +71,7 @@ class MdxEngine(object):
             mdx_q_parser=None
     ):
         self.cube = cube_name
-        self.facts = None
+        self.facts = 'Facts'
         if mdx_q_parser:
             self.parser = mdx_q_parser
         else:
