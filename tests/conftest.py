@@ -13,11 +13,11 @@ from olapy.core.mdx.executor.execute import MdxEngine
 def executor():
     MdxEngine.source_type = ('csv', 'db')
     sqlalchemy_uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
-    db_test = sqlalchemy_uri.split('/')[-1] if sqlalchemy_uri.split('/')[-1] else 'main'
+    db_test = sqlalchemy_uri.split('/')[-1]
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     create_insert(engine)
     mdx_engine = MdxEngine(sql_engine=engine, source_type='db')
-    mdx_engine.load_cube(cube_name=db_test, fact_table_name='facts')
+    mdx_engine.load_cube(cube_name=db_test if db_test else 'main', fact_table_name='facts')
     yield mdx_engine
     drop_tables(engine)
     os.environ.pop('SQLALCHEMY_DATABASE_URI', None)
