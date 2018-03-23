@@ -28,7 +28,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
-from ..tools.connection import MyDB, MyMssqlDB, MyOracleDB, MySqliteDB
+from ..tools.connection import PostgresDialect, MssqlDialect, OracleDialect, SqliteDialect
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -65,7 +65,7 @@ class MdxEngine(object):
             olapy_data_location=None,
             database_config=None,
             cube_config=None,
-            sql_engine=None,
+            sqla_engine=None,
             source_type=None,
             cubes_folder_name='cubes',
             mdx_q_parser=None
@@ -82,7 +82,7 @@ class MdxEngine(object):
             self.source_type = ('csv')
         self.csv_files_cubes = []
         self.db_cubes = []
-        self.sql_alchemy = sql_engine
+        self.sqla_engine = sqla_engine
         if olapy_data_location is None:
             self.olapy_data_location = self.get_default_cube_directory()
         else:
@@ -103,10 +103,10 @@ class MdxEngine(object):
 
     def instantiate_db(self, db_name=None):
         sql_url = None
-        if self.sql_alchemy:
+        if self.sqla_engine:
             # todo fix pass directry sql_alch
-            sql_url = str(self.sql_alchemy.url)
-            dbms = MyDB.get_dbms_from_conn_string(sql_url).upper()
+            sql_url = str(self.sqla_engine.url)
+            dbms = PostgresDialect.get_dbms_from_conn_string(sql_url).upper()
             # dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
         else:
             try:
@@ -114,13 +114,13 @@ class MdxEngine(object):
             except AttributeError:
                 raise AttributeError('database config object doesn"t contains dbms key')
         if 'SQLITE' in dbms:
-            db = MySqliteDB(self.database_config, sql_url)
+            db = SqliteDialect(self.database_config, sql_url)
         elif 'ORACLE' in dbms:
-            db = MyOracleDB(self.database_config, sql_url)
+            db = OracleDialect(self.database_config, sql_url)
         elif 'MSSQL' in dbms:
-            db = MyMssqlDB(self.database_config, sql_url, db_name)
+            db = MssqlDialect(self.database_config, sql_url, db_name)
         elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = MyDB(self.database_config, sql_url, db_name)
+            db = PostgresDialect(self.database_config, sql_url, db_name)
         else:
             db = None
         return db
@@ -146,8 +146,8 @@ class MdxEngine(object):
         # try:
         db = self.instantiate_db(self.cube)
         # todo or find another thing
-        if not self.sql_alchemy or str(self.sql_alchemy) != str(db.engine):
-            self.sql_alchemy = db.engine
+        if not self.sqla_engine or str(self.sqla_engine) != str(db.engine):
+            self.sqla_engine = db.engine
         return db.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()

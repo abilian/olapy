@@ -8,7 +8,7 @@ import os
 from sqlalchemy import create_engine
 
 
-class MyDB(object):
+class PostgresDialect(object):
     """Connect to sql database."""
 
     def __init__(self, db_config, sql_alchemy=None, db_name=None):
@@ -77,7 +77,7 @@ class MyDB(object):
         else:
             engine = create_engine(self.conn_string)
 
-        dbms = MyDB.get_dbms_from_conn_string(self.conn_string)
+        dbms = PostgresDialect.get_dbms_from_conn_string(self.conn_string)
 
         return engine, dbms
 
@@ -132,10 +132,10 @@ class MyDB(object):
             self.engine.dispose()
 
 
-class MyOracleDB(MyDB):
+class OracleDialect(PostgresDialect):
 
     def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     @property
     def username(self):
@@ -158,10 +158,10 @@ class MyOracleDB(MyDB):
         return engine, con_db
 
 
-class MySqliteDB(MyDB):
+class SqliteDialect(PostgresDialect):
 
     def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     def construct_engine(self, db=None):
         return create_engine('sqlite:///' + self.db_credentials['path'])
@@ -183,10 +183,10 @@ class MySqliteDB(MyDB):
         return engine, dbms
 
 
-class MyMssqlDB(MyDB):
+class MssqlDialect(PostgresDialect):
 
     def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        MyDB.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
 
     def get_init_table(self):
         con_db = 'msdb'

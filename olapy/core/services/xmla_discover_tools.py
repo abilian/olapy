@@ -71,7 +71,7 @@ class XmlaTools():
             self.selected_catalogue = self.catalogues[0]
 
             mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-                                   measures=measures, sql_alchemy_uri=sql_engine)
+                                   measures=measures, sqla_alchemy_uri=sql_engine)
             self.executor = mdx_executor
         self.session_id = uuid.uuid1()
 

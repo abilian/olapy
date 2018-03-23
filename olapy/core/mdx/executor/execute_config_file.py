@@ -11,7 +11,7 @@ import os
 import pandas as pd
 import pandas.io.sql as psql
 
-from ..tools.connection import MyDB
+from ..tools.connection import PostgresDialect
 
 
 def load_one_table(cubes_obj, executor, table_name, sep):
@@ -25,7 +25,7 @@ def load_one_table(cubes_obj, executor, table_name, sep):
             facts.replace('.csv', '')
         table = pd.read_csv(facts, sep=sep)
     else:
-        db = MyDB(
+        db = PostgresDialect(
             executor.database_config,
             db_name=executor.cube,
         )
@@ -106,7 +106,7 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
                 file.replace('.csv', '')
             df = pd.read_csv(file, sep=sep)
         else:
-            db = MyDB(
+            db = PostgresDialect(
                 executor.database_config,
                 db_name=executor.cube,
             )
