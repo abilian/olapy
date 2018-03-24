@@ -28,7 +28,8 @@ import pandas as pd
 from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
-from ..tools.connection import PostgresDialect, MssqlDialect, OracleDialect, SqliteDialect
+from ..tools.connection import PostgresDialect, MssqlDialect, OracleDialect, SqliteDialect, \
+    get_dialect_name_from_conn_string
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -76,17 +77,21 @@ class MdxEngine(object):
             self.parser = mdx_q_parser
         else:
             self.parser = Parser()
+
         if source_type:
             self.source_type = source_type
         else:
             self.source_type = ('csv')
+
         self.csv_files_cubes = []
         self.db_cubes = []
         self.sqla_engine = sqla_engine
+
         if olapy_data_location is None:
             self.olapy_data_location = self.get_default_cube_directory()
         else:
             self.olapy_data_location = olapy_data_location
+
         if cubes_path is None:
             self.cube_path = os.path.join(self.olapy_data_location, cubes_folder_name)
         else:
@@ -106,23 +111,22 @@ class MdxEngine(object):
         if self.sqla_engine:
             # todo fix pass directry sql_alch
             sql_url = str(self.sqla_engine.url)
-            dialect_name = PostgresDialect.get_dialect_name_from_conn_string(sql_url).upper()
-            # dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
+            dialect_name = get_dialect_name_from_conn_string(sql_url)
         else:
             try:
-                dialect_name = self.database_config.get('dbms').upper()
+                dialect_name = self.database_config.get('dbms').lower()
             except AttributeError:
                 raise AttributeError('database config object doesn"t contains dbms key')
-        if 'SQLITE' in dialect_name:
+        if 'sqlite' in dialect_name:
             dialect = SqliteDialect(self.database_config, sql_url)
-        elif 'ORACLE' in dialect_name:
+        elif 'oracle' in dialect_name:
             dialect = OracleDialect(self.database_config, sql_url)
-        elif 'MSSQL' in dialect_name:
+        elif 'mssql' in dialect_name:
             dialect = MssqlDialect(self.database_config, sql_url, db_name)
-        elif 'POSTGRES' or 'MYSQL' in dialect_name:
+        elif 'postgres' or 'mysql' in dialect_name:
             dialect = PostgresDialect(self.database_config, sql_url, db_name)
         else:
-            dialect = None
+            raise AttributeError("Unknown dialect: {}".format(dialect_name))
         return dialect
 
     @staticmethod

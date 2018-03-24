@@ -8,7 +8,26 @@ import os
 from sqlalchemy import create_engine
 
 
-class PostgresDialect(object):
+def get_dialect_name_from_conn_string(conn_string):
+    """
+    Get the dbms from the connection string.
+
+    example:
+    when connection string = 'oracle://scott:tiger@127.0.0.1:1521/sidname'
+    it returns 'oracle'
+
+    :param conn_string: connection string
+    :return: dbms
+    """
+    dialect = conn_string.split(':')[0].lower()
+    if '+' in dialect:
+        dialect = dialect.split('+')[0]
+    # just for postgres
+    dialect = dialect.replace('postgresql', 'postgres')
+    return dialect
+
+
+class BaseDialect(object):
     """Connect to sql database."""
 
     def __init__(self, db_config, sql_alchemy=None, db_name=None):
@@ -40,25 +59,6 @@ class PostgresDialect(object):
         elif self.dbms.upper() == 'MYSQL':
             return 'SHOW DATABASES'
 
-    @staticmethod
-    def get_dialect_name_from_conn_string(conn_string):
-        """
-        Get the dbms from the connection string.
-
-        example:
-        connection string => oracle://scott:tiger@127.0.0.1:1521/sidname
-        it returns oracle
-
-        :param conn_string: connection string
-        :return: dbms
-        """
-        db = conn_string.split(':')[0]
-        if '+' in db:
-            db = db.split('+')[0]
-        # just for postgres
-        db = db.replace('postgresql', 'postgres')
-        return db
-
     def get_all_databases(self):
         all_db_query = self.gen_all_databases_query()
         result = self.engine.execute(all_db_query)
@@ -77,7 +77,7 @@ class PostgresDialect(object):
         else:
             engine = create_engine(self.conn_string)
 
-        dialect_name = PostgresDialect.get_dialect_name_from_conn_string(self.conn_string)
+        dialect_name = get_dialect_name_from_conn_string(self.conn_string)
 
         return engine, dialect_name
 
@@ -132,10 +132,11 @@ class PostgresDialect(object):
             self.engine.dispose()
 
 
-class OracleDialect(PostgresDialect):
+class PostgresDialect(BaseDialect):
+    pass
 
-    def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+
+class OracleDialect(BaseDialect):
 
     @property
     def username(self):
@@ -158,10 +159,7 @@ class OracleDialect(PostgresDialect):
         return engine, con_db
 
 
-class SqliteDialect(PostgresDialect):
-
-    def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+class SqliteDialect(BaseDialect):
 
     def construct_engine(self, db=None):
         return create_engine('sqlite:///' + self.db_credentials['path'])
@@ -183,10 +181,7 @@ class SqliteDialect(PostgresDialect):
         return engine, dbms
 
 
-class MssqlDialect(PostgresDialect):
-
-    def __init__(self, db_config, sql_alchemy=None, db_name=None):
-        PostgresDialect.__init__(self, db_config, sql_alchemy=sql_alchemy, db_name=db_name)
+class MssqlDialect(BaseDialect):
 
     def get_init_table(self):
         con_db = 'msdb'
