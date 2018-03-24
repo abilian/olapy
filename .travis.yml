@@ -11,7 +11,7 @@ services:
 
 before_install:
   # Setup Postgres
-  - psql -c 'create database sales_test;' -U postgres
+  - psql -c 'create database olapy_test;' -U postgres
   # Setup Mysql
   - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_test;'
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
@@ -19,6 +19,10 @@ before_install:
 
 install:
   - pip install -U pip setuptools tox tox-travis wheel
+
+env:
+  - POSTGRES_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+  - MYSQL_URI=mysql://root_db:toor@localhost/sales_test
 
 matrix:
   include:
