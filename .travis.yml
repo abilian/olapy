@@ -10,7 +10,9 @@ services:
   - postgresql
 
 before_install:
+  # Setup Postgres
   - psql -c 'create database sales_test;' -U postgres
+  # Setup Mysql
   - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_test;'
   - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
   - mysql -u root -e "GRANT ALL ON sales_test.* TO 'root_db'@'localhost';"
@@ -32,6 +34,8 @@ matrix:
       env: TOXENV=py36-mysql
     - python: 3.6
       env: TOXENV=py36-sqlite
+    - python: 2.7
+      env: TOXENV=lint
 
 script:
   - tox
