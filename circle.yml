@@ -1,6 +1,6 @@
 machine:
   post:
-    - pyenv global 2.7.11 3.6.2
+    - pyenv global 2.7.12 3.6.2
   services:
     - postgresql
     - mysql
@@ -19,8 +19,10 @@ dependencies:
   override:
     - pip install -U pip tox tox-pyenv wheel
     # Just to fill up the cache (to speed up later builds)
-    - pyenv local 2.7.11 3.6.2
+    - pyenv local 2.7.12
     - pip install -q -r requirements.txt
+    - pyenv local 3.6.2
+    - pip3 install -q -r requirements.txt
 
 test:
   override:
