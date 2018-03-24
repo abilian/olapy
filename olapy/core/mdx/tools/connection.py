@@ -54,10 +54,7 @@ class BaseDialect(object):
 
         :return: sql query to fetch all databases
         """
-        if self.dbms.upper() == 'POSTGRES':
-            return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-        elif self.dbms.upper() == 'MYSQL':
-            return 'SHOW DATABASES'
+        raise NotImplementedError
 
     def get_all_databases(self):
         all_db_query = self.gen_all_databases_query()
@@ -133,7 +130,13 @@ class BaseDialect(object):
 
 
 class PostgresDialect(BaseDialect):
-    pass
+    def gen_all_databases_query(self):
+        return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+
+
+class MysqlDialect(BaseDialect):
+    def gen_all_databases_query(self):
+        return 'SHOW DATABASES'
 
 
 class OracleDialect(BaseDialect):

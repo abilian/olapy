@@ -29,7 +29,7 @@ from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
 from ..tools.connection import PostgresDialect, MssqlDialect, OracleDialect, SqliteDialect, \
-    get_dialect_name_from_conn_string
+    get_dialect_name_from_conn_string, MysqlDialect
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -123,8 +123,10 @@ class MdxEngine(object):
             dialect = OracleDialect(self.database_config, sql_url)
         elif 'mssql' in dialect_name:
             dialect = MssqlDialect(self.database_config, sql_url, db_name)
-        elif 'postgres' or 'mysql' in dialect_name:
+        elif 'postgres' in dialect_name:
             dialect = PostgresDialect(self.database_config, sql_url, db_name)
+        elif 'mysql' in dialect_name:
+            dialect = MysqlDialect(self.database_config, sql_url, db_name)
         else:
             raise AttributeError("Unknown dialect: {}".format(dialect_name))
         return dialect
