@@ -91,6 +91,8 @@ class XmlaTools():
                 facts = self.executor.facts
 
             self.selected_catalogue = new_catalogue
+            # todo recheck, change
+            self.executor.sqla_engine = None
             self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
