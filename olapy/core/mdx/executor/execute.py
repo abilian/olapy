@@ -193,7 +193,6 @@ class MdxEngine(object):
         :param measures: if you want to explicitly specify measures
         :return:
         """
-
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names

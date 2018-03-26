@@ -209,11 +209,11 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
                                direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
                                sql_alchemy_uri=sql_alchemy_uri)
     else:
-        db_conf = None
+        sql_alchemy_uri = None
         cube_conf = None
         if 'db' in source_type:
             db_config = DbConfigParser()
-            db_conf = db_config.get_db_credentials(db_config_file)
+            sql_alchemy_uri = db_config.get_db_credentials(db_config_file)
 
         try:
             cube_config_file_parser = ConfigParser()
@@ -223,10 +223,10 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
             print(type)
             print(value)
             print_tb(traceback)
-            db_conf = None
+            sql_alchemy_uri = None
 
         xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                               db_config=db_conf, cubes_config=cube_conf)
+                               sql_alchemy_uri=sql_alchemy_uri, cubes_config=cube_conf)
 
     application = get_spyne_app(xmla_tools)
 
