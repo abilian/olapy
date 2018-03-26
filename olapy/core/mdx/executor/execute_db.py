@@ -13,7 +13,7 @@ import pandas as pd
 import pandas.io.sql as psql
 from sqlalchemy import inspect
 
-from olapy.core.mdx.tools.connection import get_dialect_name_from_conn_string
+from olapy.core.mdx.tools.connection import get_dialect_name
 
 
 def load_tables_db(executor):
@@ -29,7 +29,7 @@ def load_tables_db(executor):
     inspector = inspect(executor.sqla_engine)
     # fix all postgres table  names are lowercase
     # load_tables is executed before construct_star_schema
-    dialect_name = get_dialect_name_from_conn_string(str(executor.sqla_engine))
+    dialect_name = get_dialect_name(str(executor.sqla_engine))
     if 'postgres' in dialect_name:
         executor.facts = executor.facts.lower()
     for table_name in inspector.get_table_names():

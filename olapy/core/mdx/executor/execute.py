@@ -28,8 +28,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from olapy.core.mdx.parser.parse import Parser
-from ..tools.connection import PostgresDialect, MssqlDialect, OracleDialect, SqliteDialect, \
-    get_dialect_name_from_conn_string, MysqlDialect
+from ..tools.connection import get_dialect
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
 from .execute_csv_files import construct_star_schema_csv_files, \
@@ -59,17 +58,17 @@ class MdxEngine(object):
     """
 
     def __init__(
-            self,
-            cube_name=None,
-            client_type='excel',
-            cubes_path=None,
-            olapy_data_location=None,
-            database_config=None,
-            cube_config=None,
-            sqla_engine=None,
-            source_type=None,
-            cubes_folder_name='cubes',
-            mdx_q_parser=None
+        self,
+        cube_name=None,
+        client_type='excel',
+        cubes_path=None,
+        olapy_data_location=None,
+        database_config=None,
+        cube_config=None,
+        sqla_engine=None,
+        source_type=None,
+        cubes_folder_name='cubes',
+        mdx_q_parser=None
     ):
         self.cube = cube_name
         self.facts = 'Facts'
@@ -106,31 +105,6 @@ class MdxEngine(object):
         self.measures = None
         self.selected_measures = None
 
-    def get_dialect(self, db_name=None):
-        sql_url = None
-        if self.sqla_engine:
-            # todo fix pass directry sql_alch
-            sql_url = str(self.sqla_engine.url)
-            dialect_name = get_dialect_name_from_conn_string(sql_url)
-        else:
-            try:
-                dialect_name = self.database_config.get('dbms').lower()
-            except AttributeError:
-                raise AttributeError('database config object doesn"t contains dbms key')
-        if 'sqlite' in dialect_name:
-            dialect = SqliteDialect(self.database_config, sql_url)
-        elif 'oracle' in dialect_name:
-            dialect = OracleDialect(self.database_config, sql_url)
-        elif 'mssql' in dialect_name:
-            dialect = MssqlDialect(self.database_config, sql_url, db_name)
-        elif 'postgres' in dialect_name:
-            dialect = PostgresDialect(self.database_config, sql_url, db_name)
-        elif 'mysql' in dialect_name:
-            dialect = MysqlDialect(self.database_config, sql_url, db_name)
-        else:
-            raise AttributeError("Unknown dialect: {}".format(dialect_name))
-        return dialect
-
     @staticmethod
     def get_default_cube_directory():
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
@@ -150,7 +124,7 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        dialect = self.get_dialect(self.cube)
+        dialect = get_dialect(self.sqla_engine)
         # todo or find another thing
         if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
             self.sqla_engine = dialect.engine
@@ -434,7 +408,7 @@ class MdxEngine(object):
                 else:
                     tables_columns.update({
                         tupl[0]: self.tables_loaded[tupl[0]].columns[
-                            :len(tupl[2:None if self.parser.hierarchized_tuples() else -1], )], })
+                                 :len(tupl[2:None if self.parser.hierarchized_tuples() else -1], )], })
 
             axes.update({axis: tables_columns})
         return axes
@@ -625,7 +599,7 @@ class MdxEngine(object):
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
         if len(tuple_as_list) == 3 \
-                and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+            and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
