@@ -121,7 +121,7 @@ class XmlaProviderService(ServiceBase):
 
         else:
             xmla_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog,)
+                request.Properties.PropertyList.Catalog, )
             xml = xmlwitch.Builder()
             executor = xmla_tools.executor
 
@@ -135,12 +135,12 @@ class XmlaProviderService(ServiceBase):
 
             with xml['return']:
                 with xml.root(
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
-                        **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance',
-                        }):
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                    }
+                ):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
                         with xml.CubeInfo:
@@ -148,12 +148,12 @@ class XmlaProviderService(ServiceBase):
                                 xml.CubeName('Sales')
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        '%Y-%m-%dT%H:%M:%S', ),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        '%Y-%m-%dT%H:%M:%S', ),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                         xml.write(xmla_tools.generate_cell_info())
@@ -282,7 +282,8 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     # log to the file
     if write_on_file:
         if not os.path.isdir(
-                os.path.join(home_directory, 'olapy-data', 'logs'),):
+            os.path.join(home_directory, 'olapy-data', 'logs'),
+        ):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:

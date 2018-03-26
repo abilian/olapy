@@ -75,5 +75,5 @@ class DbConfigParser:
             #         'sql_server_driver': sql_server_driver,
             #     }
 
-        # return credentials
+            # return credentials
             return config['connection_string']

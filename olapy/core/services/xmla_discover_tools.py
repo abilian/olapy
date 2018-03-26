@@ -44,14 +44,14 @@ class XmlaTools():
         """
         executor = kwargs.get('executor', None)
         olapy_data = kwargs.get('olapy_data', None)
-        direct_table_or_file = kwargs.get('direct_table_or_file', None)
+        # direct_table_or_file = kwargs.get('direct_table_or_file', None)
         columns = kwargs.get('columns', None)
         measures = kwargs.get('measures', None)
         self.sql_alchemy_uri = kwargs.get('sql_alchemy_uri', None)
         # if direct_table_or_file:
-            # mdx_executor = MdxEngineLite()
-            # self.catalogues = [direct_table_or_file]
-            # facts = None
+        # mdx_executor = MdxEngineLite()
+        # self.catalogues = [direct_table_or_file]
+        # facts = None
         # else:
         if executor:
             mdx_executor = executor
@@ -71,7 +71,7 @@ class XmlaTools():
             self.selected_catalogue = self.catalogues[0]
 
             mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-                                   measures=measures, sqlalchemy_uri=sql_alchemy_uri)
+                                   measures=measures)
             self.executor = mdx_executor
         self.session_id = uuid.uuid1()
 

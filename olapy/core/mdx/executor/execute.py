@@ -407,7 +407,7 @@ class MdxEngine(object):
                 else:
                     tables_columns.update({
                         tupl[0]: self.tables_loaded[tupl[0]].columns[
-                                 :len(tupl[2:None if self.parser.hierarchized_tuples() else -1], )], })
+                            :len(tupl[2:None if self.parser.hierarchized_tuples() else -1], )], })
 
             axes.update({axis: tables_columns})
         return axes
@@ -597,8 +597,7 @@ class MdxEngine(object):
         """
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
-        if len(tuple_as_list) == 3 \
-            and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
