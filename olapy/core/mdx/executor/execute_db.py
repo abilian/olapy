@@ -68,11 +68,11 @@ def construct_star_schema_db(executor):
     inspector = inspect(executor.sqla_engine)
 
     for db_table_name in inspector.get_table_names():
-        try:
-            db_table_name = str(db_table_name)
-        except Exception:
-            if isinstance(db_table_name, Iterable):
-                db_table_name = db_table_name[0]
+        # try:
+        #     db_table_name = str(db_table_name)
+        # except Exception:
+        #     if isinstance(db_table_name, Iterable):
+        #         db_table_name = db_table_name[0]
         try:
             fusion = fusion.merge(
                 psql.read_sql_query(
