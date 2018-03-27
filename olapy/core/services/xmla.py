@@ -12,7 +12,6 @@ import os
 import sys
 from datetime import datetime
 from os.path import expanduser
-from traceback import print_tb
 from wsgiref.simple_server import make_server
 
 import click
@@ -186,17 +185,9 @@ def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
     sqla_engine = None
     if sql_alchemy_uri:
         sqla_engine = create_engine(sql_alchemy_uri)
-
-    # direct_table_or_file = kwargs.get('direct_table_or_file', None)
-    # if direct_table_or_file:
-    # mdx_executor = MdxEngineLite()
-    # self.catalogues = [direct_table_or_file]
-    # facts = None
-    # else:
     executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
                          cube_config=cube_config, sqla_engine=sqla_engine)
     return executor
-
 
 
 def get_spyne_app(xmla_tools):
@@ -217,25 +208,10 @@ def get_spyne_app(xmla_tools):
 def get_wsgi_application(mdx_engine):
     """
 
-    :param olapy_data: olapy-data folder path
-    :param source_type: csv,db
-    :param db_config_file: olapy-config file path (for database connection)
-    :param cube_config_file: cube-config file (for constructing customized cubes)
-    :param direct_table_or_file: csv file pathe or database table name if you want to use olapy for a one simple file
-    :param columns: optional if direct_table_or_file provided, explicitly specify columns
-    :param measures: optional if direct_table_or_file provided, explicitly specify measures
-    :param sql_alchemy_uri: sql alchemy string connection, optional if direct_table_or_file provided, if you want \
-        to use olapy with simple database table
+    :param mdx_engine: MdxEngine instance
     :return: Wsgi Application
     """
-    # if direct_table_or_file:
-    #     xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
-    #                            direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
-    #                            sql_alchemy_uri=sql_alchemy_uri)
-    # else:
-
     xmla_tools = XmlaTools(mdx_engine)
-
     application = get_spyne_app(xmla_tools)
 
     # validator='soft' or nothing, this is important because spyne doesn't
@@ -252,7 +228,7 @@ def get_wsgi_application(mdx_engine):
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
-@click.option('--source_type', '-st', default='db', help="Get cubes from where ( db | csv ), DEFAULT : csv")
+@click.option('--source_type', '-st', default='csv', help="Get cubes from where ( db | csv ), DEFAULT : csv")
 @click.option('--db_config_file', '-dbc', default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
               help="Database configuration file path, DEFAULT : " +
                    os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'))

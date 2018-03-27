@@ -114,11 +114,6 @@ class SqliteDialect(BaseDialect):
 
 class MssqlDialect(BaseDialect):
 
-    # def get_init_table(self):
-    #     con_db = 'msdb'
-    #     engine = 'mssql+pyodbc'
-    #     return engine, con_db
-
     def gen_all_databases_query(self):
         """
         Each dbms has a different query to get user databases names.

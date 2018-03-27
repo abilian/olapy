@@ -15,8 +15,7 @@ from sqlalchemy import create_engine
 from olapy.core.services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
-from olapy.core.mdx.executor.lite_execute import MdxEngineLite
-from ..mdx.executor.execute import MdxEngine
+
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
     discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
@@ -33,33 +32,15 @@ class XmlaTools():
     def __init__(self, mdx_engine):
         """
 
-        :param source_type: csv,db
-        :param db_config: olapy-config.yml file parsing result
-        :param cubes_config: cube-config.yml file parsing result
-        :param executor: MdxEngine instance
-        :param olapy_data: olapy-data path
-        :param direct_table_or_file: if you want to use olapy with only a simple csv file or database table
-        :param sql_alchemy_uri: sql alchemy connection string if you want to use olapy with only a simple database table
+        :param mdx_engine: mdx_engine engine instance
 
         """
         self.executor = mdx_engine
         if self.executor.sqla_engine:
-            self.sql_alchemy_uri = str(self.executor.sqla_engine.url) #save sqla uri so we can change it with new database
+            self.sql_alchemy_uri = str(
+                self.executor.sqla_engine.url)  # save sqla uri so we can change it with new database
         self.catalogues = self.executor.get_cubes_names()
         self.selected_catalogue = None
-        # self.catalogues = self.mdx_engine.csv_files_cubes if self.mdx_engine.csv_files_cubes else self.mdx_engine.db_cubes
-        # # todo change catalogue here
-        # if executor.cube and cubes_config:
-        #     facts = cubes_config.facts[0].table_name
-        # else:
-        #     facts = executor.facts
-
-        # if self.catalogues:
-        #     self.selected_catalogue = self.catalogues[0]
-        #
-        #     executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-        #                            measures=measures)
-        #     self.executor = executor
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
