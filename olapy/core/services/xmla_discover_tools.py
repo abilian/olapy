@@ -43,7 +43,8 @@ class XmlaTools():
 
         """
         self.executor = mdx_engine
-        self.sql_alchemy_uri = str(self.executor.sqla_engine.url) #save sqla uri so we can change it with new database
+        if self.executor.sqla_engine:
+            self.sql_alchemy_uri = str(self.executor.sqla_engine.url) #save sqla uri so we can change it with new database
         self.catalogues = self.executor.get_cubes_names()
         self.selected_catalogue = None
         # self.catalogues = self.mdx_engine.csv_files_cubes if self.mdx_engine.csv_files_cubes else self.mdx_engine.db_cubes
@@ -69,8 +70,6 @@ class XmlaTools():
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
-        print('000000000000000000000000000000000000000')
-        print(new_catalogue)
         if self.selected_catalogue != new_catalogue:
             if self.executor.cube_config and new_catalogue == self.executor.cube_config['name']:
                 facts = self.executor.cube_config['facts']['table_name']
