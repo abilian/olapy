@@ -28,6 +28,7 @@ from olapy.core.mdx.tools.config_file_parser import ConfigParser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from sqlalchemy import create_engine
 
+from olapy.core.mdx.executor.execute import MdxEngine
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -176,6 +177,28 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
+def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
+                   source_type, direct_table_or_file, columns,
+                   measures):
+    print(direct_table_or_file)
+    print(columns)
+    print(measures)
+    sqla_engine = None
+    if sql_alchemy_uri:
+        sqla_engine = create_engine(sql_alchemy_uri)
+
+    # direct_table_or_file = kwargs.get('direct_table_or_file', None)
+    # if direct_table_or_file:
+    # mdx_executor = MdxEngineLite()
+    # self.catalogues = [direct_table_or_file]
+    # facts = None
+    # else:
+    executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
+                         cube_config=cube_config, sqla_engine=sqla_engine)
+    return executor
+
+
+
 def get_spyne_app(xmla_tools):
     """
 
@@ -191,8 +214,7 @@ def get_spyne_app(xmla_tools):
     )
 
 
-def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file, direct_table_or_file, columns,
-                         measures, sql_alchemy_uri):
+def get_wsgi_application(mdx_engine):
     """
 
     :param olapy_data: olapy-data folder path
@@ -206,33 +228,13 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
         to use olapy with simple database table
     :return: Wsgi Application
     """
-    if direct_table_or_file:
-        xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
-                               direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
-                               sql_alchemy_uri=sql_alchemy_uri)
-    else:
-        cube_conf = None
-        try:
-            cube_config_file_parser = ConfigParser()
-            cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
-        except (KeyError, IOError):
-            type, value, traceback = sys.exc_info()
-            print(type)
-            print(value)
-            print_tb(traceback)
+    # if direct_table_or_file:
+    #     xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
+    #                            direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
+    #                            sql_alchemy_uri=sql_alchemy_uri)
+    # else:
 
-        sqla_uri = None
-        if 'db' in source_type:
-            if sql_alchemy_uri:
-                # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
-                sqla_uri = sql_alchemy_uri
-            else:
-                # if uri not passed with params, look up in the olapy-data config file
-                db_config = DbConfigParser()
-                sqla_uri = db_config.get_db_credentials(db_config_file)
-
-        xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                               sql_alchemy_uri=sqla_uri, cubes_config=cube_conf)
+    xmla_tools = XmlaTools(mdx_engine)
 
     application = get_spyne_app(xmla_tools)
 
@@ -250,7 +252,7 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
 @click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
-@click.option('--source_type', '-st', default='csv', help="Get cubes from where ( db | csv ), DEFAULT : csv")
+@click.option('--source_type', '-st', default='db', help="Get cubes from where ( db | csv ), DEFAULT : csv")
 @click.option('--db_config_file', '-dbc', default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
               help="Database configuration file path, DEFAULT : " +
                    os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'))
@@ -269,10 +271,6 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     """
     Start the xmla server.
     """
-    if sql_alchemy_uri is not None:
-        # Example: olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
-        os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
-
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
@@ -280,8 +278,26 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,
-                                            direct_table_or_file, columns, measures, sql_alchemy_uri)
+    cube_config = None
+    if cube_config_file:
+        cube_config_file_parser = ConfigParser()
+        cube_config = cube_config_file_parser.get_cube_config(cube_config_file)
+
+    sqla_uri = None
+    if 'db' in source_type:
+        if sql_alchemy_uri:
+            # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
+            sqla_uri = sql_alchemy_uri
+        else:
+            # if uri not passed with params, look up in the olapy-data config file
+            db_config = DbConfigParser()
+            sqla_uri = db_config.get_db_credentials(db_config_file)
+
+    mdx_engine = get_mdx_engine(cube_config=cube_config, sql_alchemy_uri=sqla_uri, olapy_data=olapy_data,
+                                source_type=source_type, direct_table_or_file=direct_table_or_file, columns=columns,
+                                measures=measures)
+
+    wsgi_application = get_wsgi_application(mdx_engine)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")

@@ -30,7 +30,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self, source_type, cubes_config, **kwargs):
+    def __init__(self, mdx_engine):
         """
 
         :param source_type: csv,db
@@ -42,37 +42,23 @@ class XmlaTools():
         :param sql_alchemy_uri: sql alchemy connection string if you want to use olapy with only a simple database table
 
         """
-
-        olapy_data = kwargs.get('olapy_data', None)
-        # direct_table_or_file = kwargs.get('direct_table_or_file', None)
-        columns = kwargs.get('columns', None)
-        measures = kwargs.get('measures', None)
-        self.sql_alchemy_uri = kwargs.get('sql_alchemy_uri', None)
-        executor = kwargs.get('executor', MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
-                                                    cube_config=cubes_config))
-        if self.sql_alchemy_uri:
-            # to get all dbs names
-            executor.sqla_engine = create_engine(self.sql_alchemy_uri)
-
-        # if direct_table_or_file:
-        # mdx_executor = MdxEngineLite()
-        # self.catalogues = [direct_table_or_file]
-        # facts = None
+        self.executor = mdx_engine
+        self.sql_alchemy_uri = str(self.executor.sqla_engine.url) #save sqla uri so we can change it with new database
+        self.catalogues = self.executor.get_cubes_names()
+        self.selected_catalogue = None
+        # self.catalogues = self.mdx_engine.csv_files_cubes if self.mdx_engine.csv_files_cubes else self.mdx_engine.db_cubes
+        # # todo change catalogue here
+        # if executor.cube and cubes_config:
+        #     facts = cubes_config.facts[0].table_name
         # else:
-        executor.get_cubes_names()
-        self.catalogues = executor.csv_files_cubes if executor.csv_files_cubes else executor.db_cubes
-        # todo change catalogue here
-        if executor.cube and cubes_config:
-            facts = cubes_config.facts[0].table_name
-        else:
-            facts = executor.facts
+        #     facts = executor.facts
 
-        if self.catalogues:
-            self.selected_catalogue = self.catalogues[0]
-
-            executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-                                   measures=measures)
-            self.executor = executor
+        # if self.catalogues:
+        #     self.selected_catalogue = self.catalogues[0]
+        #
+        #     executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
+        #                            measures=measures)
+        #     self.executor = executor
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):
@@ -83,7 +69,8 @@ class XmlaTools():
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
-
+        print('000000000000000000000000000000000000000')
+        print(new_catalogue)
         if self.selected_catalogue != new_catalogue:
             if self.executor.cube_config and new_catalogue == self.executor.cube_config['name']:
                 facts = self.executor.cube_config['facts']['table_name']
@@ -93,8 +80,7 @@ class XmlaTools():
             self.selected_catalogue = new_catalogue
             # todo recheck, change
             if 'db' in self.executor.source_type:
-                new_sqla_uri = self.sql_alchemy_uri + '/' + new_catalogue
-                self.executor.sqla_engine = create_engine(new_sqla_uri)
+                self.executor.sqla_engine = create_engine(self.sql_alchemy_uri + '/' + new_catalogue)
             self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
