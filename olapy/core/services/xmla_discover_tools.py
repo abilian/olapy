@@ -42,37 +42,37 @@ class XmlaTools():
         :param sql_alchemy_uri: sql alchemy connection string if you want to use olapy with only a simple database table
 
         """
-        executor = kwargs.get('executor', None)
+
         olapy_data = kwargs.get('olapy_data', None)
         # direct_table_or_file = kwargs.get('direct_table_or_file', None)
         columns = kwargs.get('columns', None)
         measures = kwargs.get('measures', None)
         self.sql_alchemy_uri = kwargs.get('sql_alchemy_uri', None)
+        executor = kwargs.get('executor', MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
+                                                    cube_config=cubes_config))
+        if self.sql_alchemy_uri:
+            # to get all dbs names
+            executor.sqla_engine = create_engine(self.sql_alchemy_uri)
+
         # if direct_table_or_file:
         # mdx_executor = MdxEngineLite()
         # self.catalogues = [direct_table_or_file]
         # facts = None
         # else:
-        if executor:
-            mdx_executor = executor
-        else:
-            # todo sql_alchemy_uri here
-            mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
-                                     cube_config=cubes_config)
-        mdx_executor.get_cubes_names()
-        self.catalogues = mdx_executor.csv_files_cubes if mdx_executor.csv_files_cubes else mdx_executor.db_cubes
+        executor.get_cubes_names()
+        self.catalogues = executor.csv_files_cubes if executor.csv_files_cubes else executor.db_cubes
         # todo change catalogue here
-        if executor and cubes_config:
+        if executor.cube and cubes_config:
             facts = cubes_config.facts[0].table_name
         else:
-            facts = mdx_executor.facts
+            facts = executor.facts
 
         if self.catalogues:
             self.selected_catalogue = self.catalogues[0]
 
-            mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
+            executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
                                    measures=measures)
-            self.executor = mdx_executor
+            self.executor = executor
         self.session_id = uuid.uuid1()
 
     def change_catalogue(self, new_catalogue):

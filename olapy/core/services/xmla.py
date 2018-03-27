@@ -26,6 +26,8 @@ from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.mdx.tools.config_file_parser import ConfigParser
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+from sqlalchemy import create_engine
+
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -209,12 +211,7 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
                                direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
                                sql_alchemy_uri=sql_alchemy_uri)
     else:
-        sql_alchemy_uri = None
         cube_conf = None
-        if 'db' in source_type:
-            db_config = DbConfigParser()
-            sql_alchemy_uri = db_config.get_db_credentials(db_config_file)
-
         try:
             cube_config_file_parser = ConfigParser()
             cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
@@ -223,10 +220,19 @@ def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_fi
             print(type)
             print(value)
             print_tb(traceback)
-            sql_alchemy_uri = None
+
+        sqla_uri = None
+        if 'db' in source_type:
+            if sql_alchemy_uri:
+                # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
+                sqla_uri = sql_alchemy_uri
+            else:
+                # if uri not passed with params, look up in the olapy-data config file
+                db_config = DbConfigParser()
+                sqla_uri = db_config.get_db_credentials(db_config_file)
 
         xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                               sql_alchemy_uri=sql_alchemy_uri, cubes_config=cube_conf)
+                               sql_alchemy_uri=sqla_uri, cubes_config=cube_conf)
 
     application = get_spyne_app(xmla_tools)
 
