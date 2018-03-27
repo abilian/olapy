@@ -59,9 +59,11 @@ class XmlaTools():
 
             self.selected_catalogue = new_catalogue
             # todo recheck, change
+            # and self.sql_alchemy_uri != str(self.executor.sqla_engine.url)
             if 'db' in self.executor.source_type:
                 self.executor.sqla_engine = create_engine(self.sql_alchemy_uri + '/' + new_catalogue)
-            self.executor.load_cube(new_catalogue, fact_table_name=facts)
+            if  self.executor.cube != new_catalogue:
+                self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
     def discover_datasources_response():

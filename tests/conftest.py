@@ -18,6 +18,8 @@ def executor():
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     create_insert(engine)
     mdx_engine = MdxEngine(sqla_engine=engine, source_type='db')
+    # if db_test:
+    #     mdx_engine.load_cube(cube_name=db_test, fact_table_name='facts') # sqlit:// main db will be loaded inside 'change_catalogue'
     mdx_engine.load_cube(cube_name=db_test if db_test else 'main', fact_table_name='facts')
     yield mdx_engine
     drop_tables(engine)
