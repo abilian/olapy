@@ -92,8 +92,9 @@ class XmlaTools():
 
             self.selected_catalogue = new_catalogue
             # todo recheck, change
-            new_sqla_uri = self.sql_alchemy_uri + '/' + new_catalogue
-            self.executor.sqla_engine = create_engine(new_sqla_uri)
+            if 'db' in self.executor.source_type:
+                new_sqla_uri = self.sql_alchemy_uri + '/' + new_catalogue
+                self.executor.sqla_engine = create_engine(new_sqla_uri)
             self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
