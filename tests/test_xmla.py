@@ -78,8 +78,7 @@ class WSGIServer:
 
 @pytest.fixture(scope="module")
 def conn(executor):
-    xmla_tools = XmlaTools(executor=executor, source_type='db', db_config=None,
-                           cubes_config=None)
+    xmla_tools = XmlaTools(executor)
 
     print("spawning server")
     application = Application(
