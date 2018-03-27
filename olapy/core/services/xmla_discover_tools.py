@@ -12,7 +12,7 @@ import uuid
 import xmlwitch
 from sqlalchemy import create_engine
 
-from olapy.core.services.xmla_discover_tools_utils import discover_literals_response_rows, \
+from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
 

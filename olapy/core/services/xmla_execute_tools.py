@@ -12,7 +12,7 @@ import numpy as np
 import xmlwitch
 from six import text_type
 
-from olapy.core.mdx.parser.parse import Parser
+from ..mdx.parser.parse import Parser
 from six.moves import zip
 
 

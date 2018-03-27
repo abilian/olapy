@@ -23,11 +23,11 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
-from olapy.core.mdx.tools.config_file_parser import ConfigParser
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+from ..mdx.tools.config_file_parser import ConfigParser
+from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from sqlalchemy import create_engine
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from ..mdx.executor.execute import MdxEngine
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools

@@ -13,7 +13,7 @@ import pandas as pd
 import pandas.io.sql as psql
 from sqlalchemy import inspect
 
-from olapy.core.mdx.tools.connection import get_dialect_name
+from ..tools.connection import get_dialect_name
 
 
 def load_tables_db(executor):

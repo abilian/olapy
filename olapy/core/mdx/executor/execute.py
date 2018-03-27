@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from olapy.core.mdx.parser.parse import Parser
+from ..parser.parse import Parser
 from ..tools.connection import get_dialect
 from .execute_config_file import construct_star_schema_config_file, \
     construct_web_star_schema_config_file, load_table_config_file
