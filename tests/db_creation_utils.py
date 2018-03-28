@@ -125,9 +125,9 @@ def custom_create_insert(con):
         """
     con.execute(statement)
 
-    statement = """INSERT INTO warehouse (id integer,warehouse_name text,wa_address1 text,wa_address2 text,
-    wa_address3 text,wa_address4 text,warehouse_city text,warehouse_state_province text,warehouse_postal_code integer,
-    warehouse_country text,warehouse_owner_name text,warehouse_phone text,warehouse_fax text) VALUES
+    statement = """INSERT INTO warehouse (id,warehouse_name,wa_address1,wa_address2,
+    wa_address3,wa_address4,warehouse_city,warehouse_state_province,warehouse_postal_code,
+    warehouse_country,warehouse_owner_name,warehouse_phone,warehouse_fax) VALUES
      (1, 'Salka Warehousing', '9716 Alovera Road', '', '', '', 'Acapulco', 'Guerrero', 55555, 'Mexico', '', '821-555-1658', '594-555-2908'),
      (2, 'Foster Products', '958 Hilltop Dr', '', '', '', 'Bellingham', 'WA', 55555, 'USA', '', '315-555-8947', '119-555-3826'),
      (3, 'Destination, Inc.', '4162 Euclid Ave', '', '', '', 'Bremerton', 'WA', 55555, 'USA', '', '517-555-3022', '136-555-4501'),
