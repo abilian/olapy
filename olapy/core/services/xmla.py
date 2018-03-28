@@ -23,6 +23,7 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
+from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from sqlalchemy import create_engine
@@ -122,8 +123,7 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            xmla_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog, )
+            xmla_tools.change_catalogue(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = xmla_tools.executor
 
@@ -179,14 +179,18 @@ conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
                    source_type, direct_table_or_file, columns,
                    measures):
-    print(direct_table_or_file)
-    print(columns)
-    print(measures)
     sqla_engine = None
     if sql_alchemy_uri:
         sqla_engine = create_engine(sql_alchemy_uri)
-    executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
-                         cube_config=cube_config, sqla_engine=sqla_engine)
+
+    if direct_table_or_file:
+        executor = MdxEngineLite(direct_table_or_file=direct_table_or_file, source_type=None, db_config=None,
+                                 cubes_config=None,
+                                 columns=columns,
+                                 measures=measures, sqla_engine=sqla_engine)
+    else:
+        executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
+                             cube_config=cube_config, sqla_engine=sqla_engine)
     return executor
 
 

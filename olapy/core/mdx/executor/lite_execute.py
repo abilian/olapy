@@ -7,7 +7,6 @@ from __future__ import absolute_import, division, print_function, \
 
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine
 from ..executor.execute import MdxEngine
 
 
@@ -19,10 +18,34 @@ class MdxEngineLite(MdxEngine):
             olapy runserver -tf=/home/moddoy/olapy-data/cubes/sales/Facts.csv -c City,Licence,Amount,Count
 
     """
-    def __init__(self):
-        MdxEngine.__init__(self)
 
-    def load_cube(self, table_or_file, sqlalchemy_uri=None, **kwargs):
+    def __init__(self, direct_table_or_file, columns=None, measures=None, **kwargs):
+        MdxEngine.__init__(self, kwargs)
+        self.cube = direct_table_or_file
+        self._columns = columns,
+        self.measures = measures
+
+    @property
+    def measures(self):
+        return self.measures
+
+    @measures.setter
+    def measures(self, measures):
+        if measures:
+            self.measures = measures.split(',')
+
+    @property
+    def columns(self):
+        return self._columns
+
+    @columns.setter
+    def columns(self, columns):
+        if columns:
+            self._columns = columns.split(',')
+        else:
+            self._columns = []
+
+    def load_cube(self, table_or_file, sep=';', **kwargs):
         """
          After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
@@ -33,23 +56,12 @@ class MdxEngineLite(MdxEngine):
         :param sep: csv file separator
         """
         self.cube = table_or_file
-        if sqlalchemy_uri:
-            self.sql_alchemy = create_engine(sqlalchemy_uri)
-        measures = kwargs.get('measures', None)
-        sep = kwargs.get('sep', ';')
-        columns = kwargs.get('columns', None)
-        if self.sql_alchemy:
-            self.tables_loaded = self.load_tables_db(columns)
+        if self.sqla_engine:
+            self.tables_loaded = self.load_tables_db(self.columns)
         else:
-            self.tables_loaded = self.load_tables_csv_files(sep, columns)
-        if measures:
-            self.measures = measures.split(',')
-        else:
-            self.measures = self.get_measures()
-        if self.measures:
-            # default measure is the first one
-            self.selected_measures = [self.measures[0]]
+            self.tables_loaded = self.load_tables_csv_files(sep, self.columns)
 
+        self.selected_measures = [self.measures[0]]
         table_name = list(self.tables_loaded.keys())[0]
         self.star_schema_dataframe = self.tables_loaded[table_name]
         # remove measures from
@@ -74,8 +86,8 @@ class MdxEngineLite(MdxEngine):
         """
 
         tables = {}
-        print('Connection string = ' + str(self.sql_alchemy))
-        results = self.sql_alchemy.execution_options(stream_results=True).execute('SELECT * FROM {}'.format(self.cube))
+        print('Connection string = ' + str(self.sqla_engine.url))
+        results = self.sqla_engine.execution_options(stream_results=True).execute('SELECT * FROM {}'.format(self.cube))
         # Fetch all the results of the query
         if columns:
             value = pd.DataFrame(iter(results), columns=results.keys())[columns.split(',')]
@@ -110,7 +122,7 @@ class MdxEngineLite(MdxEngine):
         return self.get_all_tables_names()
 
     def get_all_tables_names(self, **kwargs):
-        if self.sql_alchemy:
+        if self.sqla_engine:
             return [self.cube]
         else:
             return [self.cube.split('/')[-1].replace('.csv', '')]
