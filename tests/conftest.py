@@ -35,8 +35,8 @@ cube_config = {u'xmla_authentication': False,
 def executor(request):
     config = None
     custom = False
-    if request.param:
-        custom = True
+    if hasattr(request,'param'):
+        custom = request.param
         config = cube_config
     MdxEngine.source_type = ('csv', 'db')
     sqlalchemy_uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
