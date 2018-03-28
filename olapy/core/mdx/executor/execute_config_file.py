@@ -25,15 +25,11 @@ def load_one_table(cubes_obj, executor, table_name, sep):
             facts.replace('.csv', '')
         table = pd.read_csv(facts, sep=sep)
     else:
-        db = PostgresDialect(
-            executor.database_config,
-            db_name=executor.cube,
-        )
         # load facts table
 
         table = psql.read_sql_query(
             "SELECT * FROM {}".format(table_name),
-            db.engine,
+            executor.sqla_engine,
         )
     return table
 
@@ -106,13 +102,9 @@ def construct_star_schema_config_file(executor, cubes_obj, sep):
                 file.replace('.csv', '')
             df = pd.read_csv(file, sep=sep)
         else:
-            db = PostgresDialect(
-                executor.database_config,
-                db_name=executor.cube,
-            )
             df = psql.read_sql_query(
                 "SELECT * FROM {}".format(dimension_and_key.split('.')[0]),
-                db.engine,
+                executor.sqla_engine,
             )
 
         for dimension in cubes_obj['dimensions']:
