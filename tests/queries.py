@@ -255,8 +255,7 @@ query_postgres3 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
-custom_query1 = """
-    SELECT  
-    FROM [main] 
-    WHERE ([Measures].[supply_time]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-"""
+custom_query1 = """SELECT
+                FROM [main]
+                WHERE ([Measures].[supply_time])
+                CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""

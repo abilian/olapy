@@ -221,6 +221,7 @@ class MdxEngine(object):
         tables = {}
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config['name']:
+            # todo use another class, Demeter
             tables = load_table_config_file(self, self.cube_config, sep)
 
         elif self.cube in self.db_cubes:

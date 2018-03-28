@@ -21,8 +21,8 @@ def custom_create_insert(con):
         """
     con.execute(statement)
 
-    statement = """
-        INSERT INTO food_facts (product_id, warehouse_id, store_id, units_ordered, units_shipped, warehouse_sales, warehouse_cost, supply_time, store_invoice) VALUES
+    statement = """INSERT INTO food_facts (product_id, warehouse_id, store_id, units_ordered, units_shipped,
+warehouse_sales,warehouse_cost, supply_time, store_invoice) VALUES
         (1,1,4,53,7,7.4774,2.6171,4,3.0358),
         (2,1,1,84,62,50.5548,28.8162,1,32.8505),
         (3,2,5,24,24,29.8224,15.5076,2,17.2134),
@@ -55,13 +55,13 @@ def custom_create_insert(con):
         """
     con.execute(statement)
 
-    statement = """
-        INSERT INTO product (id, brand_name, product_name, sku, srp, gross_weight, net_weight, recyclable_package, low_fat, units_per_case, cases_per_pallet, shelf_width, shelf_height, shelf_depth) VALUES
-         (1, 'Washington', 'Washington Berry Juice', 554270458, 2.85, 8.39, 6.39, 0, 0, 30, 14, 16.9, 12.6, 7.4),
-         (2, 'Washington', 'Washington Mango Drink', 2027221987, 0.74, 7.42, 4.42, 0, 1, 18, 8, 13.4, 3.71, 22.6),
-         (3, 'Washington', 'Washington Strawberry Drink', -1701770219, 0.83, 13.1, 11.1, 1, 1, 17, 13, 14.4, 11, 7.77),
-         (4, 'Washington', 'Washington Cream Soda', -12353693, 3.64, 10.6, 9.6, 1, 0, 26, 10, 22.9, 18.9, 7.93),
-         (5, 'Washington', 'Washington Diet Soda', -338154481, 2.19, 6.66, 4.65, 1, 0, 7, 10, 20.7, 21.9, 19.2);
+    statement = """INSERT INTO product (id, brand_name, product_name, sku, srp, gross_weight, net_weight,
+        recyclable_package,low_fat, units_per_case, cases_per_pallet, shelf_width, shelf_height, shelf_depth) VALUES
+        (1, 'Washington', 'Washington Berry Juice', 554270458, 2.85, 8.39, 6.39, 0, 0, 30, 14, 16.9, 12.6, 7.4),
+        (2, 'Washington', 'Washington Mango Drink', 2027221987, 0.74, 7.42, 4.42, 0, 1, 18, 8, 13.4, 3.71, 22.6),
+        (3, 'Washington', 'Washington Strawberry Drink', -1701770219, 0.83, 13.1, 11.1, 1, 1, 17, 13, 14.4, 11, 7.77),
+        (4, 'Washington', 'Washington Cream Soda', -12353693, 3.64, 10.6, 9.6, 1, 0, 26, 10, 22.9, 18.9, 7.93),
+        (5, 'Washington', 'Washington Diet Soda', -338154481, 2.19, 6.66, 4.65, 1, 0, 7, 10, 20.7, 21.9, 19.2);
         """
     con.execute(statement)
 
@@ -94,16 +94,22 @@ def custom_create_insert(con):
         """
     con.execute(statement)
 
-    statement = """
-            INSERT INTO store (id, store_type, store_name, store_number, store_street_address, store_city, store_state, store_postal_code, store_country, store_manager, store_phone, store_fax, first_opened_date, last_remodel_date, store_sqft, grocery_sqft, frozen_sqft, meat_sqft, coffee_bar, video_store, salad_bar, prepared_food, florist) VALUES
-(0, 'HeadQuarters', 'HQ', 0, '1 Alameda Way', 'Alameda', 'CA', 55555, 'USA', '', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0),
- (1, 'Supermarket', 'Store 1', 1, '2853 Bailey Rd', 'Acapulco', 'Guerrero', 55555, 'Mexico', 'Jones', '262-555-5124', '262-555-5121', '1982-01-09 00:00:00', '1990-12-05 00:00:00', 23593, 17475, 3671, 2447, 0, 0, 0, 0, 0),
- (2, 'Small Grocery', 'Store 2', 2, '5203 Catanzaro Way', 'Bellingham', 'WA', 55555, 'USA', 'Smith', '605-555-8203', '605-555-8201', '1970-04-02 00:00:00', '1973-06-04 00:00:00', 28206, 22271, 3561, 2374, 1, 0, 0, 0, 0),
- (3, 'Supermarket', 'Store 3', 3, '1501 Ramsey Circle', 'Bremerton', 'WA', 55555, 'USA', 'Davis', '509-555-1596', '509-555-1591', '1959-06-14 00:00:00', '1967-11-19 00:00:00', 39696, 24390, 9184, 6122, 0, 0, 1, 1, 0),
- (4, 'Gourmet Supermarket', 'Store 4', 4, '433 St George Dr', 'Camacho', 'Zacatecas', 55555, 'Mexico', 'Johnson', '304-555-1474', '304-555-1471', '1994-09-27 00:00:00', '1995-12-01 00:00:00', 23759, 16844, 4149, 2766, 1, 0, 1, 1, 1),
- (5, 'Small Grocery', 'Store 5', 5, '1250 Coggins Drive', 'Guadalajara', 'Jalisco', 55555, 'Mexico', 'Green', '801-555-4324', '801-555-4321', '1978-09-18 00:00:00', '1991-06-29 00:00:00', 24597, 15012, 5751, 3834, 1, 0, 0, 0, 0);
-
-        """
+    statement = """INSERT INTO store (id, store_type, store_name, store_number, store_street_address, store_city,
+store_state,store_postal_code, store_country, store_manager, store_phone, store_fax, first_opened_date,
+last_remodel_date,store_sqft, grocery_sqft, frozen_sqft, meat_sqft, coffee_bar, video_store, salad_bar,prepared_food,
+florist) VALUES
+(0,'HeadQuarters','HQ',0,'1 Alameda Way','Alameda','CA',55555,'USA','','','','','',0,0,0,0,0,0,0,0,0),
+ (1, 'Supermarket', 'Store 1', 1, '2853 Bailey Rd', 'Acapulco', 'Guerrero', 55555, 'Mexico', 'Jones', '262-555-5124',
+ '262-555-5121', '1982-01-09 00:00:00', '1990-12-05 00:00:00', 23593, 17475, 3671, 2447, 0, 0, 0, 0, 0),
+ (2, 'Small Grocery', 'Store 2', 2, '5203 Catanzaro Way', 'Bellingham', 'WA', 55555, 'USA', 'Smith', '605-555-8203',
+ '605-555-8201', '1970-04-02 00:00:00', '1973-06-04 00:00:00', 28206, 22271, 3561, 2374, 1, 0, 0, 0, 0),
+ (3, 'Supermarket', 'Store 3', 3, '1501 Ramsey Circle', 'Bremerton', 'WA', 55555, 'USA', 'Davis', '509-555-1596',
+ '509-555-1591', '1959-06-14 00:00:00', '1967-11-19 00:00:00', 39696, 24390, 9184, 6122, 0, 0, 1, 1, 0),
+ (4, 'Gourmet Supermarket', 'Store 4', 4, '433 St George Dr', 'Camacho', 'Zacatecas', 55555, 'Mexico', 'Johnson',
+ '304-555-1474', '304-555-1471', '1994-09-27 00:00:00', '1995-12-01 00:00:00', 23759, 16844, 4149, 2766, 1, 0, 1, 1, 1),
+ (5, 'Small Grocery', 'Store 5', 5, '1250 Coggins Drive', 'Guadalajara', 'Jalisco', 55555, 'Mexico', 'Green',
+ '801-555-4324', '801-555-4321', '1978-09-18 00:00:00', '1991-06-29 00:00:00', 24597, 15012, 5751, 3834, 1, 0, 0, 0, 0);
+"""
     con.execute(statement)
 
     statement = """
@@ -128,11 +134,16 @@ def custom_create_insert(con):
     statement = """INSERT INTO warehouse (id,warehouse_name,wa_address1,wa_address2,
     wa_address3,wa_address4,warehouse_city,warehouse_state_province,warehouse_postal_code,
     warehouse_country,warehouse_owner_name,warehouse_phone,warehouse_fax) VALUES
-     (1, 'Salka Warehousing', '9716 Alovera Road', '', '', '', 'Acapulco', 'Guerrero', 55555, 'Mexico', '', '821-555-1658', '594-555-2908'),
-     (2, 'Foster Products', '958 Hilltop Dr', '', '', '', 'Bellingham', 'WA', 55555, 'USA', '', '315-555-8947', '119-555-3826'),
-     (3, 'Destination, Inc.', '4162 Euclid Ave', '', '', '', 'Bremerton', 'WA', 55555, 'USA', '', '517-555-3022', '136-555-4501'),
-     (4, 'Anderson Warehousing', '5657 Georgia Dr', '', '', '', 'Camacho', 'Zacatecas', 55555, 'Mexico', '', '681-555-1655', '946-555-4848'),
-     (5, 'Focus, Inc.', '9116 Tice Valley Blv.', '', '', '', 'Guadalajara', 'Jalisco', 55555, 'Mexico', '', '344-555-5530', '379-555-9065');"""
+ (1, 'Salka Warehousing', '9716 Alovera Road', '', '', '', 'Acapulco', 'Guerrero', 55555, 'Mexico', '', '821-555-1658',
+ '594-555-2908'),
+ (2, 'Foster Products', '958 Hilltop Dr', '', '', '', 'Bellingham', 'WA', 55555, 'USA', '', '315-555-8947',
+ '119-555-3826'),
+ (3, 'Destination, Inc.', '4162 Euclid Ave', '', '', '', 'Bremerton', 'WA', 55555, 'USA', '', '517-555-3022',
+ '136-555-4501'),
+ (4, 'Anderson Warehousing', '5657 Georgia Dr', '', '', '', 'Camacho', 'Zacatecas', 55555, 'Mexico', '',
+ '681-555-1655', '946-555-4848'),
+ (5, 'Focus, Inc.', '9116 Tice Valley Blv.', '', '', '', 'Guadalajara', 'Jalisco', 55555, 'Mexico', '',
+ '344-555-5530', '379-555-9065');"""
 
     con.execute(statement)
 
