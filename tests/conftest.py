@@ -35,7 +35,7 @@ cube_config = {u'xmla_authentication': False,
 def executor(request):
     config = None
     custom = False
-    if hasattr(request,'param'):
+    if hasattr(request, 'param'):
         custom = request.param
         config = cube_config
         sqlalchemy_uri = 'sqlite://'
