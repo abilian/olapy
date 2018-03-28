@@ -14,18 +14,18 @@ from olapy.core.mdx.executor.execute import MdxEngine
 cube_config = {u'xmla_authentication': False,
                u'source': 'db',
                u'name': 'main',
-               u'facts': {u'keys': {'warehouse_id': 'Warehouse.id', 'store_id': 'Store.id', 'product_id': 'Product.id'},
+               u'facts': {u'keys': {'warehouse_id': 'warehouse.id', 'store_id': 'store.id', 'product_id': 'product.id'},
                           u'measures': ['units_ordered', 'units_shipped', 'supply_time'], u'table_name': 'food_facts'},
                u'dimensions': [{u'displayName': 'food_facts', u'name': 'food_facts', u'columns': {}},
-                               {u'displayName': 'Product', u'name': 'Product', u'columns': OrderedDict(
+                               {u'displayName': 'product', u'name': 'product', u'columns': OrderedDict(
                                    [('id', 'id'), ('brand_name', 'brand_name'), ('product_name', 'product_name'),
-                                    ('SKU', 'Stock_keeping_unit')])}, {u'displayName': 'Store', u'name': 'Store',
+                                    ('sku', 'stock_keeping_unit')])}, {u'displayName': 'store', u'name': 'store',
                                                                        u'columns': OrderedDict(
                                                                            [('id', 'id'), ('store_type', 'store_type'),
                                                                             ('store_name', 'store_name'),
                                                                             ('store_city', 'store_city'),
                                                                             ('store_country', 'country')])},
-                               {u'displayName': 'Warehouse', u'name': 'Warehouse', u'columns': OrderedDict(
+                               {u'displayName': 'warehouse', u'name': 'warehouse', u'columns': OrderedDict(
                                    [('id', 'id'), ('warehouse_name', 'warehouse_name'),
                                     ('warehouse_city', 'warehouse_city'),
                                     ('warehouse_country', 'warehouse_country')])}]}
