@@ -17,9 +17,14 @@ install:
   - pip install -U pip setuptools tox tox-travis wheel
 
 env:
-  global:
-    - POSTGRES_URI=postgresql+psycopg2://postgres@localhost/olapy_test
-    - MYSQL_URI=mysql://travis@localhost/olapy_test
+  matrix:
+    - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+    - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
+    - SQLALCHEMY_DATABASE_URI=sqlite://
+#env:
+#  global:
+#    - POSTGRES_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+#    - MYSQL_URI=mysql://travis@localhost/olapy_test
 
 matrix:
   include:
