@@ -153,45 +153,6 @@ query9 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
-query10 = """
-    SELECT {(
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count]),
-
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[count])}
-
-    ON 0
-    FROM [sales]
-    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-"""
-
 query11 = """
     SELECT  FROM [sales]
     WHERE ([Measures].[amount])
@@ -205,14 +166,6 @@ query12 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
-query13 = """
-    SELECT NON EMPTY
-    Hierarchize(AddCalculatedMembers({[geography].[geography].[continent].Members}))
-    DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS
-    FROM [sales]
-    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-
-"""
 
 query14 = """
     SELECT
