@@ -3,48 +3,14 @@ Managing all database access
 """
 from __future__ import absolute_import, division, print_function
 
-
-def get_dialect(sqla_engine):
-    dialect_name = get_dialect_name(sqla_engine.url)
-    if 'sqlite' in dialect_name:
-        dialect = SqliteDialect(sqla_engine)
-    elif 'oracle' in dialect_name:
-        dialect = OracleDialect(sqla_engine)
-    elif 'mssql' in dialect_name:
-        dialect = MssqlDialect(sqla_engine)
-    elif 'postgres' in dialect_name:
-        dialect = PostgresDialect(sqla_engine)
-    elif 'mysql' in dialect_name:
-        dialect = MysqlDialect(sqla_engine)
-    else:
-        raise AttributeError("Unknown dialect: {}".format(dialect_name))
-    return dialect
-
-
-def get_dialect_name(conn_string):
-    """
-    Get the dbms from the connection string.
-
-    example:
-    when connection string = 'oracle://scott:tiger@127.0.0.1:1521/sidname'
-    it returns 'oracle'
-
-    :param conn_string: connection string
-    :return: dbms
-    """
-    dialect = str(conn_string).split(':')[0]
-    if '+' in dialect:
-        dialect = dialect.split('+')[0]
-    # just for postgres
-    dialect = dialect.replace('postgresql', 'postgres')
-
-    return dialect
+from typing import List, Text
 
 
 class BaseDialect(object):
     """Connect to sql database."""
 
     def __init__(self, sqla_engine=None):
+        # FIXME: this docstring is not up to date with the implementation.
         """
         Connection can be made either with connection string provided from
         environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config
@@ -64,6 +30,7 @@ class BaseDialect(object):
         raise NotImplementedError
 
     def get_all_databases(self):
+        # type: () -> List[Text]
         all_db_query = self.gen_all_databases_query()
         result = self.engine.execute(all_db_query)
         available_tables = result.fetchall()
@@ -121,3 +88,42 @@ class MssqlDialect(BaseDialect):
         :return: SQL query to fetch all databases
         """
         return "SELECT name FROM sys.databases WHERE name NOT IN ('master','tempdb','model','msdb');"
+
+
+def get_dialect(sqla_engine):
+    # type: () -> BaseDialect
+    dialect_name = get_dialect_name(sqla_engine.url)
+    if 'sqlite' in dialect_name:
+        dialect = SqliteDialect(sqla_engine)
+    elif 'oracle' in dialect_name:
+        dialect = OracleDialect(sqla_engine)
+    elif 'mssql' in dialect_name:
+        dialect = MssqlDialect(sqla_engine)
+    elif 'postgres' in dialect_name:
+        dialect = PostgresDialect(sqla_engine)
+    elif 'mysql' in dialect_name:
+        dialect = MysqlDialect(sqla_engine)
+    else:
+        raise AttributeError("Unknown dialect: {}".format(dialect_name))
+    return dialect
+
+
+def get_dialect_name(conn_string):
+    # type: (Text) -> Text
+    """
+    Get the dbms from the connection string.
+
+    example:
+    when connection string = 'oracle://scott:tiger@127.0.0.1:1521/sidname'
+    it returns 'oracle'
+
+    :param conn_string: connection string
+    :return: dbms
+    """
+    dialect = str(conn_string).split(':')[0]
+    if '+' in dialect:
+        dialect = dialect.split('+')[0]
+    # just for postgres
+    dialect = dialect.replace('postgresql', 'postgres')
+
+    return dialect
