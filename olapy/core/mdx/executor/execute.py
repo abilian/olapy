@@ -307,7 +307,10 @@ class MdxEngine(object):
             # measures in config-file only
             if cube_config['facts']['measures']:
                 self.measures = cube_config['facts']['measures']
-            cube_loader = CubeLoaderCustom(cube_config)
+
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoaderCustom(cube_config=cube_config, cube_path=cube_path,
+                                           sqla_engine=self.sqla_engine, sep=sep)
             fusion = cube_loader.construct_star_schema(sep)
             # fusion = construct_star_schema_config_file(self, cube_config, sep)
 
