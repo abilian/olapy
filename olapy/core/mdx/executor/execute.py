@@ -31,7 +31,7 @@ from .cube_loader_custom import CubeLoaderCustom
 from .cube_loader_db import CubeLoaderDB
 from .cube_loader import CubeLoader
 from ..parser.parse import Parser
-from ..tools.connection import get_dialect
+from ..tools.connection import get_dialect, get_dialect_name
 
 
 class MdxEngine(object):
@@ -215,37 +215,25 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-
-        tables = {}
-
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config['name']:
             # todo use another class, Demeter
             cube_path = self.cube_path
             cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
                                            sqla_engine=self.sqla_engine, sep=sep)
-            tables = cube_loader.load_tables()
-            # tables = load_table_config_file(self, self.cube_config, sep)
-
         elif self.cube in self.db_cubes:
-            # dialect_name = get_dialect_name(str(self.sqla_engine))
-            # if 'postgres' in dialect_name:
-            #     executor.facts = executor.facts.lower()
+            dialect_name = get_dialect_name(str(self.sqla_engine))
+            if 'postgres' in dialect_name:
+                self.facts = self.facts.lower()
             cube_loader = CubeLoaderDB(self.sqla_engine)
-            tables = cube_loader.load_tables()
-            # tables = load_tables_db(self)
-
             # if not tables:
             #     raise Exception(
             #         'unable to load tables, check that the database is not empty',
             #     )
-
-        elif self.cube in self.csv_files_cubes:
+        # elif self.cube in self.csv_files_cubes:
+        else:
             cube_path = self.cube_path
             cube_loader = CubeLoader(cube_path, sep)
-            tables = cube_loader.load_tables()
-            # tables = load_tables_csv_files(self, sep)
-
-        return tables
+        return cube_loader.load_tables()
 
     def get_measures(self):
         """:return: all numerical columns in Facts table."""
