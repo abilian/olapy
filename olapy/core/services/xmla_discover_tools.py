@@ -8,14 +8,13 @@ from __future__ import absolute_import, division, print_function, \
 
 import os
 import uuid
-from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import urlunparse, urlparse
 
 import xmlwitch
 from sqlalchemy import create_engine
 
 from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
-
 
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
@@ -45,8 +44,8 @@ class XmlaTools():
         self.session_id = uuid.uuid1()
 
     def _change_db_uri(self, old_sqla_uri, new_db):
-        parse_uri = urlparse(old_sqla_uri)
-        return parse_uri.scheme + '://' + parse_uri.netloc + '/' + new_db
+        scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
+        return urlunparse(('http', netloc, new_db, params, query, fragment))
 
     def change_catalogue(self, new_catalogue):
         """
