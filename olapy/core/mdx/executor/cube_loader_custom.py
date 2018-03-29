@@ -42,8 +42,6 @@ class CubeLoaderCustom(CubeLoader):
 
         tables = {}
         # just one facts table right now
-        print('.........................')
-        print(self.cube_config)
         for dimension in self.cube_config['dimensions']:
 
             df = self.load_one_table(dimension['name'])
@@ -69,7 +67,7 @@ class CubeLoaderCustom(CubeLoader):
         return tables
 
     # excel client
-    def construct_star_schema(self, sep):
+    def construct_star_schema(self,facts):
         """Construct star schema DataFrame from configuration file for excel client.
 
         :param executor:  MdxEngine instance
@@ -77,7 +75,6 @@ class CubeLoaderCustom(CubeLoader):
         :param sep: csv file separator
         :return: star schema DataFrame
         """
-        facts = self.cube_config['facts']['table_name']
         fusion = self.load_one_table(facts)
         for fact_key, dimension_and_key in self.cube_config['facts']['keys'].items():
             if self.cube_config['source'].upper() == 'CSV':
@@ -88,7 +85,7 @@ class CubeLoaderCustom(CubeLoader):
                 # with extension or not
                 if not os.path.isfile(file):
                     file.replace('.csv', '')
-                df = pd.read_csv(file, sep=sep)
+                df = pd.read_csv(file, sep=self.sep)
             else:
                 df = psql.read_sql_query(
                     "SELECT * FROM {}".format(dimension_and_key.split('.')[0]),
