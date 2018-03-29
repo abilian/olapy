@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import os
 import uuid
+from six.moves.urllib.parse import urlparse
 
 import xmlwitch
 from sqlalchemy import create_engine
@@ -43,6 +44,10 @@ class XmlaTools():
         self.selected_catalogue = None
         self.session_id = uuid.uuid1()
 
+    def _change_db_uri(self, old_sqla_uri, new_db):
+        parse_uri = urlparse(old_sqla_uri)
+        return parse_uri.scheme + '://' + parse_uri.netloc + '/' + new_db
+
     def change_catalogue(self, new_catalogue):
         """
         If you change the catalogue (cube) in any request, we have to
@@ -58,10 +63,9 @@ class XmlaTools():
                 facts = 'Facts'
 
             self.selected_catalogue = new_catalogue
-            # todo recheck, change
-            # and self.sql_alchemy_uri != str(self.executor.sqla_engine.url)
             if 'db' in self.executor.source_type:
-                self.executor.sqla_engine = create_engine(self.sql_alchemy_uri + '/' + new_catalogue)
+                new_sql_alchemy_uri = self._change_db_uri(self.sql_alchemy_uri, new_catalogue)
+                self.executor.sqla_engine = create_engine(new_sql_alchemy_uri)
             if self.executor.cube != new_catalogue:
                 self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
