@@ -3,16 +3,18 @@ from __future__ import absolute_import, division, print_function, \
 
 import threading
 
-import os
 import pytest
+import sqlalchemy
 from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
+from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
 from olapy.core.services.xmla_discover_tools import XmlaTools
+from tests.db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -77,7 +79,11 @@ class WSGIServer:
 
 
 @pytest.fixture(scope="module")
-def conn(executor):
+def conn():
+    engine = sqlalchemy.create_engine('sqlite://')
+    create_insert(engine)
+    executor = MdxEngine(sqla_engine=engine, source_type='db')
+    executor.load_cube(cube_name='main', fact_table_name='facts')
     xmla_tools = XmlaTools(executor)
 
     print("spawning server")
@@ -98,6 +104,7 @@ def conn(executor):
     yield provider.connect(location=server.url)
 
     print("stopping server")
+    drop_tables(engine)
     server.stop()
 
 
@@ -122,14 +129,14 @@ def test_discover_properties(conn):
 def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
-        restrictions={'CUBE_NAME': 'olapy_test'},
-        properties={'Catalog': 'olapy_test'},
+        restrictions={'CUBE_NAME': 'main'},
+        properties={'Catalog': 'main'},
     )[0]
-    assert discover['CATALOG_NAME'] == "olapy_test"
-    assert discover['CUBE_NAME'] == "olapy_test"
+    assert discover['CATALOG_NAME'] == "main"
+    assert discover['CUBE_NAME'] == "main"
     assert discover['CUBE_TYPE'] == "CUBE"
     assert discover['IS_DRILLTHROUGH_ENABLED'] == "true"
-    assert discover['CUBE_CAPTION'] == "olapy_test"
+    assert discover['CUBE_CAPTION'] == "main"
 
 
 def test_query1(conn):
@@ -140,12 +147,12 @@ def test_query1(conn):
     # 1023
     cmd = """
     SELECT
-    FROM [olapy_test]
+    FROM [main]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="olapy_test")
+    res = conn.Execute(cmd, Catalog="main")
     assert res.cellmap[0]['_CellOrdinal'] == '0'
     assert res.cellmap[0]['Value'] == 1023
 
@@ -177,11 +184,11 @@ def test_query2(conn):
         [geography].[geography].[continent].[Europe].[Spain]})))
     DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [olapy_test]
+    FROM [main]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="olapy_test")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -307,11 +314,11 @@ def test_query3(conn):
         [product].[product].[company].Members}))),
         Hierarchize(AddCalculatedMembers({[time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS
-        FROM [olapy_test]
+        FROM [main]
         WHERE ([Measures].[amount])
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="olapy_test")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -429,11 +436,11 @@ def test_query4(conn):
         [time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [olapy_test]
+    FROM [main]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="olapy_test")
+    res = conn.Execute(cmd, Catalog="main")
     columns = []
     values = []
     for cell in res.cellmap.items():
