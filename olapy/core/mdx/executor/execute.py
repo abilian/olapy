@@ -27,13 +27,11 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
+from .cube_loader_custom import CubeLoaderCustom
+from .cube_loader_db import CubeLoaderDB
+from .cube_loader import CubeLoader
 from ..parser.parse import Parser
 from ..tools.connection import get_dialect
-from .execute_config_file import construct_star_schema_config_file, \
-    construct_web_star_schema_config_file, load_table_config_file
-from .execute_csv_files import construct_star_schema_csv_files, \
-    load_tables_csv_files
-from .execute_db import construct_star_schema_db, load_tables_db
 
 
 class MdxEngine(object):
@@ -222,17 +220,30 @@ class MdxEngine(object):
 
         if self.cube_config and self.client == 'excel' and self.cube == self.cube_config['name']:
             # todo use another class, Demeter
-            tables = load_table_config_file(self, self.cube_config, sep)
+            cube_path = self.cube_path
+            cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
+                                           sqla_engine=self.sqla_engine, sep=sep)
+            tables = cube_loader.load_tables()
+            # tables = load_table_config_file(self, self.cube_config, sep)
 
         elif self.cube in self.db_cubes:
-            tables = load_tables_db(self)
+            # dialect_name = get_dialect_name(str(self.sqla_engine))
+            # if 'postgres' in dialect_name:
+            #     executor.facts = executor.facts.lower()
+            cube_loader = CubeLoaderDB(self.sqla_engine)
+            tables = cube_loader.load_tables()
+            # tables = load_tables_db(self)
+
             # if not tables:
             #     raise Exception(
             #         'unable to load tables, check that the database is not empty',
             #     )
 
         elif self.cube in self.csv_files_cubes:
-            tables = load_tables_csv_files(self, sep)
+            cube_path = self.cube_path
+            cube_loader = CubeLoader(cube_path, sep)
+            tables = cube_loader.load_tables()
+            # tables = load_tables_csv_files(self, sep)
 
         return tables
 
@@ -262,27 +273,43 @@ class MdxEngine(object):
                 if col.lower()[-2:] != 'id'
             ]
 
-    def _construct_star_schema_from_config(self, config_file_parser, sep):
+    def _construct_star_schema_from_config(self, cube_config, sep):
         """
         There is two different configurations:
 
         - one for excel 'cubes-config.xml',
         - the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
 
-        :param config_file_parser: dict result of cube config parsing
+        :param cube_config: dict result of cube config parsing
         :param sep: csv files separator.
         :return:
         """
+        # todo check and clean
         fusion = None
+        # todo recheck with web
         if self.client == 'web':
-            if config_file_parser['facts']:
-                fusion = construct_web_star_schema_config_file(self, config_file_parser, sep)
-            elif config_file_parser['name'] in self.csv_files_cubes:
-                fusion = construct_star_schema_csv_files(self, sep)
-            elif config_file_parser['name'] in self.db_cubes:
-                fusion = construct_star_schema_db(self)
+            if cube_config['facts']:
+                # todo recheck with web
+                cube_loader = CubeLoaderCustom(cube_config)
+                fusion = cube_loader.construct_web_star_schema_config_file()
+                # fusion = construct_web_star_schema_config_file(self, cube_config, sep)
+            elif cube_config['name'] in self.csv_files_cubes:
+                cube_path = self.get_cube_path()
+                cube_loader = CubeLoader(cube_path)
+                fusion = cube_loader.construct_star_schema(self.facts)
+                # fusion = construct_star_schema_csv_files(self, sep)
+            elif cube_config['name'] in self.db_cubes:
+                cube_loader = CubeLoaderDB(self.sqla_engine)
+                fusion = cube_loader.construct_star_schema(self.facts)
+                # fusion = construct_star_schema_db(self)
         else:
-            fusion = construct_star_schema_config_file(self, config_file_parser, sep)
+            self.facts = cube_config['facts']['table_name']
+            # measures in config-file only
+            if cube_config['facts']['measures']:
+                self.measures = cube_config['facts']['measures']
+            cube_loader = CubeLoaderCustom(cube_config)
+            fusion = cube_loader.construct_star_schema(sep)
+            # fusion = construct_star_schema_config_file(self, cube_config, sep)
 
         return fusion
 
@@ -318,10 +345,15 @@ class MdxEngine(object):
             fusion = self._construct_star_schema_from_config(self.cube_config, sep)
 
         elif self.cube in self.db_cubes:
-            fusion = construct_star_schema_db(self)
+            cube_loader = CubeLoaderDB(self.sqla_engine)
+            fusion = cube_loader.construct_star_schema(self.facts)
+            # fusion = construct_star_schema_db(self)
 
         elif self.cube in self.csv_files_cubes:
-            fusion = construct_star_schema_csv_files(self, sep)
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoader(cube_path)
+            fusion = cube_loader.construct_star_schema(self.facts)
+            # fusion = construct_star_schema_csv_files(self, sep)
 
         star_schema_df = self.clean_data(fusion, self.measures)
 
