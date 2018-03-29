@@ -41,7 +41,6 @@ def executor(request):
         sqlalchemy_uri = 'sqlite://'
     else:
         sqlalchemy_uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
-    MdxEngine.source_type = ('csv', 'db')
     db_test = urlparse(sqlalchemy_uri).path.replace('/', '')
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     create_insert(engine, custom)

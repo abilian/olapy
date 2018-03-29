@@ -122,14 +122,14 @@ def test_discover_properties(conn):
 def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
-        restrictions={'CUBE_NAME': 'main'},
-        properties={'Catalog': 'main'},
+        restrictions={'CUBE_NAME': 'olapy_test'},
+        properties={'Catalog': 'olapy_test'},
     )[0]
-    assert discover['CATALOG_NAME'] == "main"
-    assert discover['CUBE_NAME'] == "main"
+    assert discover['CATALOG_NAME'] == "olapy_test"
+    assert discover['CUBE_NAME'] == "olapy_test"
     assert discover['CUBE_TYPE'] == "CUBE"
     assert discover['IS_DRILLTHROUGH_ENABLED'] == "true"
-    assert discover['CUBE_CAPTION'] == "main"
+    assert discover['CUBE_CAPTION'] == "olapy_test"
 
 
 def test_query1(conn):
@@ -140,12 +140,12 @@ def test_query1(conn):
     # 1023
     cmd = """
     SELECT
-    FROM [main]
+    FROM [olapy_test]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="main")
+    res = conn.Execute(cmd, Catalog="olapy_test")
     assert res.cellmap[0]['_CellOrdinal'] == '0'
     assert res.cellmap[0]['Value'] == 1023
 
@@ -177,11 +177,11 @@ def test_query2(conn):
         [geography].[geography].[continent].[Europe].[Spain]})))
     DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [main]
+    FROM [olapy_test]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="main")
+    res = conn.Execute(cmd, Catalog="olapy_test")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -307,11 +307,11 @@ def test_query3(conn):
         [product].[product].[company].Members}))),
         Hierarchize(AddCalculatedMembers({[time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS
-        FROM [main]
+        FROM [olapy_test]
         WHERE ([Measures].[amount])
         CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
-    res = conn.Execute(cmd, Catalog="main")
+    res = conn.Execute(cmd, Catalog="olapy_test")
     columns = []
     values = []
     for cell in res.cellmap.items():
@@ -429,11 +429,11 @@ def test_query4(conn):
         [time].[time].[year].Members})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
     ON COLUMNS
-    FROM [main]
+    FROM [olapy_test]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
     """
 
-    res = conn.Execute(cmd, Catalog="main")
+    res = conn.Execute(cmd, Catalog="olapy_test")
     columns = []
     values = []
     for cell in res.cellmap.items():
