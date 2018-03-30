@@ -23,6 +23,7 @@ from collections import OrderedDict
 from os.path import expanduser
 from typing import List
 
+import attr
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
@@ -33,7 +34,7 @@ from .cube_loader import CubeLoader
 from ..parser.parse import Parser
 from ..tools.connection import get_dialect, get_dialect_name
 
-
+@attr.s
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -54,53 +55,28 @@ class MdxEngine(object):
     :param mdx_q_parser: mdx query parser
 
     """
+    cube = attr.ib(default=None)
+    facts = attr.ib(default='Facts')
+    source_type = attr.ib(default='csv')
+    cubes_folder_name =  attr.ib(default='cubes')
+    parser = attr.ib(default=Parser())
+    csv_files_cubes = attr.ib(default=attr.Factory(list))
+    db_cubes = attr.ib(default=attr.Factory(list))
+    sqla_engine = attr.ib(default=None)
+    olapy_data_location = attr.ib()
+    # cubes_path = attr.ib(default=os.path.join(olapy_data_location, cubes_folder_name))
+    cube_path = attr.ib(default=os.path.join(expanduser("~"), 'cubes'))
+    database_config = attr.ib(default=None)
+    cube_config = attr.ib(default=None)
+    client = attr.ib('excel')
+    tables_loaded = attr.ib(default=None)
+    star_schema_dataframe = attr.ib(default=None)
+    measures = attr.ib(default=None)
+    selected_measures = attr.ib(default=None)
 
-    def __init__(
-        self,
-        cube_name=None,
-        client_type='excel',
-        cubes_path=None,
-        olapy_data_location=None,
-        database_config=None,
-        cube_config=None,
-        sqla_engine=None,
-        source_type='csv',
-        cubes_folder_name='cubes',
-        mdx_q_parser=None
-    ):
-        self.cube = cube_name
-        self.facts = 'Facts'
-        self.source_type = source_type
-        if mdx_q_parser:
-            self.parser = mdx_q_parser
-        else:
-            self.parser = Parser()
-
-        self.csv_files_cubes = []
-        self.db_cubes = []
-        self.sqla_engine = sqla_engine
-
-        if olapy_data_location is None:
-            self.olapy_data_location = self.get_default_cube_directory()
-        else:
-            self.olapy_data_location = olapy_data_location
-
-        if cubes_path is None:
-            self.cube_path = os.path.join(self.olapy_data_location, cubes_folder_name)
-        else:
-            self.cube_path = cubes_path
-
-        self.database_config = database_config
-        self.cube_config = cube_config
-        self.client = client_type
-        self.tables_loaded = None
-        self.star_schema_dataframe = None
-        # all measures
-        self.measures = None
-        self.selected_measures = None
-
-    @staticmethod
-    def get_default_cube_directory():
+    # @staticmethod
+    @olapy_data_location.default
+    def get_default_cube_directory(self):
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
         if 'olapy-data' not in home_directory:
