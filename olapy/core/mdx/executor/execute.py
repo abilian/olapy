@@ -59,7 +59,6 @@ class MdxEngine(object):
     cube = attr.ib(default=None)
     facts = attr.ib(default='Facts')
     source_type = attr.ib(default='csv')
-    cubes_folder_name = attr.ib(default='cubes')
     parser = attr.ib(default=Parser())
     csv_files_cubes = attr.ib(default=attr.Factory(list))
     db_cubes = attr.ib(default=attr.Factory(list))
