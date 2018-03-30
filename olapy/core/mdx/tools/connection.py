@@ -10,13 +10,10 @@ class BaseDialect(object):
     """Connect to sql database."""
 
     def __init__(self, sqla_engine=None):
-        # FIXME: this docstring is not up to date with the implementation.
         """
-        Connection can be made either with connection string provided from
-        environment variable 'SQLALCHEMY_DATABASE_URI', or with olapy config
-        file parser obj.
+        Connect to cube from database
 
-        :param db_name: database name to connect to
+        :param sqla_engine: sql alchemy engine instance
         """
 
         self.engine = sqla_engine

@@ -7,6 +7,9 @@ from .cube_loader import CubeLoader
 
 
 class CubeLoaderCustom(CubeLoader):
+    """
+    Load Cube with some configurations
+    """
 
     def __init__(self, cube_config, cube_path=None, sqla_engine=None, sep=';'):
         CubeLoader.__init__(self)
@@ -33,10 +36,6 @@ class CubeLoaderCustom(CubeLoader):
     def load_tables(self):
         """
         Load tables from config file.
-
-        :param executor: MdxEngine instance
-        :param cube_obj: cubes parser object
-        :param sep: csv file separator
         :return: tables dict with table name as key and DataFrame as value
         """
 
@@ -70,9 +69,7 @@ class CubeLoaderCustom(CubeLoader):
     def construct_star_schema(self, facts):
         """Construct star schema DataFrame from configuration file for excel client.
 
-        :param executor:  MdxEngine instance
-        :param cubes_obj: cubes object
-        :param sep: csv file separator
+        :param facts:  Facts table name
         :return: star schema DataFrame
         """
         fusion = self.load_one_table(facts)
@@ -109,8 +106,6 @@ class CubeLoaderCustom(CubeLoader):
     def get_columns_n_tables(self):
         """
         Get all tables and their columns (and renames columns, if you specify this in the config file)
-        :param cubes_obj: config file parser obj
-        :param executor: MdxEngine instance
         :return:
         """
 
@@ -145,10 +140,6 @@ class CubeLoaderCustom(CubeLoader):
     # web client
     def construct_web_star_schema_config_file(self):
         """Construct star schema DataFrame from configuration file for web client.
-
-        :param executor: MdxEngine instance
-        :param cubes_obj: cubes parser object
-        :param sep: csv file separator
         :return: star schema DataFrame
         """
 

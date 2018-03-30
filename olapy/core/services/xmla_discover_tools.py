@@ -46,6 +46,7 @@ class XmlaTools():
     def _change_db_uri(self, old_sqla_uri, new_db):
         # scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
         # urlunparse((scheme, netloc, new_db, params, query, fragment))
+        # urlunparse -> bad result with sqlite://
         parse_uri = urlparse(old_sqla_uri)
         return parse_uri.scheme + '://' + parse_uri.netloc + '/' + new_db
 

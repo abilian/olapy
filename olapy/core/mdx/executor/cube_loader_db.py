@@ -24,8 +24,6 @@ class CubeLoaderDB(CubeLoader):
     def load_tables(self):
         """
         Load tables from database.
-
-        :param executor: MdxEngine instance
         :return: tables dict with table name as key and dataframe as value
         """
 
@@ -56,7 +54,7 @@ class CubeLoaderDB(CubeLoader):
         """
         Construct star schema DataFrame from database.
 
-        :param executor: MdxEngine instance
+        :param facts: Facts table name
         :return: star schema DataFrame
         """
 

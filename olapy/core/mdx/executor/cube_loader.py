@@ -12,9 +12,6 @@ class CubeLoader(object):
     def load_tables(self):
         """
         Load tables from csv files.
-
-        :param executor: MdxEngine instance
-        :param sep: csv file separator
         :return: tables dict with table name as key and dataframe as value
         """
         tables = {}
@@ -29,8 +26,7 @@ class CubeLoader(object):
         """
         Construct star schema DataFrame from csv files.
 
-        :param executor: MdxEngine instance
-        :param sep: csv file separator
+        :param facts: Facts table name
         :return: star schema DataFrame
         """
         # loading facts table

@@ -46,10 +46,6 @@ class MdxEngineLite(MdxEngine):
          After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
         :param table_or_file: full file path, or just database table name if sql_alchemy_uri provided
-        :param sqlalchemy_uri: sql alchemy connection string
-        :param measures: explicitly specify measures
-        :param columns: explicitly specify columns, order matters
-        :param sep: csv file separator
         """
         self.cube = table_or_file
         if self.sqla_engine:
@@ -76,8 +72,6 @@ class MdxEngineLite(MdxEngine):
     def load_tables_db(self):
         """
         Load table from database.
-
-        :param columns: list of columns names
         :return: tables dict with table name as key and dataframe as value
         """
 
@@ -101,8 +95,6 @@ class MdxEngineLite(MdxEngine):
     def load_tables_csv_files(self):
         """
         load the csv file
-        :param sep: csv file separator
-        :param columns: list of columns names
         :return: pandas DataFrame
         """
         tables = {}
