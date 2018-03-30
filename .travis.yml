@@ -1,9 +1,10 @@
 dist: trusty
 sudo: false
-# group: deprecated-2017Q3
 
 language: python
-cache: pip
+cache:
+  - pip
+  - yarn
 
 services:
   - mysql
