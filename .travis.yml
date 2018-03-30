@@ -21,25 +21,13 @@ env:
     - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
     - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - SQLALCHEMY_DATABASE_URI=sqlite://
-#env:
-#  global:
-#    - POSTGRES_URI=postgresql+psycopg2://postgres@localhost/olapy_test
-#    - MYSQL_URI=mysql://travis@localhost/olapy_test
 
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27-postgres
-    - python: 2.7
-      env: TOXENV=py27-mysql
-    - python: 2.7
-      env: TOXENV=py27-sqlite
+      env: TOXENV=py27
     - python: 3.6
-      env: TOXENV=py36-postgres
-    - python: 3.6
-      env: TOXENV=py36-mysql
-    - python: 3.6
-      env: TOXENV=py36-sqlite
+      env: TOXENV=py36
     - python: 2.7
       env: TOXENV=lint
 
