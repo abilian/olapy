@@ -8,14 +8,14 @@ from __future__ import absolute_import, division, print_function, \
 
 import os
 import uuid
+from six.moves.urllib.parse import urlparse
 
 import xmlwitch
+from sqlalchemy import create_engine
 
-from olapy.core.services.xmla_discover_tools_utils import discover_literals_response_rows, \
+from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
-from olapy.core.mdx.executor.lite_execute import MdxEngineLite
-from ..mdx.executor.execute import MdxEngine
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
     discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
@@ -29,49 +29,26 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 class XmlaTools():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
-    def __init__(self, source_type, db_config, cubes_config, **kwargs):
+    def __init__(self, mdx_engine):
         """
 
-        :param source_type: csv,db
-        :param db_config: olapy-config.yml file parsing result
-        :param cubes_config: cube-config.yml file parsing result
-        :param executor: MdxEngine instance
-        :param olapy_data: olapy-data path
-        :param direct_table_or_file: if you want to use olapy with only a simple csv file or database table
-        :param sql_alchemy_uri: sql alchemy connection string if you want to use olapy with only a simple database table
+        :param mdx_engine: mdx_engine engine instance
 
         """
-        executor = kwargs.get('executor', None)
-        olapy_data = kwargs.get('olapy_data', None)
-        direct_table_or_file = kwargs.get('direct_table_or_file', None)
-        columns = kwargs.get('columns', None)
-        measures = kwargs.get('measures', None)
-        sql_engine = kwargs.get('sql_alchemy_uri', None)
-        if direct_table_or_file:
-            mdx_executor = MdxEngineLite()
-            self.catalogues = [direct_table_or_file]
-            facts = None
-        else:
-            mdx_executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type, database_config=db_config,
-                                     cube_config=cubes_config)
-            mdx_executor.get_cubes_names()
-            self.catalogues = mdx_executor.csv_files_cubes if mdx_executor.csv_files_cubes else mdx_executor.db_cubes
-            # todo change catalogue here
-            if executor and cubes_config:
-                facts = cubes_config.facts[0].table_name
-            else:
-                facts = 'Facts'
-
-        if self.catalogues:
-            self.selected_catalogue = self.catalogues[0]
-            if executor:
-                self.executor = executor
-            else:
-                mdx_executor.load_cube(self.selected_catalogue, fact_table_name=facts, columns=columns,
-                                       measures=measures, sql_alchemy_uri=sql_engine)
-                self.executor = mdx_executor
-
+        self.executor = mdx_engine
+        if self.executor.sqla_engine:
+            self.sql_alchemy_uri = str(
+                self.executor.sqla_engine.url)  # save sqla uri so we can change it with new database
+        self.catalogues = self.executor.get_cubes_names()
+        self.selected_catalogue = None
         self.session_id = uuid.uuid1()
+
+    def _change_db_uri(self, old_sqla_uri, new_db):
+        # scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
+        # urlunparse((scheme, netloc, new_db, params, query, fragment))
+        # urlunparse -> bad result with sqlite://
+        parse_uri = urlparse(old_sqla_uri)
+        return parse_uri.scheme + '://' + parse_uri.netloc + '/' + new_db
 
     def change_catalogue(self, new_catalogue):
         """
@@ -81,7 +58,6 @@ class XmlaTools():
         :param new_catalogue: catalogue name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
-
         if self.selected_catalogue != new_catalogue:
             if self.executor.cube_config and new_catalogue == self.executor.cube_config['name']:
                 facts = self.executor.cube_config['facts']['table_name']
@@ -89,7 +65,11 @@ class XmlaTools():
                 facts = 'Facts'
 
             self.selected_catalogue = new_catalogue
-            self.executor.load_cube(new_catalogue, fact_table_name=facts)
+            if 'db' in self.executor.source_type:
+                new_sql_alchemy_uri = self._change_db_uri(self.sql_alchemy_uri, new_catalogue)
+                self.executor.sqla_engine = create_engine(new_sql_alchemy_uri)
+            if self.executor.cube != new_catalogue:
+                self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
     def discover_datasources_response():

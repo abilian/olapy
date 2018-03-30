@@ -23,19 +23,19 @@ from collections import OrderedDict
 from os.path import expanduser
 from typing import List
 
+import attr
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from olapy.core.mdx.parser.parse import Parser
-from ..tools.connection import MyDB, MyMssqlDB, MyOracleDB, MySqliteDB
-from .execute_config_file import construct_star_schema_config_file, \
-    construct_web_star_schema_config_file, load_table_config_file
-from .execute_csv_files import construct_star_schema_csv_files, \
-    load_tables_csv_files
-from .execute_db import construct_star_schema_db, load_tables_db
+from .cube_loader_custom import CubeLoaderCustom
+from .cube_loader_db import CubeLoaderDB
+from .cube_loader import CubeLoader
+from ..parser.parse import Parser
+from ..tools.connection import get_dialect, get_dialect_name
 
 
+@attr.s
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -56,73 +56,26 @@ class MdxEngine(object):
     :param mdx_q_parser: mdx query parser
 
     """
+    cube = attr.ib(default=None)
+    facts = attr.ib(default='Facts')
+    source_type = attr.ib(default='csv')
+    parser = attr.ib(default=Parser())
+    csv_files_cubes = attr.ib(default=attr.Factory(list))
+    db_cubes = attr.ib(default=attr.Factory(list))
+    sqla_engine = attr.ib(default=None)
+    olapy_data_location = attr.ib()
+    # cubes_path = attr.ib(default=os.path.join(olapy_data_location, cubes_folder_name))
+    cube_path = attr.ib(default=os.path.join(expanduser("~"), 'cubes'))
+    database_config = attr.ib(default=None)
+    cube_config = attr.ib(default=None)
+    tables_loaded = attr.ib(default=None)
+    star_schema_dataframe = attr.ib(default=None)
+    measures = attr.ib(default=None)
+    selected_measures = attr.ib(default=None)
 
-    def __init__(
-            self,
-            cube_name=None,
-            client_type='excel',
-            cubes_path=None,
-            olapy_data_location=None,
-            database_config=None,
-            cube_config=None,
-            sql_engine=None,
-            source_type=None,
-            cubes_folder_name='cubes',
-            mdx_q_parser=None
-    ):
-        self.cube = cube_name
-        self.facts = None
-        if mdx_q_parser:
-            self.parser = mdx_q_parser
-        else:
-            self.parser = Parser()
-        if source_type:
-            self.source_type = source_type
-        else:
-            self.source_type = ('csv')
-        self.csv_files_cubes = []
-        self.db_cubes = []
-        self.sql_alchemy = sql_engine
-        if olapy_data_location is None:
-            self.olapy_data_location = self.get_default_cube_directory()
-        else:
-            self.olapy_data_location = olapy_data_location
-        if cubes_path is None:
-            self.cube_path = os.path.join(self.olapy_data_location, cubes_folder_name)
-        else:
-            self.cube_path = cubes_path
-
-        self.database_config = database_config
-        self.cube_config = cube_config
-        self.client = client_type
-        self.tables_loaded = None
-        self.star_schema_dataframe = None
-        # all measures
-        self.measures = None
-        self.selected_measures = None
-
-    def instantiate_db(self, db_name=None):
-        if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-            dbms = MyDB.get_dbms_from_conn_string(os.environ['SQLALCHEMY_DATABASE_URI']).upper()
-        else:
-            try:
-                dbms = self.database_config.get('dbms').upper()
-            except AttributeError:
-                raise AttributeError('database config object doesn"t contains dbms key')
-        if 'SQLITE' in dbms:
-            db = MySqliteDB(self.database_config)
-        elif 'ORACLE' in dbms:
-            db = MyOracleDB(self.database_config)
-        elif 'MSSQL' in dbms:
-            db = MyMssqlDB(self.database_config, db_name)
-        elif 'POSTGRES' or 'MYSQL' in dbms:
-            db = MyDB(self.database_config, db_name)
-        else:
-            db = None
-        return db
-
-    @staticmethod
-    def get_default_cube_directory():
+    # @staticmethod
+    @olapy_data_location.default
+    def get_default_cube_directory(self):
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
         if 'olapy-data' not in home_directory:
@@ -140,11 +93,11 @@ class MdxEngine(object):
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
         # try:
-        db = self.instantiate_db(self.cube)
+        dialect = get_dialect(self.sqla_engine)
         # todo or find another thing
-        if not self.sql_alchemy or str(self.sql_alchemy) != str(db.engine):
-            self.sql_alchemy = db.engine
-        return db.get_all_databases()
+        if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
+            self.sqla_engine = dialect.engine
+        return dialect.get_all_databases()
         # except Exception:
         #     type, value, traceback = sys.exc_info()
         #     print(type)
@@ -209,7 +162,6 @@ class MdxEngine(object):
         :param measures: if you want to explicitly specify measures
         :return:
         """
-
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
@@ -234,23 +186,25 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-
-        tables = {}
-
-        if self.cube_config and self.client == 'excel' and self.cube == self.cube_config['name']:
-            tables = load_table_config_file(self, self.cube_config, sep)
-
+        if self.cube_config and self.cube == self.cube_config['name']:
+            # todo use another class, Demeter
+            cube_path = self.cube_path
+            cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
+                                           sqla_engine=self.sqla_engine, sep=sep)
         elif self.cube in self.db_cubes:
-            tables = load_tables_db(self)
+            dialect_name = get_dialect_name(str(self.sqla_engine))
+            if 'postgres' in dialect_name:
+                self.facts = self.facts.lower()
+            cube_loader = CubeLoaderDB(self.sqla_engine)
             # if not tables:
             #     raise Exception(
             #         'unable to load tables, check that the database is not empty',
             #     )
-
-        elif self.cube in self.csv_files_cubes:
-            tables = load_tables_csv_files(self, sep)
-
-        return tables
+        # elif self.cube in self.csv_files_cubes:
+        else:
+            cube_path = self.cube_path
+            cube_loader = CubeLoader(cube_path, sep)
+        return cube_loader.load_tables()
 
     def get_measures(self):
         """:return: all numerical columns in Facts table."""
@@ -258,14 +212,14 @@ class MdxEngine(object):
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
 
-        if self.client == 'web' and self.cube_config:
-            if self.cube_config['facts']:
-                # update facts table name
-                self.facts = self.cube_config['facts']['table_name']
-
-                # if measures are specified in the config file
-                if self.cube_config['facts']['measures']:
-                    return self.cube_config['facts']['measures']
+        # if self.client == 'web' and self.cube_config:
+        #     if self.cube_config['facts']:
+        #         # update facts table name
+        #         self.facts = self.cube_config['facts']['table_name']
+        #
+        #         # if measures are specified in the config file
+        #         if self.cube_config['facts']['measures']:
+        #             return self.cube_config['facts']['measures']
 
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
@@ -277,30 +231,6 @@ class MdxEngine(object):
                     include=[np.number], ).columns
                 if col.lower()[-2:] != 'id'
             ]
-
-    def _construct_star_schema_from_config(self, config_file_parser, sep):
-        """
-        There is two different configurations:
-
-        - one for excel 'cubes-config.xml',
-        - the other for the web 'web_cube_config.xml' (if you want to use olapy-web), they are a bit different.
-
-        :param config_file_parser: dict result of cube config parsing
-        :param sep: csv files separator.
-        :return:
-        """
-        fusion = None
-        if self.client == 'web':
-            if config_file_parser['facts']:
-                fusion = construct_web_star_schema_config_file(self, config_file_parser, sep)
-            elif config_file_parser['name'] in self.csv_files_cubes:
-                fusion = construct_star_schema_csv_files(self, sep)
-            elif config_file_parser['name'] in self.db_cubes:
-                fusion = construct_star_schema_db(self)
-        else:
-            fusion = construct_star_schema_config_file(self, config_file_parser, sep)
-
-        return fusion
 
     @staticmethod
     def clean_data(star_schema_df, measures):
@@ -328,17 +258,25 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: star schema DataFrame
         """
-
-        fusion = None
         if self.cube_config and self.cube == self.cube_config['name']:
-            fusion = self._construct_star_schema_from_config(self.cube_config, sep)
+            self.facts = self.cube_config['facts']['table_name']
+            # measures in config-file only
+            if self.cube_config['facts']['measures']:
+                self.measures = self.cube_config['facts']['measures']
+
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
+                                           sqla_engine=self.sqla_engine, sep=sep)
 
         elif self.cube in self.db_cubes:
-            fusion = construct_star_schema_db(self)
+            cube_loader = CubeLoaderDB(self.sqla_engine)
 
-        elif self.cube in self.csv_files_cubes:
-            fusion = construct_star_schema_csv_files(self, sep)
+        # elif self.cube in self.csv_files_cubes:
+        else:
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoader(cube_path)
 
+        fusion = cube_loader.construct_star_schema(self.facts)
         star_schema_df = self.clean_data(fusion, self.measures)
 
         return star_schema_df[[
@@ -614,8 +552,7 @@ class MdxEngine(object):
         """
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
-        if len(tuple_as_list) == 3 \
-                and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        if len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:

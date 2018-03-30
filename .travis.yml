@@ -1,16 +1,25 @@
-sudo: required
 dist: trusty
-group: deprecated-2017Q3
+sudo: false
+# group: deprecated-2017Q3
 
 language: python
 cache: pip
 
-python:
-  - "2.7"
-  - "3.6"
+services:
+  - mysql
+  - postgresql
+
+before_install:
+  - psql -c 'create database olapy_test;' -U postgres
+  - mysql -e 'create database olapy_test;'
 
 install:
   - pip install -U pip setuptools tox tox-travis wheel
+
+env:
+  global:
+    - POSTGRES_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+    - MYSQL_URI=mysql://travis@localhost/olapy_test
 
 matrix:
   include:
@@ -26,30 +35,11 @@ matrix:
       env: TOXENV=py36-mysql
     - python: 3.6
       env: TOXENV=py36-sqlite
+    - python: 2.7
+      env: TOXENV=lint
 
 script:
   - tox
-
-services:
-  - mysql
-  - postgresql
-
-test:
-  adapter: mysql2
-  database: sales_test
-  username: root_db
-  password: toor
-  encoding: utf8
-
-test:
-  adapter: postgresql
-  database: sales_test
-
-before_install:
-  - psql -c 'create database sales_test;' -U postgres
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS sales_test;'
-  - mysql -u root -e "CREATE USER 'root_db'@'localhost' IDENTIFIED BY 'toor';"
-  - mysql -u root -e "GRANT ALL ON sales_test.* TO 'root_db'@'localhost';"
 
 notifications:
   slack:

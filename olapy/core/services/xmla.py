@@ -12,7 +12,6 @@ import os
 import sys
 from datetime import datetime
 from os.path import expanduser
-from traceback import print_tb
 from wsgiref.simple_server import make_server
 
 import click
@@ -24,8 +23,12 @@ from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 
-from olapy.core.mdx.tools.config_file_parser import ConfigParser
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
+from ..mdx.executor.lite_execute import MdxEngineLite
+from ..mdx.tools.config_file_parser import ConfigParser
+from ..mdx.tools.olapy_config_file_parser import DbConfigParser
+from sqlalchemy import create_engine
+
+from ..mdx.executor.execute import MdxEngine
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -120,8 +123,7 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            xmla_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog,)
+            xmla_tools.change_catalogue(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = xmla_tools.executor
 
@@ -135,12 +137,12 @@ class XmlaProviderService(ServiceBase):
 
             with xml['return']:
                 with xml.root(
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
-                        **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance',
-                        }):
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
+                    **{
+                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                    }
+                ):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
                         with xml.CubeInfo:
@@ -148,12 +150,12 @@ class XmlaProviderService(ServiceBase):
                                 xml.CubeName('Sales')
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        '%Y-%m-%dT%H:%M:%S', ),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        '%Y-%m-%dT%H:%M:%S', ),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                         xml.write(xmla_tools.generate_cell_info())
@@ -174,6 +176,25 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
+def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
+                   source_type, direct_table_or_file, columns,
+                   measures):
+    sqla_engine = None
+    if sql_alchemy_uri:
+        sqla_engine = create_engine(sql_alchemy_uri)
+
+    if direct_table_or_file:
+        executor = MdxEngineLite(direct_table_or_file=direct_table_or_file, source_type=None, db_config=None,
+                                 cubes_config=None,
+                                 columns=columns,
+                                 measures=measures, sqla_engine=sqla_engine)
+        executor.load_cube(table_or_file=direct_table_or_file)
+    else:
+        executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
+                             cube_config=cube_config, sqla_engine=sqla_engine)
+    return executor
+
+
 def get_spyne_app(xmla_tools):
     """
 
@@ -189,45 +210,13 @@ def get_spyne_app(xmla_tools):
     )
 
 
-def get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file, direct_table_or_file, columns,
-                         measures, sql_alchemy_uri):
+def get_wsgi_application(mdx_engine):
     """
 
-    :param olapy_data: olapy-data folder path
-    :param source_type: csv,db
-    :param db_config_file: olapy-config file path (for database connection)
-    :param cube_config_file: cube-config file (for constructing customized cubes)
-    :param direct_table_or_file: csv file pathe or database table name if you want to use olapy for a one simple file
-    :param columns: optional if direct_table_or_file provided, explicitly specify columns
-    :param measures: optional if direct_table_or_file provided, explicitly specify measures
-    :param sql_alchemy_uri: sql alchemy string connection, optional if direct_table_or_file provided, if you want \
-        to use olapy with simple database table
+    :param mdx_engine: MdxEngine instance
     :return: Wsgi Application
     """
-    if direct_table_or_file:
-        xmla_tools = XmlaTools(source_type=None, db_config=None, cubes_config=None,
-                               direct_table_or_file=direct_table_or_file, columns=columns, measures=measures,
-                               sql_alchemy_uri=sql_alchemy_uri)
-    else:
-        db_conf = None
-        cube_conf = None
-        if 'db' in source_type:
-            db_config = DbConfigParser()
-            db_conf = db_config.get_db_credentials(db_config_file)
-
-        try:
-            cube_config_file_parser = ConfigParser()
-            cube_conf = cube_config_file_parser.get_cube_config(cube_config_file)
-        except (KeyError, IOError):
-            type, value, traceback = sys.exc_info()
-            print(type)
-            print(value)
-            print_tb(traceback)
-            db_conf = None
-
-        xmla_tools = XmlaTools(olapy_data=olapy_data, source_type=source_type,
-                               db_config=db_conf, cubes_config=cube_conf)
-
+    xmla_tools = XmlaTools(mdx_engine)
     application = get_spyne_app(xmla_tools)
 
     # validator='soft' or nothing, this is important because spyne doesn't
@@ -263,10 +252,6 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     """
     Start the xmla server.
     """
-    if sql_alchemy_uri is not None:
-        # Example: olapy start_server -wf=True -sa='postgresql+psycopg2://postgres:root@localhost:5432'
-        os.environ['SQLALCHEMY_DATABASE_URI'] = sql_alchemy_uri
-
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
@@ -274,15 +259,34 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     except Exception:
         pass
 
-    wsgi_application = get_wsgi_application(olapy_data, source_type, db_config_file, cube_config_file,
-                                            direct_table_or_file, columns, measures, sql_alchemy_uri)
+    cube_config = None
+    if cube_config_file:
+        cube_config_file_parser = ConfigParser()
+        cube_config = cube_config_file_parser.get_cube_config(cube_config_file)
+
+    sqla_uri = None
+    if 'db' in source_type:
+        if sql_alchemy_uri:
+            # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
+            sqla_uri = sql_alchemy_uri
+        else:
+            # if uri not passed with params, look up in the olapy-data config file
+            db_config = DbConfigParser()
+            sqla_uri = db_config.get_db_credentials(db_config_file)
+
+    mdx_engine = get_mdx_engine(cube_config=cube_config, sql_alchemy_uri=sqla_uri, olapy_data=olapy_data,
+                                source_type=source_type, direct_table_or_file=direct_table_or_file, columns=columns,
+                                measures=measures)
+
+    wsgi_application = get_wsgi_application(mdx_engine)
 
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
     if write_on_file:
         if not os.path.isdir(
-                os.path.join(home_directory, 'olapy-data', 'logs'),):
+            os.path.join(home_directory, 'olapy-data', 'logs'),
+        ):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:

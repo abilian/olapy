@@ -3,16 +3,18 @@ from __future__ import absolute_import, division, print_function, \
 
 import threading
 
-import os
 import pytest
+import sqlalchemy
 from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from werkzeug.serving import make_server
 
+from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
 from olapy.core.services.xmla_discover_tools import XmlaTools
+from tests.db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -77,9 +79,12 @@ class WSGIServer:
 
 
 @pytest.fixture(scope="module")
-def conn(executor):
-    xmla_tools = XmlaTools(executor=executor, source_type='db', db_config=None,
-                           cubes_config=None)
+def conn():
+    engine = sqlalchemy.create_engine('sqlite://')
+    create_insert(engine)
+    executor = MdxEngine(sqla_engine=engine, source_type='db')
+    executor.load_cube(cube_name='main', fact_table_name='facts')
+    xmla_tools = XmlaTools(executor)
 
     print("spawning server")
     application = Application(
@@ -99,6 +104,7 @@ def conn(executor):
     yield provider.connect(location=server.url)
 
     print("stopping server")
+    drop_tables(engine)
     server.stop()
 
 
