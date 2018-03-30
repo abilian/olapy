@@ -186,7 +186,7 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-        if self.cube == self.cube_config['name']:
+        if self.cube_config and self.cube == self.cube_config['name']:
             # todo use another class, Demeter
             cube_path = self.cube_path
             cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
