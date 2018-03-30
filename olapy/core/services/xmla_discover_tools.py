@@ -45,7 +45,7 @@ class XmlaTools():
 
     def _change_db_uri(self, old_sqla_uri, new_db):
         scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
-        return urlunparse(('http', netloc, new_db, params, query, fragment))
+        return urlunparse((scheme, netloc, new_db, params, query, fragment))
 
     def change_catalogue(self, new_catalogue):
         """
