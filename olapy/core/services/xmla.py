@@ -188,6 +188,7 @@ def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
                                  cubes_config=None,
                                  columns=columns,
                                  measures=measures, sqla_engine=sqla_engine)
+        executor.load_cube(table_or_file=direct_table_or_file)
     else:
         executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
                              cube_config=cube_config, sqla_engine=sqla_engine)
