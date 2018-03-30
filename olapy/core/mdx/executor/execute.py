@@ -64,21 +64,17 @@ class MdxEngine(object):
         database_config=None,
         cube_config=None,
         sqla_engine=None,
-        source_type=None,
+        source_type='csv',
         cubes_folder_name='cubes',
         mdx_q_parser=None
     ):
         self.cube = cube_name
         self.facts = 'Facts'
+        self.source_type = source_type
         if mdx_q_parser:
             self.parser = mdx_q_parser
         else:
             self.parser = Parser()
-
-        if source_type:
-            self.source_type = source_type
-        else:
-            self.source_type = ('csv')
 
         self.csv_files_cubes = []
         self.db_cubes = []
@@ -241,14 +237,14 @@ class MdxEngine(object):
         # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
 
-        if self.client == 'web' and self.cube_config:
-            if self.cube_config['facts']:
-                # update facts table name
-                self.facts = self.cube_config['facts']['table_name']
-
-                # if measures are specified in the config file
-                if self.cube_config['facts']['measures']:
-                    return self.cube_config['facts']['measures']
+        # if self.client == 'web' and self.cube_config:
+        #     if self.cube_config['facts']:
+        #         # update facts table name
+        #         self.facts = self.cube_config['facts']['table_name']
+        #
+        #         # if measures are specified in the config file
+        #         if self.cube_config['facts']['measures']:
+        #             return self.cube_config['facts']['measures']
 
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
