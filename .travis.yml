@@ -25,13 +25,13 @@ matrix:
     - python: 2.7
       env: TOXENV=py27-mysql SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - python: 2.7
-      env: TOXENV=py27-sqlite
+      env: TOXENV=py27
     - python: 3.6
       env: TOXENV=py36-postgres SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
     - python: 3.6
       env: TOXENV=py36-mysql SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - python: 3.6
-      env: TOXENV=py36-sqlite
+      env: TOXENV=py36
     - python: 2.7
       env: TOXENV=lint
 
