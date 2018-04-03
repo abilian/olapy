@@ -24,13 +24,13 @@ env:
     - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - SQLALCHEMY_DATABASE_URI=sqlite://
   matrix:
-    include:
-      - python: 2.7
-        env: TOXENV=py27
-      - python: 3.6
-        env: TOXENV=py36
-      - python: 2.7
-        env: TOX
+#    include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 2.7
+      env: TOX
 
 #matrix:
 #  include:
