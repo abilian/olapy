@@ -40,7 +40,9 @@ def executor(request):
         config = cube_config
         sqlalchemy_uri = 'sqlite://'
     else:
-        sqlalchemy_uri = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
+        sqlalchemy_uri = os.environ.get('SQLALCHEMY_DATABASE_URI', '')
+        if not sqlalchemy_uri:
+            sqlalchemy_uri = 'sqlite://'
     db_test = urlparse(sqlalchemy_uri).path.replace('/', '')
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     create_insert(engine, custom)
