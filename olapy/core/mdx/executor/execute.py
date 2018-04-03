@@ -188,8 +188,8 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
+        cubes_folder_path = os.path.join(self.olapy_data_location, self.cubes_folder, self.cube)
         if self.cube_config and self.cube == self.cube_config['name']:
-            cubes_folder_path = os.path.join(self.olapy_data_location, self.cubes_folder)
             cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cubes_folder_path,
                                            sqla_engine=self.sqla_engine, sep=sep)
         elif self.cube in self.db_cubes:
@@ -203,7 +203,6 @@ class MdxEngine(object):
             #     )
         # elif self.cube in self.csv_files_cubes:
         else:
-            cubes_folder_path = os.path.join(self.olapy_data_location, self.cubes_folder, self.cube)
             cube_loader = CubeLoader(cubes_folder_path, sep)
         return cube_loader.load_tables()
 
