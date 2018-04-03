@@ -21,6 +21,7 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
+
 from typing import List
 
 import attr
@@ -56,6 +57,7 @@ class MdxEngine(object):
     :param mdx_q_parser: mdx query parser
 
     """
+
     cube = attr.ib(default=None)
     facts = attr.ib(default='Facts')
     source_type = attr.ib(default='csv')
@@ -64,8 +66,6 @@ class MdxEngine(object):
     db_cubes = attr.ib(default=attr.Factory(list))
     sqla_engine = attr.ib(default=None)
     olapy_data_location = attr.ib()
-    # cubes_path = attr.ib(default=os.path.join(olapy_data_location, cubes_folder_name))
-    cube_path = attr.ib(default=os.path.join(expanduser("~"), 'olapy-data', 'cubes'))
     database_config = attr.ib(default=None)
     cube_config = attr.ib(default=None)
     tables_loaded = attr.ib(default=None)
@@ -73,9 +73,9 @@ class MdxEngine(object):
     measures = attr.ib(default=None)
     selected_measures = attr.ib(default=None)
 
-    # @staticmethod
+    @staticmethod
     @olapy_data_location.default
-    def get_default_cubes_directory(self):
+    def get_default_cubes_directory():
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
         if 'olapy-data' not in home_directory:
@@ -139,11 +139,11 @@ class MdxEngine(object):
         """
 
         # by default , and before passing values to class with olapy runserver .... it executes this with csv
-        cubes_folder_path = os.path.join(self.get_default_cubes_directory(), 'cubes')
+        cubes_folder_path = os.path.join(self.olapy_data_location, 'cubes')
         if 'db' in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
         if 'csv' in self.source_type and os.path.exists(cubes_folder_path):
-            self.csv_files_cubes = self._get_csv_cubes_names(self.cube_path)
+            self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
         return self.db_cubes + self.csv_files_cubes
 
     def _get_tables_name(self):
@@ -188,9 +188,8 @@ class MdxEngine(object):
         :return: dict with table names as keys and DataFrames as values.
         """
         if self.cube_config and self.cube == self.cube_config['name']:
-            # todo use another class, Demeter
-            cube_path = self.cube_path
-            cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
+            cubes_folder_path = os.path.join(self.olapy_data_location, 'cubes')
+            cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cubes_folder_path,
                                            sqla_engine=self.sqla_engine, sep=sep)
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
@@ -203,8 +202,8 @@ class MdxEngine(object):
             #     )
         # elif self.cube in self.csv_files_cubes:
         else:
-            cube_path = self.cube_path
-            cube_loader = CubeLoader(cube_path, sep)
+            cubes_folder_path = os.path.join(self.olapy_data_location, 'cubes')
+            cube_loader = CubeLoader(cubes_folder_path, sep)
         return cube_loader.load_tables()
 
     def get_measures(self):
@@ -301,7 +300,8 @@ class MdxEngine(object):
 
         :return: path to the cube
         """
-        return os.path.join(self.cube_path, self.cube)
+        cubes_folder_path = os.path.join(self.olapy_data_location, 'cubes')
+        return os.path.join(cubes_folder_path, self.cube)
 
     @staticmethod
     def change_measures(tuples_on_mdx):

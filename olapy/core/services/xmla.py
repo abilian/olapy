@@ -232,7 +232,8 @@ def get_wsgi_application(mdx_engine):
               help='Write logs into a file or display them into the console. (True : on file)(False : on console)', )
 @click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
 @click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
-@click.option('--olapy_data', '-od', default=None, help="Olapy Data folder location, Default : ~/olapy-data")
+@click.option('--olapy_data', '-od', default=os.path.join(expanduser('~'), 'olapy-data'),
+              help="Olapy Data folder location, Default : ~/olapy-data")
 @click.option('--source_type', '-st', default='csv', help="Get cubes from where ( db | csv ), DEFAULT : csv")
 @click.option('--db_config_file', '-dbc', default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
               help="Database configuration file path, DEFAULT : " +
