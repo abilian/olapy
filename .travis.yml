@@ -19,9 +19,10 @@ install:
 
 env:
 #  matrix:
-  - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
-  - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
-  - SQLALCHEMY_DATABASE_URI=sqlite://
+  global:
+    - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+    - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
+    - SQLALCHEMY_DATABASE_URI=sqlite://
 
 matrix:
   include:
