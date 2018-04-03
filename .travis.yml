@@ -17,24 +17,18 @@ before_install:
 install:
   - pip install -U pip setuptools tox tox-travis wheel
 
-python:
-  - 2.7
-  - 3.6
-
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27
     - python: 2.7
-      env: TOXENV=py27 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+      env: SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
     - python: 2.7
       env: TOXENV=py27 SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - python: 3.6
-      env: TOXENV=py36
     - python: 3.6
-      env: TOXENV=py36 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
+      env: SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres@localhost/olapy_test
     - python: 3.6
-      env: TOXENV=py36 SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
+      env: SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
     - python: 2.7
       env: TOXENV=lint
 
