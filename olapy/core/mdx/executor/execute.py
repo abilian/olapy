@@ -73,9 +73,9 @@ class MdxEngine(object):
     measures = attr.ib(default=None)
     selected_measures = attr.ib(default=None)
 
-    @staticmethod
+    # @staticmethod
     @olapy_data_location.default
-    def get_default_cubes_directory():
+    def get_default_cubes_directory(self):
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
         if 'olapy-data' not in home_directory:
