@@ -65,7 +65,7 @@ class MdxEngine(object):
     sqla_engine = attr.ib(default=None)
     olapy_data_location = attr.ib()
     # cubes_path = attr.ib(default=os.path.join(olapy_data_location, cubes_folder_name))
-    cube_path = attr.ib(default=os.path.join(expanduser("~"), 'cubes'))
+    cube_path = attr.ib(default=os.path.join(expanduser("~"), 'olapy-data', 'cubes'))
     database_config = attr.ib(default=None)
     cube_config = attr.ib(default=None)
     tables_loaded = attr.ib(default=None)
@@ -75,7 +75,7 @@ class MdxEngine(object):
 
     # @staticmethod
     @olapy_data_location.default
-    def get_default_cube_directory(self):
+    def get_default_cubes_directory(self):
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
 
         if 'olapy-data' not in home_directory:
@@ -139,9 +139,10 @@ class MdxEngine(object):
         """
 
         # by default , and before passing values to class with olapy runserver .... it executes this with csv
+        cubes_folder_path = os.path.join(self.get_default_cubes_directory(), 'cubes')
         if 'db' in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
-        if 'csv' in self.source_type and os.path.exists(self.cube_path):
+        if 'csv' in self.source_type and os.path.exists(cubes_folder_path):
             self.csv_files_cubes = self._get_csv_cubes_names(self.cube_path)
         return self.db_cubes + self.csv_files_cubes
 
