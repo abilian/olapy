@@ -49,7 +49,6 @@ class MdxEngine(object):
     :param cubes_path: Olapy cubes path, which is under olapy-data,
         by default *~/olapy-data/cube_name*
     :param olapy_data_location: By default *~/olapy-data/*
-    :param database_config: olapy-config.yml parsing file result (dict for connecting to database)
     :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
     :param sql_engine: sql_alchemy engine if you don't want to use any database config file
     :param source_type: source data input, Default csv
@@ -66,7 +65,6 @@ class MdxEngine(object):
     db_cubes = attr.ib(default=attr.Factory(list))
     sqla_engine = attr.ib(default=None)
     olapy_data_location = attr.ib()
-    database_config = attr.ib(default=None)
     cube_config = attr.ib(default=None)
     tables_loaded = attr.ib(default=None)
     star_schema_dataframe = attr.ib(default=None)
