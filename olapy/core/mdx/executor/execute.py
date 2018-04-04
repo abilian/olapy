@@ -154,7 +154,7 @@ class MdxEngine(object):
         """
         return list(self.tables_loaded.keys())
 
-    def load_cube(self, cube_name, fact_table_name='Facts', sep=';', measures=None, **kwargs):
+    def load_cube(self, cube_name, fact_table_name='Facts', sep=';', measures=None, cube_folder=None, **kwargs):
         """
         After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
@@ -169,7 +169,7 @@ class MdxEngine(object):
         # load cubes names
         self.get_cubes_names()
         # load tables
-        self.tables_loaded = self.load_tables(sep=sep)
+        self.tables_loaded = self.load_tables(sep=sep, cube_folder=cube_folder)
         if measures:
             self.measures = measures
         else:
@@ -179,16 +179,17 @@ class MdxEngine(object):
             self.selected_measures = [self.measures[0]]
         # construct star_schema
         if self.tables_loaded:
-            self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
+            self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep, cube_folder=cube_folder)
 
-    def load_tables(self, sep):
+    def load_tables(self, sep, cube_folder=None):
         """
         Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
 
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-        cubes_folder_path = os.path.join(self.olapy_data_location, self.cubes_folder, self.cube)
+
+        cubes_folder_path = self.get_cube_path(cube_folder)
         if self.cube_config and self.cube_config['facts'] and self.cube == self.cube_config['name']:
             cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cubes_folder_path,
                                            sqla_engine=self.sqla_engine, sep=sep)
@@ -251,7 +252,7 @@ class MdxEngine(object):
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 
-    def get_star_schema_dataframe(self, sep):
+    def get_star_schema_dataframe(self, sep, cube_folder=None):
         """
         Merge all DataFrames as star schema.
 
@@ -264,7 +265,7 @@ class MdxEngine(object):
             if self.cube_config['facts']['measures']:
                 self.measures = self.cube_config['facts']['measures']
 
-            cube_path = self.get_cube_path()
+            cube_path = self.get_cube_path(cube_folder)
             cube_loader = CubeLoaderCustom(cube_config=self.cube_config, cube_path=cube_path,
                                            sqla_engine=self.sqla_engine, sep=sep)
 
@@ -273,7 +274,7 @@ class MdxEngine(object):
 
         # elif self.cube in self.csv_files_cubes:
         else:
-            cube_path = self.get_cube_path()
+            cube_path = self.get_cube_path(cube_folder)
             cube_loader = CubeLoader(cube_path)
 
         fusion = cube_loader.construct_star_schema(self.facts)
@@ -294,14 +295,15 @@ class MdxEngine(object):
             return [tab for tab in self.tables_loaded if self.facts not in tab]
         return self.tables_loaded
 
-    def get_cube_path(self):
+    def get_cube_path(self, cube_folder):
         """
         Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
-        cubes_folder_path = os.path.join(self.olapy_data_location, self.cubes_folder)
-        return os.path.join(cubes_folder_path, self.cube)
+        if cube_folder:
+            return cube_folder
+        return os.path.join(self.olapy_data_location, self.cubes_folder, self.cube)
 
     @staticmethod
     def change_measures(tuples_on_mdx):
