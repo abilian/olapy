@@ -76,7 +76,6 @@ class MdxEngine(object):
     @olapy_data_location.default
     def get_default_cubes_directory(self):
         home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
-
         if 'olapy-data' not in home_directory:
             home_directory = os.path.join(home_directory, 'olapy-data')
 
@@ -144,13 +143,6 @@ class MdxEngine(object):
         if 'csv' in self.source_type and os.path.exists(cubes_folder_path):
             self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
         return self.db_cubes + self.csv_files_cubes
-
-    def _get_tables_name(self):
-        """Get all tables names.
-
-        :return: list tables names
-        """
-        return list(self.tables_loaded.keys())
 
     def load_cube(self, cube_name, fact_table_name='Facts', sep=';', measures=None, cube_folder=None, **kwargs):
         """
@@ -291,7 +283,7 @@ class MdxEngine(object):
         """
         if ignore_fact:
             return [tab for tab in self.tables_loaded if self.facts not in tab]
-        return self.tables_loaded
+        return self.tables_loaded.keys()
 
     def get_cube_path(self, cube_folder):
         """
