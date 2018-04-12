@@ -2,7 +2,9 @@ from __future__ import absolute_import, division, print_function
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
-from tests.queries import query_posgres1, query_posgres2, query_postgres3, query1, query7, query8, query9
+
+from .queries import query1, query7, query8, query9, query_posgres1, \
+    query_posgres2, query_postgres3
 
 
 def test_execution_query12(executor):

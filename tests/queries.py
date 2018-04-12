@@ -166,7 +166,6 @@ query12 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
-
 query14 = """
     SELECT
     {[Measures].[count],[Measures].[amount]}

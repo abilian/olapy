@@ -77,18 +77,16 @@ class Parser(object):
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
-        return [
-            [
-                tup_att.replace('All ', '').replace('[', "").replace("]", "")
-                for tup_att in tup[0].replace('.Members', '').replace(
-                    '.MEMBERS',
-                    '',
-                ).split('].[')
-                if tup_att
-            ]
-            for tup in regex.compile(cls.REG).findall(query[start:stop],)
-            if len(tup[0].split('].[')) > 1
+        return [[
+            tup_att.replace('All ', '').replace('[', "").replace("]", "")
+            for tup_att in tup[0].replace('.Members', '').replace(
+                '.MEMBERS',
+                '',
+            ).split('].[')
+            if tup_att
         ]
+            for tup in regex.compile(cls.REG).findall(query[start:stop],)
+            if len(tup[0].split('].[')) > 1]
 
     def decorticate_query(self, query):
         """Get all tuples that exists in the MDX Query by axes.

@@ -8,14 +8,13 @@ from __future__ import absolute_import, division, print_function, \
 
 import os
 import uuid
-from six.moves.urllib.parse import urlparse
 
 import xmlwitch
+from six.moves.urllib.parse import urlparse
 from sqlalchemy import create_engine
 
 from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
-
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
     discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
@@ -38,7 +37,8 @@ class XmlaTools():
         self.executor = mdx_engine
         if self.executor.sqla_engine:
             self.sql_alchemy_uri = str(
-                self.executor.sqla_engine.url)  # save sqla uri so we can change it with new database
+                self.executor.sqla_engine.url,
+            )  # save sqla uri so we can change it with new database
         self.catalogues = self.executor.get_cubes_names()
         self.selected_catalogue = None
         self.session_id = uuid.uuid1()
@@ -66,7 +66,8 @@ class XmlaTools():
 
             self.selected_catalogue = new_catalogue
             if 'db' in self.executor.source_type:
-                new_sql_alchemy_uri = self._change_db_uri(self.sql_alchemy_uri, new_catalogue)
+                new_sql_alchemy_uri = self._change_db_uri(
+                    self.sql_alchemy_uri, new_catalogue)
                 self.executor.sqla_engine = create_engine(new_sql_alchemy_uri)
             if self.executor.cube != new_catalogue:
                 self.executor.load_cube(new_catalogue, fact_table_name=facts)
@@ -649,15 +650,15 @@ class XmlaTools():
                 with xml.root(
                         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
                         **{
-                            'xmlns:xsd':
-                                'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
                             'xmlns:xsi':
-                                'http://www.w3.org/2001/XMLSchema-instance',
+                            'http://www.w3.org/2001/XMLSchema-instance',
                         }):
                     xml.write(mdschema_hierarchies_xsd)
                     if restriction_list.HIERARCHY_VISIBILITY == 3 \
                             or restriction_list.CATALOG_NAME == self.selected_catalogue:
-                        for table_name, df in self.executor.tables_loaded.items():
+                        for table_name, df in self.executor.tables_loaded.items(
+                        ):
                             if table_name == self.executor.facts:
                                 continue
 

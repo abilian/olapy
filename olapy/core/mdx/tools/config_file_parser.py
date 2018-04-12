@@ -124,18 +124,17 @@ class ConfigParser:
             from os.path import expanduser
             home_directory = expanduser("~")
 
-        return os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml')
+        return os.path.join(home_directory, 'olapy-data', 'cubes',
+                            'cubes-config.yml')
 
     @staticmethod
     def _get_columns(dimension):
         if 'columns' in dimension:
-            return OrderedDict(
-                (
-                    column['name'],
-                    column['name'] if 'column_new_name' not in column else
-                    column['column_new_name'],
-                ) for column in dimension['columns']
-            )
+            return OrderedDict((
+                column['name'],
+                column['name'] if 'column_new_name' not in column else column[
+                    'column_new_name'],
+            ) for column in dimension['columns'])
         else:
             return {}
 
@@ -145,7 +144,7 @@ class ConfigParser:
             dimensions.append({
                 'name': dimension['name'],
                 'displayName': dimension['displayName'],
-                'columns': self._get_columns(dimension)
+                'columns': self._get_columns(dimension),
             })
         return dimensions
 
@@ -153,7 +152,7 @@ class ConfigParser:
         return {
             'table_name': config['facts']['table_name'],
             'keys': config['facts']['keys'],
-            'measures': config['facts']['measures']
+            'measures': config['facts']['measures'],
         }
 
     def get_cube_config(self, conf_file=None):

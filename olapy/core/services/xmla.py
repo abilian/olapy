@@ -22,13 +22,12 @@ from spyne.error import InvalidCredentialsError
 from spyne.protocol.soap import Soap11
 from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
-
-from ..mdx.executor.lite_execute import MdxEngineLite
-from ..mdx.tools.config_file_parser import ConfigParser
-from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from sqlalchemy import create_engine
 
 from ..mdx.executor.execute import MdxEngine
+from ..mdx.executor.lite_execute import MdxEngineLite
+from ..mdx.tools.config_file_parser import ConfigParser
+from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_tools import XmlaTools
 from .xmla_execute_tools import XmlaExecuteTools
@@ -123,26 +122,30 @@ class XmlaProviderService(ServiceBase):
             return str(xml)
 
         else:
-            xmla_tools.change_catalogue(request.Properties.PropertyList.Catalog)
+            xmla_tools.change_catalogue(
+                request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             executor = xmla_tools.executor
 
             # Hierarchize
-            if all(key in mdx_query for key in ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
+            if all(key in mdx_query
+                   for key in
+                   ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
                 convert2formulas = True
             else:
                 convert2formulas = False
 
-            xmla_tools = XmlaExecuteTools(executor, mdx_query, convert2formulas)
+            xmla_tools = XmlaExecuteTools(
+                executor, mdx_query, convert2formulas)
 
             with xml['return']:
                 with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
-                    **{
-                        'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-                    }
-                ):
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
+                        **{
+                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                            'xmlns:xsi':
+                            'http://www.w3.org/2001/XMLSchema-instance',
+                        }):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
                         with xml.CubeInfo:
@@ -150,12 +153,12 @@ class XmlaProviderService(ServiceBase):
                                 xml.CubeName('Sales')
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S', ),
+                                        '%Y-%m-%dT%H:%M:%S',),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S', ),
+                                        '%Y-%m-%dT%H:%M:%S',),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                         xml.write(xmla_tools.generate_cell_info())
@@ -176,22 +179,37 @@ home_directory = expanduser("~")
 conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
 
 
-def get_mdx_engine(cube_config, sql_alchemy_uri, olapy_data,
-                   source_type, direct_table_or_file, columns,
-                   measures):
+def get_mdx_engine(
+        cube_config,
+        sql_alchemy_uri,
+        olapy_data,
+        source_type,
+        direct_table_or_file,
+        columns,
+        measures,
+):
     sqla_engine = None
     if sql_alchemy_uri:
         sqla_engine = create_engine(sql_alchemy_uri)
 
     if direct_table_or_file:
-        executor = MdxEngineLite(direct_table_or_file=direct_table_or_file, source_type=None, db_config=None,
-                                 cubes_config=None,
-                                 columns=columns,
-                                 measures=measures, sqla_engine=sqla_engine)
+        executor = MdxEngineLite(
+            direct_table_or_file=direct_table_or_file,
+            source_type=None,
+            db_config=None,
+            cubes_config=None,
+            columns=columns,
+            measures=measures,
+            sqla_engine=sqla_engine,
+        )
         executor.load_cube(table_or_file=direct_table_or_file)
     else:
-        executor = MdxEngine(olapy_data_location=olapy_data, source_type=source_type,
-                             cube_config=cube_config, sqla_engine=sqla_engine)
+        executor = MdxEngine(
+            olapy_data_location=olapy_data,
+            source_type=source_type,
+            cube_config=cube_config,
+            sqla_engine=sqla_engine,
+        )
     return executor
 
 
@@ -206,7 +224,7 @@ def get_spyne_app(xmla_tools):
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=XmlaSoap11(validator='soft'),
         out_protocol=XmlaSoap11(validator='soft'),
-        config={'xmla_tools': xmla_tools}
+        config={'xmla_tools': xmla_tools},
     )
 
 
@@ -228,28 +246,80 @@ def get_wsgi_application(mdx_engine):
 @click.command()
 @click.option('--host', '-h', default='0.0.0.0', help='Host ip address.')
 @click.option('--port', '-p', default=8000, help='Host port.')
-@click.option('--write_on_file', '-wf', default=True,
-              help='Write logs into a file or display them into the console. (True : on file)(False : on console)', )
-@click.option('--log_file_path', '-lf', default=conf_file, help='Log file path. DEFAUL : ' + conf_file)
-@click.option('--sql_alchemy_uri', '-sa', default=None, help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
-@click.option('--olapy_data', '-od', default=os.path.join(expanduser('~'), 'olapy-data'),
-              help="Olapy Data folder location, Default : ~/olapy-data")
-@click.option('--source_type', '-st', default='csv', help="Get cubes from where ( db | csv ), DEFAULT : csv")
-@click.option('--db_config_file', '-dbc', default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
-              help="Database configuration file path, DEFAULT : " +
-                   os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'))
-@click.option('--cube_config_file', '-cbf',
-              default=os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'),
-              help="Cube config file path, DEFAULT : " +
-                   os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'))
-@click.option('--direct_table_or_file', '-tf', default=None,
-              help="File path or db table name if you want to construct cube from a single file (table)")
-@click.option('--columns', '-c', default=None,
-              help="To explicitly specify columns if (construct cube from a single file), columns order matters ")
-@click.option('--measures', '-m', default=None,
-              help="To explicitly specify measures if (construct cube from a single file)")
-def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_data, source_type, db_config_file,
-              cube_config_file, direct_table_or_file, columns, measures):
+@click.option(
+    '--write_on_file',
+    '-wf',
+    default=True,
+    help='Write logs into a file or display them into the console. (True : on file)(False : on console)',
+)
+@click.option(
+    '--log_file_path',
+    '-lf',
+    default=conf_file,
+    help='Log file path. DEFAUL : ' + conf_file)
+@click.option(
+    '--sql_alchemy_uri',
+    '-sa',
+    default=None,
+    help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
+@click.option(
+    '--olapy_data',
+    '-od',
+    default=os.path.join(expanduser('~'), 'olapy-data'),
+    help="Olapy Data folder location, Default : ~/olapy-data",
+)
+@click.option(
+    '--source_type',
+    '-st',
+    default='csv',
+    help="Get cubes from where ( db | csv ), DEFAULT : csv")
+@click.option(
+    '--db_config_file',
+    '-dbc',
+    default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
+    help="Database configuration file path, DEFAULT : " +
+    os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
+)
+@click.option(
+    '--cube_config_file',
+    '-cbf',
+    default=os.path.join(home_directory, 'olapy-data', 'cubes',
+                         'cubes-config.yml'),
+    help="Cube config file path, DEFAULT : " +
+    os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'),
+)
+@click.option(
+    '--direct_table_or_file',
+    '-tf',
+    default=None,
+    help="File path or db table name if you want to construct cube from a single file (table)",
+)
+@click.option(
+    '--columns',
+    '-c',
+    default=None,
+    help="To explicitly specify columns if (construct cube from a single file), columns order matters ",
+)
+@click.option(
+    '--measures',
+    '-m',
+    default=None,
+    help="To explicitly specify measures if (construct cube from a single file)",
+)
+def runserver(
+        host,
+        port,
+        write_on_file,
+        log_file_path,
+        sql_alchemy_uri,
+        olapy_data,
+        source_type,
+        db_config_file,
+        cube_config_file,
+        direct_table_or_file,
+        columns,
+        measures,
+):
     """
     Start the xmla server.
     """
@@ -275,9 +345,15 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
             db_config = DbConfigParser()
             sqla_uri = db_config.get_db_credentials(db_config_file)
 
-    mdx_engine = get_mdx_engine(cube_config=cube_config, sql_alchemy_uri=sqla_uri, olapy_data=olapy_data,
-                                source_type=source_type, direct_table_or_file=direct_table_or_file, columns=columns,
-                                measures=measures)
+    mdx_engine = get_mdx_engine(
+        cube_config=cube_config,
+        sql_alchemy_uri=sqla_uri,
+        olapy_data=olapy_data,
+        source_type=source_type,
+        direct_table_or_file=direct_table_or_file,
+        columns=columns,
+        measures=measures,
+    )
 
     wsgi_application = get_wsgi_application(mdx_engine)
 
@@ -286,8 +362,7 @@ def runserver(host, port, write_on_file, log_file_path, sql_alchemy_uri, olapy_d
     # log to the file
     if write_on_file:
         if not os.path.isdir(
-            os.path.join(home_directory, 'olapy-data', 'logs'),
-        ):
+                os.path.join(home_directory, 'olapy-data', 'logs'),):
             os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:

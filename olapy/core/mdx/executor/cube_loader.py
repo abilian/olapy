@@ -18,8 +18,11 @@ class CubeLoader(object):
         for file in os.listdir(self.cube_path):
             # to remove file extension ".csv"
             table_name = os.path.splitext(file)[0]
-            value = pd.read_csv(os.path.join(self.cube_path, file), sep=self.sep)
-            tables[table_name] = value[[col for col in value.columns if col.lower()[-3:] != '_id']]
+            value = pd.read_csv(
+                os.path.join(self.cube_path, file), sep=self.sep)
+            tables[table_name] = value[[
+                col for col in value.columns if col.lower()[-3:] != '_id'
+            ]]
         return tables
 
     def construct_star_schema(self, facts):
@@ -30,12 +33,13 @@ class CubeLoader(object):
         :return: star schema DataFrame
         """
         # loading facts table
-        fusion = pd.read_csv(os.path.join(self.cube_path, facts + '.csv'), sep=self.sep)
+        fusion = pd.read_csv(
+            os.path.join(self.cube_path, facts + '.csv'), sep=self.sep)
         for file_name in os.listdir(self.cube_path):
             try:
                 fusion = fusion.merge(
-                    pd.read_csv(os.path.join(self.cube_path, file_name), sep=self.sep)
-                )
+                    pd.read_csv(
+                        os.path.join(self.cube_path, file_name), sep=self.sep),)
             except BaseException:
                 print('No common column')
                 pass

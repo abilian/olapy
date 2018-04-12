@@ -14,7 +14,8 @@ from werkzeug.serving import make_server
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
 from olapy.core.services.xmla_discover_tools import XmlaTools
-from tests.db_creation_utils import create_insert, drop_tables
+
+from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
@@ -75,7 +76,7 @@ class WSGIServer:
     def url(self):
         host, port = self.server_address
         proto = 'http' if self._server.ssl_context is None else 'https'
-        return '{0}://{1}:{2}'.format(proto, host, port)
+        return '{}://{}:{}'.format(proto, host, port)
 
 
 @pytest.fixture(scope="module")
@@ -92,8 +93,9 @@ def conn():
         'urn:schemas-microsoft-com:xml-analysis',
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
-        config={'xmla_tools': xmla_tools}
-    )
+        config={
+            'xmla_tools': xmla_tools
+        })
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)

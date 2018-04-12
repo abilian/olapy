@@ -11,15 +11,14 @@ import cpuinfo
 from olap.xmla import xmla
 from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
-
-from olapy.core.mdx.executor.execute import MdxEngine
-from olapy.core.services.xmla_discover_tools import XmlaTools
 from tests.test_xmla import WSGIServer
 
+from olapy.core.mdx.executor.execute import MdxEngine
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property
-from olapy.core.services.xmla import get_spyne_app, XmlaProviderService
+from olapy.core.services.xmla import XmlaProviderService, get_spyne_app
+from olapy.core.services.xmla_discover_tools import XmlaTools
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -31,6 +30,7 @@ PROFILING_LINES = 15
 
 
 class Config(object):
+
     def __init__(self, xmla_tools):
         self.config = {"xmla_tools": xmla_tools}
 
@@ -326,23 +326,32 @@ def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
     t = PrettyTable(['Query', 'olapy execution time'])
     cmd = """SELECT FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])
             CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-    file.write("Query 1 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 1 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 1', mbench.bench(conn, cmd, CUBE_NAME)])
     cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
-        [table0].[table0].[table0A].[""" + str(xmla_tools.executor.star_schema_dataframe.table0A[1]) + """]})))
+        [table0].[table0].[table0A].[""" + str(
+        xmla_tools.executor.star_schema_dataframe.table0A[1]) + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])"""
-    file.write("Query 2 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 2 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 2', mbench.bench(conn, cmd, CUBE_NAME)])
-    tup = "[table0].[table0].[table0A].[" + str(xmla_tools.executor.star_schema_dataframe.table0A[0]) + "]"
+    tup = "[table0].[table0].[table0A].[" + str(
+        xmla_tools.executor.star_schema_dataframe.table0A[0]) + "]"
     for d in range(REFINEMENT_LVL):
-        tup += ",\n[table0].[table0].[table0A].[" + str(xmla_tools.executor.star_schema_dataframe.table0A[d + 1]) + "]"
+        tup += ",\n[table0].[table0].[table0A].[" + str(
+            xmla_tools.executor.star_schema_dataframe.table0A[d + 1]) + "]"
     cmd = """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {""" + tup + """})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS FROM [""" + CUBE_NAME + """] WHERE ([Measures].[Amount])"""
-    file.write("Query 3 :\n" + cmd + "\n----------------------------------------------------------\n\n")
+    file.write(
+        "Query 3 :\n" + cmd +
+        "\n----------------------------------------------------------\n\n")
     t.add_row(['Query 3', mbench.bench(conn, cmd, CUBE_NAME)])
     file.write(str(t) + "\n\n")
 
@@ -384,8 +393,7 @@ xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='csv',
 xmla_p_server = XmlaProviderService()
 setattr(xmla_p_server,"app", Config(xmla_tools))
 xmla_p_server.Execute(xmla_p_server, request)
-""",
-                 "{}.profile".format(__file__))
+""", "{}.profile".format(__file__))
 
     s = pstats.Stats("{}.profile".format(__file__), stream=file)
     s.strip_dirs()
@@ -405,13 +413,18 @@ def _get_xmla_tools():
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
     mdx_executor = MdxEngine()
     mdx_executor.load_cube(CUBE_NAME)
-    xmla_tools = XmlaTools(executor=mdx_executor, olapy_data=olapy_data, source_type='csv',
-                           db_config=None, cubes_config=None)
+    xmla_tools = XmlaTools(
+        executor=mdx_executor,
+        olapy_data=olapy_data,
+        source_type='csv',
+        db_config=None,
+        cubes_config=None)
     return xmla_tools
 
 
 def main():
-    file = open('bench_result' + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
+    file = open('bench_result' +
+                str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), 'w')
     gen = CubeGen(number_dimensions=3, rows_length=1000, columns_length=5)
     gen.generate_csv(gen.generate_cube(3, 1000))
     mbench = MicBench()

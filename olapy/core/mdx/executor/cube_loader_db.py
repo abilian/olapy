@@ -1,13 +1,12 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from .cube_loader import CubeLoader
-
 import pandas as pd
 import pandas.io.sql as psql
 from sqlalchemy import inspect
 
 from ..tools.connection import get_dialect_name
+from .cube_loader import CubeLoader
 
 
 class CubeLoaderDB(CubeLoader):
@@ -36,7 +35,7 @@ class CubeLoaderDB(CubeLoader):
                 table_name = table_name.title()
             results = self.sqla_engine.execution_options(
                 stream_results=True,
-            ).execute('SELECT * FROM {}'.format(table_name), )
+            ).execute('SELECT * FROM {}'.format(table_name),)
             # Fetch all the results of the query
             value = pd.DataFrame(
                 iter(results),
@@ -58,7 +57,8 @@ class CubeLoaderDB(CubeLoader):
         :return: star schema DataFrame
         """
 
-        fusion = psql.read_sql_query('SELECT * FROM {}'.format(facts), self.sqla_engine)
+        fusion = psql.read_sql_query('SELECT * FROM {}'.format(facts),
+                                     self.sqla_engine)
         inspector = inspect(self.sqla_engine)
 
         for db_table_name in inspector.get_table_names():
@@ -72,9 +72,10 @@ class CubeLoaderDB(CubeLoader):
                     psql.read_sql_query(
                         "SELECT * FROM {}".format(db_table_name),
                         self.sqla_engine,
-                    ))
+                    ),)
             except BaseException:
-                print('No common column between {} and {}'.format(facts, db_table_name))
+                print('No common column between {} and {}'.format(
+                    facts, db_table_name))
                 pass
 
         return fusion

@@ -35,7 +35,7 @@ class BaseDialect(object):
             database[0]
             for database in available_tables
             if database[0] not in
-               ['mysql', 'information_schema', 'performance_schema', 'sys']
+            ['mysql', 'information_schema', 'performance_schema', 'sys']
         ]
 
     def __del__(self):
@@ -44,11 +44,13 @@ class BaseDialect(object):
 
 
 class PostgresDialect(BaseDialect):
+
     def gen_all_databases_query(self):
         return 'SELECT datname FROM pg_database WHERE datistemplate = false;'
 
 
 class MysqlDialect(BaseDialect):
+
     def gen_all_databases_query(self):
         return 'SHOW DATABASES'
 

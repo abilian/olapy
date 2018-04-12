@@ -55,7 +55,11 @@ class CubeLoaderCustom(CubeLoader):
 
                 # rename columns if value not None
                 df.rename(
-                    columns=({k: v for k, v in dimension['columns'].items() if v}),
+                    columns=({
+                        k: v
+                        for k, v in dimension['columns'].items()
+                        if v
+                    }),
                     inplace=True,
                 )
 
@@ -73,7 +77,8 @@ class CubeLoaderCustom(CubeLoader):
         :return: star schema DataFrame
         """
         fusion = self.load_one_table(facts)
-        for fact_key, dimension_and_key in self.cube_config['facts']['keys'].items():
+        for fact_key, dimension_and_key in self.cube_config['facts'][
+                'keys'].items():
             if self.cube_config['source'].upper() == 'CSV':
                 file = os.path.join(
                     self.cube_path,

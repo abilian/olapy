@@ -11,9 +11,9 @@ from collections import OrderedDict
 import numpy as np
 import xmlwitch
 from six import text_type
+from six.moves import zip
 
 from ..mdx.parser.parse import Parser
-from six.moves import zip
 
 
 class XmlaExecuteTools():
@@ -201,7 +201,7 @@ class XmlaExecuteTools():
 
     def _gen_measures_xs0(self, xml, tupls):
         with xml.Member(Hierarchy="[Measures]"):
-            xml.UName('[Measures].[{}]'.format(tupls[0][1]), )
+            xml.UName('[Measures].[{}]'.format(tupls[0][1]),)
             xml.Caption('{}'.format(tupls[0][1]))
             xml.LName('[Measures]')
             xml.LNum('0')
@@ -215,33 +215,48 @@ class XmlaExecuteTools():
         split_df = kwargs.get('split_df')
         tuple = kwargs.get('tuple')
 
-        parent = '.'.join(map(lambda x: '[' + str(x) + ']', tuple[first_att - 1:-1]))
+        parent = '.'.join(
+            map(lambda x: '[' + str(x) + ']', tuple[first_att - 1:-1]))
         if parent:
             parent = '.' + parent
         xml.PARENT_UNIQUE_NAME('[{0}].[{0}].[{1}]{2}'.format(
             tuple[0],
-            split_df[tuple[0]].columns[0], parent))
+            split_df[tuple[0]].columns[0],
+            parent,
+        ))
 
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):
         first_att = kwargs.get('first_att')
         split_df = kwargs.get('split_df')
         for tupl in tupls:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
-            d_tup = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
-            with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0], )):
+            d_tup = split_df[tuple_without_minus_1[0]].columns[
+                len(tuple_without_minus_1) - first_att]
+            with xml.Member(
+                    Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0],)):
                 xml.UName('[{0}].[{0}].[{1}].{2}'.format(
                     tuple_without_minus_1[0],
                     d_tup,
-                    '.'.join(['[' + str(i) + ']' for i in tuple_without_minus_1[first_att - 1:]])))
+                    '.'.join([
+                        '[' + str(i) + ']'
+                        for i in tuple_without_minus_1[first_att - 1:]
+                    ]),
+                ))
                 xml.Caption(str((tuple_without_minus_1[-1])))
-                xml.LName('[{0}].[{0}].[{1}]'.format(tuple_without_minus_1[0], d_tup))
+                xml.LName('[{0}].[{0}].[{1}]'.format(tuple_without_minus_1[0],
+                                                     d_tup))
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo('131076')
 
                 if 'PARENT_UNIQUE_NAME' in self.mdx_query.upper():
-                    self._gen_xs0_parent(xml, tuple=tuple_without_minus_1, split_df=split_df, first_att=first_att)
+                    self._gen_xs0_parent(
+                        xml,
+                        tuple=tuple_without_minus_1,
+                        split_df=split_df,
+                        first_att=first_att)
                 if 'HIERARCHY_UNIQUE_NAME' in self.mdx_query.upper():
-                    xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(tuple_without_minus_1[0]))
+                    xml.HIERARCHY_UNIQUE_NAME('[{0}].[{0}]'.format(
+                        tuple_without_minus_1[0]))
 
     def tuples_2_xs0(self, tuples, split_df, first_att, axis):
         xml = xmlwitch.Builder()
@@ -249,11 +264,13 @@ class XmlaExecuteTools():
             with xml.Tuples:
                 for tupls in itertools.chain(*tuples):
                     with xml.Tuple:
-                        if tupls[0][1] in self.executor.measures and len(self.executor.selected_measures) > 1:
+                        if tupls[0][1] in self.executor.measures and len(
+                                self.executor.selected_measures) > 1:
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
-                        self._gen_xs0_tuples(xml, tupls, split_df=split_df, first_att=first_att)
+                        self._gen_xs0_tuples(
+                            xml, tupls, split_df=split_df, first_att=first_att)
                         # Hierarchize'
                         if not self.executor.parser.hierarchized_tuples():
                             self._gen_measures_xs0(xml, tupls)
@@ -654,7 +671,8 @@ class XmlaExecuteTools():
         slicer_list = sorted(
             list(
                 set(all_dimensions_names) -
-                {table_name for table_name in self.columns_desc['all']},),)
+                {table_name
+                 for table_name in self.columns_desc['all']},),)
 
         if 'Measures' in slicer_list:
             slicer_list.insert(
@@ -738,17 +756,33 @@ class XmlaExecuteTools():
     def _generate_table_axis_info(self, xml, axis_tables):
         for table_name in axis_tables:
             with xml.HierarchyInfo(name='[{0}].[{0}]'.format(table_name)):
-                xml.UName(name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(table_name), type='xs:string')
-                xml.Caption(name="[{0}].[{0}].[MEMBER_CAPTION]".format(table_name), type='xs:string')
-                xml.LName(name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(table_name), type='xs:string')
-                xml.LNum(name="[{0}].[{0}].[LEVEL_NUMBER]".format(table_name), type='xs:int')
-                xml.DisplayInfo(name="[{0}].[{0}].[DISPLAY_INFO]".format(table_name), type='xs:unsignedInt')
+                xml.UName(
+                    name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(table_name),
+                    type='xs:string')
+                xml.Caption(
+                    name="[{0}].[{0}].[MEMBER_CAPTION]".format(table_name),
+                    type='xs:string')
+                xml.LName(
+                    name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(table_name),
+                    type='xs:string')
+                xml.LNum(
+                    name="[{0}].[{0}].[LEVEL_NUMBER]".format(table_name),
+                    type='xs:int')
+                xml.DisplayInfo(
+                    name="[{0}].[{0}].[DISPLAY_INFO]".format(table_name),
+                    type='xs:unsignedInt')
 
                 if 'Hierarchize' in self.mdx_query:
-                    xml.PARENT_UNIQUE_NAME(name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(table_name),
-                                           type='xs:string')
-                    xml.HIERARCHY_UNIQUE_NAME(name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".format(table_name),
-                                              type='xs:string')
+                    xml.PARENT_UNIQUE_NAME(
+                        name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
+                            table_name),
+                        type='xs:string',
+                    )
+                    xml.HIERARCHY_UNIQUE_NAME(
+                        name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".format(
+                            table_name),
+                        type='xs:string',
+                    )
 
     def generate_one_axis_info(self, mdx_query_axis='columns', Axis='Axis0'):
         """
@@ -784,19 +818,23 @@ class XmlaExecuteTools():
         """
         # Hierarchize !!
         axis_tables = self.columns_desc[mdx_query_axis]
-        axis_tables_without_facts = [table_name for table_name in axis_tables if table_name != self.executor.facts]
+        axis_tables_without_facts = [
+            table_name for table_name in axis_tables
+            if table_name != self.executor.facts
+        ]
         xml = xmlwitch.Builder()
         # measure must be written at the top
         if axis_tables:
             with xml.AxisInfo(name=Axis):
                 # many measures , then write this on the top
                 if self.executor.facts in axis_tables.keys() and len(
-                        axis_tables[self.executor.facts], ) > 1:
+                        axis_tables[self.executor.facts],) > 1:
                     self._gen_measures_one_axis_info(xml)
                 self._generate_table_axis_info(xml, axis_tables_without_facts)
                 # Hierarchize
                 if not self.executor.parser.hierarchized_tuples() and len(
-                        self.columns_desc['columns'].get(self.executor.facts, [1, 1])) == 1:
+                        self.columns_desc['columns'].get(
+                            self.executor.facts, [1, 1]),) == 1:
                     self._gen_measures_one_axis_info(xml)
 
         return str(xml)
@@ -955,14 +993,16 @@ class XmlaExecuteTools():
         unused_dimensions = sorted(
             list(
                 set(self.executor.get_all_tables_names(ignore_fact=True)) -
-                {table_name for table_name in self.columns_desc['all']},),)
+                {table_name
+                 for table_name in self.columns_desc['all']},),)
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
                 with xml.Tuples:
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
-                            column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][0]
+                            column_attribut = self.executor.tables_loaded[
+                                dim_diff].iloc[0][0]
                             with xml.Member(
                                     Hierarchy="[{0}].[{0}]".format(dim_diff),):
                                 xml.UName('[{0}].[{0}].[{1}].[{2}]'.format(

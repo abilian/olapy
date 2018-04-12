@@ -10,11 +10,10 @@ from cpuinfo import cpuinfo, os
 from olap.xmla import xmla
 from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
-
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
 
+from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from olapy.core.services.xmla import get_spyne_app
 from olapy.core.services.xmla_discover_tools import XmlaTools
 
@@ -83,10 +82,14 @@ def main():
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
     db_config = DbConfigParser()
     # todo conn string
-    db_conf = db_config.get_db_credentials(os.path.join(olapy_data, 'olapy-config.yml'))
+    db_conf = db_config.get_db_credentials(
+        os.path.join(olapy_data, 'olapy-config.yml'))
 
-    xmla_tools = XmlaTools(olapy_data=olapy_data, source_type='db',
-                           db_config=db_conf, cubes_config=None)
+    xmla_tools = XmlaTools(
+        olapy_data=olapy_data,
+        source_type='db',
+        db_config=db_conf,
+        cubes_config=None)
     application = get_spyne_app(xmla_tools)
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
