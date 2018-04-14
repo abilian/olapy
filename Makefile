@@ -38,14 +38,20 @@ lint-python:
 	@echo "--> Linting Python files"
 	flake8
 
-	@echo "Checking Py3k (basic) compatibility"
-	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+	@make lint-py3k
+
+	@make lint-mypy
 
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
 
 lint-py3k:
-	pylint --py3k *.py $(SRC) tests
+	@echo "Checking Py3k (basic) compatibility"
+	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+
+
+lint-mypy:
+	mypy olapy tests
 
 clean:
 	find . -name "*.pyc" -delete
