@@ -8,7 +8,7 @@ from typing import List, Optional, Text
 from sqlalchemy.engine import Engine
 
 
-class BaseDialect(object):
+class Dialect(object):
     """Connect to sql database."""
 
     def __init__(self, sqla_engine=None):
@@ -51,19 +51,19 @@ class BaseDialect(object):
             self.engine.dispose()
 
 
-class PostgresDialect(BaseDialect):
+class PostgresDialect(Dialect):
 
     def gen_all_databases_query(self):
         return "SELECT datname FROM pg_database WHERE datistemplate = false;"
 
 
-class MysqlDialect(BaseDialect):
+class MysqlDialect(Dialect):
 
     def gen_all_databases_query(self):
         return "SHOW DATABASES"
 
 
-class OracleDialect(BaseDialect):
+class OracleDialect(Dialect):
 
     @property
     def username(self):
@@ -78,7 +78,7 @@ class OracleDialect(BaseDialect):
         return "SELECT username FROM dba_users;"
 
 
-class SqliteDialect(BaseDialect):
+class SqliteDialect(Dialect):
 
     def get_all_databases(self):
         available_dbs = self.engine.execute("PRAGMA database_list;").fetchall()
@@ -86,7 +86,7 @@ class SqliteDialect(BaseDialect):
         return dbs if dbs != [""] else [available_dbs[0][1]]
 
 
-class MssqlDialect(BaseDialect):
+class MssqlDialect(Dialect):
 
     def gen_all_databases_query(self):
         """
@@ -108,7 +108,7 @@ DIALECT_REGISTRY = {
 
 
 def get_dialect(sqla_engine):
-    # type: (Engine) -> BaseDialect
+    # type: (Engine) -> Dialect
     dialect_name = get_dialect_name(sqla_engine.url)
     dialect_class = DIALECT_REGISTRY.get(dialect_name)
     if not dialect_class:
