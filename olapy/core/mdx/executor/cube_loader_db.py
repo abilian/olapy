@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from typing import Text, Dict
+from typing import Dict, Text
 
 import pandas as pd
 import pandas.io.sql as psql
@@ -32,15 +32,15 @@ class CubeLoaderDB(CubeLoader):
         """
 
         tables = {}
-        print('Connection string = ' + str(self.sqla_engine))
+        print("Connection string = " + str(self.sqla_engine))
         inspector = inspect(self.sqla_engine)
         dialect_name = get_dialect_name(str(self.sqla_engine))
         for table_name in inspector.get_table_names():
-            if 'oracle' in dialect_name and table_name.upper() == 'FACTS':
+            if "oracle" in dialect_name and table_name.upper() == "FACTS":
                 table_name = table_name.title()
             results = self.sqla_engine.execution_options(
                 stream_results=True,
-            ).execute('SELECT * FROM {}'.format(table_name))
+            ).execute("SELECT * FROM {}".format(table_name),)
             # Fetch all the results of the query
             value = pd.DataFrame(
                 iter(results),
@@ -49,7 +49,7 @@ class CubeLoaderDB(CubeLoader):
             # with string_folding_wrapper we loose response time
             # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
             tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
+                col for col in value.columns if col.lower()[-3:] != "_id"
             ]]
 
         return tables
@@ -63,8 +63,10 @@ class CubeLoaderDB(CubeLoader):
         :return: star schema DataFrame
         """
 
-        fusion = psql.read_sql_query('SELECT * FROM {}'.format(facts),
-                                     self.sqla_engine)
+        fusion = psql.read_sql_query(
+            "SELECT * FROM {}".format(facts),
+            self.sqla_engine,
+        )
         inspector = inspect(self.sqla_engine)
 
         for db_table_name in inspector.get_table_names():
@@ -78,10 +80,12 @@ class CubeLoaderDB(CubeLoader):
                     psql.read_sql_query(
                         "SELECT * FROM {}".format(db_table_name),
                         self.sqla_engine,
-                    ))
+                    ),)
             except BaseException:
-                print('No common column between {} and {}'.format(
-                    facts, db_table_name))
+                print("No common column between {} and {}".format(
+                    facts,
+                    db_table_name,
+                ))
                 pass
 
         return fusion

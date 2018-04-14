@@ -49,9 +49,17 @@ class Tuple(object):
         PARENT_UNIQUE_NAME : {}
         HIERARCHY_UNIQUE_NAME : {}
         Value : {}
-        """.format(self.hierarchy, self.uname, self.caption, self.lname,
-                   self.lnum, self.display_info, self.parent_unique_name,
-                   self.hierarchy_unique_name, self.value)
+        """.format(
+            self.hierarchy,
+            self.uname,
+            self.caption,
+            self.lname,
+            self.lnum,
+            self.display_info,
+            self.parent_unique_name,
+            self.hierarchy_unique_name,
+            self.value,
+        )
 
 
 class Property(ComplexModel):
@@ -59,22 +67,22 @@ class Property(ComplexModel):
 
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     _type_info = {
-        'LocaleIdentifier': Unicode,
-        'Format': Unicode,
-        'Catalog': Unicode,
-        'Content': Unicode,
-        'DataSourceInfo': Unicode,
-        'Password': Unicode,
-        'StateSupport': Unicode,
-        'Timeout': Unicode,
-        'ProviderVersion': Unicode,
-        'BASE_CUBE_NAME': Unicode,
-        'AxisFormat': Unicode,
-        'BeginRange': Unicode,
-        'EndRange': Unicode,
-        'MDXSupport': Unicode,
-        'ProviderName': Unicode,
-        'UserName': Unicode,
+        "LocaleIdentifier": Unicode,
+        "Format": Unicode,
+        "Catalog": Unicode,
+        "Content": Unicode,
+        "DataSourceInfo": Unicode,
+        "Password": Unicode,
+        "StateSupport": Unicode,
+        "Timeout": Unicode,
+        "ProviderVersion": Unicode,
+        "BASE_CUBE_NAME": Unicode,
+        "AxisFormat": Unicode,
+        "BeginRange": Unicode,
+        "EndRange": Unicode,
+        "MDXSupport": Unicode,
+        "ProviderName": Unicode,
+        "UserName": Unicode,
     }
 
 
@@ -83,19 +91,19 @@ class Restriction(ComplexModel):
 
     __namespace__ = "urn:schemas-microsoft-com:xml-analysis"
     _type_info = {
-        'CATALOG_NAME': Unicode,
-        'SCHEMA_NAME': Unicode,
-        'CUBE_NAME': Unicode,
-        'MEMBER_UNIQUE_NAME': Unicode,
-        'DIMENSION_UNIQUE_NAME': Unicode,
-        'HIERARCHY_UNIQUE_NAME': Unicode,
-        'LEVEL_UNIQUE_NAME': Unicode,
-        'TREE_OP': Integer,
-        'PropertyName': Unicode,
-        'SchemaName': Unicode,
-        'HIERARCHY_VISIBILITY': Integer,
-        'MEASURE_VISIBILITY': Integer,
-        'PROPERTY_TYPE': Integer,
+        "CATALOG_NAME": Unicode,
+        "SCHEMA_NAME": Unicode,
+        "CUBE_NAME": Unicode,
+        "MEMBER_UNIQUE_NAME": Unicode,
+        "DIMENSION_UNIQUE_NAME": Unicode,
+        "HIERARCHY_UNIQUE_NAME": Unicode,
+        "LEVEL_UNIQUE_NAME": Unicode,
+        "TREE_OP": Integer,
+        "PropertyName": Unicode,
+        "SchemaName": Unicode,
+        "HIERARCHY_VISIBILITY": Integer,
+        "MEASURE_VISIBILITY": Integer,
+        "PROPERTY_TYPE": Integer,
     }
 
 
@@ -125,9 +133,7 @@ class Propertieslist(ComplexModel):
 class Command(ComplexModel):
     """Command description (used by spyne)."""
 
-    _type_info = {
-        'Statement': Unicode,
-    }
+    _type_info = {"Statement": Unicode}
 
 
 class ExecuteRequest(ComplexModel):

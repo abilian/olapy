@@ -41,9 +41,10 @@ class XmlaSoap11(Soap11):
         if isinstance(ctx.transport, HttpTransportContext):
             http_verb = ctx.transport.get_request_method()
             if http_verb == "OPTIONS":
-                ctx.transport.resp_headers['allow'] = "POST, OPTIONS"
+                ctx.transport.resp_headers["allow"] = "POST, OPTIONS"
                 ctx.transport.respond(HTTP_200)
                 raise Fault("")
+
         return Soap11.create_in_document(self, ctx, charset)
 
 
@@ -79,24 +80,27 @@ class XmlaProviderService(ServiceBase):
         # ctx is the 'context' parameter used by Spyne
         # (which cause problems when we want to access xmla_provider instantiation variables)
 
-        xmla_tools = ctx.app.config['xmla_tools']
+        xmla_tools = ctx.app.config["xmla_tools"]
         ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
         config_parser = xmla_tools.executor.cube_config
-        if config_parser and config_parser['xmla_authentication'] and ctx.transport.req_env['QUERY_STRING'] != 'admin':
+        if (config_parser and config_parser["xmla_authentication"] and
+                ctx.transport.req_env["QUERY_STRING"] != "admin"):
             raise InvalidCredentialsError(
-                fault_string='You do not have permission to access this resource',
+                fault_string="You do not have permission to access this resource",
                 fault_object=None,
             )
 
-        method_name = request.RequestType.lower() + '_response'
+        method_name = request.RequestType.lower() + "_response"
         method = getattr(xmla_tools, method_name)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return method()
+
         return method(request)
 
     # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
     # we encapsulate them in ExecuteRequest object
+
     @rpc(
         ExecuteRequest,
         _returns=AnyXml,
@@ -110,55 +114,58 @@ class XmlaProviderService(ServiceBase):
         :return: XML Execute response as string
         """
 
-        xmla_tools = ctx.app.config['xmla_tools']
+        xmla_tools = ctx.app.config["xmla_tools"]
         ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
-        mdx_query = request.Command.Statement.encode().decode('utf8')
-        if mdx_query == '':
+        mdx_query = request.Command.Statement.encode().decode("utf8")
+        if mdx_query == "":
             # check if command contains a query
             xml = xmlwitch.Builder()
-            with xml['return']:
+            with xml["return"]:
                 xml.root(xmlns="urn:schemas-microsoft-com:xml-analysis:empty")
 
             return str(xml)
 
         else:
-            xmla_tools.change_catalogue(
-                request.Properties.PropertyList.Catalog)
+            xmla_tools.change_catalogue(request.Properties.PropertyList.Catalog,
+                                        )
             xml = xmlwitch.Builder()
             executor = xmla_tools.executor
 
             # Hierarchize
             if all(key in mdx_query
                    for key in
-                   ['WITH MEMBER', 'strtomember', '[Measures].[XL_SD0]']):
+                   ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]):
                 convert2formulas = True
             else:
                 convert2formulas = False
 
             xmla_tools = XmlaExecuteTools(
-                executor, mdx_query, convert2formulas)
+                executor,
+                mdx_query,
+                convert2formulas,
+            )
 
-            with xml['return']:
+            with xml["return"]:
                 with xml.root(
                         xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
                         **{
-                            'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-                            'xmlns:xsi':
-                            'http://www.w3.org/2001/XMLSchema-instance',
+                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                            "xmlns:xsi":
+                            "http://www.w3.org/2001/XMLSchema-instance",
                         }):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
                         with xml.CubeInfo:
                             with xml.Cube:
-                                xml.CubeName('Sales')
+                                xml.CubeName("Sales")
                                 xml.LastDataUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        "%Y-%m-%dT%H:%M:%S",),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
                                     datetime.now().strftime(
-                                        '%Y-%m-%dT%H:%M:%S',),
+                                        "%Y-%m-%dT%H:%M:%S",),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                         xml.write(xmla_tools.generate_cell_info())
@@ -176,7 +183,7 @@ class XmlaProviderService(ServiceBase):
 
 
 home_directory = expanduser("~")
-conf_file = os.path.join(home_directory, 'olapy-data', 'logs', 'xmla.log')
+conf_file = os.path.join(home_directory, "olapy-data", "logs", "xmla.log")
 
 
 def get_mdx_engine(
@@ -221,10 +228,10 @@ def get_spyne_app(xmla_tools):
     """
     return Application(
         [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=XmlaSoap11(validator='soft'),
-        out_protocol=XmlaSoap11(validator='soft'),
-        config={'xmla_tools': xmla_tools},
+        "urn:schemas-microsoft-com:xml-analysis",
+        in_protocol=XmlaSoap11(validator="soft"),
+        out_protocol=XmlaSoap11(validator="soft"),
+        config={"xmla_tools": xmla_tools},
     )
 
 
@@ -244,65 +251,72 @@ def get_wsgi_application(mdx_engine):
 
 
 @click.command()
-@click.option('--host', '-h', default='0.0.0.0', help='Host ip address.')
-@click.option('--port', '-p', default=8000, help='Host port.')
+@click.option("--host", "-h", default="0.0.0.0", help="Host ip address.")
+@click.option("--port", "-p", default=8000, help="Host port.")
 @click.option(
-    '--write_on_file',
-    '-wf',
+    "--write_on_file",
+    "-wf",
     default=True,
-    help='Write logs into a file or display them into the console. (True : on file)(False : on console)',
+    help="Write logs into a file or display them into the console. (True : on file)(False : on console)",
 )
 @click.option(
-    '--log_file_path',
-    '-lf',
+    "--log_file_path",
+    "-lf",
     default=conf_file,
-    help='Log file path. DEFAUL : ' + conf_file)
+    help="Log file path. DEFAUL : " + conf_file,
+)
 @click.option(
-    '--sql_alchemy_uri',
-    '-sa',
+    "--sql_alchemy_uri",
+    "-sa",
     default=None,
-    help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ")
+    help="SQL Alchemy URI , **DON'T PUT THE DATABASE NAME** ",
+)
 @click.option(
-    '--olapy_data',
-    '-od',
-    default=os.path.join(expanduser('~'), 'olapy-data'),
+    "--olapy_data",
+    "-od",
+    default=os.path.join(expanduser("~"), "olapy-data"),
     help="Olapy Data folder location, Default : ~/olapy-data",
 )
 @click.option(
-    '--source_type',
-    '-st',
-    default='csv',
-    help="Get cubes from where ( db | csv ), DEFAULT : csv")
+    "--source_type",
+    "-st",
+    default="csv",
+    help="Get cubes from where ( db | csv ), DEFAULT : csv",
+)
 @click.option(
-    '--db_config_file',
-    '-dbc',
-    default=os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
+    "--db_config_file",
+    "-dbc",
+    default=os.path.join(home_directory, "olapy-data", "olapy-config.yml"),
     help="Database configuration file path, DEFAULT : " +
-    os.path.join(home_directory, 'olapy-data', 'olapy-config.yml'),
+    os.path.join(home_directory, "olapy-data", "olapy-config.yml"),
 )
 @click.option(
-    '--cube_config_file',
-    '-cbf',
-    default=os.path.join(home_directory, 'olapy-data', 'cubes',
-                         'cubes-config.yml'),
+    "--cube_config_file",
+    "-cbf",
+    default=os.path.join(
+        home_directory,
+        "olapy-data",
+        "cubes",
+        "cubes-config.yml",
+    ),
     help="Cube config file path, DEFAULT : " +
-    os.path.join(home_directory, 'olapy-data', 'cubes', 'cubes-config.yml'),
+    os.path.join(home_directory, "olapy-data", "cubes", "cubes-config.yml"),
 )
 @click.option(
-    '--direct_table_or_file',
-    '-tf',
+    "--direct_table_or_file",
+    "-tf",
     default=None,
     help="File path or db table name if you want to construct cube from a single file (table)",
 )
 @click.option(
-    '--columns',
-    '-c',
+    "--columns",
+    "-c",
     default=None,
     help="To explicitly specify columns if (construct cube from a single file), columns order matters ",
 )
 @click.option(
-    '--measures',
-    '-m',
+    "--measures",
+    "-m",
     default=None,
     help="To explicitly specify measures if (construct cube from a single file)",
 )
@@ -326,7 +340,7 @@ def runserver(
     try:
         imp.reload(sys)
         # reload(sys)  # Reload is a hack
-        sys.setdefaultencoding('UTF8')
+        sys.setdefaultencoding("UTF8")
     except Exception:
         pass
 
@@ -336,7 +350,7 @@ def runserver(
         cube_config = cube_config_file_parser.get_cube_config(cube_config_file)
 
     sqla_uri = None
-    if 'db' in source_type:
+    if "db" in source_type:
         if sql_alchemy_uri:
             # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
             sqla_uri = sql_alchemy_uri
@@ -362,12 +376,12 @@ def runserver(
     # log to the file
     if write_on_file:
         if not os.path.isdir(
-                os.path.join(home_directory, 'olapy-data', 'logs'),):
-            os.makedirs(os.path.join(home_directory, 'olapy-data', 'logs'))
+                os.path.join(home_directory, "olapy-data", "logs"),):
+            os.makedirs(os.path.join(home_directory, "olapy-data", "logs"))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:
         logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
+    logging.getLogger("spyne.protocol.xml").setLevel(logging.DEBUG)
     logging.info("listening to http://127.0.0.1:8000/xmla")
     logging.info("wsdl is at: http://localhost:8000/xmla?wsdl")
     server = make_server(host, port, wsgi_application)

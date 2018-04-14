@@ -5,7 +5,7 @@ import pandas as pd
 
 class CubeLoader(object):
 
-    def __init__(self, cube_path=None, sep=';'):
+    def __init__(self, cube_path=None, sep=";"):
         self.cube_path = cube_path
         self.sep = sep
 
@@ -20,9 +20,11 @@ class CubeLoader(object):
             # to remove file extension ".csv"
             table_name = os.path.splitext(file)[0]
             value = pd.read_csv(
-                os.path.join(self.cube_path, file), sep=self.sep)
+                os.path.join(self.cube_path, file),
+                sep=self.sep,
+            )
             tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
+                col for col in value.columns if col.lower()[-3:] != "_id"
             ]]
         return tables
 
@@ -35,14 +37,18 @@ class CubeLoader(object):
         """
         # loading facts table
         fusion = pd.read_csv(
-            os.path.join(self.cube_path, facts + '.csv'), sep=self.sep)
+            os.path.join(self.cube_path, facts + ".csv"),
+            sep=self.sep,
+        )
         for file_name in os.listdir(self.cube_path):
             try:
                 fusion = fusion.merge(
                     pd.read_csv(
-                        os.path.join(self.cube_path, file_name), sep=self.sep),)
+                        os.path.join(self.cube_path, file_name),
+                        sep=self.sep,
+                    ),)
             except BaseException:
-                print('No common column')
+                print("No common column")
                 pass
 
         return fusion

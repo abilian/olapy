@@ -57,8 +57,8 @@ class MdxEngine(object):
     """
 
     cube = attr.ib(default=None)
-    facts = attr.ib(default='Facts')
-    source_type = attr.ib(default='csv')
+    facts = attr.ib(default="Facts")
+    source_type = attr.ib(default="csv")
     parser = attr.ib(default=Parser())
     csv_files_cubes = attr.ib(default=attr.Factory(list))
     db_cubes = attr.ib(default=attr.Factory(list))
@@ -69,14 +69,15 @@ class MdxEngine(object):
     star_schema_dataframe = attr.ib(default=None)
     measures = attr.ib(default=None)
     selected_measures = attr.ib(default=None)
-    cubes_folder = attr.ib(default='cubes')
+    cubes_folder = attr.ib(default="cubes")
 
     # @staticmethod
+
     @olapy_data_location.default
     def get_default_cubes_directory(self):
-        home_directory = os.environ.get('OLAPY_PATH', expanduser("~"))
-        if 'olapy-data' not in home_directory:
-            home_directory = os.path.join(home_directory, 'olapy-data')
+        home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
+        if "olapy-data" not in home_directory:
+            home_directory = os.path.join(home_directory, "olapy-data")
 
         return home_directory
 
@@ -100,22 +101,18 @@ class MdxEngine(object):
         """
         Get csv folder names
 
-        :param cubes_location: OlaPy cubes path, which is under olapy-data, by default ~/olapy-data/cubes_location
+        :param cubes_location: OlaPy cubes path, which is under olapy-data,
+            by default ~/olapy-data/cubes_location
         """
 
-        # get csv folders names first , and them instantiate MdxEngine with this database, thus \
-        # MdxEngine will try to construct the star schema either automatically or manually
+        # get csv folders names first , and them instantiate MdxEngine
+        # with this database, thus MdxEngine will try to construct
+        # the star schema either automatically or manually
 
-        # try:
         return [
             file for file in os.listdir(cubes_location)
             if os.path.isdir(os.path.join(cubes_location, file))
         ]
-        # except Exception:
-        #     type, value, traceback = sys.exc_info()
-        #     print('Error opening %s' % (value))
-        #     print('no csv folders')
-        #     pass
 
     def get_cubes_names(self):
         """
@@ -127,24 +124,28 @@ class MdxEngine(object):
         :return: list of all cubes
         """
 
-        # by default , and before passing values to class with olapy runserver .... it executes this with csv
-        cubes_folder_path = os.path.join(self.olapy_data_location,
-                                         self.cubes_folder)
-        if 'db' in self.source_type:
+        # by default, and before passing values to class with olapy runserver
+        # .... it executes this with csv
+        cubes_folder_path = os.path.join(
+            self.olapy_data_location,
+            self.cubes_folder,
+        )
+        if "db" in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
-        if 'csv' in self.source_type and os.path.exists(cubes_folder_path):
+        if "csv" in self.source_type and os.path.exists(cubes_folder_path):
             self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
         return self.db_cubes + self.csv_files_cubes
 
     def load_cube(self,
                   cube_name,
-                  fact_table_name='Facts',
-                  sep=';',
+                  fact_table_name="Facts",
+                  sep=";",
                   measures=None,
                   cube_folder=None,
                   **kwargs):
         """
-        After instantiating MdxEngine(), load_cube construct the cube and load all tables.
+        After instantiating MdxEngine(), load_cube construct the cube
+        and load all tables.
 
         :param cube_name: cube name
         :param fact_table_name:  facts table name, Default **Facts**
@@ -168,18 +169,22 @@ class MdxEngine(object):
         # construct star_schema
         if self.tables_loaded:
             self.star_schema_dataframe = self.get_star_schema_dataframe(
-                sep=sep, cube_folder=cube_folder)
+                sep=sep,
+                cube_folder=cube_folder,
+            )
 
     def load_tables(self, sep, cube_folder=None):
         """
-        Load all tables as dict of { Table_name : DataFrame } for the current cube instance.
+        Load all tables as dict of { Table_name : DataFrame } for the current
+        cube instance.
 
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
 
         cubes_folder_path = self.get_cube_path(cube_folder)
-        if self.cube_config and self.cube_config['facts'] and self.cube == self.cube_config['name']:
+        if (self.cube_config and self.cube_config["facts"] and
+                self.cube == self.cube_config["name"]):
             cube_loader = CubeLoaderCustom(
                 cube_config=self.cube_config,
                 cube_path=cubes_folder_path,
@@ -188,13 +193,13 @@ class MdxEngine(object):
             )
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
-            if 'postgres' in dialect_name:
+            if "postgres" in dialect_name:
                 self.facts = self.facts.lower()
             cube_loader = CubeLoaderDB(self.sqla_engine)
-            # if not tables:
-            #     raise Exception(
-            #         'unable to load tables, check that the database is not empty',
-            #     )
+        # if not tables:
+        #     raise Exception(
+        #         'unable to load tables, check that the database is not empty',
+        #     )
         # elif self.cube in self.csv_files_cubes:
         else:
             cube_loader = CubeLoader(cubes_folder_path, sep)
@@ -219,21 +224,23 @@ class MdxEngine(object):
         if self.facts in list(self.tables_loaded.keys()):
             not_id_columns = [
                 column for column in self.tables_loaded[self.facts].columns
-                if 'id' not in column
+                if "id" not in column
             ]
-            cleaned_facts = self.clean_data(self.tables_loaded[self.facts],
-                                            not_id_columns)
+            cleaned_facts = self.clean_data(
+                self.tables_loaded[self.facts],
+                not_id_columns,
+            )
             return [
                 col
                 for col in cleaned_facts.select_dtypes(include=[np.number],
                                                        ).columns
-                if col.lower()[-2:] != 'id'
+                if col.lower()[-2:] != "id"
             ]
 
     @staticmethod
     def clean_data(star_schema_df, measures):
         """
-        measure like this : 1 349 is not numeric so we try to transform it to 1349.
+        measure like this: 1 349 is not numeric so we try to transform it to 1349.
 
         :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
@@ -244,10 +251,13 @@ class MdxEngine(object):
             for measure in measures:
                 if star_schema_df[measure].dtype == object:
                     star_schema_df[measure] = star_schema_df[
-                        measure].str.replace(" ", "")
+                        measure].str.replace(
+                            " ",
+                            "",
+                    )
                     try:
                         star_schema_df[measure] = star_schema_df[
-                            measure].astype('float')
+                            measure].astype("float",)
                     except:
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
@@ -259,11 +269,12 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: star schema DataFrame
         """
-        if self.cube_config and self.cube_config['facts'] and self.cube == self.cube_config['name']:
-            self.facts = self.cube_config['facts']['table_name']
+        if (self.cube_config and self.cube_config["facts"] and
+                self.cube == self.cube_config["name"]):
+            self.facts = self.cube_config["facts"]["table_name"]
             # measures in config-file only
-            if self.cube_config['facts']['measures']:
-                self.measures = self.cube_config['facts']['measures']
+            if self.cube_config["facts"]["measures"]:
+                self.measures = self.cube_config["facts"]["measures"]
 
             cube_path = self.get_cube_path(cube_folder)
             cube_loader = CubeLoaderCustom(
@@ -285,7 +296,7 @@ class MdxEngine(object):
         star_schema_df = self.clean_data(fusion, self.measures)
 
         return star_schema_df[[
-            col for col in fusion.columns if col.lower()[-3:] != '_id'
+            col for col in fusion.columns if col.lower()[-3:] != "_id"
         ]]
 
     def get_all_tables_names(self, ignore_fact=False):
@@ -297,6 +308,7 @@ class MdxEngine(object):
         """
         if ignore_fact:
             return [tab for tab in self.tables_loaded if self.facts not in tab]
+
         return self.tables_loaded.keys()
 
     def get_cube_path(self, cube_folder):
@@ -307,8 +319,12 @@ class MdxEngine(object):
         """
         if cube_folder:
             return cube_folder
-        return os.path.join(self.olapy_data_location, self.cubes_folder,
-                            self.cube)
+
+        return os.path.join(
+            self.olapy_data_location,
+            self.cubes_folder,
+            self.cube,
+        )
 
     @staticmethod
     def change_measures(tuples_on_mdx):
@@ -363,19 +379,20 @@ class MdxEngine(object):
             # SELECT {[Measures].[Amount],[Measures].[Count]} ON COLUMNS
             # we have to add measures directly to tables_columns
             for tupl in tuples:
-                if tupl[0].upper() == 'MEASURES':
+                if tupl[0].upper() == "MEASURES":
                     if tupl[-1] not in measures:
                         measures.append(tupl[-1])
                         tables_columns.update({self.facts: measures})
                     else:
                         continue
+
                 else:
                     tables_columns.update({
                         tupl[0]:
                         self.tables_loaded[tupl[0]].columns[:len(
                             tupl[2:None if self.parser.hierarchized_tuples()
                                  else -1],)],
-                    })
+                    },)
 
             axes.update({axis: tables_columns})
         return axes
@@ -565,9 +582,8 @@ class MdxEngine(object):
         """
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
-        if (len(
-                tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns):
+        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in
+                self.tables_loaded[tuple_as_list[0]].columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -659,8 +675,8 @@ class MdxEngine(object):
         """
         Check if the MDX Query is Hierarchized and contains many tuples groups.
         """
-        return (not self.parser.hierarchized_tuples() and len(
-            self.parser.get_nested_select()) >= 2)
+        return (not self.parser.hierarchized_tuples() and
+                len(self.parser.get_nested_select()) >= 2)
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
@@ -675,10 +691,10 @@ class MdxEngine(object):
         for tuple_groupe in grouped_tuples:
             transformed_tuple_groups = []
             for tuple in self.parser.split_group(tuple_groupe):
-                tuple = tuple.split('].[')
-                tuple[0] = tuple[0].replace('[', '')
-                tuple[-1] = tuple[-1].replace(']', '')
-                if tuple[0].upper() != 'MEASURES':
+                tuple = tuple.split("].[")
+                tuple[0] = tuple[0].replace("[", "")
+                tuple[-1] = tuple[-1].replace("]", "")
+                if tuple[0].upper() != "MEASURES":
                     transformed_tuple_groups.append(tuple)
 
             dfs.append(
@@ -690,7 +706,7 @@ class MdxEngine(object):
         return dfs
 
     def clean_mdx_query(self, mdx_query):
-        clean_query = mdx_query.strip().replace('\n', '').replace('\t', '')
+        clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
         # todo property in parser
         self.parser.mdx_query = clean_query
         return clean_query
@@ -721,18 +737,18 @@ class MdxEngine(object):
 
         # use measures that exists on where or insides axes
         query_axes = self.parser.decorticate_query(query)
-        if self.change_measures(query_axes['all']):
-            self.selected_measures = self.change_measures(query_axes['all'])
+        if self.change_measures(query_axes["all"]):
+            self.selected_measures = self.change_measures(query_axes["all"])
 
         tables_n_columns = self.get_tables_and_columns(query_axes)
 
         columns_to_keep = OrderedDict(
             (table, columns)
-            for table, columns in tables_n_columns['all'].items()
+            for table, columns in tables_n_columns["all"].items()
             if table != self.facts)
 
         tuples_on_mdx_query = [
-            tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
+            tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
         ]
 
         if not self.parser.hierarchized_tuples():
@@ -756,17 +772,14 @@ class MdxEngine(object):
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values(),),)
+                itertools.chain.from_iterable(columns_to_keep.values(),))
 
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
 
         else:
-            result = self.star_schema_dataframe[self.selected_measures] \
-                .sum().to_frame().T
+            result = self.star_schema_dataframe[
+                self.selected_measures].sum().to_frame().T
 
-        return {
-            'result': result,
-            'columns_desc': tables_n_columns,
-        }
+        return {"result": result, "columns_desc": tables_n_columns}

@@ -22,11 +22,12 @@ class DbConfigParser:
 
         if config_file_path is None:
             from os.path import expanduser
+
             home_directory = expanduser("~")
             self.config_file_path = os.path.join(
                 home_directory,
-                'olapy-data',
-                'olapy-config.yml',
+                "olapy-data",
+                "olapy-config.yml",
             )
         else:
             self.config_file_path = config_file_path
@@ -44,4 +45,4 @@ class DbConfigParser:
             file_path = self.config_file_path
         with open(file_path) as config_file:
             config = yaml.load(config_file)
-            return config['connection_string']
+            return config["connection_string"]

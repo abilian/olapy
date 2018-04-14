@@ -22,10 +22,10 @@ from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.etl.utils import create_db_engine
 
 dotenv.load_dotenv(dotenv.find_dotenv())
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
-GEN_FOLDER = 'etl_generated'
-INPUT_DIR = 'input_dir'
+GEN_FOLDER = "etl_generated"
+INPUT_DIR = "input_dir"
 
 
 class ETL(object):
@@ -41,7 +41,7 @@ class ETL(object):
             source_folder=INPUT_DIR,
             separator=None,
             olay_cubes_path=None,
-            target_cube='etl_cube',
+            target_cube="etl_cube",
     ):
         """
 
@@ -58,11 +58,13 @@ class ETL(object):
             self.olapy_cube_path = olay_cubes_path
         else:
             self.olapy_cube_path = os.path.join(
-                MdxEngine.get_default_cube_directory(), 'cubes')
+                MdxEngine.get_default_cube_directory(),
+                "cubes",
+            )
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
-        if source_folder != INPUT_DIR and source_type.upper() != 'DB':
+        if source_folder != INPUT_DIR and source_type.upper() != "DB":
             # #1 fix bonobo read from file path
             if not os.path.exists(INPUT_DIR):
                 os.mkdir(INPUT_DIR)
@@ -79,8 +81,8 @@ class ETL(object):
             os.mkdir(GEN_FOLDER)
 
     def _get_default_seperator(self):
-        if self.source_type.upper() in ['CSV', 'FILE']:
-            return ','
+        if self.source_type.upper() in ["CSV", "FILE"]:
+            return ","
 
     def _transform_file(self, line):
         """
@@ -98,8 +100,9 @@ class ETL(object):
             self.dim_headers = splited
             self.dim_first_row_headers = False
             for idx, column_header in enumerate(splited):
-                if column_header in self.current_dim_id_column and '_id' not in column_header[-3:]:
-                    splited[idx] = column_header + '_id'
+                if (column_header in self.current_dim_id_column and
+                        "_id" not in column_header[-3:]):
+                    splited[idx] = column_header + "_id"
 
         else:
             if self.dim_headers:
@@ -124,8 +127,8 @@ class ETL(object):
         """
         if self.dim_first_row_headers:
             for key in self.current_dim_id_column:
-                if '_id' not in key:
-                    kwargs[key + '_id'] = kwargs[key]
+                if "_id" not in key:
+                    kwargs[key + "_id"] = kwargs[key]
                     del kwargs[key]
         return kwargs
 
@@ -136,15 +139,18 @@ class ETL(object):
         :param table_name: table/file to extract
         :return: Bonobo Reader
         """
-        if self.source_type.upper() == 'DB':
+        if self.source_type.upper() == "DB":
             engine = create_db_engine()
-            return engine.execute('SELECT * from {};'.format(table_name))
-        elif self.source_type.upper() == 'FILE':
+            return engine.execute("SELECT * from {};".format(table_name))
+
+        elif self.source_type.upper() == "FILE":
             # delimiter not used with files
             return bonobo.FileReader(table_name)
-        elif self.source_type.upper() == 'CSV':
+
+        elif self.source_type.upper() == "CSV":
             return bonobo.CsvReader(table_name, **kwargs)
-            # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
+
+    # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
 
     def transform(self, *args, **kwargs):
         """
@@ -154,11 +160,12 @@ class ETL(object):
         :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
         :return: args or kwargs transformed
         """
-        if self.source_type.upper() == 'FILE':
+        if self.source_type.upper() == "FILE":
             return self._transform_file(kwargs)
 
-        elif self.source_type.upper() == 'CSV':
+        elif self.source_type.upper() == "CSV":
             return self._transform_csv(args)
+
         else:
             return args if args else kwargs
 
@@ -170,8 +177,8 @@ class ETL(object):
         :return: generated table into olapy dir
         """
         if table_name == self.facts_table:
-            table_name = 'Facts'
-        return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + '.csv'),)
+            table_name = "Facts"
+        return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + ".csv"))
 
     def copy_2_olapy_dir(self):
         """
@@ -195,19 +202,22 @@ class ETL(object):
 
         :return: .txt OR .csv
         """
-        if self.source_type.upper() == 'FILE':
-            return '.txt'
-        elif self.source_type.upper() == 'CSV':
-            return '.csv'
-        elif self.source_type.upper() == 'DB':
-            return ''
+        if self.source_type.upper() == "FILE":
+            return ".txt"
+
+        elif self.source_type.upper() == "CSV":
+            return ".csv"
+
+        elif self.source_type.upper() == "DB":
+            return ""
 
 
 def get_graph(etl, **options):
     return bonobo.Graph(
         etl.extract(
             options.get("extraction_source"),
-            delimiter=options.get("in_delimiter")),
+            delimiter=options.get("in_delimiter"),
+        ),
         etl.transform,
         etl.load(options.get("table")),
     )
@@ -217,8 +227,8 @@ def run_olapy_etl(dims_infos,
                   facts_table,
                   facts_ids,
                   source_folder=INPUT_DIR,
-                  source_type='csv',
-                  in_delimiter=',',
+                  source_type="csv",
+                  in_delimiter=",",
                   **kwargs):
     """
     Run ETl Process on each table pass to it.
@@ -253,7 +263,7 @@ def run_olapy_etl(dims_infos,
     )
 
     for table in list(dims_infos.keys()) + [etl.facts_table]:
-        if etl.source_type.upper() != 'DB':
+        if etl.source_type.upper() != "DB":
             extraction_source = os.path.join(
                 etl.source_folder,
                 table + etl.get_source_extension(),

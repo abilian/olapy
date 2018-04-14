@@ -13,8 +13,10 @@ class Parser(object):
     """
     Class for Parsing MdxQuery
     """
-    REG = "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*\w+\d\.\,\s\(\)\_\-\:\"\’\€\&\$ " \
-          "]+\])*\.?((Members)|(\[Q\d\]))?)"
+    # FIXME: make this regex more readable (split it)
+    REG = (
+        "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
+        '\w+\d\.\,\s\(\)\_\-\:"\’\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
@@ -33,9 +35,9 @@ class Parser(object):
         :param tupl: MDX Tuple as String
         :return: Tuple items in list
         """
-        split_tupl = tupl.strip(' \t\n').split('].[')
-        split_tupl[0] = split_tupl[0].replace('[', '')
-        split_tupl[-1] = split_tupl[-1].replace(']', '')
+        split_tupl = tupl.strip(" \t\n").split("].[")
+        split_tupl[0] = split_tupl[0].replace("[", "")
+        split_tupl[-1] = split_tupl[-1].replace("]", "")
         return split_tupl
 
     @classmethod
@@ -78,15 +80,15 @@ class Parser(object):
 
         # clean the query (remove All, Members...)
         return [[
-            tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').replace(
-                '.MEMBERS',
-                '',
-            ).split('].[')
+            tup_att.replace("All ", "").replace("[", "").replace("]", "")
+            for tup_att in tup[0].replace(".Members", "").replace(
+                ".MEMBERS",
+                "",
+            ).split("].[",)
             if tup_att
         ]
-            for tup in regex.compile(cls.REG).findall(query[start:stop],)
-            if len(tup[0].split('].[')) > 1]
+            for tup in regex.compile(cls.REG).findall(query[start:stop])
+            if len(tup[0].split("].[")) > 1]
 
     def decorticate_query(self, query):
         """Get all tuples that exists in the MDX Query by axes.
@@ -123,7 +125,7 @@ class Parser(object):
         # Hierarchize -> ON COLUMNS , ON ROWS ...
         # without Hierarchize -> ON 0
         try:
-            query = query.decode('utf-8')
+            query = query.decode("utf-8")
         except AttributeError:
             pass
         tuples_on_mdx_query = self.get_tuples(query)
@@ -133,39 +135,39 @@ class Parser(object):
 
         try:
             # ON ROWS
-            if 'ON ROWS' in query:
-                stop = 'ON ROWS'
-                if 'ON COLUMNS' in query:
-                    start = 'ON COLUMNS'
+            if "ON ROWS" in query:
+                stop = "ON ROWS"
+                if "ON COLUMNS" in query:
+                    start = "ON COLUMNS"
                 else:
-                    start = 'SELECT'
+                    start = "SELECT"
                 on_rows = self.get_tuples(query, start, stop)
 
             # ON COLUMNS
-            if 'ON COLUMNS' in query:
-                start = 'SELECT'
-                stop = 'ON COLUMNS'
+            if "ON COLUMNS" in query:
+                start = "SELECT"
+                stop = "ON COLUMNS"
                 on_columns = self.get_tuples(query, start, stop)
 
             # ON COLUMNS (AS 0)
-            if 'ON 0' in query:
-                start = 'SELECT'
-                stop = 'ON 0'
+            if "ON 0" in query:
+                start = "SELECT"
+                stop = "ON 0"
                 on_columns = self.get_tuples(query, start, stop)
 
             # WHERE
-            if 'WHERE' in query:
-                start = 'FROM'
+            if "WHERE" in query:
+                start = "FROM"
                 on_where = self.get_tuples(query, start)
 
         except BaseException:
-            raise SyntaxError('Please check your MDX Query')
+            raise SyntaxError("Please check your MDX Query")
 
         return {
-            'all': tuples_on_mdx_query,
-            'columns': on_columns,
-            'rows': on_rows,
-            'where': on_where,
+            "all": tuples_on_mdx_query,
+            "columns": on_columns,
+            "rows": on_rows,
+            "where": on_where,
         }
 
     @staticmethod
@@ -178,10 +180,10 @@ class Parser(object):
         :return: [aa].[bb].[cc].[dd] as string.
         """
         tupl = tupl.strip()
-        if tupl[0] != '[':
-            tupl = '[' + tupl
-        if tupl[-1] != ']':
-            tupl = tupl + ']'
+        if tupl[0] != "[":
+            tupl = "[" + tupl
+        if tupl[-1] != "]":
+            tupl = tupl + "]"
         return tupl
 
     def split_group(self, group):
@@ -196,9 +198,9 @@ class Parser(object):
         :param group: Group of tuple as string.
         :return: Separated tuples as list.
         """
-        split_group = group.replace('\n', '').replace('\t', '').split('],')
+        split_group = group.replace("\n", "").replace("\t", "").split("],")
         return list(
-            map(lambda tupl: self.add_tuple_brackets(tupl), split_group),)
+            map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
 
     def get_nested_select(self):
         """
@@ -224,11 +226,11 @@ class Parser(object):
         :return: All groups as list of strings.
 
         """
-        return regex.findall(r'\(([^()]+)\)', self.mdx_query)
+        return regex.findall(r"\(([^()]+)\)", self.mdx_query)
 
     def hierarchized_tuples(self):
         """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
 
         :return: True | False
         """
-        return 'Hierarchize' in self.mdx_query
+        return "Hierarchize" in self.mdx_query

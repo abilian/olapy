@@ -118,41 +118,47 @@ class ConfigParser:
             self.cube_config_file = self._get_cube_path()
 
     def _get_cube_path(self):
-        if 'OLAPY_PATH' in os.environ:
-            home_directory = os.environ['OLAPY_PATH']
+        if "OLAPY_PATH" in os.environ:
+            home_directory = os.environ["OLAPY_PATH"]
         else:
             from os.path import expanduser
+
             home_directory = expanduser("~")
 
-        return os.path.join(home_directory, 'olapy-data', 'cubes',
-                            'cubes-config.yml')
+        return os.path.join(
+            home_directory,
+            "olapy-data",
+            "cubes",
+            "cubes-config.yml",
+        )
 
     @staticmethod
     def _get_columns(dimension):
-        if 'columns' in dimension:
+        if "columns" in dimension:
             return OrderedDict((
-                column['name'],
-                column['name'] if 'column_new_name' not in column else column[
-                    'column_new_name'],
-            ) for column in dimension['columns'])
+                column["name"],
+                column["name"] if "column_new_name" not in column else column[
+                    "column_new_name"],
+            ) for column in dimension["columns"])
+
         else:
             return {}
 
     def _get_dimensions(self, config):
         dimensions = []
-        for dimension in config['dimensions']:
+        for dimension in config["dimensions"]:
             dimensions.append({
-                'name': dimension['name'],
-                'displayName': dimension['displayName'],
-                'columns': self._get_columns(dimension),
-            })
+                "name": dimension["name"],
+                "displayName": dimension["displayName"],
+                "columns": self._get_columns(dimension),
+            },)
         return dimensions
 
     def _get_facts(self, config):
         return {
-            'table_name': config['facts']['table_name'],
-            'keys': config['facts']['keys'],
-            'measures': config['facts']['measures'],
+            "table_name": config["facts"]["table_name"],
+            "keys": config["facts"]["keys"],
+            "measures": config["facts"]["measures"],
         }
 
     def get_cube_config(self, conf_file=None):
@@ -172,9 +178,9 @@ class ConfigParser:
             config = yaml.load(config_file)
         # only one cube right now
         return {
-            'xmla_authentication': bool(config['xmla_authentication']),
-            'name': config['name'],
-            'source': config['source'],
-            'facts': self._get_facts(config),
-            'dimensions': self._get_dimensions(config),
+            "xmla_authentication": bool(config["xmla_authentication"]),
+            "name": config["name"],
+            "source": config["source"],
+            "facts": self._get_facts(config),
+            "dimensions": self._get_dimensions(config),
         }
