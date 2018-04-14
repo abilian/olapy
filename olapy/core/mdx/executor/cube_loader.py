@@ -1,4 +1,5 @@
 import os
+from typing import Dict, Text
 
 import pandas as pd
 
@@ -10,6 +11,7 @@ class CubeLoader(object):
         self.sep = sep
 
     def load_tables(self):
+        # type: () -> Dict[Text, pd.DataFrame]
         """
         Load tables from csv files.
 

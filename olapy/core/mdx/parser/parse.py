@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
 """
-This module Parse Mdx Query, And Break it in parts
+Parser for MDX queries, and Break it in parts.
 """
 
 from __future__ import absolute_import, division, print_function, \
@@ -9,15 +9,16 @@ from __future__ import absolute_import, division, print_function, \
 import regex
 
 
+# FIXME: make this regex more readable (split it)
+REGEX = regex.compile(
+    "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
+    '\w+\d\.\,\s\(\)\_\-\:"\’\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
+
+
 class Parser(object):
     """
-    Class for Parsing MdxQuery
+    Class for Parsing a MDX query
     """
-    # FIXME: make this regex more readable (split it)
-    REG = (
-        "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
-        '\w+\d\.\,\s\(\)\_\-\:"\’\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
-
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
 
@@ -40,8 +41,8 @@ class Parser(object):
         split_tupl[-1] = split_tupl[-1].replace("]", "")
         return split_tupl
 
-    @classmethod
-    def get_tuples(cls, query, start=None, stop=None):
+    @staticmethod
+    def get_tuples(query, start=None, stop=None):
         """Get all tuples in the mdx query.
 
         Example::
@@ -87,7 +88,7 @@ class Parser(object):
             ).split("].[",)
             if tup_att
         ]
-            for tup in regex.compile(cls.REG).findall(query[start:stop])
+            for tup in REGEX.findall(query[start:stop])
             if len(tup[0].split("].[")) > 1]
 
     def decorticate_query(self, query):
@@ -160,7 +161,7 @@ class Parser(object):
                 start = "FROM"
                 on_where = self.get_tuples(query, start)
 
-        except BaseException:
+        except BaseException:  # pragma: no cover
             raise SyntaxError("Please check your MDX Query")
 
         return {
@@ -229,6 +230,7 @@ class Parser(object):
         return regex.findall(r"\(([^()]+)\)", self.mdx_query)
 
     def hierarchized_tuples(self):
+        # type: () -> bool
         """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
 
         :return: True | False

@@ -1,10 +1,13 @@
 """
-To use olapy correctly with you source file (tables), some data structure cleaning operation must be applied to that \
- data (for example , if you want to use olapy with csv files, you must use semi columns separator for those csv files.
-or if tables id columns don't contains _id, this will cause some bugs sometimes)
+To use olapy correctly with you source file (tables), some data structure
+cleaning operation must be applied to that data (for example, if you want
+to use olapy with csv files, you must use semicolon separators for those
+csv files; or if tables id columns don't contains _id, this will cause some
+bugs sometimes).
 
-This module will do the work for you, here olapy will extract data from your source, transform it with olapy's data \
-structure rules and load them to olapy-data folder *(as csv files right now)*
+This module will do the work for you, here olapy will extract data from
+your source, transform it with olapy's data structure rules,
+and load them to olapy-data folder *(as csv files right now)*.
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -14,6 +17,7 @@ import os
 import shutil
 from distutils.dir_util import copy_tree
 from shutil import copyfile
+from typing import Text
 
 import bonobo
 import dotenv
@@ -30,8 +34,10 @@ INPUT_DIR = "input_dir"
 
 class ETL(object):
     """
-    Extract-transform-load for Olapy, It take a source (folder or database), make all necessary transformation to
-    that data, and then load them into olapy-data directory
+    Extract-transform-load for Olapy.
+
+    It take a source (folder or database), make all necessary transformation to
+    that data, and then load them into olapy-data directory.
     """
 
     def __init__(
@@ -45,8 +51,9 @@ class ETL(object):
     ):
         """
 
-        :param source_type: file | csv | db (if db , make sure that you put database connection credentials in the
-        /home/user/olapy-data/olapy-config file
+        :param source_type: file | csv | db (if db, make sure that you put
+            database connection credentials in the
+            /home/user/olapy-data/olapy-config file
         :param facts_table: facts table name
         :param source_folder: your csv|txt files path
         :param separator: input file separator (, ; : ...)
@@ -86,7 +93,8 @@ class ETL(object):
 
     def _transform_file(self, line):
         """
-        :func:`extract` return line by line as args if :func:`extract` from text file
+        :func:`extract` return line by line as args if :func:`extract`
+            from text file
         :param line: line is generated from extract function (see bonobo chain)
         :return: dict { column_name : data}
         """
@@ -122,7 +130,8 @@ class ETL(object):
     def _transform_csv(self, kwargs):
         """
         :func:`extract` return dict as kwargs if :func:`extract` from csv file
-        :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
+        :param kwargs: :func:`extract` return dict as kwargs
+            if :func:`extract` from csv file
         :return: transformed kwargs
         """
         if self.dim_first_row_headers:
@@ -156,8 +165,10 @@ class ETL(object):
         """
         Bonobo's second chain, transform data based on olapy rules.
 
-        :param args: :func:`extract` return line by line as args if :func:`extract` from text file
-        :param kwargs: :func:`extract` return dict as kwargs if :func:`extract` from csv file
+        :param args: :func:`extract` return line by line as args
+            if :func:`extract` from text file
+        :param kwargs: :func:`extract` return dict as kwargs
+            if :func:`extract` from csv file
         :return: args or kwargs transformed
         """
         if self.source_type.upper() == "FILE":
@@ -182,7 +193,8 @@ class ETL(object):
 
     def copy_2_olapy_dir(self):
         """
-        right now, bonobo can't export (save) to path (bonobo bug) so we copy all generated tables directly to olapy dir
+        Right now, bonobo can't export (save) to path (bonobo bug) so we copy
+        all generated tables directly to olapy dir.
         """
         if not os.path.isdir(
                 os.path.join(self.olapy_cube_path, self.target_cube),):
@@ -197,8 +209,9 @@ class ETL(object):
             )
 
     def get_source_extension(self):
+        # type: () -> Text
         """
-        get source file extension based on :attr:`self.source_type`
+        Get source file extension based on :attr:`self.source_type`.
 
         :return: .txt OR .csv
         """
@@ -211,8 +224,11 @@ class ETL(object):
         elif self.source_type.upper() == "DB":
             return ""
 
+        raise RuntimeError("Unknown source type: {}".format(self.source_type))
+
 
 def get_graph(etl, **options):
+    # (Any) -> bonobo.Graph
     return bonobo.Graph(
         etl.extract(
             options.get("extraction_source"),
@@ -249,8 +265,10 @@ def run_olapy_etl(dims_infos,
         facts_ids = ['geography_key', 'product_key']
 
     :param facts_table: facts table name
-    :param source_type: file -> .txt files in input || csv -> .csv files in input
-    :param source_folder: from where you get your files (if source is csv or text files)
+    :param source_type: file -> .txt files in input || csv -> .csv files
+        in input
+    :param source_folder: from where you get your files
+        (if source is csv or text files)
     :return: generate files to olapy dir
     """
 
