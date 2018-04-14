@@ -145,6 +145,7 @@ class CubeLoaderCustom(CubeLoader):
     # web client
     def construct_web_star_schema_config_file(self):
         """Construct star schema DataFrame from configuration file for web client.
+
         :return: star schema DataFrame
         """
 

@@ -42,22 +42,21 @@ class MdxEngineLite(MdxEngine):
     @columns.setter
     def columns(self, columns):
         if columns:
-
             self._columns = columns.split(',')
         else:
             self._columns = []
 
     def load_cube(self, table_or_file, **kwargs):
         """
-         After instantiating MdxEngine(), load_cube construct the cube and load all tables.
+        After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
         :param table_or_file: full file path, or just database table name if sql_alchemy_uri provided
         """
         self.cube = table_or_file
         if self.sqla_engine:
-            self.tables_loaded = self.load_tables_db()
+            self.tables_loaded = self.load_tables_from_db()
         else:
-            self.tables_loaded = self.load_tables_csv_files()
+            self.tables_loaded = self.load_tables_from_csv_files()
 
         # self.selected_measures = [self.measures[0]]
         table_name = list(self.tables_loaded.keys())[0]
@@ -78,13 +77,14 @@ class MdxEngineLite(MdxEngine):
         cleaned_facts = self.clean_data(table, not_id_columns)
         return [
             col
-            for col in cleaned_facts.select_dtypes(include=[np.number],).columns
+            for col in cleaned_facts.select_dtypes(include=[np.number]).columns
             if col.lower()[-2:] != 'id'
         ]
 
-    def load_tables_db(self):
+    def load_tables_from_db(self):
         """
         Load table from database.
+
         :return: tables dict with table name as key and dataframe as value
         """
 
@@ -109,9 +109,10 @@ class MdxEngineLite(MdxEngine):
 
         return tables
 
-    def load_tables_csv_files(self):
+    def load_tables_from_csv_files(self):
         """
         load the csv file
+
         :return: pandas DataFrame
         """
         tables = {}

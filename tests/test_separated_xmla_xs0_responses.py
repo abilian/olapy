@@ -130,5 +130,4 @@ def test_xs0_axis_query15(executor):
                     xml.DisplayInfo('0')
 
     xmla_tools = XmlaExecuteTools(executor, query15, False)
-
     assert str(xml) == xmla_tools.generate_xs0()

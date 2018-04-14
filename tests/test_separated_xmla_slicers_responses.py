@@ -75,7 +75,6 @@ def test_slicer_axis_query12(executor):
                     xml.DisplayInfo('2')
 
     xmla_tools = XmlaExecuteTools(executor, query12, False)
-
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
@@ -102,5 +101,4 @@ def test_slicer_axis_query14(executor):
                     xml.DisplayInfo('2')
 
     xmla_tools = XmlaExecuteTools(executor, query14, False)
-
     assert str(xml) == xmla_tools.generate_slicer_axis()

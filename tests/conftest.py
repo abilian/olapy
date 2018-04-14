@@ -81,6 +81,8 @@ def executor(request):
         sqla_engine=engine, source_type='db', cube_config=config)
     mdx_engine.load_cube(
         cube_name=db_test if db_test else 'main', fact_table_name='facts')
+
     yield mdx_engine
+
     drop_tables(engine, custom)
     # os.environ.pop('SQLALCHEMY_DATABASE_URI', None)

@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+from typing import Text, Dict
+
 import pandas as pd
 import pandas.io.sql as psql
+from pandas import DataFrame
 from sqlalchemy import inspect
 
 from ..tools.connection import get_dialect_name
@@ -21,8 +24,10 @@ class CubeLoaderDB(CubeLoader):
         self.sqla_engine = sqla_engine
 
     def load_tables(self):
+        # type: () -> Dict[Text, DataFrame]
         """
         Load tables from database.
+
         :return: tables dict with table name as key and dataframe as value
         """
 
@@ -35,7 +40,7 @@ class CubeLoaderDB(CubeLoader):
                 table_name = table_name.title()
             results = self.sqla_engine.execution_options(
                 stream_results=True,
-            ).execute('SELECT * FROM {}'.format(table_name),)
+            ).execute('SELECT * FROM {}'.format(table_name))
             # Fetch all the results of the query
             value = pd.DataFrame(
                 iter(results),
@@ -50,6 +55,7 @@ class CubeLoaderDB(CubeLoader):
         return tables
 
     def construct_star_schema(self, facts):
+        # type: (Text) -> DataFrame
         """
         Construct star schema DataFrame from database.
 
@@ -72,7 +78,7 @@ class CubeLoaderDB(CubeLoader):
                     psql.read_sql_query(
                         "SELECT * FROM {}".format(db_table_name),
                         self.sqla_engine,
-                    ),)
+                    ))
             except BaseException:
                 print('No common column between {} and {}'.format(
                     facts, db_table_name))

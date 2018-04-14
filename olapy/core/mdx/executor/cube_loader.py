@@ -12,6 +12,7 @@ class CubeLoader(object):
     def load_tables(self):
         """
         Load tables from csv files.
+
         :return: tables dict with table name as key and dataframe as value
         """
         tables = {}

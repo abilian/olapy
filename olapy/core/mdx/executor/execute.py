@@ -89,26 +89,18 @@ class MdxEngine(object):
 
         # surrounded with try, except and pass so we continue getting cubes
         # from different sources (db, csv...) without interruption
-        # try:
         dialect = get_dialect(self.sqla_engine)
         # todo or find another thing
         if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
             self.sqla_engine = dialect.engine
         return dialect.get_all_databases()
-        # except Exception:
-        #     type, value, traceback = sys.exc_info()
-        #     print(type)
-        #     print(value)
-        #     print_tb(traceback)
-        #     print('no database connexion')
-        #     pass
 
-    def _get_csv_cubes_names(self, cubes_location):
+    @staticmethod
+    def _get_csv_cubes_names(cubes_location):
         """
         Get csv folder names
 
         :param cubes_location: OlaPy cubes path, which is under olapy-data, by default ~/olapy-data/cubes_location
-        :return:
         """
 
         # get csv folders names first , and them instantiate MdxEngine with this database, thus \
@@ -245,6 +237,7 @@ class MdxEngine(object):
 
         :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
+
         :return: cleaned columns
         """
         if measures:
@@ -338,11 +331,13 @@ class MdxEngine(object):
         return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
-        """Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
+        """Get used dimensions and columns in the MDX Query.
+
+        Useful for DataFrame -> xmla response transformation.
 
         :param tuple_as_list: list of tuples
 
-        example ::
+        example::
 
             [
             '[Measures].[Amount]',
@@ -389,29 +384,29 @@ class MdxEngine(object):
         """
         Filter a DataFrame (Dataframe_in) with one tuple.
 
-            Example ::
+        Example ::
 
-                tuple = ['Geography','Geography','Continent','Europe','France','olapy']
+            tuple = ['Geography','Geography','Continent','Europe','France','olapy']
 
-                Dataframe_in in :
+            Dataframe_in in :
 
-                +-------------+----------+---------+---------+---------+
-                | Continent   | Country  | Company | Article | Amount  |
-                +=============+==========+=========+=========+=========+
-                | America     | US       | MS      | SSAS    | 35150   |
-                +-------------+----------+---------+---------+---------+
-                | Europe      |  France  | AB      | olapy   | 41239   |
-                +-------------+----------+---------+---------+---------+
-                |  .....      |  .....   | ......  | .....   | .....   |
-                +-------------+----------+---------+---------+---------+
+            +-------------+----------+---------+---------+---------+
+            | Continent   | Country  | Company | Article | Amount  |
+            +=============+==========+=========+=========+=========+
+            | America     | US       | MS      | SSAS    | 35150   |
+            +-------------+----------+---------+---------+---------+
+            | Europe      |  France  | AB      | olapy   | 41239   |
+            +-------------+----------+---------+---------+---------+
+            |  .....      |  .....   | ......  | .....   | .....   |
+            +-------------+----------+---------+---------+---------+
 
-                out :
+            out :
 
-                +-------------+----------+---------+---------+---------+
-                | Continent   | Country  | Company | Article | Amount  |
-                +=============+==========+=========+=========+=========+
-                | Europe      |  France  | AB      | olapy   | 41239   |
-                +-------------+----------+---------+---------+---------+
+            +-------------+----------+---------+---------+---------+
+            | Continent   | Country  | Company | Article | Amount  |
+            +=============+==========+=========+=========+=========+
+            | Europe      |  France  | AB      | olapy   | 41239   |
+            +-------------+----------+---------+---------+---------+
 
 
         :param tuple_as_list: tuple as list
@@ -524,7 +519,7 @@ class MdxEngine(object):
 
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
         """
-        If we have multiple dimensions, with many columns like:
+        If we have multiple dimensions, with many columns like::
 
             columns_to_keep :
 
@@ -539,7 +534,7 @@ class MdxEngine(object):
 
         So if tuple_as_list = ['Geography','Geography','Continent']
 
-        then columns_to_keep will be:
+        then columns_to_keep will be::
 
             columns_to_keep :
 
@@ -570,9 +565,9 @@ class MdxEngine(object):
         """
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
-        if len(
+        if (len(
                 tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
@@ -664,8 +659,8 @@ class MdxEngine(object):
         """
         Check if the MDX Query is Hierarchized and contains many tuples groups.
         """
-        return not self.parser.hierarchized_tuples() and len(
-            self.parser.get_nested_select(),) >= 2
+        return (not self.parser.hierarchized_tuples() and len(
+            self.parser.get_nested_select()) >= 2)
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
