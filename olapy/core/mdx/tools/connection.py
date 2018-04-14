@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function
 
 from typing import List, Text
 
+from sqlalchemy.engine import Engine
+
 
 class BaseDialect(object):
     """Connect to sql database."""
@@ -13,7 +15,7 @@ class BaseDialect(object):
         """
         Connect to cube from database
 
-        :param sqla_engine: sql alchemy engine instance
+        :param sqla_engine: SqlAlchemy engine instance
         """
 
         self.engine = sqla_engine
@@ -89,22 +91,22 @@ class MssqlDialect(BaseDialect):
         return "SELECT name FROM sys.databases WHERE name NOT IN ('master','tempdb','model','msdb');"
 
 
+DIALECT_REGISTRY = {
+    'sqlite': SqliteDialect,
+    'oracle': OracleDialect,
+    'mssql': MssqlDialect,
+    'postgres': PostgresDialect,
+    'mysql': MysqlDialect,
+}
+
+
 def get_dialect(sqla_engine):
-    # type: () -> BaseDialect
+    # type: (Engine) -> BaseDialect
     dialect_name = get_dialect_name(sqla_engine.url)
-    if 'sqlite' in dialect_name:
-        dialect = SqliteDialect(sqla_engine)
-    elif 'oracle' in dialect_name:
-        dialect = OracleDialect(sqla_engine)
-    elif 'mssql' in dialect_name:
-        dialect = MssqlDialect(sqla_engine)
-    elif 'postgres' in dialect_name:
-        dialect = PostgresDialect(sqla_engine)
-    elif 'mysql' in dialect_name:
-        dialect = MysqlDialect(sqla_engine)
-    else:
+    dialect_class = DIALECT_REGISTRY.get(dialect_name)
+    if not dialect_class:
         raise AttributeError("Unknown dialect: {}".format(dialect_name))
-    return dialect
+    return dialect_class(sqla_engine)
 
 
 def get_dialect_name(conn_string):
