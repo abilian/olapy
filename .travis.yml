@@ -15,7 +15,7 @@ before_install:
   - mysql -e 'create database olapy_test;'
 
 install:
-  - pip install -U pip setuptools tox tox-travis wheel
+  - pip install -U 'pip<10' setuptools tox tox-travis wheel
 
 python:
   - '2.7'
