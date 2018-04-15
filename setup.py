@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function
 
-from pip.download import PipSession
-from pip.req import parse_requirements
+import setuptools
+from pkg_resources import parse_requirements
 from setuptools import find_packages, setup
+from setuptools.command.develop import develop as _develop
+from setuptools.command.sdist import sdist as _sdist
 
-session = PipSession()
-_install_requires = parse_requirements('requirements.in', session=session)
-install_requires = [str(ir.req) for ir in _install_requires]
+_install_requires = parse_requirements(open("requirements.in"))
+install_requires = [str(req) for req in _install_requires]
 
 setup(
     name='olapy',
