@@ -1,6 +1,13 @@
 Changelog for Olapy
 ===================
 
+0.6.2 (2018-04-16)
+------------------
+
+- fix some issues with excel 2010
+- Big Refactor and API cleanup
+- No new features
+
 0.6.1 (2018-03-20)
 ------------------
 
