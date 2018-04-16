@@ -3,8 +3,7 @@ sudo: false
 
 language: python
 cache:
-  - pip
-  - yarn
+  pip: true
 
 services:
   - mysql

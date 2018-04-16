@@ -74,7 +74,6 @@ tidy: clean
 
 format:
 	isort -rc $(SRC) tests micro_bench demos *.py
-	-add-trailing-comma `find olapy -name '*.py'`
 	yapf --style google -r -i $(SRC) tests micro_bench demos *.py
 	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench demos
 	isort -rc $(SRC) tests micro_bench demos *.py
