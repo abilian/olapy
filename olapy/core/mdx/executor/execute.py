@@ -130,7 +130,6 @@ class MdxEngine(object):
                   fact_table_name="Facts",
                   sep=";",
                   measures=None,
-                  cube_folder=None,
                   **kwargs):
         """
         After instantiating MdxEngine(), load_cube construct the cube
@@ -146,7 +145,7 @@ class MdxEngine(object):
         # load cubes names
         self.get_cubes_names()  # necessary, it fills csv_files_cubes and db_cubes
         # load tables
-        self.tables_loaded = self.load_tables(sep=sep, cube_folder=cube_folder)
+        self.tables_loaded = self.load_tables(sep=sep)
         if measures:
             self.measures = measures
         else:
@@ -156,12 +155,9 @@ class MdxEngine(object):
             self.selected_measures = [self.measures[0]]
         # construct star_schema
         if self.tables_loaded:
-            self.star_schema_dataframe = self.get_star_schema_dataframe(
-                sep=sep,
-                cube_folder=cube_folder,
-            )
+            self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
-    def load_tables(self, sep, cube_folder=None):
+    def load_tables(self, sep):
         # type: (str) -> Dict[unicode, DataFrame]
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
@@ -171,7 +167,7 @@ class MdxEngine(object):
         :return: dict with table names as keys and DataFrames as values.
         """
 
-        cubes_folder_path = self.get_cube_path(cube_folder)
+        cubes_folder_path = self.get_cube_path()
         if (self.cube_config and self.cube_config["facts"] and
                 self.cube == self.cube_config["name"]):
             cube_loader = CubeLoaderCustom(
@@ -240,7 +236,7 @@ class MdxEngine(object):
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 
-    def get_star_schema_dataframe(self, sep, cube_folder=None):
+    def get_star_schema_dataframe(self, sep):
         """
         Merge all DataFrames as star schema.
 
@@ -254,7 +250,7 @@ class MdxEngine(object):
             if self.cube_config["facts"]["measures"]:
                 self.measures = self.cube_config["facts"]["measures"]
 
-            cube_path = self.get_cube_path(cube_folder)
+            cube_path = self.get_cube_path()
             cube_loader = CubeLoaderCustom(
                 cube_config=self.cube_config,
                 cube_path=cube_path,
@@ -267,7 +263,7 @@ class MdxEngine(object):
 
         # elif self.cube in self.csv_files_cubes:
         else:
-            cube_path = self.get_cube_path(cube_folder)
+            cube_path = self.get_cube_path()
             cube_loader = CubeLoader(cube_path)
 
         fusion = cube_loader.construct_star_schema(self.facts)
@@ -289,15 +285,12 @@ class MdxEngine(object):
 
         return list(self.tables_loaded)
 
-    def get_cube_path(self, cube_folder):
+    def get_cube_path(self):
         """
         Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
-        if cube_folder:
-            return cube_folder
-
         return os.path.join(
             self.olapy_data_location,
             self.cubes_folder,
