@@ -158,7 +158,7 @@ class MdxEngine(object):
             self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
-        # type: (str) -> Dict[unicode, DataFrame]
+        # type: (str) -> Dict[str, DataFrame]
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.
@@ -175,7 +175,7 @@ class MdxEngine(object):
                 cube_path=cubes_folder_path,
                 sqla_engine=self.sqla_engine,
                 sep=sep,
-            )
+            )  # type: CubeLoaderCustom
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
             if "postgres" in dialect_name:

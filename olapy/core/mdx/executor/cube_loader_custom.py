@@ -5,6 +5,8 @@ import os
 
 import pandas as pd
 import pandas.io.sql as psql
+from pandas import DataFrame
+from typing import Dict
 
 from .cube_loader import CubeLoader
 
@@ -37,6 +39,7 @@ class CubeLoaderCustom(CubeLoader):
         return table
 
     def load_tables(self):
+        # type: () -> Dict[str, DataFrame]
         """
         Load tables from config file.
         :return: tables dict with table name as key and DataFrame as value
