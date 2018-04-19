@@ -1,3 +1,6 @@
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 import os
 
 import pandas as pd
@@ -69,7 +72,6 @@ class CubeLoaderCustom(CubeLoader):
 
         return tables
 
-
     def construct_star_schema(self, facts):
         """Construct star schema DataFrame from configuration file for excel client.
 
@@ -77,8 +79,7 @@ class CubeLoaderCustom(CubeLoader):
         :return: star schema DataFrame
         """
         fusion = self.load_one_table(facts)
-        for fact_key, dimension_and_key in self.cube_config["facts"][
-                "keys"].items():
+        for fact_key, dimension_and_key in self.cube_config["facts"]["keys"].items():
             if self.cube_config["source"].upper() == "CSV":
                 file = os.path.join(
                     self.cube_path,

@@ -144,7 +144,7 @@ class MdxEngine(object):
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
-        self.get_cubes_names() #necessary, it fills csv_files_cubes and db_cubes
+        self.get_cubes_names()  # necessary, it fills csv_files_cubes and db_cubes
         # load tables
         self.tables_loaded = self.load_tables(sep=sep, cube_folder=cube_folder)
         if measures:
@@ -287,7 +287,7 @@ class MdxEngine(object):
         if ignore_fact:
             return [tab for tab in self.tables_loaded if self.facts not in tab]
 
-        return self.tables_loaded.keys()
+        return list(self.tables_loaded)
 
     def get_cube_path(self, cube_folder):
         """
