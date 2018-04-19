@@ -69,7 +69,6 @@ class CubeLoaderCustom(CubeLoader):
 
         return tables
 
-    # excel client
 
     def construct_star_schema(self, facts):
         """Construct star schema DataFrame from configuration file for excel client.

@@ -53,14 +53,11 @@ class ConfigParser:
         facts:
           table_name: food_facts              # facts table name
           keys:
-            columns_names:                    # primary keys
-              - product_id
-              - warehouse_id
-              - store_id
-            refs:                             # keys refs (example : product_id ref to column id from table Product...)
-              - Product.id
-              - Warehouse.id
-              - Store.id
+
+           # primary keys : keys refs (example : product_id ref to column id from table Product...)
+            product_id : Product.id
+            warehouse_id : Warehouse.id
+            store_id : Store.id
 
           measures:                           # list of measures
                                               # by default, all number type columns in facts table
@@ -69,13 +66,11 @@ class ConfigParser:
             - supply_time
 
         dimensions:                          # star building customized dimensions display in excel from the star schema
-          - dimension:
             #  IMPORTANT: put here facts table also (little bug)
-              name: food_facts
+            - name: food_facts
               displayName: food_facts
 
-          - dimension:
-              name: Product
+            - name: Product
               displayName: Product
               columns:
                 - name: id
@@ -95,15 +90,6 @@ class ConfigParser:
                 - name: store_city
                 - name: store_country
                   column_new_name: country
-
-          - dimension:
-              name: Warehouse
-              displayName: Warehouse
-              columns:
-                - name: id
-                - name: warehouse_name
-                - name: warehouse_city
-                - name: warehouse_country
     """
 
     def __init__(self, cube_config_file=None):

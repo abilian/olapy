@@ -78,8 +78,6 @@ class XmlaProviderService(ServiceBase):
 
         """
         # ctx is the 'context' parameter used by Spyne
-        # (which cause problems when we want to access xmla_provider instantiation variables)
-
         xmla_tools = ctx.app.config["xmla_tools"]
         ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
         config_parser = xmla_tools.executor.cube_config

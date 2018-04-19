@@ -8,11 +8,11 @@ Execution need two main objects:
 
 Those two objects are constructed in three ways:
 
-    - manually with a config file, see :mod:`execute_config_file`
+    - manually with a config file, see :mod:`cube_loader_custom`
     - automatically from csv files, if they respect olapy's
       `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
-      see :mod:`execute_csv_files`
-    - automatically from database, also if they respect the start schema model, see :mod:`execute_db`
+      see :mod:`cube_loader`
+    - automatically from database, also if they respect the start schema model, see :mod:`cube_loader_db`
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -21,7 +21,7 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-from typing import List
+from typing import List, Dict
 
 import attr
 import numpy as np
@@ -39,20 +39,19 @@ from .cube_loader_db import CubeLoaderDB
 class MdxEngine(object):
     """The main class for executing a query.
 
-    :param cube_name: It must be under ~/olapy-data/cubes/{cube_name}.
+    :param cube: It must be under ~/olapy-data/cubes/{cube_name}.
 
-        example: if cube_name = 'sales'
+        example: if cube = 'sales'
         then full path -> *home_directory/olapy-data/cubes/sales*
-    :param client_type: excel | web , by default excel, so you can use olapy as xmla server with excel spreadsheet,
-        web if you want to use olapy with `olapy-web <https://github.com/abilian/olapy-web>`_,
-    :param cubes_path: Olapy cubes path, which is under olapy-data,
-        by default *~/olapy-data/cube_name*
+
+    :param cubes_folder: cubes folder, which is under olapy-data, and contains all csv cubes
+        by default *~/olapy-data/cubes/...
     :param olapy_data_location: By default *~/olapy-data/*
     :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
     :param sql_engine: sql_alchemy engine if you don't want to use any database config file
     :param source_type: source data input, Default csv
-    :param cubes_folder_name: csv files, folder name, Default *cubes*
-    :param mdx_q_parser: mdx query parser
+    :param parser: mdx query parser
+    :param facts:  facts table name, Default **Facts**
 
     """
 
@@ -71,10 +70,9 @@ class MdxEngine(object):
     selected_measures = attr.ib(default=None)
     cubes_folder = attr.ib(default="cubes")
 
-    # @staticmethod
-
     @olapy_data_location.default
     def get_default_cubes_directory(self):
+        # with OLAPY_PATH env var, we can inject olap_web's flask instance_path olapy-data,
         home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
         if "olapy-data" not in home_directory:
             home_directory = os.path.join(home_directory, "olapy-data")
@@ -86,12 +84,9 @@ class MdxEngine(object):
         Get databases cubes names.
         """
         # get databases names first , and them instantiate MdxEngine with this database, thus \
-        # MdxEngine will try to construct the star schema either automatically or manually
+        # it will try to construct the star schema either automatically or manually
 
-        # surrounded with try, except and pass so we continue getting cubes
-        # from different sources (db, csv...) without interruption
         dialect = get_dialect(self.sqla_engine)
-        # todo or find another thing
         if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
             self.sqla_engine = dialect.engine
         return dialect.get_all_databases()
@@ -102,12 +97,8 @@ class MdxEngine(object):
         Get csv folder names
 
         :param cubes_location: OlaPy cubes path, which is under olapy-data,
-            by default ~/olapy-data/cubes_location
+            by default ~/olapy-data/cubes/...
         """
-
-        # get csv folders names first , and them instantiate MdxEngine
-        # with this database, thus MdxEngine will try to construct
-        # the star schema either automatically or manually
 
         return [
             file for file in os.listdir(cubes_location)
@@ -119,13 +110,11 @@ class MdxEngine(object):
         List all cubes (by default from csv folder only).
 
         You can explicitly specify csv folder and databases
-        with *MdxEngine.source_type = ('csv','db')*
+        with *self.source_type = ('csv','db')*
 
         :return: list of all cubes
         """
 
-        # by default, and before passing values to class with olapy runserver
-        # .... it executes this with csv
         cubes_folder_path = os.path.join(
             self.olapy_data_location,
             self.cubes_folder,
@@ -151,12 +140,11 @@ class MdxEngine(object):
         :param fact_table_name:  facts table name, Default **Facts**
         :param sep: separator used in csv files
         :param measures: if you want to explicitly specify measures
-        :return:
         """
         self.cube = cube_name
         self.facts = fact_table_name
         # load cubes names
-        self.get_cubes_names()
+        self.get_cubes_names() #necessary, it fills csv_files_cubes and db_cubes
         # load tables
         self.tables_loaded = self.load_tables(sep=sep, cube_folder=cube_folder)
         if measures:
@@ -174,6 +162,7 @@ class MdxEngine(object):
             )
 
     def load_tables(self, sep, cube_folder=None):
+        # type: (str) -> Dict[unicode, DataFrame]
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.
@@ -208,18 +197,7 @@ class MdxEngine(object):
     def get_measures(self):
         """:return: all numerical columns in Facts table."""
 
-        # if web, get measures from config file
         # from postgres and oracle databases , all tables names are lowercase
-
-        # if self.client == 'web' and self.cube_config:
-        #     if self.cube_config['facts']:
-        #         # update facts table name
-        #         self.facts = self.cube_config['facts']['table_name']
-        #
-        #         # if measures are specified in the config file
-        #         if self.cube_config['facts']['measures']:
-        #             return self.cube_config['facts']['measures']
-
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
             not_id_columns = [

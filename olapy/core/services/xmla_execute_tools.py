@@ -20,6 +20,13 @@ class XmlaExecuteTools():
     """XmlaExecuteTools for generating xmla execute responses."""
 
     def __init__(self, executor, mdx_query, convert2formulas=False):
+        """
+
+        :param executor: MdxEngine instance
+        :param mdx_query: mdx query to execute
+        :param convert2formulas: mdx queries with  `excel convert formulas \
+            <https://exceljet.net/excel-functions/excel-convert-function>`_,
+        """
         self.executor = executor
         self.convert2formulas = convert2formulas
         self.mdx_query = mdx_query
