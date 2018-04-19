@@ -175,7 +175,7 @@ class MdxEngine(object):
                 cube_path=cubes_folder_path,
                 sqla_engine=self.sqla_engine,
                 sep=sep,
-            )  # type: CubeLoaderCustom
+            )  # type: CubeLoader
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
             if "postgres" in dialect_name:
