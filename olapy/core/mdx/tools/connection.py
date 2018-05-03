@@ -33,7 +33,7 @@ class Dialect(object):
     def get_all_databases(self):
         # type: () -> List[Text]
         all_db_query = self.gen_all_databases_query()
-        result = self.engine.execute(all_db_query)
+        result = self.engine.execute(all_db_query)  # type: ignore
         available_tables = result.fetchall()
         return [
             database[0]
