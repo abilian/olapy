@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 appdirs==1.4.3            # via fs
-attrs==17.4.0
+attrs==18.1.0
 awesome-slugify==1.6.5
 bonobo-sqlalchemy==0.5.1
 bonobo==0.5.2
@@ -13,16 +13,16 @@ certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 click==6.7
 colorama==0.3.9           # via bonobo
-fs==2.0.20                # via bonobo
+fs==2.0.21                # via bonobo
 idna==2.6                 # via requests
 lxml==4.2.1
-numpy==1.14.2             # via pandas
+numpy==1.14.3             # via pandas
 packaging==16.8           # via bonobo
-pandas==0.22.0
-pbr==4.0.2                # via stevedore
+pandas==0.23.0
+pbr==4.0.3                # via stevedore
 psutil==5.4.5             # via bonobo
 pyparsing==2.2.0          # via packaging
-python-dateutil==2.7.2    # via pandas
+python-dateutil==2.7.3    # via pandas
 python-dotenv==0.8.2
 pytz==2018.4              # via fs, pandas, spyne
 pyyaml==3.12
