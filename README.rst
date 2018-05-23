@@ -26,41 +26,48 @@ This project is currently licenced under the LGPL v3 licence.
 Installation
 ------------
 
+Install from PyPI
+~~~~~~~~~~~~~~~~~
+
+You can install it directly from the `Python Package Index <https://pypi.python.org/pypi/olapy>`_::
+
+    pip install olapy
+
+Install from Github
+~~~~~~~~~~~~~~~~~~~
+
+The project sources are stored in `Github repository <https://github.com/abilian/olapy>`_.
+
+Download from Github::
+
+    git clone git://github.com/abilian/olapy.git
+
+
 To set up the application, run, ideally in a virtualenv::
 
+    cd olapy
     python setup.py install
 
 or just::
 
     pip install -e .
 
+
 Usage
 -----
 
-With an XMLA client
-~~~~~~~~~~~~~~~~~~~
+Before running OlaPy, you need to initialize it with::
 
-To use XMLA from Excel, just start the XMLA server by executing in the root directory::
+    olapy init
 
-    python olapy ( -c | --console , if you want to print logs only in the console)
+and then you can run the server with::
 
-and use the url: http://127.0.0.1:8000/xmla in Excel
-
-*  Be sure to use ``Provider=MSOLAP.6`` in Excel (see https://blogs.technet.microsoft.com/excel_services__powerpivot_for_sharepoint_support_blog/2015/10/30/configuring-the-msolap-data-provider-version).
+    olapy runserver
 
 
-With the demo web app
-~~~~~~~~~~~~~~~~~~~~~
+and then from excel, open new spreadsheet and go to : Data -> From Other Sources -> From Analysis Services and use http://127.0.0.1:8000/ as server name and click next, then you can chose one of default olapy demo cubes (sales, foodmart...) and finish.
 
-Run:
-
-1. `python manage.py initdb` to initialize the db
-
-2. `python manage.py runserver` to run application, using the following credential to log in:
-
-  - **login**: admin
-
-  - **password**: admin
+that's it ! now you can play with data
 
 
 Developing

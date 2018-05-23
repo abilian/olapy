@@ -1,6 +1,9 @@
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 from timeit import Timer
 
-from cube_generator import CUBE_NAME
+from .cube_generator import CUBE_NAME
 
 
 class MicBench:
@@ -21,4 +24,5 @@ class MicBench:
         to one million
         :return: float execution time in seconds
         """
-        return Timer(lambda: connection.Execute(query, Catalog=cube)).timeit(number=number)
+        return Timer(lambda: connection.Execute(query, Catalog=cube)).timeit(
+            number=number)

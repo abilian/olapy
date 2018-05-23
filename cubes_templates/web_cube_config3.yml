@@ -1,0 +1,61 @@
+#cube name <=> db name
+name : foodmart_with_config
+#csv | postgres | mysql| mssql | oracle
+source : csv
+
+
+facts :
+  table_name : food_facts
+  keys:
+    columns_names :
+      - product_id
+      - warehouse_id
+      - store_id
+    refs :
+      - Product.id
+      - Warehouse.id
+      - Store.id
+
+  measures :
+#   by default, all number type columns in facts table, or you can specify them here
+    - units_ordered
+    - units_shipped
+    - supply_time
+
+#  additional columns to keep other than measures and ids
+#  columns :
+
+tables :
+  - table :
+      name : Product
+      columns : id,brand_name,product_name
+      new_names :
+        product_name : Product_Name
+
+  - table :
+      name : Store
+      columns : id,store_type,store_name,store_city
+
+  - table :
+      name : Warehouse
+      columns : id,warehouse_name,warehouse_city,warehouse_country
+
+Dashboard :
+  Global_table:
+    columns :
+      - warehouse_name
+      - warehouse_country
+      - store_type
+      - store_name
+      - brand_name
+    rows :
+      - store_city
+
+  PieCharts :
+    - store_city
+    - store_type
+    - warehouse_city
+
+  BarCharts :
+    - warehouse_country
+

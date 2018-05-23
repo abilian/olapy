@@ -1,0 +1,56 @@
+# cube name <==> db name
+name : foodmart_with_config
+#csv | postgres | mysql ...
+source : csv
+
+# star building customized star schema
+xmla_authentication : False
+
+facts :
+  table_name : food_facts
+  keys:
+    product_id : Product.id
+    warehouse_id : Warehouse.id
+    store_id : Store.id
+
+  measures :
+#   by default, all number type columns in facts table, or you can specify them here
+    - units_ordered
+    - units_shipped
+    - supply_time
+
+# star building customized dimensions display in excel from the star schema
+dimensions:
+  #  IMPORTANT , put here facts table also (little bug)
+  - name : food_facts
+    displayName : food_facts
+
+
+
+  - name : Product
+    displayName : Product
+    columns :
+      - name : id
+      - name : brand_name
+      - name : product_name
+      - name : SKU
+        column_new_name : Stock_keeping_unit
+
+
+  - name : Store
+    displayName : Store
+    columns :
+      - name : id
+      - name : store_type
+      - name : store_name
+      - name : store_city
+      - name : store_country
+        column_new_name : country
+
+  - name : Warehouse
+    displayName : Warehouse
+    columns :
+      - name : id
+      - name : warehouse_name
+      - name : warehouse_city
+      - name : warehouse_country

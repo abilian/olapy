@@ -1,0 +1,41 @@
+dist: trusty
+sudo: false
+
+language: python
+cache:
+  pip: true
+
+services:
+  - mysql
+  - postgresql
+
+before_install:
+  - psql -c 'create database olapy_test;' -U postgres
+  - mysql -e 'create database olapy_test;'
+
+install:
+  - pip install -U 'pip<10' setuptools tox tox-travis wheel
+
+python:
+  - '2.7'
+  - '3.6'
+
+env:
+  - SQLALCHEMY_DATABASE_URI=
+  - SQLALCHEMY_DATABASE_URI=postgresql://postgres@localhost/olapy_test
+  - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
+
+matrix:
+  include:
+    - python: 3.6
+      env: TOXENV=lint
+
+script:
+  - tox
+
+notifications:
+  slack:
+    rooms:
+      - abilian:dTtRD7DHS4Dw3jfRrqytQWU6#code
+    on_success: change
+    on_failure: always

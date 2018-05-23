@@ -8,6 +8,8 @@
 .cache
 .coveralls.yml
 .ropeproject
+.mypy_cache
+.vscode
 *,cover
 
 sandbox

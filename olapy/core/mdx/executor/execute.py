@@ -1,485 +1,341 @@
 # -*- encoding: utf8 -*-
+"""
+Olapy main's module, this module manipulate Mdx Queries and execute them.
+Execution need two main objects:
 
-from __future__ import absolute_import, division, print_function
+    - table_loaded: which contains all tables needed to construct a cube
+    - star_schema: which is the cube
+
+Those two objects are constructed in three ways:
+
+    - manually with a config file, see :mod:`cube_loader_custom`
+    - automatically from csv files, if they respect olapy's
+      `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
+      see :mod:`cube_loader`
+    - automatically from database, also if they respect the start schema model, see :mod:`cube_loader_db`
+"""
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import itertools
 import os
-import re
 from collections import OrderedDict
 from os.path import expanduser
+from typing import List, Dict
 
+import attr
 import numpy as np
 import pandas as pd
-import pandas.io.sql as psql
+from pandas import DataFrame
 
-from ..tools.config_file_parser import ConfigParser
-from ..tools.connection import MyDB
+from ..parser.parse import Parser
+from ..tools.connection import get_dialect, get_dialect_name
+from .cube_loader import CubeLoader
+from .cube_loader_custom import CubeLoaderCustom
+from .cube_loader_db import CubeLoaderDB
 
-RUNNING_TOX = 'RUNNING_TOX' in os.environ
 
+@attr.s
+class MdxEngine(object):
+    """The main class for executing a query.
 
-class MdxEngine:
+    :param cube: It must be under ~/olapy-data/cubes/{cube_name}.
+
+        example: if cube = 'sales'
+        then full path -> *home_directory/olapy-data/cubes/sales*
+
+    :param cubes_folder: cubes folder, which is under olapy-data, and contains all csv cubes
+        by default *~/olapy-data/cubes/...
+    :param olapy_data_location: By default *~/olapy-data/*
+    :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
+    :param sql_engine: sql_alchemy engine if you don't want to use any database config file
+    :param source_type: source data input, Default csv
+    :param parser: mdx query parser
+    :param facts:  facts table name, Default **Facts**
+
     """
-    The principal class for executing a query.
 
-    :param cube_name: It must be under home_directory/olapy-data/CUBE_FOLDER (example : home_directory/olapy-data/cubes/sales)
-    :param cube_folder: parent cube folder name
-    :param mdx_query: query to execute
-    :param sep: separator in the csv files
-    """
+    cube = attr.ib(default=None)
+    facts = attr.ib(default="Facts")
+    source_type = attr.ib(default="csv")
+    parser = attr.ib(default=Parser())
+    csv_files_cubes = attr.ib(default=attr.Factory(list))
+    db_cubes = attr.ib(default=attr.Factory(list))
+    sqla_engine = attr.ib(default=None)
+    olapy_data_location = attr.ib()
+    cube_config = attr.ib(default=None)
+    tables_loaded = attr.ib(default=None)
+    star_schema_dataframe = attr.ib(default=None)
+    measures = attr.ib(default=None)
+    selected_measures = attr.ib(default=None)
+    cubes_folder = attr.ib(default="cubes")
 
-    CUBE_FOLDER = "cubes"
-    # (before instantiate MdxEngine I need to access cubes information)
-    csv_files_cubes = []
-    postgres_db_cubes = []
-    # to show just config file's dimensions
-    dimension_display_name = []
+    @olapy_data_location.default
+    def get_default_cubes_directory(self):
+        # with OLAPY_PATH env var, we can inject olap_web's flask instance_path olapy-data,
+        home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
+        if "olapy-data" not in home_directory:
+            home_directory = os.path.join(home_directory, "olapy-data")
 
-    def __init__(self,
-                 cube_name,
-                 cubes_path=None,
-                 mdx_query=None,
-                 cube_folder=CUBE_FOLDER,
-                 sep=';',
-                 fact_table_name="Facts"):
-        self.cube_folder = cube_folder
-        self.cube = cube_name
-        self.sep = sep
-        self.facts = fact_table_name
-        self.mdx_query = mdx_query
+        return home_directory
 
-        if cubes_path is None:
-            self.cube_path = self._get_default_cube_directory()
-        else:
-            self.cube_path = cubes_path
-
-        # to get cubes in db
-        self._ = self.get_cubes_names()
-        self.tables_loaded = self.load_tables()
-        # all measures
-        self.measures = self.get_measures()
-        self.load_star_schema_dataframe = self.get_star_schema_dataframe(
-            cube_name)
-        self.tables_names = self._get_tables_name()
-        # default measure is the first one
-        self.selected_measures = [self.measures[0]]
-
-    @classmethod
-    def get_cubes_names(cls):
-        """:return: list cubes name that exists in cubes folder (under ~/olapy-data/cubes) and postgres database (if connected)."""
-        # get csv files folders (cubes)
-        # toxworkdir does not expanduser properly under tox
-        if RUNNING_TOX:
-            home_directory = os.environ.get('HOME_DIR')
-        else:
-            home_directory = expanduser("~")
-
-        location = os.path.join(home_directory, 'olapy-data', cls.CUBE_FOLDER)
-
-        try:
-            MdxEngine.csv_files_cubes = [
-                file for file in os.listdir(location)
-                if os.path.isdir(os.path.join(location, file))
-            ]
-
-        except Exception:
-            print('no csv folders')
-            pass
-
-        # get postgres databases
-        try:
-            db = MyDB()
-            cursor = db.connection.cursor()
-            cursor.execute("""SELECT datname FROM pg_database
-            WHERE datistemplate = false;""")
-
-            MdxEngine.postgres_db_cubes = [
-                database[0] for database in cursor.fetchall()
-            ]
-        except Exception:
-            print('no database connexion')
-            pass
-
-        return MdxEngine.csv_files_cubes + MdxEngine.postgres_db_cubes
-
-    def _get_default_cube_directory(self):
-
-        # toxworkdir does not expanduser properly under tox
-        if RUNNING_TOX:
-            home_directory = os.environ.get('HOME_DIR')
-        else:
-            home_directory = expanduser("~")
-
-        return os.path.join(home_directory, 'olapy-data', self.cube_folder)
-
-    def _get_tables_name(self):
+    def _get_db_cubes_names(self):
         """
-        Get all tables names.
-
-        :return: list tables names
+        Get databases cubes names.
         """
-        return self.tables_loaded.keys()
+        # get databases names first , and them instantiate MdxEngine with this database, thus \
+        # it will try to construct the star schema either automatically or manually
 
-    def _load_table_config_file(self, cube_obj):
+        dialect = get_dialect(self.sqla_engine)
+        if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
+            self.sqla_engine = dialect.engine
+        return dialect.get_all_databases()
+
+    @staticmethod
+    def _get_csv_cubes_names(cubes_location):
         """
-        Load tables from config file.
-        
-        :param cube_obj: cubes object
-        :return: tables dict with table name as key and DataFrame as value
+        Get csv folder names
+
+        :param cubes_location: OlaPy cubes path, which is under olapy-data,
+            by default ~/olapy-data/cubes/...
         """
-        tables = {}
-        # just one facts table right now
-        self.facts = cube_obj.facts[0].table_name
 
-        db = MyDB(db=self.cube)
-
-        for table in cube_obj.dimensions:
-            value = psql.read_sql_query("SELECT * FROM {0}".format(table.name),
-                                        db.connection)
-
-            tables[table.name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-
-        # update table display name
-        for dimension in cube_obj.dimensions:
-            if dimension.displayName and dimension.name and dimension.displayName != dimension.name:
-                tables[dimension.displayName] = tables[dimension.name][
-                    dimension.columns]
-                MdxEngine.dimension_display_name.append(dimension.name)
-
-        return tables
-
-    def _load_tables_csv_files(self):
-        """
-        Load tables from csv files.
-        
-        :return: tables dict with table name as key and dataframe as value
-        """
-        tables = {}
-        cube = self.get_cube()
-        for file in os.listdir(cube):
-            # to remove file extension ".csv"
-            table_name = os.path.splitext(file)[0]
-            value = pd.read_csv(os.path.join(cube, file), sep=self.sep)
-            tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-
-        return tables
-
-    def _load_tables_db(self):
-        """
-        Load tables from database.
-        
-        :return: tables dict with table name as key and dataframe as value
-        """
-        tables = {}
-        db = MyDB(db=self.cube)
-        cursor = db.connection.cursor()
-        cursor.execute("""SELECT table_name FROM information_schema.tables
-                          WHERE table_schema = 'public'""")
-
-        for table_name in cursor.fetchall():
-            value = psql.read_sql_query(
-                'SELECT * FROM "{0}" '.format(table_name[0]), db.connection)
-
-            tables[table_name[0]] = value[[
-                col for col in value.columns if col.lower()[-3:] != '_id'
-            ]]
-        return tables
-
-    def load_tables(self):
-        """
-        Load all tables { Table name : DataFrame } of the current cube instance.
-        
-        :return: dict with key as table name and DataFrame as value
-        """
-        config_file_parser = ConfigParser(self.cube_path)
-        tables = {}
-        if config_file_parser.config_file_exist(
-        ) and self.cube in config_file_parser.get_cubes_names():
-            for cubes in config_file_parser.construct_cubes():
-
-                # TODO working with cubes.source == 'csv'
-                if cubes.source == 'postgres':
-                    tables = self._load_table_config_file(cubes)
-
-        elif self.cube in self.csv_files_cubes:
-            tables = self._load_tables_csv_files()
-
-        elif self.cube in self.postgres_db_cubes:
-            tables = self._load_tables_db()
-
-        return tables
-
-    def get_measures(self):
-        """:return: all numerical columns in facts table."""
-        # col.lower()[-2:] != 'id' to ignore any id column
         return [
-            col
-            for col in self.tables_loaded[self.facts].select_dtypes(
-                include=[np.number]).columns if col.lower()[-2:] != 'id'
+            file for file in os.listdir(cubes_location)
+            if os.path.isdir(os.path.join(cubes_location, file))
         ]
 
-    def _construct_star_schema_config_file(self, cube_name, cubes_obj):
+    def get_cubes_names(self):
         """
-        Construct star schema DataFrame from configuration file.
-        
-        :param cube_name:  cube name (or database name)
-        :param cubes_obj: cubes object
-        :return: star schema DataFrame
+        List all cubes (by default from csv folder only).
+
+        You can explicitly specify csv folder and databases
+        with *self.source_type = ('csv','db')*
+
+        :return: list of all cubes
         """
-        self.facts = cubes_obj.facts[0].table_name
-        db = MyDB(db=cube_name)
-        # load facts table
-        fusion = psql.read_sql_query("SELECT * FROM {0}".format(self.facts),
-                                     db.connection)
 
-        for fact_key, dimension_and_key in cubes_obj.facts[0].keys.items():
-            df = psql.read_sql_query(
-                "SELECT * FROM {0}".format(dimension_and_key.split('.')[0]),
-                db.connection)
+        cubes_folder_path = os.path.join(
+            self.olapy_data_location,
+            self.cubes_folder,
+        )
+        if "db" in self.source_type:
+            self.db_cubes = self._get_db_cubes_names()
+        if "csv" in self.source_type and os.path.exists(cubes_folder_path):
+            self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
+        return self.db_cubes + self.csv_files_cubes
 
-            fusion = fusion.merge(
-                df, left_on=fact_key, right_on=dimension_and_key.split('.')[1])
-
-            # TODO CHOSE BETWEEN THOSES DF
-            # if separated dimensions
-            # fusion = fusion.merge(df, left_on=fact_key,right_on=dimension_and_key.split('.')[1])
-
-        # TODO CHOSE BETWEEN THOSES DF
-        # if facts contains all dimensions
-        # fusion = facts
-
-        # measures in config-file only
-        if cubes_obj.facts[0].measures:
-            self.measures = cubes_obj.facts[0].measures
-
-        return fusion
-
-    def _construct_star_schema_csv_files(self, cube_name):
+    def load_cube(self,
+                  cube_name,
+                  fact_table_name="Facts",
+                  sep=";",
+                  measures=None,
+                  **kwargs):
         """
-        Construct star schema DataFrame from csv files.
-        
-        :param cube_name:  cube name (folder name)
-        :return: star schema DataFrame
+        After instantiating MdxEngine(), load_cube construct the cube
+        and load all tables.
+
+        :param cube_name: cube name
+        :param fact_table_name:  facts table name, Default **Facts**
+        :param sep: separator used in csv files
+        :param measures: if you want to explicitly specify measures
         """
-        cube = self.get_cube()
-        # loading facts table
-        fusion = pd.read_csv(
-            os.path.join(cube, self.facts + '.csv'), sep=self.sep)
-        for file_name in os.listdir(cube):
-            try:
-                fusion = fusion.merge(
-                    pd.read_csv(os.path.join(cube, file_name), sep=self.sep))
-            except:
-                print('No common column')
-                pass
+        self.cube = cube_name
+        self.facts = fact_table_name
+        # load cubes names
+        self.get_cubes_names()  # necessary, it fills csv_files_cubes and db_cubes
+        # load tables
+        self.tables_loaded = self.load_tables(sep=sep)
+        if measures:
+            self.measures = measures
+        else:
+            self.measures = self.get_measures()
+        if self.measures:
+            # default measure is the first one
+            self.selected_measures = [self.measures[0]]
+        # construct star_schema
+        if self.tables_loaded:
+            self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
-        return fusion
-
-    def _construct_star_schema_db(self, cube_name):
+    def load_tables(self, sep):
+        # type: (str) -> Dict[str, DataFrame]
         """
-        Construct star schema DataFrame from database.
-        
-        :param cube_name:  cube name (database name)
-        :return: star schema DataFrame
+        Load all tables as dict of { Table_name : DataFrame } for the current
+        cube instance.
+
+        :param sep: csv files separator.
+        :return: dict with table names as keys and DataFrames as values.
         """
-        db = MyDB(db=cube_name)
 
-        # load facts table
-        fusion = psql.read_sql_query('SELECT * FROM "{0}" '.format(self.facts),
-                                     db.connection)
+        cubes_folder_path = self.get_cube_path()
+        if (self.cube_config and self.cube_config["facts"] and
+                self.cube == self.cube_config["name"]):
+            cube_loader = CubeLoaderCustom(
+                cube_config=self.cube_config,
+                cube_path=cubes_folder_path,
+                sqla_engine=self.sqla_engine,
+                sep=sep,
+            )  # type: CubeLoader
+        elif self.cube in self.db_cubes:
+            dialect_name = get_dialect_name(str(self.sqla_engine))
+            if "postgres" in dialect_name:
+                self.facts = self.facts.lower()
+            cube_loader = CubeLoaderDB(self.sqla_engine)
+        # if not tables:
+        #     raise Exception(
+        #         'unable to load tables, check that the database is not empty',
+        #     )
+        # elif self.cube in self.csv_files_cubes:
+        else:
+            cube_loader = CubeLoader(cubes_folder_path, sep)
+        return cube_loader.load_tables()
 
-        cursor = db.connection.cursor()
-        cursor.execute("""SELECT table_name FROM information_schema.tables
-                              WHERE table_schema = 'public'""")
-        for db_table_name in cursor.fetchall():
-            try:
-                fusion = fusion.merge(
-                    psql.read_sql_query("SELECT * FROM {0}".format(
-                        db_table_name[0]), db.connection))
-            except:
-                print('No common column')
-                pass
+    def get_measures(self):
+        """:return: all numerical columns in Facts table."""
 
-        return fusion
+        # from postgres and oracle databases , all tables names are lowercase
+        # col.lower()[-2:] != 'id' to ignore any id column
+        if self.facts in list(self.tables_loaded.keys()):
+            not_id_columns = [
+                column for column in self.tables_loaded[self.facts].columns
+                if "id" not in column
+            ]
+            cleaned_facts = self.clean_data(
+                self.tables_loaded[self.facts],
+                not_id_columns,
+            )
+            return [
+                col
+                for col in cleaned_facts.select_dtypes(include=[np.number],
+                                                       ).columns
+                if col.lower()[-2:] != "id"
+            ]
 
-    def get_star_schema_dataframe(self, cube_name):
+    @staticmethod
+    def clean_data(star_schema_df, measures):
+        """
+        measure like this: 1 349 is not numeric so we try to transform it to 1349.
+
+        :param star_schema_df: start schema dataframe
+        :param measures: list of measures columns names
+
+        :return: cleaned columns
+        """
+        if measures:
+            for measure in measures:
+                if star_schema_df[measure].dtype == object:
+                    star_schema_df[measure] = star_schema_df[
+                        measure].str.replace(
+                            " ",
+                            "",
+                    )
+                    try:
+                        star_schema_df[measure] = star_schema_df[
+                            measure].astype("float",)
+                    except:
+                        star_schema_df = star_schema_df.drop(measure, 1)
+        return star_schema_df
+
+    def get_star_schema_dataframe(self, sep):
         """
         Merge all DataFrames as star schema.
 
-        :param cube_name: cube name with which we want to generate a star schema model
+        :param sep: csv files separator.
         :return: star schema DataFrame
         """
-        fusion = None
+        if (self.cube_config and self.cube_config["facts"] and
+                self.cube == self.cube_config["name"]):
+            self.facts = self.cube_config["facts"]["table_name"]
+            # measures in config-file only
+            if self.cube_config["facts"]["measures"]:
+                self.measures = self.cube_config["facts"]["measures"]
 
-        config_file_parser = ConfigParser(self.cube_path)
-        if config_file_parser.config_file_exist(
-        ) and cube_name in config_file_parser.get_cubes_names():
-            for cubes in config_file_parser.construct_cubes():
-                # TODO cubes.source == 'csv'
-                if cubes.source == 'postgres':
-                    fusion = self._construct_star_schema_config_file(
-                        cube_name, cubes)
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoaderCustom(
+                cube_config=self.cube_config,
+                cube_path=cube_path,
+                sqla_engine=self.sqla_engine,
+                sep=sep,
+            )
 
-        elif cube_name in self.csv_files_cubes:
-            fusion = self._construct_star_schema_csv_files(cube_name)
+        elif self.cube in self.db_cubes:
+            cube_loader = CubeLoaderDB(self.sqla_engine)
 
-        elif cube_name in self.postgres_db_cubes:
-            fusion = self._construct_star_schema_db(cube_name)
+        # elif self.cube in self.csv_files_cubes:
+        else:
+            cube_path = self.get_cube_path()
+            cube_loader = CubeLoader(cube_path)
 
-        return fusion[[
-            col for col in fusion.columns if col.lower()[-3:] != '_id'
+        fusion = cube_loader.construct_star_schema(self.facts)
+        star_schema_df = self.clean_data(fusion, self.measures)
+
+        return star_schema_df[[
+            col for col in fusion.columns if col.lower()[-3:] != "_id"
         ]]
 
     def get_all_tables_names(self, ignore_fact=False):
         """
-        Get list of tables names of the cube.
+        Get list of tables names.
 
-        :param ignore_fact: return all table name with facts table name
+        :param ignore_fact: return all table name with or without facts table name
         :return: all tables names
         """
         if ignore_fact:
-            return [tab for tab in self.tables_names if self.facts not in tab]
-        return self.tables_names
+            return [tab for tab in self.tables_loaded if self.facts not in tab]
 
-    def get_cube(self):
+        return list(self.tables_loaded)
+
+    def get_cube_path(self):
         """
-        Get path to the cube (example /home_directory/olapy-data/cubes).
+        Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
-        return os.path.join(self.cube_path, self.cube)
-
-    # TODO temporary function
-    @staticmethod
-    def get_tuples(query, start=None, stop=None):
-        """
-        Get all tuples in the mdx query.
-
-        example::
-
-
-            SELECT  {
-                    [Geography].[Geography].[All Continent].Members,
-                    [Geography].[Geography].[Continent].[Europe]
-                    } ON COLUMNS,
-
-                    {
-                    [Product].[Product].[Company]
-                    } ON ROWS
-
-                    FROM {sales}
-
-            it returns :
-            
-                [
-                ['Geography','Geography','Continent'],
-                ['Geography','Geography','Continent','Europe'],
-                ['Product','Product','Company']
-                ]
-
-
-        :param query: mdx query
-        :param start: key-word in the query where we start (examples start = SELECT)
-        :param stop:  key-word in the query where we stop (examples start = ON ROWS)
-        :return:  nested list of tuples (see the example)
-        """
-        # french characters
-        # or use new regex 2017.02.08
-        regex = "(\[[\w+\d ]+\](\.\[[\w+\d\.\,\s\_\-\é\ù\è\ù\û\ü\ÿ\€\’\à\â\æ\ç\é\è\ê\ë\ï\î" \
-                "\ô\œ\Ù\Û\Ü\Ÿ\À\Â\Æ\Ç\É\È\Ê\Ë\Ï\Î\Ô\Œ\& ]+\])*\.?((Members)|(\[Q\d\]))?)"
-
-        if start is not None:
-            start = query.index(start)
-        if stop is not None:
-            stop = query.index(stop)
-
-        # clean the query (remove All, Members...)
-        return [[
-            tup_att.replace('All ', '').replace('[', "").replace("]", "")
-            for tup_att in tup[0].replace('.Members', '').split('.')
-        ]
-                for tup in re.compile(regex).findall(
-                    query.encode("utf-8")[start:stop])
-                if len(tup[0].split('.')) > 1]
-
-    # TODO temporary function
-    def decorticate_query(self, query):
-        """
-        Get all tuples that exists in the MDX Query by axes.
-
-        :param query: MDX Query
-        :return: dict of axis as key and tuples as value
-        """
-        tuples_on_mdx_query = self.get_tuples(query)
-        on_rows = []
-        on_columns = []
-        on_where = []
-
-        try:
-
-            # ON ROWS
-            if 'ON ROWS' in query:
-                stop = 'ON ROWS'
-                if 'ON COLUMNS' in query:
-                    start = 'ON COLUMNS'
-                else:
-                    start = 'SELECT'
-                on_rows = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS
-            if 'ON COLUMNS' in query:
-                start = 'SELECT'
-                stop = 'ON COLUMNS'
-                on_columns = self.get_tuples(query, start, stop)
-
-            # WHERE
-            if 'WHERE' in query:
-                start = 'FROM'
-                on_where = self.get_tuples(query, start)
-
-        except:
-            raise SyntaxError('Please check your MDX Query')
-
-        return {
-            'all': tuples_on_mdx_query,
-            'columns': on_columns,
-            'rows': on_rows,
-            'where': on_where
-        }
+        return os.path.join(
+            self.olapy_data_location,
+            self.cubes_folder,
+            self.cube,
+        )
 
     @staticmethod
     def change_measures(tuples_on_mdx):
+        """Set measures to which exists in the query.
+
+        :param tuples_on_mdx: List of tuples
+
+            example ::
+
+             [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
+
+        :return: measures column's names *(Amount for the example)*
         """
-        Set measures to which exists in the query.
-        
-        :param tuples_on_mdx: list of tuples:
-            
-            
-            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-            
-            
-        :return: measures column's names
-        """
-        return [
-            tple[-1] for tple in tuples_on_mdx if tple[0].upper() == "MEASURES"
-        ]
+
+        list_measures = []
+        for tple in tuples_on_mdx:
+            if tple[0].upper() == "MEASURES" and tple[-1] not in list_measures:
+                list_measures.append(tple[-1])
+
+        return list_measures
 
     def get_tables_and_columns(self, tuple_as_list):
-        # TODO update docstring
-        """
-        Get used dimensions and columns in the MDX Query (useful for DataFrame -> xmla response transformation).
+        """Get used dimensions and columns in the MDX Query.
+
+        Useful for DataFrame -> xmla response transformation.
 
         :param tuple_as_list: list of tuples
 
-            example : [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
+        example::
+
+            [
+            '[Measures].[Amount]',
+            '[Product].[Product].[Crazy Development]',
+            '[Geography].[Geography].[Continent]'
+            ]
 
         :return: dimension and columns dict
 
-            example :
+        example::
+
             {
             Geography : ['Continent','Country'],
             Product : ['Company']
@@ -487,7 +343,6 @@ class MdxEngine:
             }
         """
         axes = {}
-        # TODO optimize
         for axis, tuples in tuple_as_list.items():
             measures = []
             tables_columns = OrderedDict()
@@ -495,59 +350,60 @@ class MdxEngine:
             # SELECT {[Measures].[Amount],[Measures].[Count]} ON COLUMNS
             # we have to add measures directly to tables_columns
             for tupl in tuples:
-                if tupl[0].upper() == 'MEASURES':
+                if tupl[0].upper() == "MEASURES":
                     if tupl[-1] not in measures:
                         measures.append(tupl[-1])
                         tables_columns.update({self.facts: measures})
                     else:
                         continue
+
                 else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(tupl[2:])]
-                    })
+                        self.tables_loaded[tupl[0]].columns[:len(
+                            tupl[2:None if self.parser.hierarchized_tuples()
+                                 else -1],)],
+                    },)
 
             axes.update({axis: tables_columns})
-
         return axes
 
-    def execute_one_tuple(self, tuple_as_list, Dataframe_in, columns_to_keep):
+    def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
-        Filter a DataFrame (Dataframe_in) with one tuple.   
+        Filter a DataFrame (Dataframe_in) with one tuple.
 
-            Example ::
-            
-    
-                tuple = ['Geography','Geography','Continent','Europe','France','olapy']
-        
-                Dataframe_in in :
-        
-                +-------------+----------+---------+---------+---------+
-                | Continent   | Country  | Company | Article | Amount  |
-                +=============+==========+=========+=========+=========+
-                | America     | US       | MS      | SSAS    | 35150   |
-                +-------------+----------+---------+---------+---------+
-                | Europe      |  France  | AB      | olapy   | 41239   |
-                +-------------+----------+---------+---------+---------+
-                |  .....      |  .....   | ......  | .....   | .....   |
-                +-------------+----------+---------+---------+---------+
-        
-                out :
-        
-                +-------------+----------+---------+---------+---------+
-                | Continent   | Country  | Company | Article | Amount  |
-                +=============+==========+=========+=========+=========+
-                | Europe      |  France  | AB      | olapy   | 41239   |
-                +-------------+----------+---------+---------+---------+
+        Example ::
+
+            tuple = ['Geography','Geography','Continent','Europe','France','olapy']
+
+            Dataframe_in in :
+
+            +-------------+----------+---------+---------+---------+
+            | Continent   | Country  | Company | Article | Amount  |
+            +=============+==========+=========+=========+=========+
+            | America     | US       | MS      | SSAS    | 35150   |
+            +-------------+----------+---------+---------+---------+
+            | Europe      |  France  | AB      | olapy   | 41239   |
+            +-------------+----------+---------+---------+---------+
+            |  .....      |  .....   | ......  | .....   | .....   |
+            +-------------+----------+---------+---------+---------+
+
+            out :
+
+            +-------------+----------+---------+---------+---------+
+            | Continent   | Country  | Company | Article | Amount  |
+            +=============+==========+=========+=========+=========+
+            | Europe      |  France  | AB      | olapy   | 41239   |
+            +-------------+----------+---------+---------+---------+
 
 
         :param tuple_as_list: tuple as list
-        :param Dataframe_in: DataFrame in with you want to execute tuple
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx) 
+        :param dataframe_in: DataFrame in with you want to execute tuple
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
             other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
-        df = Dataframe_in
+        df = dataframe_in
         #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
         if len(tuple_as_list) == 3:
@@ -566,15 +422,12 @@ class MdxEngine:
                 df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
                          == tup_att)]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
-
         return df[cols + self.selected_measures]
 
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
         """
-        Solution to fix BUG : https://github.com/pandas-dev/pandas/issues/15525
-
-        if you want to concat two dataframes with different columns like :
+        if you want to concat two Dataframes with different columns like :
 
         +-------------+---------+
         | Continent   | Amount  |
@@ -632,8 +485,10 @@ class MdxEngine:
         | Europe      | -1           |41239    |
         +-------------+--------------+---------+
 
+        :param dataframe1: first DataFrame
+        :param dataframe2: second DataFrame
 
-        :return: two DataFrames with same columns
+        :return: Two DataFrames with same columns
         """
         df_with_less_columns = dataframe1
         df_with_more_columns = dataframe2
@@ -652,159 +507,250 @@ class MdxEngine:
 
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
         """
-        If we have multiple dimensions, with many columns like:
+        If we have multiple dimensions, with many columns like::
 
             columns_to_keep :
-    
+
                 Geo  -> Continent,Country
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                  
 
-        we have to use only dimension's columns of current dimension that exist in tuple_as_list and keep other dimensions columns
-        
-        so if tuple_as_list = ['Geography','Geography','Continent']
+        we have to use only dimension's columns of current dimension that exist
+        in tuple_as_list and keep other dimensions columns.
 
-        columns_to_keep will be:
+        So if tuple_as_list = ['Geography','Geography','Continent']
+
+        then columns_to_keep will be::
 
             columns_to_keep :
-    
+
                 Geo  -> Continent
-                
+
                 Prod -> Company
-                
+
                 Time -> Year,Month,Day
-                
 
         we need columns_to_keep for grouping our columns in the DataFrame
 
-        :param tuple_as_list:  example : ['Geography','Geography','Continent']
-        :param columns_to_keep:  
-            
-            example :
-                 
+        :param tuple_as_list:
+
+            example::
+
+                ['Geography','Geography','Continent']
+
+        :param columns_to_keep:
+
+            example::
+
                 {
-                
-                'Geography':
-                 
-                    ['Continent','Country'],
-                    
-                'Time': 
-                
-                    ['Year','Month','Day']
+                'Geography': ['Continent','Country'],
+                'Time': ['Year','Month','Day']
                 }
-                
+
         :return: updated columns_to_keep
         """
-        if len(
-                tuple_as_list
-        ) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns:
+
+        columns = 2 if self.parser.hierarchized_tuples() else 3
+        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in
+                self.tables_loaded[tuple_as_list[0]].columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[2:])]
+                tuple_as_list[columns:],)]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
-    def execute_mdx(self):
+    @staticmethod
+    def _uniquefy_tuples(tuples):
         """
-        Execute an MDX Query.
+        Remove redundant tuples.
 
-        usage ::
+        :param tuples: list of string of tuples.
+        :return: list of string of unique tuples.
+        """
+        uniquefy = []
+        for tup in tuples:
+            if tup not in uniquefy:
+                uniquefy.append(tup)
 
-            executer = MdxEngine('sales')
-            executer.mdx_query = "SELECT  FROM [sales] WHERE ([Measures].[Amount])"
-            executer.execute_mdx()
+        return uniquefy
+
+    def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
+        """
+        Construct DataFrame of many groups mdx query.
+
+        many groups mdx query is something like:
+
+        example with 3 groups::
+
+            SELECT{ ([A].[A].[A])
+                    ([B].[B].[B])
+                    ([C].[C].[C]) }
+            FROM [D]
+
+        :param tuples_on_mdx_query: list of string of tuples.
+        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+        :return: Pandas DataFrame.
+        """
+        # get only used columns and dimensions for all query
+        star_df = self.star_schema_dataframe
+        df_to_fusion = []
+        table_name = tuples_on_mdx_query[0][0]
+        # in every tuple
+        for tupl in tuples_on_mdx_query:
+            # if we have measures in columns or rows axes like :
+            # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
+            # we use only used columns for dimension in that tuple and keep
+            # other dimension's columns
+            self.update_columns_to_keep(tupl, columns_to_keep)
+            # a tuple with new dimension
+            if tupl[0] != table_name:
+                # if we change dimension , we have to work on the
+                # exection's result on previous DataFrames
+
+                df = df_to_fusion[0]
+                for next_df in df_to_fusion[1:]:
+                    df = pd.concat(self.add_missed_column(df, next_df))
+
+                table_name = tupl[0]
+                df_to_fusion = []
+                star_df = df
+
+            df_to_fusion.append(
+                self.execute_one_tuple(
+                    tupl,
+                    star_df,
+                    columns_to_keep.values(),
+                ),)
+
+        return df_to_fusion
+
+    def fusion_dataframes(self, df_to_fusion):
+        # type: (List[DataFrame]) -> DataFrame
+        """Concat chunks of DataFrames.
+
+        :param df_to_fusion: List of Pandas DataFrame.
+        :return: a Pandas DataFrame.
+        """
+
+        df = df_to_fusion[0]
+        for next_df in df_to_fusion[1:]:
+            df = pd.concat(self.add_missed_column(df, next_df))
+        return df
+
+    def check_nested_select(self):
+        # type: () -> bool
+        """
+        Check if the MDX Query is Hierarchized and contains many tuples groups.
+        """
+        return (not self.parser.hierarchized_tuples() and
+                len(self.parser.get_nested_select()) >= 2)
+
+    def nested_tuples_to_dataframes(self, columns_to_keep):
+        """
+        Construct DataFrame of many groups.
+
+        :param columns_to_keep: :func:`columns_to_keep`
+            (useful for executing many tuples, for instance execute_mdx).
+        :return: a list of Pandas DataFrame.
+        """
+        dfs = []
+        grouped_tuples = self.parser.get_nested_select()
+        for tuple_groupe in grouped_tuples:
+            transformed_tuple_groups = []
+            for tuple in self.parser.split_group(tuple_groupe):
+                tuple = tuple.split("].[")
+                tuple[0] = tuple[0].replace("[", "")
+                tuple[-1] = tuple[-1].replace("]", "")
+                if tuple[0].upper() != "MEASURES":
+                    transformed_tuple_groups.append(tuple)
+
+            dfs.append(
+                self.tuples_to_dataframes(
+                    transformed_tuple_groups,
+                    columns_to_keep,
+                )[0],)
+
+        return dfs
+
+    def clean_mdx_query(self, mdx_query):
+        clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
+        # todo property in parser
+        self.parser.mdx_query = clean_query
+        return clean_query
+
+    def execute_mdx(self, mdx_query):
+        """Execute an MDX Query.
+
+        Usage ::
+
+            executor = MdxEngine()
+            executor.load_cube('sales')
+            query = "SELECT FROM [sales] WHERE ([Measures].[Amount])"
+            executor.execute_mdx(query)
+
+        :param mdx_query: Mdx Query
 
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
 
+        example::
+
             {
-            'result' : DataFrame result
-            'columns_desc' : dict of dimension and columns used
+            'result': DataFrame result
+            'columns_desc': dict of dimension and columns used
             }
 
         """
-        # use measures that exists on where or insides axes
-        query_axes = self.decorticate_query(self.mdx_query)
-        if self.change_measures(query_axes['all']):
-            self.selected_measures = self.change_measures(query_axes['all'])
+        query = self.clean_mdx_query(mdx_query)
 
-        # get only used columns and dimensions for all query
-        start_df = self.load_star_schema_dataframe
+        # use measures that exists on where or insides axes
+        query_axes = self.parser.decorticate_query(query)
+        if self.change_measures(query_axes["all"]):
+            self.selected_measures = self.change_measures(query_axes["all"])
+
         tables_n_columns = self.get_tables_and_columns(query_axes)
 
         columns_to_keep = OrderedDict(
             (table, columns)
-            for table, columns in tables_n_columns['all'].items()
+            for table, columns in tables_n_columns["all"].items()
             if table != self.facts)
-        # if we have measures on axes we have to ignore them
+
         tuples_on_mdx_query = [
-            tup for tup in query_axes['all'] if tup[0].upper() != 'MEASURES'
+            tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
         ]
+
+        if not self.parser.hierarchized_tuples():
+            tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
+            tuples_on_mdx_query.sort(key=lambda x: x[0])
+
         # if we have tuples in axes
-        # to avoid prob with query like this: SELECT  FROM [Sales] WHERE ([Measures].[Amount])
+        # to avoid prob with query like this:
+        # SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
 
-            df_to_fusion = []
-            table_name = tuples_on_mdx_query[0][0]
-            # in every tuple
-            for tupl in tuples_on_mdx_query:
+            if self.check_nested_select():
+                df_to_fusion = self.nested_tuples_to_dataframes(
+                    columns_to_keep,)
+            else:
+                df_to_fusion = self.tuples_to_dataframes(
+                    tuples_on_mdx_query,
+                    columns_to_keep,
+                )
 
-                # if we have measures in columns or rows axes like :
-                # SELECT {[Measures].[Amount],[Measures].[Count], [Customers].[Geography].[All Regions]} ON COLUMNS
-                # we use only used columns for dimension in that tuple and keep other dimension's columns
-                self.update_columns_to_keep(tupl, columns_to_keep)
-
-                # a tuple with new dimension
-                if tupl[0] != table_name:
-                    # if we change dimension , we have to work on the exection's result on previous DataFrames
-
-                    # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-                    # solution 1 .astype(str) ( take a lot of time from execution)
-                    # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-                    # solution 3 a['ccc'] = -1
-                    # solution 4 finding something with merge
-
-                    # fix 3 test
-                    df = df_to_fusion[0]
-                    for next_df in df_to_fusion[1:]:
-                        df = pd.concat(self.add_missed_column(df, next_df))
-                    # df = pd.concat(df_to_fusion)
-
-                    table_name = tupl[0]
-                    df_to_fusion = []
-                    start_df = df
-
-                df_to_fusion.append(
-                    self.execute_one_tuple(tupl, start_df,
-                                           columns_to_keep.values()))
+            df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values()))
+                itertools.chain.from_iterable(columns_to_keep.values(),))
 
-            # TODO BUG !!! https://github.com/pandas-dev/pandas/issues/15525
-            # solution 1 .astype(str) ( take a lot of time from execution)
-            # solution 2 a['ccc'] = "" ( good solution i think ) also it avoid nan values and -1 :D !!
-            # solution 3 a['ccc'] = -1 (the best)
-            # solution 4 finding something with merge
-
-            # fix 3 test
-            df = df_to_fusion[0]
-            for next_df in df_to_fusion[1:]:
-                df = pd.concat(self.add_missed_column(df, next_df))
-
-            # TODO groupby in web demo (remove it for more performance)
-            # TODO margins=True for columns total !!!!!
-            return {
-                'result': df.groupby(cols).sum()[self.selected_measures],
-                'columns_desc': tables_n_columns
-            }
+            sort = self.parser.hierarchized_tuples()
+            # margins=True for columns total !!!!!
+            result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
 
         else:
-            return {
-                'result': start_df[self.selected_measures].sum().to_frame().T,
-                'columns_desc': tables_n_columns
-            }
+            result = self.star_schema_dataframe[
+                self.selected_measures].sum().to_frame().T
+
+        return {"result": result, "columns_desc": tables_n_columns}

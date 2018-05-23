@@ -1,0 +1,28 @@
+#cube name <=> db name
+name : Black_Friday
+#csv | postgres | mysql| mssql | oracle
+source : csv
+
+Dashboard :
+  Global_table:
+    columns :
+      - Year
+      - Country
+    rows :
+      - Company
+      - Category
+
+  PieCharts :
+    - Year
+    - Country
+    - Sub_Category
+
+  BarCharts :
+    - Year
+    - Category
+
+#  LineCharts :
+#    table : Year
+#    columns :
+#      - 2010
+#      - 2011

@@ -1,87 +1,238 @@
-from __future__ import absolute_import, division, print_function
+# -*- encoding: utf8 -*-
+"""
+Parser for MDX queries, and Break it in parts.
+"""
 
-from grako.model import ModelBuilderSemantics
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
-from .gen_parser.mdxparser import MdxParserGen
-from .gen_parser.models import SelectStatement
+import regex
 
 
-class MdxParser:
-    """Parse the mdx query and split it into well-defined parts."""
-    START = 'MDX_statement'
+# FIXME: make this regex more readable (split it)
+REGEX = regex.compile(
+    "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
+    '\w+\d\.\,\s\(\)\_\-\:"\’\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
+
+
+class Parser(object):
+    """
+    Class for Parsing a MDX query
+    """
+    def __init__(self, mdx_query=None):
+        self.mdx_query = mdx_query
 
     @staticmethod
-    def parsing_mdx_query(axis, query):
-        """Split the query into axis.
+    def split_tuple(tupl):
+        """
+        Split Tuple (String) into items.
 
-        **Example**::
+        example::
+
+             input : '[Geography].[Geography].[Continent].[Europe]'
+
+             output : ['Geography','Geography','Continent','Europe']
+
+        :param tupl: MDX Tuple as String
+        :return: Tuple items in list
+        """
+        split_tupl = tupl.strip(" \t\n").split("].[")
+        split_tupl[0] = split_tupl[0].replace("[", "")
+        split_tupl[-1] = split_tupl[-1].replace("]", "")
+        return split_tupl
+
+    @staticmethod
+    def get_tuples(query, start=None, stop=None):
+        """Get all tuples in the mdx query.
+
+        Example::
 
 
-            SELECT
+            SELECT  {
+                        [Geography].[Geography].[All Continent].Members,
+                        [Geography].[Geography].[Continent].[Europe]
+                    } ON COLUMNS,
 
-            { [Geography].[Geo].[Country].[France],
-              [Geography].[Geo].[Country].[Spain] } ON COLUMNS,
+                    {
+                        [Product].[Product].[Company]
+                    } ON ROWS
 
-            { [Product].[Prod].[Company].[Crazy Development] } ON ROWS
+                    FROM {sales}
 
-              FROM [Sales]
+        It returns ::
 
-              WHERE [Time].[Calendar].[Year].[2010]
+            [
+                ['Geography','Geography','Continent'],
+                ['Geography','Geography','Continent','Europe'],
+                ['Product','Product','Company']
+            ]
 
 
-        +------------+------------------------------------------------+
-        |            | [Geography].[Geo].[Country].[France]           |
-        | column     |                                                |
-        |            | [Geography].[Geo].[Country].[Spain]            |
-        +------------+------------------------------------------------+
-        | row        | [Product].[Prod].[Company].[Crazy Development] |
-        +------------+------------------------------------------------+
-        | cube       | [Sales]                                        |
-        +------------+------------------------------------------------+
-        | condition  | [Time].[Calendar].[Year].[2010]                |
-        +------------+------------------------------------------------+
+        :param query: mdx query
+        :param start: keyword in the query where we start (examples start = SELECT)
+        :param stop:  keyword in the query where we stop (examples start = ON ROWS)
+
+        :return:  nested list of tuples (see the example)
+        """
+        if start is not None:
+            start = query.index(start)
+        if stop is not None:
+            stop = query.index(stop)
+
+        # clean the query (remove All, Members...)
+        return [[
+            tup_att.replace("All ", "").replace("[", "").replace("]", "")
+            for tup_att in tup[0].replace(".Members", "").replace(
+                ".MEMBERS",
+                "",
+            ).split("].[",)
+            if tup_att
+        ]
+            for tup in REGEX.findall(query[start:stop])
+            if len(tup[0].split("].[")) > 1]
+
+    def decorticate_query(self, query):
+        """Get all tuples that exists in the MDX Query by axes.
+
+        Example::
+
+            query : SELECT  {
+                                [Geography].[Geography].[All Continent].Members,
+                                [Geography].[Geography].[Continent].[Europe]
+                            } ON COLUMNS,
+
+                            {
+                                [Product].[Product].[Company]
+                            } ON ROWS
+
+                            FROM {sales}
+
+            output : {
+                    'all': [   ['Geography', 'Geography', 'Continent'],
+                               ['Geography', 'Geography', 'Continent', 'Europe'],
+                               ['Product', 'Product', 'Company']],
+
+                    'columns': [['Geography', 'Geography', 'Continent'],
+                                ['Geography', 'Geography', 'Continent', 'Europe']],
+
+                    'rows': [['Product', 'Product', 'Company']],
+                    'where': []
+                    }
 
         :param query: MDX Query
-        :param axis: column | row | cube | condition | all
-        :return: Tuples in the axis, from the MDX query
+        :return: dict of axis as key and tuples as value
         """
-        model = MdxParserGen(semantics=ModelBuilderSemantics(
-            types=[SelectStatement]))
-        ast = model.parse(query, rule_name=MdxParser.START, ignorecase=True)
-        if axis == "column":
-            if ast.select_statement.axis_specification_columns is not None and \
-                    u'' in ast.select_statement.axis_specification_columns:
-                ast.select_statement.axis_specification_columns.remove(u'')
-            return ast.select_statement.axis_specification_columns
-        elif axis == "row":
-            if ast.select_statement.axis_specification_rows is not None and \
-                    u'' in ast.select_statement.axis_specification_rows:
-                ast.select_statement.axis_specification_rows.remove(u'')
-            return ast.select_statement.axis_specification_rows
-        elif axis == "cube":
-            if ast.select_statement.cube_specification is not None and \
-                    u'' in ast.select_statement.cube_specification:
-                ast.select_statement.cube_specification.remove(u'')
-            return ast.select_statement.cube_specification[1] if \
-                isinstance(ast.select_statement.cube_specification, list) \
-                else ast.select_statement.cube_specification
-        elif axis == "condition":
-            if ast.select_statement.condition_specification is not None and \
-                    type(ast.select_statement.condition_specification) not in (
-                    unicode, str) and \
-                    u'' in ast.select_statement.condition_specification:
-                ast.select_statement.condition_specification.remove(u'')
-            return ast.select_statement.condition_specification
-        elif axis == "all":
 
-            return 'Operation = {} \n' \
-                   'Columns = {} \n' \
-                   'Rows = {} \n' \
-                   'From = {} \n' \
-                   'Where = {} \n'.format(ast.select_statement.name,
-                                          ast.select_statement.from_,
-                                          ast.select_statement.axis_specification_columns,
-                                          ast.select_statement.axis_specification_rows,
-                                          ast.select_statement.cube_specification,
-                                          ast.select_statement.condition_specification,
-                                          )
+        # Hierarchize -> ON COLUMNS , ON ROWS ...
+        # without Hierarchize -> ON 0
+        try:
+            query = query.decode("utf-8")
+        except AttributeError:
+            pass
+        tuples_on_mdx_query = self.get_tuples(query)
+        on_rows = []
+        on_columns = []
+        on_where = []
+
+        try:
+            # ON ROWS
+            if "ON ROWS" in query:
+                stop = "ON ROWS"
+                if "ON COLUMNS" in query:
+                    start = "ON COLUMNS"
+                else:
+                    start = "SELECT"
+                on_rows = self.get_tuples(query, start, stop)
+
+            # ON COLUMNS
+            if "ON COLUMNS" in query:
+                start = "SELECT"
+                stop = "ON COLUMNS"
+                on_columns = self.get_tuples(query, start, stop)
+
+            # ON COLUMNS (AS 0)
+            if "ON 0" in query:
+                start = "SELECT"
+                stop = "ON 0"
+                on_columns = self.get_tuples(query, start, stop)
+
+            # WHERE
+            if "WHERE" in query:
+                start = "FROM"
+                on_where = self.get_tuples(query, start)
+
+        except BaseException:  # pragma: no cover
+            raise SyntaxError("Please check your MDX Query")
+
+        return {
+            "all": tuples_on_mdx_query,
+            "columns": on_columns,
+            "rows": on_rows,
+            "where": on_where,
+        }
+
+    @staticmethod
+    def add_tuple_brackets(tupl):
+        """
+        After splitting tuple with :func:`split_group`, you got some tuple like **aa].[bb].[cc].[dd**
+        so add_tuple_brackets fix this by adding missed brackets **[aa].[bb].[cc].[dd]**.
+
+        :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
+        :return: [aa].[bb].[cc].[dd] as string.
+        """
+        tupl = tupl.strip()
+        if tupl[0] != "[":
+            tupl = "[" + tupl
+        if tupl[-1] != "]":
+            tupl = tupl + "]"
+        return tupl
+
+    def split_group(self, group):
+        """
+        Split group of tuples.
+        example::
+
+            group : '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'
+
+            out : ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]']
+
+        :param group: Group of tuple as string.
+        :return: Separated tuples as list.
+        """
+        split_group = group.replace("\n", "").replace("\t", "").split("],")
+        return list(
+            map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
+
+    def get_nested_select(self):
+        """
+        Get tuples groups in query like ::
+
+                Select {
+                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount]),
+
+                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+                    [Geography].[Geography].[Continent].[Europe],
+                    [Measures].[Amount])
+                    }
+
+                out :
+                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
+                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
+
+                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
+                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
+
+        :return: All groups as list of strings.
+
+        """
+        return regex.findall(r"\(([^()]+)\)", self.mdx_query)
+
+    def hierarchized_tuples(self):
+        # type: () -> bool
+        """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
+
+        :return: True | False
+        """
+        return "Hierarchize" in self.mdx_query

@@ -1,0 +1,5 @@
+dbms : oracle
+port : 1521
+user : hr
+host : localhost
+password : hr

@@ -1,0 +1,22 @@
+##### Configuration file to connect to Database
+##### This must be under olapy-dir (default : home/user_name/olapy-data)
+
+#dbms : postgres         # mysql | oracle | mssql | oracle | sqlite
+#path : /home/mouadh/sales.sqlite # If dbms is sqlite , just put the path to the database file. host, port ... not needed
+
+#host : localhost
+#port : 5432             # 3306 default for mysql || 1521 default for ORACLE
+#user : postgres
+#password : root
+
+#### if you use sql server, add this line and change sql server driver version if need
+#sql_server_driver : SQL Server Native Client 11.0
+
+
+
+######### for ETL #####
+#db_name : tutorial
+#driver : postgres        #mysql | postgres
+#--------- IMPORTANT ---------
+# for sql server 'driver':mssql+pyodbc or mssql+pymssql
+connection_string : postgresql+psycopg2://postgres:root@localhost:5432

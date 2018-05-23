@@ -1,0 +1,5 @@
+product_key,Company,Article,Licence
+1,Crazy Development,olapy,Corporate
+2,Crazy Development,olapy,Partnership
+3,Crazy Development,olapy,Personal
+4,Crazy Development,olapy,Startup

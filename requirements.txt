@@ -4,29 +4,36 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-click==6.7                # via flask
-Flask-Login==0.3.2
-Flask-Script==2.0.5
-Flask-Session==0.3.0
-Flask-SQLAlchemy==2.1
-Flask-WTF==0.12
-flask==0.12.1
-grako==3.22.0
-itsdangerous==0.24        # via flask
-jinja2==2.9.6             # via flask
-lxml==3.6.0
-markupsafe==1.0           # via jinja2
-numpy==1.12.1             # via pandas
-pandas==0.19.2
-plotly==1.12.9
-psycopg2==2.7.1
-python-dateutil==2.6.0    # via pandas
-pytz==2017.2              # via pandas, plotly, spyne
-requests==2.13.0          # via plotly
-six==1.10.0               # via plotly, python-dateutil
+appdirs==1.4.3            # via fs
+attrs==18.1.0
+awesome-slugify==1.6.5
+bonobo-sqlalchemy==0.5.1
+bonobo==0.5.2
+certifi==2018.4.16        # via requests
+chardet==3.0.4            # via requests
+click==6.7
+colorama==0.3.9           # via bonobo
+fs==2.0.21                # via bonobo
+idna==2.6                 # via requests
+lxml==4.2.1
+numpy==1.14.3             # via pandas
+packaging==16.8           # via bonobo
+pandas==0.23.0
+pbr==4.0.3                # via stevedore
+psutil==5.4.5             # via bonobo
+pyparsing==2.2.0          # via packaging
+python-dateutil==2.7.3    # via pandas
+python-dotenv==0.8.2
+pytz==2018.4              # via fs, pandas, spyne
+pyyaml==3.12
+regex==2018.2.21
+requests==2.18.4          # via bonobo
+six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.12.14
-sqlalchemy==1.0.17
-treelib==1.3.5
-werkzeug==0.12.1          # via flask, flask-wtf
-wtforms==2.1
-XlsxWriter==0.9.3
+sqlalchemy==1.1.18
+stevedore==1.28.0         # via bonobo
+typing==3.6.4
+unidecode==0.4.21         # via awesome-slugify
+urllib3==1.22             # via requests
+werkzeug==0.14.1
+xmlwitch==0.3

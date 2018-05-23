@@ -3,102 +3,107 @@
 Cube customization
 ==================
 
-If you want to customize a cube, you can do this with a configuration file (home-directory/olapy-data/cubes/cubes-config.xml)
+If you don't want to follow olapy cubes rules and  you want to customize olapy cube construction, you can use a configuration file, you can find the default example under ::
 
-Here is an examples of configuration::
+    ~/olapy-data/cubes/cubes-config.xml for mac/linux
+
+    C:\\User\\{USER_NAME}\\olapy-data\\cubes\\cubes-config.xml for windows
+
+
+Here is an examples of configuration:
+
+Assuming we have two tables as follows under 'labster' folder
+
+table 1: stats_line (which is the facts table)
+
++----------------+---------+--------------------+----------------------+
+| departement_id | amount  |    monthly_salary  |  total monthly cost  |
++----------------+---------+--------------------+----------------------+
+|  111           |  1000   |      2000          |    3000              |
++----------------+---------+--------------------+----------------------+
+| ...            |         |                    |                      |
++----------------+---------+--------------------+----------------------+
+
+table 2: orgunit (which is a dimension)
+
++------+---------------+-----------+------------------+------------------+
+| id   | type          |  name     |  acronym         | other colums.....|
++------+---------------+-----------+------------------+------------------+
+|  111 | humanitarian  |  humania  | for better life  |                  |
++------+---------------+-----------+------------------+------------------+
+| ...  | ...           |           |                  |                  |
++------+---------------+-----------+------------------+------------------+
+
+you can use a configuration file like this to construct cube and access to it with excel::
 
     <?xml version="1.0" encoding="UTF-8"?>
 
-                <cubes>
+    <cubes>
 
-                    <!-- if you want to set an authentication mechanism in excel so to access cube,
-                        user must set a token with login url like 'http://127.0.0.1/admin  -->
+        <!-- if you want to set an authentication mechanism for excel to access cube,
+        user must set a token with login url like 'http://127.0.0.1/admin  -->
+        <!-- default password = admin -->
 
-                    <!-- default password = admin -->
+        <!-- enable/disable xmla authentication -->
+        <xmla_authentication>False</xmla_authentication>
 
-                    <xmla_authentication>False</xmla_authentication>
+        <cube>
 
-                    <cube>
-                        <!-- cube name => db name -->
+        <!-- cube name => csv folder name or database name -->
+        <name>labster</name>
 
-                        <name>labster</name>
-
-                        <!-- source : postgres | csv -->
-
-                        <source>postgres</source>
-
-
-                        <!-- star building customized star schema -->
-                        <facts>
-
-                            <!-- facts table name -->
-
-                            <table_name>stats_line</table_name>
-
-                            <keys>
-
-                                <!-- ref = table_name.column  -->
-
-                                <column_name ref="orgunit.id">departement_id</column_name>
-
-                            </keys>
-
-                            <!-- specify measures explicitly -->
-                            <measures>
-
-                                <!-- by default, all number type columns in facts table, or you can specify them here -->
-                                <name>montant</name>
-                                <name>salaire_brut_mensuel</name>
-                                <name>cout_total_mensuel</name>
-                            </measures>
-
-                        </facts>
-                        <!-- end building customized star schema -->
+        <!-- source : csv | postgres | mysql | oracle | mssql -->
+        <source>csv</source>
 
 
-                        <!-- star building customized dimensions display in excel from the star schema -->
-                        <dimensions>
+        <!-- star building customized star schema -->
 
-                            <dimension>
+        <facts>
 
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+            <!-- facts table name -->
+            <table_name>stats_line</table_name>
 
-                                <name>stats_line</name>
-                                <displayName>Demande</displayName>
+            <keys>
+            <!-- <column_name ref="[target_table_name].[target_column_name]">[Facts_column_name]</column_name> -->
+            <column_name ref="orgunit.id">departement_id</column_name>
 
-                                <columns>
+            </keys>
 
-                                    <!-- columns order matter -->
-                                    <name>type_demande</name>
-                                    <name>financeur</name>
-                                    <name>wf_state</name>
-                                    <name>type_recrutement</name>
+            <!-- specify measures explicitly -->
+            <measures>
 
-                                </columns>
+            <!-- by default, all number type columns in facts table, or you can specify them here -->
+            <name>montant</name>
+            <name>salaire_brut_mensuel</name>
+            <name>cout_total_mensuel</name>
+            </measures>
 
-                            </dimension>
-
-                            <dimension>
-
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                                <name>orgunit</name>
-                                <displayName>Organisation</displayName>
-
-                                <columns>
-                                    <!-- columns order matter -->
-                                    <name>type</name>
-                                    <name>nom</name>
-                                    <name>sigle</name>
-                                </columns>
-
-                            </dimension>
-
-                        </dimensions>
-
-                        <!-- end building customized dimensions display in excel from the star schema -->
+        </facts>
+        <!-- end building customized star schema -->
 
 
-                    </cube>
+        <!-- star building customized dimensions display in excel from the star schema -->
+        <dimensions>
 
-                </cubes>
+            <dimension>
 
+            <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
+            <name>orgunit</name>
+            <displayName>Organisation</displayName>
+
+            <columns>
+                <!-- IMPORTANT !!!!  COLUMNS ORDER MATTER -->
+                <name>type</name>
+                <name>nom</name>
+                <name>sigle</name>
+            </columns>
+
+            </dimension>
+
+        </dimensions>
+
+        <!-- end building customized dimensions display in excel from the star schema -->
+
+        </cube>
+
+    </cubes>

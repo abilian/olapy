@@ -1,21 +1,24 @@
-#
-grako
+typing
+#grako
 pandas<1
-lxml==3.6.0  #lxml 3.7 causes problems in windows
+lxml
 spyne<3
-treelib<2
-psycopg2
+SQLAlchemy<1.2 # <1.2 required by bonobo
+xmlwitch
+attrs
+pyyaml
+regex
+click
 
-# Web
-Flask
-SQLAlchemy<1.1
-WTForms<3
-# Pin these for now
-Flask-Login==0.3.2
-Flask-Script==2.0.5
-Flask-Session==0.3.0
-Flask-SQLAlchemy==2.1
-Flask-WTF==0.12
-plotly==1.12.9
-XlsxWriter==0.9.3
+# Test
+werkzeug
 
+# Tools
+#psutil
+#pympler
+
+#ETL
+bonobo<0.6
+bonobo-sqlalchemy<0.6
+awesome-slugify
+python-dotenv

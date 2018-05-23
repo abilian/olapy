@@ -1,222 +1,172 @@
-from __future__ import absolute_import, division, print_function
+"""
+Parse cube configuration file and create cube parser object which
+can be passed to the MdxEngine.
+"""
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
+from collections import OrderedDict
 
-from lxml import etree
-
-from .models import Cube, Dimension, Facts
+import yaml
 
 
 class ConfigParser:
+    """Parse olapy config excel file.
+
+    Config file used if you want to show only some measures, dimensions,
+    columns... in excel
+
+    Config file should be under '~/olapy-data/cubes/cubes-config.xml'
+
+    Assuming we have two tables as follows under 'labster' folder
+
+    table 1: stats_line (which is the facts table)
+
+    +----------------+---------+--------------------+----------------------+
+    | departement_id | amount  |    monthly_salary  |  total monthly cost  |
+    +----------------+---------+--------------------+----------------------+
+    |  111           |  1000   |      2000          |    3000              |
+    +----------------+---------+--------------------+----------------------+
+    | bla  bla bla   |         |                    |                      |
+    +----------------+---------+--------------------+----------------------+
+
+    table 2: orgunit (which is a dimension)
+
+    +------+---------------+-----------+------------------+------------------+
+    | id   | type          |  name     |  acronym         | other colums.....|
+    +------+---------------+-----------+------------------+------------------+
+    |  111 | humanitarian  |  humania  | for better life  |                  |
+    +------+---------------+-----------+------------------+------------------+
+    | bla  | bla   bla     |           |                  |                  |
+    +------+---------------+-----------+------------------+------------------+
+
+
+    Excel Config file Structure example::
+
+        name: foodmart_with_config            # csv folder name or db name
+        source: csv                           # csv | postgres | mysql ...
+
+        xmla_authentication : False            need to enter special token with xmla url or not \
+                                              (example http://127.0.0.1:8000/xmla?admin)  admin just an example
+
+        facts:
+          table_name: food_facts              # facts table name
+          keys:
+
+           # primary keys : keys refs (example : product_id ref to column id from table Product...)
+            product_id : Product.id
+            warehouse_id : Warehouse.id
+            store_id : Store.id
+
+          measures:                           # list of measures
+                                              # by default, all number type columns in facts table
+            - units_ordered
+            - units_shipped
+            - supply_time
+
+        dimensions:                          # star building customized dimensions display in excel from the star schema
+            #  IMPORTANT: put here facts table also (little bug)
+            - name: food_facts
+              displayName: food_facts
+
+            - name: Product
+              displayName: Product
+              columns:
+                - name: id
+                - name: brand_name
+                - name: product_name
+                - name: SKU
+                  column_new_name: Stock_keeping_unit
+
+
+          - dimension :
+              name: Store
+              displayName: Store
+              columns:
+                - name: id
+                - name: store_type
+                - name: store_name
+                - name: store_city
+                - name: store_country
+                  column_new_name: country
     """
-    Parse olapy config files.
-    
-    Config file used if you want to show only some measures, dimensions, columns... in excel
-    
-    Config file should be under 'home-directory/olapy-data/cubes/cubes-config.xml'
-    
-    Config file Structure::
-            
-            
-            <?xml version="1.0" encoding="UTF-8"?>
 
-                <cubes>
-                    
-                    <!-- if you want to set an authentication mechanism in excel so to access cube, 
-                        user must set a token with login url like 'http://127.0.0.1/admin  -->
-                        
-                    <!-- default password = admin -->
-                        
-                    <xmla_authentication>False</xmla_authentication>
-                
-                    <cube>
-                        <!-- cube name => db name -->
-                        
-                        <name>labster</name>
-                        
-                        <!-- source : postgres | csv -->
-                        
-                        <source>postgres</source>
-                
-                        
-                        <!-- star building customized star schema -->
-                        <facts>
-                        
-                            <!-- facts table name -->
-                            
-                            <table_name>stats_line</table_name>
-                            
-                            <keys>
-                            
-                                <!-- ref = table_name.column  -->
-                                
-                                <column_name ref="orgunit.id">departement_id</column_name>
-                            
-                            </keys>
-                
-                            <!-- specify measures explicitly -->
-                            <measures>
-                                
-                                <!-- by default, all number type columns in facts table, or you can specify them here -->
-                                <name>montant</name>
-                                <name>salaire_brut_mensuel</name>
-                                <name>cout_total_mensuel</name>
-                            </measures>
-                
-                        </facts>        
-                        <!-- end building customized star schema -->
-                        
-                        
-                        <!-- star building customized dimensions display in excel from the star schema -->             
-                        <dimensions>
-                
-                            <dimension>
-                            
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                                
-                                <name>stats_line</name>
-                                <displayName>Demande</displayName>
-                                
-                                <columns>
-                                
-                                    <!-- columns order matter -->
-                                    <name>type_demande</name>
-                                    <name>financeur</name>
-                                    <name>wf_state</name>
-                                    <name>type_recrutement</name>
-                                    
-                                </columns>
-                                
-                            </dimension>
-                
-                            <dimension>
-                            
-                                <!-- if you want to keep the same name for excel display, just use the same name in name and displayName -->
-                                <name>orgunit</name>
-                                <displayName>Organisation</displayName>
-                                
-                                <columns>
-                                    <!-- columns order matter -->
-                                    <name>type</name>
-                                    <name>nom</name>
-                                    <name>sigle</name>
-                                </columns>
-                                
-                            </dimension>
-                
-                        </dimensions>
-                        
-                        <!-- end building customized dimensions display in excel from the star schema -->
-                        
-                                
-                    </cube>
-                
-                </cubes>
-      
-    """
-    def __init__(self, cube_path, file_name='cubes-config.xml'):
+    def __init__(self, cube_config_file=None):
         """
-        
-        :param cube_path: path to cube (csv folders)
-        :param file_name: config file name (DEFAULT = cubes-config.xml)
+
+        :param cube_config_file: full path to cube config file, Default : ~/olapy-data/cube/cubes-config.yml
         """
-        self.cube_path = cube_path
-        self.file_name = file_name
 
-    def config_file_exist(self):
-        """
-        Check whether the config file exists or not.
-        
-        :return: True | False
-        """
-        return os.path.isfile(os.path.join(self.cube_path, self.file_name))
-
-    def xmla_authentication(self):
-        """
-        Check if excel need authentication to access cubes or not. (xmla_authentication tag in the config file).
-        
-        :return: True | False
-        """
-        with open(os.path.join(self.cube_path, self.file_name)) as config_file:
-
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
-
-            try:
-                return tree.xpath('/cubes/xmla_authentication')[
-                    0].text == 'True'
-            except:
-                return False
-
-    def get_cubes_names(self):
-        """
-        Get all cubes names in the config file.
-        
-        :return: dict of cube name as key and cube source as value (csv or postgres) (right now only postgres is supported)
-        """
-        with open(os.path.join(self.cube_path, self.file_name)) as config_file:
-
-            parser = etree.XMLParser()
-            tree = etree.parse(config_file, parser)
-
-            try:
-                return {
-                    cube.find('name').text: cube.find('source').text
-                    for cube in tree.xpath('/cubes/cube')
-                }
-            except:
-                raise ('missed name or source tags')
-
-    def construct_cubes(self):
-        """
-        Construct cube (with it dimensions) and facts from  the config file.
-        
-        :return: list of Cubes instance
-        """
-        if self.config_file_exist():
-            try:
-                with open(os.path.join(self.cube_path,
-                                       self.file_name)) as config_file:
-
-                    parser = etree.XMLParser()
-                    tree = etree.parse(config_file, parser)
-
-                    facts = [
-                        Facts(
-                            table_name=xml_facts.find('table_name').text,
-                            keys={
-                                key.text: key.attrib['ref']
-                                for key in xml_facts.findall(
-                                    'keys/column_name')
-                            },
-                            measures=[
-                                mes.text
-                                for mes in xml_facts.findall('measures/name')
-                            ]) for xml_facts in tree.xpath('/cubes/cube/facts')
-                    ]
-
-                    dimensions = [
-                        Dimension(
-                            name=xml_dimension.find('name').text,
-                            displayName=xml_dimension.find('displayName').text,
-                            columns=[
-                                column_name.text
-                                for column_name in xml_dimension.findall(
-                                    'columns/name')
-                            ])
-                        for xml_dimension in tree.xpath(
-                            '/cubes/cube/dimensions/dimension')
-                    ]
-
-                return [
-                    Cube(
-                        name=xml_cube.find('name').text,
-                        source=xml_cube.find('source').text,
-                        facts=facts,
-                        dimensions=dimensions)
-                    for xml_cube in tree.xpath('/cubes/cube')
-                ]
-            except:
-                raise ('Bad configuration in the configuration file')
+        if cube_config_file:
+            self.cube_config_file = cube_config_file
         else:
-            raise ("Config file don't exist")
+            self.cube_config_file = self._get_cube_path()
+
+    def _get_cube_path(self):
+        if "OLAPY_PATH" in os.environ:
+            home_directory = os.environ["OLAPY_PATH"]
+        else:
+            from os.path import expanduser
+
+            home_directory = expanduser("~")
+
+        return os.path.join(
+            home_directory,
+            "olapy-data",
+            "cubes",
+            "cubes-config.yml",
+        )
+
+    @staticmethod
+    def _get_columns(dimension):
+        if "columns" in dimension:
+            return OrderedDict((
+                column["name"],
+                column["name"] if "column_new_name" not in column else column[
+                    "column_new_name"],
+            ) for column in dimension["columns"])
+
+        else:
+            return {}
+
+    def _get_dimensions(self, config):
+        dimensions = []
+        for dimension in config["dimensions"]:
+            dimensions.append({
+                "name": dimension["name"],
+                "displayName": dimension["displayName"],
+                "columns": self._get_columns(dimension),
+            },)
+        return dimensions
+
+    def _get_facts(self, config):
+        return {
+            "table_name": config["facts"]["table_name"],
+            "keys": config["facts"]["keys"],
+            "measures": config["facts"]["measures"],
+        }
+
+    def get_cube_config(self, conf_file=None):
+        """
+        Construct parser cube obj (which can ben passed to MdxEngine) for excel
+
+        :param conf_file: full path to config file, Default : ~/olapy-data/cube/cubes-config.yml
+        :return: Cube obj
+        """
+
+        if conf_file:
+            file_path = conf_file
+        else:
+            file_path = self.cube_config_file
+
+        with open(file_path) as config_file:
+            config = yaml.load(config_file)
+        # only one cube right now
+        return {
+            "xmla_authentication": bool(config["xmla_authentication"]),
+            "name": config["name"],
+            "source": config["source"],
+            "facts": self._get_facts(config),
+            "dimensions": self._get_dimensions(config),
+        }

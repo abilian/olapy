@@ -4,7 +4,7 @@
 SRC=olapy
 PKG=$(SRC)
 
-default: test
+default: test lint
 
 
 run:
@@ -28,6 +28,8 @@ develop:
 	pip-sync requirements.txt
 	pip install -q -r requirements.txt -r dev-requirements.txt
 	pip install -e .
+	@echo "--> Activating pre-commit hook"
+	pre-commit install
 	@echo ""
 
 #
@@ -37,12 +39,22 @@ lint: lint-python
 
 lint-python:
 	@echo "--> Linting Python files"
-	-flake8 $(SRC) tests
-	@echo "Checking Py3k (basic) compatibility"
-	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+	flake8
+
+	@make lint-py3k
+
+	@make lint-mypy
+
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
 
+lint-py3k:
+	@echo "Checking Py3k (basic) compatibility"
+	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+
+
+lint-mypy:
+	mypy olapy tests
 
 clean:
 	find . -name "*.pyc" -delete
@@ -64,9 +76,10 @@ tidy: clean
 	rm -rf .tox
 
 format:
-	isort -rc $(SRC) tests *.py
-	yapf --style google -r -i $(SRC) tests *.py
-	isort -rc $(SRC) tests *.py
+	isort -rc $(SRC) tests micro_bench demos *.py
+	yapf --style google -r -i $(SRC) tests micro_bench demos *.py
+	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench demos
+	isort -rc $(SRC) tests micro_bench demos *.py
 
 update-deps:
 	pip-compile -U > /dev/null
