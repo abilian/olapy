@@ -24,8 +24,6 @@ flake8
 flake8-tidy-imports
 pre-commit
 
-# 0.16 doesn't give as good looking output as this version
-yapf==0.15.2
 # Formatting (update version explicitely when needed)
 isort==4.2.15
 yapf==0.20.0
