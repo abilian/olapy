@@ -2,7 +2,6 @@
 tox
 PrettyTable
 gprof2dot
-isort
 ipdb
 mccabe
 pip-tools
