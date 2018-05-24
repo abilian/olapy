@@ -7,6 +7,9 @@ PKG=$(SRC)
 default: test lint
 
 
+run:
+	python manage.py runserver
+
 #
 # testing
 #
