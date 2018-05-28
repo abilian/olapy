@@ -1,3 +1,5 @@
+# -*- encoding: utf8 -*-
+
 """
 Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
 """

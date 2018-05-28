@@ -677,7 +677,10 @@ class MdxEngine(object):
         return dfs
 
     def clean_mdx_query(self, mdx_query):
-        clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
+        try:
+            clean_query = mdx_query.decode("utf-8").strip().replace("\n", "").replace("\t", "")
+        except AttributeError:
+            clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
         # todo property in parser
         self.parser.mdx_query = clean_query
         return clean_query
@@ -705,7 +708,6 @@ class MdxEngine(object):
 
         """
         query = self.clean_mdx_query(mdx_query)
-
         # use measures that exists on where or insides axes
         query_axes = self.parser.decorticate_query(query)
         if self.change_measures(query_axes["all"]):
@@ -721,7 +723,6 @@ class MdxEngine(object):
         tuples_on_mdx_query = [
             tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
         ]
-
         if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             tuples_on_mdx_query.sort(key=lambda x: x[0])

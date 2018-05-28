@@ -12,7 +12,7 @@ import regex
 # FIXME: make this regex more readable (split it)
 REGEX = regex.compile(
     "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
-    '\w+\d\.\,\s\(\)\_\-\:"\’\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
+    '\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
 
 
 class Parser(object):
@@ -127,8 +127,9 @@ class Parser(object):
         # without Hierarchize -> ON 0
         try:
             query = query.decode("utf-8")
-        except AttributeError:
+        except:
             pass
+
         tuples_on_mdx_query = self.get_tuples(query)
         on_rows = []
         on_columns = []
