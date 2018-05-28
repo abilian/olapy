@@ -2,6 +2,8 @@
 tox
 PrettyTable
 gprof2dot
+ipdb
+mccabe
 pip-tools
 py-cpuinfo
 pytest

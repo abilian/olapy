@@ -10,6 +10,9 @@ About
 .. _MDX: https://en.wikipedia.org/wiki/MultiDimensional_eXpressions
 .. _XMLA: https://en.wikipedia.org/wiki/XML_for_Analysis
 
+`https://olapy.readthedocs.io/en/latest/ <https://olapy.readthedocs.io/en/latest/>`_
+
+
 Status
 ~~~~~~
 
