@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 from datetime import datetime
-from os.path import expanduser
+from os.path import expanduser, isfile
 from wsgiref.simple_server import make_server
 
 import click
@@ -343,7 +343,7 @@ def runserver(
         pass
 
     cube_config = None
-    if cube_config_file:
+    if cube_config_file and isfile(cube_config_file):
         cube_config_file_parser = ConfigParser()
         cube_config = cube_config_file_parser.get_cube_config(cube_config_file)
 
