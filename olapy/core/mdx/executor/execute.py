@@ -114,14 +114,16 @@ class MdxEngine(object):
         :return: list of all cubes
         """
 
-        cubes_folder_path = os.path.join(
-            self.olapy_data_location,
-            self.cubes_folder,
-        )
         if "db" in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
-        if "csv" in self.source_type and os.path.exists(cubes_folder_path):
+        if "csv" in self.source_type:
+            cubes_folder_path = os.path.join(
+                self.olapy_data_location,
+                self.cubes_folder,
+            )
+
             self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
+
         return self.db_cubes + self.csv_files_cubes
 
     def load_cube(self,
@@ -167,6 +169,7 @@ class MdxEngine(object):
         """
 
         cubes_folder_path = self.get_cube_path()
+
         if (self.cube_config and self.cube_config["facts"] and
             self.cube == self.cube_config["name"]):
             cube_loader = CubeLoaderCustom(
@@ -290,11 +293,13 @@ class MdxEngine(object):
 
         :return: path to the cube
         """
-        return os.path.join(
-            self.olapy_data_location,
-            self.cubes_folder,
-            self.cube,
-        )
+        if self.source_type.upper() == "CSV":
+            return os.path.join(
+                self.olapy_data_location,
+                self.cubes_folder,
+                self.cube,
+            )
+        return None
 
     @staticmethod
     def change_measures(tuples_on_mdx):
