@@ -20,7 +20,6 @@ from __future__ import absolute_import, division, print_function, \
 import itertools
 import os
 from collections import OrderedDict
-from os.path import expanduser
 from typing import List, Dict
 
 import attr
@@ -46,7 +45,7 @@ class MdxEngine(object):
 
     :param cubes_folder: cubes folder, which is under olapy-data, and contains all csv cubes
         by default *~/olapy-data/cubes/...
-    :param olapy_data_location: By default *~/olapy-data/*
+    :param olapy_data_location: olapy-data path
     :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
     :param sql_engine: sql_alchemy engine if you don't want to use any database config file
     :param source_type: source data input, Default csv
@@ -62,7 +61,7 @@ class MdxEngine(object):
     csv_files_cubes = attr.ib(default=attr.Factory(list))
     db_cubes = attr.ib(default=attr.Factory(list))
     sqla_engine = attr.ib(default=None)
-    olapy_data_location = attr.ib()
+    olapy_data_location = attr.ib(default=None)
     cube_config = attr.ib(default=None)
     tables_loaded = attr.ib(default=None)
     star_schema_dataframe = attr.ib(default=None)
@@ -70,14 +69,14 @@ class MdxEngine(object):
     selected_measures = attr.ib(default=None)
     cubes_folder = attr.ib(default="cubes")
 
-    @olapy_data_location.default
-    def get_default_cubes_directory(self):
-        # with OLAPY_PATH env var, we can inject olap_web's flask instance_path olapy-data,
-        home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
-        if "olapy-data" not in home_directory:
-            home_directory = os.path.join(home_directory, "olapy-data")
-
-        return home_directory
+    # @olapy_data_location.default
+    # def get_default_cubes_directory(self):
+    #     # with OLAPY_PATH env var, we can inject olap_web's flask instance_path olapy-data,
+    #     home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
+    #     if "olapy-data" not in home_directory:
+    #         home_directory = os.path.join(home_directory, "olapy-data")
+    #
+    #     return home_directory
 
     def _get_db_cubes_names(self):
         """
@@ -169,7 +168,7 @@ class MdxEngine(object):
 
         cubes_folder_path = self.get_cube_path()
         if (self.cube_config and self.cube_config["facts"] and
-                self.cube == self.cube_config["name"]):
+            self.cube == self.cube_config["name"]):
             cube_loader = CubeLoaderCustom(
                 cube_config=self.cube_config,
                 cube_path=cubes_folder_path,
@@ -226,12 +225,12 @@ class MdxEngine(object):
                 if star_schema_df[measure].dtype == object:
                     star_schema_df[measure] = star_schema_df[
                         measure].str.replace(
-                            " ",
-                            "",
+                        " ",
+                        "",
                     )
                     try:
                         star_schema_df[measure] = star_schema_df[
-                            measure].astype("float",)
+                            measure].astype("float", )
                     except:
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
@@ -244,7 +243,7 @@ class MdxEngine(object):
         :return: star schema DataFrame
         """
         if (self.cube_config and self.cube_config["facts"] and
-                self.cube == self.cube_config["name"]):
+            self.cube == self.cube_config["name"]):
             self.facts = self.cube_config["facts"]["table_name"]
             # measures in config-file only
             if self.cube_config["facts"]["measures"]:
@@ -360,10 +359,10 @@ class MdxEngine(object):
                 else:
                     tables_columns.update({
                         tupl[0]:
-                        self.tables_loaded[tupl[0]].columns[:len(
-                            tupl[2:None if self.parser.hierarchized_tuples()
-                                 else -1],)],
-                    },)
+                            self.tables_loaded[tupl[0]].columns[:len(
+                                tupl[2:None if self.parser.hierarchized_tuples()
+                                else -1], )],
+                    }, )
 
             axes.update({axis: tables_columns})
         return axes
@@ -554,12 +553,12 @@ class MdxEngine(object):
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
         if (len(tuple_as_list) == 3 and tuple_as_list[-1] in
-                self.tables_loaded[tuple_as_list[0]].columns):
+            self.tables_loaded[tuple_as_list[0]].columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
             cols = self.tables_loaded[tuple_as_list[0]].columns[:len(
-                tuple_as_list[columns:],)]
+                tuple_as_list[columns:], )]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -624,7 +623,7 @@ class MdxEngine(object):
                     tupl,
                     star_df,
                     columns_to_keep.values(),
-                ),)
+                ), )
 
         return df_to_fusion
 
@@ -672,7 +671,7 @@ class MdxEngine(object):
                 self.tuples_to_dataframes(
                     transformed_tuple_groups,
                     columns_to_keep,
-                )[0],)
+                )[0], )
 
         return dfs
 
@@ -734,7 +733,7 @@ class MdxEngine(object):
 
             if self.check_nested_select():
                 df_to_fusion = self.nested_tuples_to_dataframes(
-                    columns_to_keep,)
+                    columns_to_keep, )
             else:
                 df_to_fusion = self.tuples_to_dataframes(
                     tuples_on_mdx_query,
@@ -744,7 +743,7 @@ class MdxEngine(object):
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values(),))
+                itertools.chain.from_iterable(columns_to_keep.values(), ))
 
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
