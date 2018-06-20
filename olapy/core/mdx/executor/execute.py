@@ -170,8 +170,7 @@ class MdxEngine(object):
 
         cubes_folder_path = self.get_cube_path()
 
-        if (self.cube_config and self.cube_config["facts"] and
-            self.cube == self.cube_config["name"]):
+        if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
             cube_loader = CubeLoaderCustom(
                 cube_config=self.cube_config,
                 cube_path=cubes_folder_path,
@@ -245,8 +244,7 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: star schema DataFrame
         """
-        if (self.cube_config and self.cube_config["facts"] and
-            self.cube == self.cube_config["name"]):
+        if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
             self.facts = self.cube_config["facts"]["table_name"]
             # measures in config-file only
             if self.cube_config["facts"]["measures"]:
@@ -364,9 +362,8 @@ class MdxEngine(object):
                 else:
                     tables_columns.update({
                         tupl[0]:
-                            self.tables_loaded[tupl[0]].columns[:len(
-                                tupl[2:None if self.parser.hierarchized_tuples()
-                                else -1], )],
+                            self.tables_loaded[tupl[0]].columns[
+                            :len(tupl[2:None if self.parser.hierarchized_tuples() else -1])],
                     }, )
 
             axes.update({axis: tables_columns})
@@ -557,8 +554,7 @@ class MdxEngine(object):
         """
 
         columns = 2 if self.parser.hierarchized_tuples() else 3
-        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in
-            self.tables_loaded[tuple_as_list[0]].columns):
+        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
