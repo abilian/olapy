@@ -640,7 +640,7 @@ class MdxEngine(object):
 
         df = df_to_fusion[0]
         for next_df in df_to_fusion[1:]:
-            df = pd.concat(self.add_missed_column(df, next_df))
+            df = pd.concat(self.add_missed_column(df, next_df), sort=False)
         return df
 
     def check_nested_select(self):
