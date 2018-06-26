@@ -20,6 +20,8 @@ from __future__ import absolute_import, division, print_function, \
 import itertools
 import os
 from collections import OrderedDict
+from os.path import expanduser
+
 from typing import List, Dict
 
 import attr
@@ -61,7 +63,7 @@ class MdxEngine(object):
     csv_files_cubes = attr.ib(default=attr.Factory(list))
     db_cubes = attr.ib(default=attr.Factory(list))
     sqla_engine = attr.ib(default=None)
-    olapy_data_location = attr.ib(default=None)
+    olapy_data_location = attr.ib(default=os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"))
     cube_config = attr.ib(default=None)
     tables_loaded = attr.ib(default=None)
     star_schema_dataframe = attr.ib(default=None)
