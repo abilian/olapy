@@ -15,10 +15,10 @@ chardet==3.0.4            # via requests
 click==6.7
 colorama==0.3.9           # via bonobo
 enum34==1.1.6             # via fs
-fs==2.0.23                # via bonobo
+fs==2.0.24                # via bonobo
 future==0.16.0            # via backports.os
 idna==2.7                 # via requests
-lxml==4.2.2
+lxml==4.2.3
 numpy==1.14.5             # via pandas
 packaging==16.8           # via bonobo
 pandas==0.23.1
@@ -27,7 +27,7 @@ psutil==5.4.6             # via bonobo
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3    # via pandas
 python-dotenv==0.8.2
-pytz==2018.4              # via fs, pandas, spyne
+pytz==2018.5              # via fs, pandas, spyne
 pyyaml==3.12
 regex==2018.6.21
 requests==2.19.1          # via bonobo
