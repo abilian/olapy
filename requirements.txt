@@ -22,13 +22,13 @@ lxml==4.2.3
 numpy==1.14.5             # via pandas
 packaging==16.8           # via bonobo
 pandas==0.23.1
-pbr==4.0.4                # via stevedore
+pbr==4.1.0                # via stevedore
 psutil==5.4.6             # via bonobo
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3    # via pandas
 python-dotenv==0.8.2
 pytz==2018.5              # via fs, pandas, spyne
-pyyaml==3.12
+pyyaml==3.13
 regex==2018.6.21
 requests==2.19.1          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
