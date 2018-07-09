@@ -21,7 +21,7 @@ idna==2.7                 # via requests
 lxml==4.2.3
 numpy==1.14.5             # via pandas
 packaging==16.8           # via bonobo
-pandas==0.23.1
+pandas==0.23.3
 pbr==4.1.0                # via stevedore
 psutil==5.4.6             # via bonobo
 pyparsing==2.2.0          # via packaging
