@@ -239,7 +239,7 @@ class MdxEngine(object):
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 
-    def get_star_schema_dataframe(self, sep):
+    def get_star_schema_dataframe(self, sep, with_id_columns=False):
         """
         Merge all DataFrames as star schema.
 
@@ -270,6 +270,9 @@ class MdxEngine(object):
 
         fusion = cube_loader.construct_star_schema(self.facts)
         star_schema_df = self.clean_data(fusion, self.measures)
+
+        if with_id_columns:
+            return star_schema_df
 
         return star_schema_df[[
             col for col in fusion.columns if col.lower()[-3:] != "_id"
