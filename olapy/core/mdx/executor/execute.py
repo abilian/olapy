@@ -244,6 +244,7 @@ class MdxEngine(object):
         Merge all DataFrames as star schema.
 
         :param sep: csv files separator.
+        :param with_id_columns: start schema dataFrame contains id columns or not
         :return: star schema DataFrame
         """
         if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
