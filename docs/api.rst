@@ -45,9 +45,7 @@ to import the package use::
     .. autoclass:: MdxEngineLite
         :members:
                 load_cube,
-                get_measures,
-                load_tables_db,
-                load_tables_csv_files
+                get_measures
 
 
 Package ``olapy.etl.etl``

@@ -45,8 +45,7 @@ class MdxEngine(object):
         example: if cube = 'sales'
         then full path -> *home_directory/olapy-data/cubes/sales*
 
-    :param cubes_folder: cubes folder, which is under olapy-data, and contains all csv cubes
-        by default *~/olapy-data/cubes/...
+    :param cubes_folder: which is under olapy-data, and contains all csv cubes by default * ~/olapy-data/cubes/...
     :param olapy_data_location: olapy-data path
     :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
     :param sql_engine: sql_alchemy engine if you don't want to use any database config file
