@@ -7,16 +7,13 @@
 appdirs==1.4.3            # via fs
 attrs==18.1.0
 awesome-slugify==1.6.5
-backports.os==0.1.1       # via fs
 bonobo-sqlalchemy==0.5.1
 bonobo==0.5.2
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 click==6.7
 colorama==0.3.9           # via bonobo
-enum34==1.1.6             # via fs
 fs==2.0.27                # via bonobo
-future==0.16.0            # via backports.os
 idna==2.7                 # via requests
 lxml==4.2.4
 numpy==1.15.0             # via pandas
