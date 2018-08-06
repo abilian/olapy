@@ -183,7 +183,7 @@ class XmlaTools():
                     ),)
                 value = self.selected_catalogue
             else:
-                value = "olapy Unspecified Catalog"
+                value = self.catalogues[0]
 
             return self._get_props(
                 discover_preperties_xsd,
