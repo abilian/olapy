@@ -21,15 +21,16 @@ from typing import Text
 
 import bonobo
 import dotenv
+from sqlalchemy import create_engine
 
 from olapy.core.mdx.executor.execute import MdxEngine
-from olapy.etl.utils import create_db_engine
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 GEN_FOLDER = "etl_generated"
 INPUT_DIR = "input_dir"
+TEMP_DB_URI = "postgresql+psycopg2://postgres:root@localhost:5432"
 
 
 class ETL(object):
@@ -41,13 +42,13 @@ class ETL(object):
     """
 
     def __init__(
-            self,
-            source_type,
-            facts_table,
-            source_folder=INPUT_DIR,
-            separator=None,
-            olay_cubes_path=None,
-            target_cube="etl_cube",
+        self,
+        source_type,
+        facts_table,
+        source_folder=INPUT_DIR,
+        separator=None,
+        olay_cubes_path=None,
+        target_cube="etl_cube",
     ):
         """
 
@@ -64,10 +65,12 @@ class ETL(object):
         if olay_cubes_path:
             self.olapy_cube_path = olay_cubes_path
         else:
+            executor = MdxEngine(source_type=source_type)
             self.olapy_cube_path = os.path.join(
-                MdxEngine.get_default_cube_directory(),
-                "cubes",
+                executor.olapy_data_location,
+                executor.cubes_folder
             )
+
         self.seperator = self._get_default_seperator(
         ) if not separator else separator
         self.target_cube = target_cube
@@ -109,7 +112,7 @@ class ETL(object):
             self.dim_first_row_headers = False
             for idx, column_header in enumerate(splited):
                 if (column_header in self.current_dim_id_column and
-                        "_id" not in column_header[-3:]):
+                    "_id" not in column_header[-3:]):
                     splited[idx] = column_header + "_id"
 
         else:
@@ -141,7 +144,7 @@ class ETL(object):
                     del kwargs[key]
         return kwargs
 
-    def extract(self, table_name, **kwargs):
+    def extract(self, table_name, db_uri=TEMP_DB_URI, **kwargs):
         """
         Bonobo's First chain, extract data from source.
 
@@ -149,7 +152,8 @@ class ETL(object):
         :return: Bonobo Reader
         """
         if self.source_type.upper() == "DB":
-            engine = create_db_engine()
+            engine = create_engine(db_uri)
+
             return engine.execute("SELECT * from {};".format(table_name))
 
         elif self.source_type.upper() == "FILE":
@@ -197,7 +201,7 @@ class ETL(object):
         all generated tables directly to olapy dir.
         """
         if not os.path.isdir(
-                os.path.join(self.olapy_cube_path, self.target_cube),):
+            os.path.join(self.olapy_cube_path, self.target_cube), ):
             os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
@@ -304,7 +308,7 @@ def run_olapy_etl(dims_infos,
                 extraction_source=extraction_source,
                 in_delimiter=in_delimiter,
                 table=table,
-            ),)
+            ), )
 
     # temp ( bonobo can't export (save) to path (bonobo bug)
     etl.copy_2_olapy_dir()
