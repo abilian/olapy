@@ -165,7 +165,7 @@ class ETL(object):
 
     # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
 
-    def transform(self, *args, **kwargs):
+    def transform(self, olapy_sep=';', *args, **kwargs):
         """
         Bonobo's second chain, transform data based on olapy rules.
 
@@ -175,16 +175,17 @@ class ETL(object):
             if :func:`extract` from csv file
         :return: args or kwargs transformed
         """
-
-        data = args if args else kwargs
+        in_data = args if args else kwargs
         if self.source_type.upper() == "FILE":
-            return self._transform_file(data)
+            transformed_data = self._transform_file(in_data)
 
         elif self.source_type.upper() == "CSV":
-            return self._transform_csv(data)
+            transformed_data = self._transform_csv(in_data)
 
         else:
-            return args if args else kwargs
+            transformed_data = in_data
+
+        return olapy_sep.join(transformed_data)
 
     def load(self, table_name):
         """
@@ -196,6 +197,7 @@ class ETL(object):
         if table_name == self.facts_table:
             table_name = "Facts"
         return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + ".csv"))
+        # return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + ".csv"))
 
     def copy_2_olapy_dir(self):
         """
