@@ -73,18 +73,26 @@ def get_services(input_file_path, cube_config, output_cube_path, **options):
 
 
 @click.command()
-@click.option('--input_file_path', '-in_file', default="/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx",
-              help='Number of greetings.')
-@click.option('--cube_config', '-config', default="etl_conf.yml")
-@click.option('--output_cube_path', '-out_cube', default=None, help='The person to greet.')
+@click.option('--input_file_path', default=None, help='Input file')
+@click.option('--cube_config', '-config', default=None, help='Configuration file path')
+@click.option('--output_cube_path', '-out_cube', default=None, help='Cube export path')
 def run_etl(input_file_path, cube_config, output_cube_path):
     parser = bonobo.get_argument_parser()
+    parser.add_argument("--input_file_path", help="Input file")
+    parser.add_argument("-config", "--cube_config", help="Configuration file path")
+    parser.add_argument("-out_cube", "--output_cube_path", help="Cube export path")
     with bonobo.parse_args(parser) as options:
 
-        with open(cube_config) as config_file:
-            options['cube_config'] = yaml.load(config_file)
+        if cube_config:
+            with open(cube_config) as config_file:
+                options['cube_config'] = yaml.load(config_file)
+        else:
+            raise Exception('Config file is not specified')
 
-        options['input_file_path'] = input_file_path
+        if input_file_path:
+            options['input_file_path'] = input_file_path
+        else:
+            raise Exception('Excel file is not specified')
 
         if output_cube_path:
             options['output_cube_path'] = output_cube_path
@@ -100,4 +108,5 @@ def run_etl(input_file_path, cube_config, output_cube_path):
 
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
+    # python etl2.py --input_file_path='/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx' -config='etl_conf.yml'
     run_etl()
