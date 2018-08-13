@@ -3,33 +3,20 @@ import os
 import pandas as pd
 
 import bonobo
-
-TEMP_PATH = "/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx"
-TEMP_OLAPY_PATH = "/home/moddoy/olapy-data/cubes/trotinettes"
-CONFIG = {
-    'Facts': ['Price', 'Product or Service Default Purchase Price', 'Total Price', 'Quantity'],
-    'Accounts': ['Source Account', 'Destination Account'],
-    'Client': ['Client Activity', 'Client', 'Client Role', 'Client Function', 'Client Region', 'Client Province',
-               'Client Address', 'Client Address City', 'Client Address ZipCode', 'Client Telephone'],
-    'Date': ['Shipping Date', 'Delivery Date', 'Creation Date', 'Modification Date'],
-    'Delivery': ['State', 'Delivery Type', 'Type', 'Owner', 'Delivery Title', 'Delivery Description',
-                 'Delivery Reference'],
-    'Product': ['Product Line', 'Product or Service Reference', 'Product or Service'],
-    'Sales': ['Seller', 'Buyer', 'Reference'],
-    'sender': ['Sender or Provider', 'Recipient or Beneficiary', 'Supplier', 'Invoice Sender'],
-    'Trade': ['Trade Condition Type', 'Trade Condition', 'Trade Condition Reference']
-}
+from bonobo.config import use
 
 
-def extract_excel_pd(file_path=TEMP_PATH):
-    yield pd.read_excel(file_path)
+@use('input_file_path')
+def extract_excel_pd(**kwargs):
+    yield pd.read_excel(kwargs.get('input_file_path'))
 
 
-def transform(*args):
+@use('cube_config')
+def transform(*args, **kwargs):
     # pas de transformation ligne par ligne
     df = args[0]  # args 0 is the df
     olapy_data_set = {}
-    for table_name, columns in CONFIG.items():
+    for table_name, columns in kwargs.get('cube_config').items():
         olapy_data_set[table_name] = df[columns].copy()
         olapy_data_set[table_name].reset_index()
         if table_name.upper() != 'FACTS':
@@ -38,10 +25,11 @@ def transform(*args):
     yield olapy_data_set
 
 
-def load_to_olapy(*args):
+@use('olapy_data_path')
+def load_to_olapy(*args, **kwargs):
     olapy_data_set = args[0]
     for df_name, df in olapy_data_set.items():
-        save_to = os.path.join(TEMP_OLAPY_PATH, df_name + '.csv')
+        save_to = os.path.join(kwargs.get('olapy_data_path'), df_name + '.csv')
         df.to_csv(path_or_buf=save_to, sep=';', encoding='utf8')
 
 
@@ -53,12 +41,9 @@ def get_graph(**options):
 
     """
     graph = bonobo.Graph()
-    # graph.add_chain(extract, transform, load)
     graph.add_chain(extract_excel_pd,
-                    # bonobo.Limit(10),
                     transform,
                     load_to_olapy
-                    # bonobo.PrettyPrinter()
                     )
 
     return graph
@@ -74,13 +59,36 @@ def get_services(**options):
 
     :return: dict
     """
-    return {}
+    return {
+        'olapy_data_path': options.get('olapy_data_path'),
+        'cube_config': options.get('cube_config'),
+        'input_file_path': options.get('input_file_path'),
+    }
 
 
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
     parser = bonobo.get_argument_parser()
     with bonobo.parse_args(parser) as options:
+        cube_config = {
+            'Facts': ['Price', 'Product or Service Default Purchase Price', 'Total Price', 'Quantity'],
+            'Accounts': ['Source Account', 'Destination Account'],
+            'Client': ['Client Activity', 'Client', 'Client Role', 'Client Function', 'Client Region',
+                       'Client Province',
+                       'Client Address', 'Client Address City', 'Client Address ZipCode', 'Client Telephone'],
+            'Date': ['Shipping Date', 'Delivery Date', 'Creation Date', 'Modification Date'],
+            'Delivery': ['State', 'Delivery Type', 'Type', 'Owner', 'Delivery Title', 'Delivery Description',
+                         'Delivery Reference'],
+            'Product': ['Product Line', 'Product or Service Reference', 'Product or Service'],
+            'Sales': ['Seller', 'Buyer', 'Reference'],
+            'sender': ['Sender or Provider', 'Recipient or Beneficiary', 'Supplier', 'Invoice Sender'],
+            'Trade': ['Trade Condition Type', 'Trade Condition', 'Trade Condition Reference']
+        }
+        options['cube_config'] = cube_config
+
+        options['input_file_path'] = "/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx"
+
+        options['olapy_data_path'] = "/home/moddoy/olapy-data/cubes/trotinettes"
         bonobo.run(
             get_graph(**options),
             services=get_services(**options)
