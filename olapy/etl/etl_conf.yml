@@ -1,0 +1,10 @@
+Facts: [Price, Product or Service Default Purchase Price, Total Price, Quantity]
+Accounts: ['Source Account', 'Destination Account']
+Client: ['Client Activity', 'Client', 'Client Role', 'Client Function', 'Client Region',
+         'Client Province', 'Client Address', 'Client Address City', 'Client Address ZipCode', 'Client Telephone']
+Date: ['Shipping Date', 'Delivery Date', 'Creation Date', 'Modification Date']
+Delivery: ['State', 'Delivery Type', 'Type', 'Owner', 'Delivery Title', 'Delivery Description', 'Delivery Reference']
+Product: ['Product Line', 'Product or Service Reference', 'Product or Service']
+Sales: ['Seller', 'Buyer', 'Reference']
+sender: ['Sender or Provider', 'Recipient or Beneficiary', 'Supplier', 'Invoice Sender']
+Trade: ['Trade Condition Type', 'Trade Condition', 'Trade Condition Reference']
