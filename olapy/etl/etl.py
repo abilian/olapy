@@ -111,8 +111,7 @@ class ETL(object):
             self.dim_headers = splited
             self.dim_first_row_headers = False
             for idx, column_header in enumerate(splited):
-                if (column_header in self.current_dim_id_column and
-                    "_id" not in column_header[-3:]):
+                if (column_header in self.current_dim_id_column and "_id" not in column_header[-3:]):
                     splited[idx] = column_header + "_id"
 
         else:
@@ -184,7 +183,6 @@ class ETL(object):
 
         else:
             transformed_data = in_data
-
         return olapy_sep.join(transformed_data)
 
     def load(self, table_name):
@@ -204,8 +202,7 @@ class ETL(object):
         Right now, bonobo can't export (save) to path (bonobo bug) so we copy
         all generated tables directly to olapy dir.
         """
-        if not os.path.isdir(
-            os.path.join(self.olapy_cube_path, self.target_cube), ):
+        if not os.path.isdir(os.path.join(self.olapy_cube_path, self.target_cube), ):
             os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
 
         self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
