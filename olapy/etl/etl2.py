@@ -4,8 +4,6 @@ import pandas as pd
 
 import bonobo
 
-# import xlrd
-
 TEMP_PATH = "/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx"
 TEMP_OLAPY_PATH = "/home/moddoy/olapy-data/cubes/trotinettes"
 CONFIG = {
@@ -23,12 +21,6 @@ CONFIG = {
 }
 
 
-# def extract_excel(file_path=TEMP_PATH, sheet_index=0):
-#     wb = xlrd.open_workbook(file_path)
-#     sheet = wb.sheet_by_index(sheet_index)
-#     for row in sheet.get_rows():
-#         yield row
-
 def extract_excel_pd(file_path=TEMP_PATH):
     yield pd.read_excel(file_path)
 
@@ -38,9 +30,10 @@ def transform(*args):
     df = args[0]  # args 0 is the df
     olapy_data_set = {}
     for table_name, columns in CONFIG.items():
-        olapy_data_set[table_name] = df[columns]
+        olapy_data_set[table_name] = df[columns].copy()
         olapy_data_set[table_name].reset_index()
         if table_name.upper() != 'FACTS':
+            # add primary key (X_id) column to the table
             olapy_data_set[table_name][table_name.lower() + '_id'] = df.index
     yield olapy_data_set
 
