@@ -73,14 +73,17 @@ def get_services(input_file_path, cube_config, output_cube_path, **options):
 
 @click.command()
 @click.option('--input_file_path', '-in_file', default=None, help='Input file')
-@click.option('--cube_config', '-config', default=None, help='Configuration file path')
+@click.option('--config_file', '-config', default=None, help='Configuration file path')
 @click.option('--output_cube_path', '-out_cube', default=None, help='Cube export path')
 def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=None):
     """
 
     :param input_file_path: excel file
+
     :param config_file: config file path
+
     :param output_cube_path: cube folder path
+
     :param cube_config: config as dict
     :return:
     """
