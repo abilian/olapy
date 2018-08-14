@@ -1,0 +1,4 @@
+Facts: [Amount, Count]
+Geography: ['Continent', 'Country', 'City']
+Product: ['Company', 'Article', 'Licence']
+Date: ['Year', 'Quarter', 'Month', 'Day']
