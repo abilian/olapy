@@ -22,9 +22,7 @@ def transform(*args, **kwargs):
     olapy_data_set = {}
     for table_name, columns in kwargs.get('cube_config').items():
         olapy_data_set[table_name] = df[columns]
-        if table_name.upper() != 'FACTS':
-            # add primary key (X_id) column to the table
-            olapy_data_set[table_name].index.names = [table_name.lower() + '_id']
+        olapy_data_set[table_name].index.names = ['_id']
 
     yield olapy_data_set
 
