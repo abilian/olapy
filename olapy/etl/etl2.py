@@ -21,11 +21,11 @@ def transform(*args, **kwargs):
     df = args[0]  # args 0 is the df
     olapy_data_set = {}
     for table_name, columns in kwargs.get('cube_config').items():
-        olapy_data_set[table_name] = df[columns].copy()
-        olapy_data_set[table_name].reset_index()
+        olapy_data_set[table_name] = df[columns]
         if table_name.upper() != 'FACTS':
             # add primary key (X_id) column to the table
-            olapy_data_set[table_name][table_name.lower() + '_id'] = df.index
+            olapy_data_set[table_name].index.names = [table_name.lower() + '_id']
+
     yield olapy_data_set
 
 
@@ -37,6 +37,7 @@ def load_to_olapy(*args, **kwargs):
     for df_name, df in olapy_data_set.items():
         save_to = os.path.join(kwargs.get('output_cube_path'), df_name + '.csv')
         df.to_csv(path_or_buf=save_to, sep=';', encoding='utf8')
+    print('Loaded in ' + kwargs.get('output_cube_path'))
 
 
 def get_graph(**options):
@@ -73,18 +74,28 @@ def get_services(input_file_path, cube_config, output_cube_path, **options):
 
 
 @click.command()
-@click.option('--input_file_path', default=None, help='Input file')
+@click.option('--input_file_path', '-in_file', default=None, help='Input file')
 @click.option('--cube_config', '-config', default=None, help='Configuration file path')
 @click.option('--output_cube_path', '-out_cube', default=None, help='Cube export path')
-def run_etl(input_file_path, cube_config, output_cube_path):
+def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=None):
+    """
+
+    :param input_file_path: excel file
+    :param config_file: config file path
+    :param output_cube_path: cube folder path
+    :param cube_config: config as dict
+    :return:
+    """
     parser = bonobo.get_argument_parser()
-    parser.add_argument("--input_file_path", help="Input file")
-    parser.add_argument("-config", "--cube_config", help="Configuration file path")
-    parser.add_argument("-out_cube", "--output_cube_path", help="Cube export path")
+    parser.add_argument('-in', "--input_file_path", help="Input file")
+    parser.add_argument("-cf", "--config_file", help="Configuration file path")
+    parser.add_argument("-out", "--output_cube_path", help="Cube export path")
     with bonobo.parse_args(parser) as options:
 
         if cube_config:
-            with open(cube_config) as config_file:
+            options['cube_config'] = cube_config
+        elif config_file:
+            with open(config_file) as config_file:
                 options['cube_config'] = yaml.load(config_file)
         else:
             raise Exception('Config file is not specified')
@@ -97,7 +108,7 @@ def run_etl(input_file_path, cube_config, output_cube_path):
         if output_cube_path:
             options['output_cube_path'] = output_cube_path
         else:
-            options['output_cube_path'] = os.path.join(expanduser('~'),
+            options['output_cube_path'] = os.path.join(expanduser('~'), 'olapy-data', 'cubes',
                                                        Path(input_file_path).stem)
 
         bonobo.run(
@@ -109,4 +120,5 @@ def run_etl(input_file_path, cube_config, output_cube_path):
 # The __main__ block actually execute the graph.
 if __name__ == '__main__':
     # python etl2.py --input_file_path='/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx' -config='etl_conf.yml'
+    # run_etl(input_file_path='/home/moddoy/Downloads/Activity Export.Jan.Fev.2018.xlsx', config_file='etl_conf.yml')
     run_etl()
