@@ -29,5 +29,6 @@ setup(
         "Programming Language :: Python :: 3.6",
         # "Topic :: Business intelligence",
     ],
-    entry_points={'console_scripts': ['olapy = olapy.__main__:cli']},
+    entry_points={'console_scripts': ['olapy = olapy.__main__:cli',
+                                      'etl = olapy.etl.etl2:run_etl', ]},
 )
