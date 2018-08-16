@@ -30,5 +30,5 @@ setup(
         # "Topic :: Business intelligence",
     ],
     entry_points={'console_scripts': ['olapy = olapy.__main__:cli',
-                                      'etl = olapy.etl.etl2:run_etl', ]},
+                                      'etl = olapy.etl.etl:run_etl', ]},
 )
