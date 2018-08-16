@@ -57,4 +57,4 @@ to import the package use::
 
 
 .. automodule:: olapy.etl.etl
-        :members: run_olapy_etl
+        :members: run_etl
