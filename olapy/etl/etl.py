@@ -1,317 +1,163 @@
 """
-To use olapy correctly with you source file (tables), some data structure
-cleaning operation must be applied to that data (for example, if you want
-to use olapy with csv files, you must use semicolon separators for those
-csv files; or if tables id columns don't contains _id, this will cause some
-bugs sometimes).
-
-This module will do the work for you, here olapy will extract data from
-your source, transform it with olapy's data structure rules,
-and load them to olapy-data folder *(as csv files right now)*.
+If you have a single excel file containing your data and you want to use olapy, you should use this module to
+extract data from your excel file, make transformations, and load then into olapy data folder.
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-import logging
 import os
-import shutil
-from distutils.dir_util import copy_tree
-from shutil import copyfile
-from typing import Text
+from os.path import isdir, expanduser
+from pathlib import Path
+
+import click
+import pandas as pd
 
 import bonobo
-import dotenv
-from sqlalchemy import create_engine
-
-from olapy.core.mdx.executor.execute import MdxEngine
-
-dotenv.load_dotenv(dotenv.find_dotenv())
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-
-GEN_FOLDER = "etl_generated"
-INPUT_DIR = "input_dir"
-TEMP_DB_URI = "postgresql+psycopg2://postgres:root@localhost:5432"
+import yaml
+from bonobo.config import use
+from pandas import DataFrame
 
 
-class ETL(object):
+@use('input_file_path')
+def extract_excel_pd(**kwargs):
+    # type: (dict) -> DataFrame
     """
-    Extract-transform-load for Olapy.
+    Bonobo's First chain, extract data from source.
+    :return: Pandas DataFrame
+    """
+    yield pd.read_excel(kwargs.get('input_file_path'))
 
-    It take a source (folder or database), make all necessary transformation to
-    that data, and then load them into olapy-data directory.
+
+@use('cube_config')
+def transform(*args, **kwargs):
+    """
+    Bonobo's second chain, transform data based on olapy rules.
+    :return: dict of DataFrames
     """
 
-    def __init__(
-        self,
-        source_type,
-        facts_table,
-        source_folder=INPUT_DIR,
-        separator=None,
-        olay_cubes_path=None,
-        target_cube="etl_cube",
-    ):
-        """
+    # pas de transformation ligne par ligne
+    df = args[0]  # args 0 is the df
+    olapy_data_set = {}
+    for table_name, columns in kwargs.get('cube_config').items():
+        olapy_data_set[table_name] = df[columns]
+        olapy_data_set[table_name].index.names = ['_id']
 
-        :param source_type: file | csv | db (if db, make sure that you put
-            database connection credentials in the
-            /home/user/olapy-data/olapy-config file
-        :param facts_table: facts table name
-        :param source_folder: your csv|txt files path
-        :param separator: input file separator (, ; : ...)
-        :param target_cube: generated file path
-        """
-        self.source_type = source_type
-        self.facts_table = facts_table
-        if olay_cubes_path:
-            self.olapy_cube_path = olay_cubes_path
-        else:
-            executor = MdxEngine(source_type=source_type)
-            self.olapy_cube_path = os.path.join(
-                executor.olapy_data_location,
-                executor.cubes_folder
-            )
-
-        self.seperator = self._get_default_seperator(
-        ) if not separator else separator
-        self.target_cube = target_cube
-        if source_folder != INPUT_DIR and source_type.upper() != "DB":
-            # #1 fix bonobo read from file path
-            if not os.path.exists(INPUT_DIR):
-                os.mkdir(INPUT_DIR)
-            for file in os.listdir(INPUT_DIR):
-                os.remove(os.path.join(INPUT_DIR, file))
-            copy_tree(source_folder, os.path.join(INPUT_DIR))
-            self.source_folder = INPUT_DIR
-        else:
-            self.source_folder = INPUT_DIR
-        self.current_dim_id_column = None
-        self.dim_first_row_headers = True
-        self.dim_headers = []
-        if not os.path.exists(GEN_FOLDER):
-            os.mkdir(GEN_FOLDER)
-
-    def _get_default_seperator(self):
-        if self.source_type.upper() in ["CSV", "FILE"]:
-            return ","
-
-    def _transform_file(self, line):
-        """
-        :func:`extract` return line by line as args if :func:`extract`
-            from text file
-        :param line: line is generated from extract function (see bonobo chain)
-        :return: dict { column_name : data}
-        """
-
-        line = line[0]
-        transformed = {}
-
-        if self.dim_first_row_headers:
-            # split headers
-            splited = line.split(self.seperator)
-            self.dim_headers = splited
-            self.dim_first_row_headers = False
-            for idx, column_header in enumerate(splited):
-                if (column_header in self.current_dim_id_column and "_id" not in column_header[-3:]):
-                    splited[idx] = column_header + "_id"
-
-        else:
-            if self.dim_headers:
-                splited = line.split(
-                    self.seperator,
-                    maxsplit=len(self.dim_headers),
-                )
-            else:
-                # columns = self.current_dim_id_column
-                splited = line.split(self.seperator)
-
-            for idx, head in enumerate(self.dim_headers):
-                transformed.update({head: splited[idx]})
-
-        return transformed
-
-    def _transform_csv(self, kwargs):
-        """
-        :func:`extract` return dict as kwargs if :func:`extract` from csv file
-        :param kwargs: :func:`extract` return dict as kwargs
-            if :func:`extract` from csv file
-        :return: transformed kwargs
-        """
-        if self.dim_first_row_headers:
-            for key in self.current_dim_id_column:
-                if "_id" not in key:
-                    kwargs[key + "_id"] = kwargs[key]
-                    del kwargs[key]
-        return kwargs
-
-    def extract(self, table_name, db_uri=TEMP_DB_URI, **kwargs):
-        """
-        Bonobo's First chain, extract data from source.
-
-        :param table_name: table/file to extract
-        :return: Bonobo Reader
-        """
-        if self.source_type.upper() == "DB":
-            engine = create_engine(db_uri)
-
-            return engine.execute("SELECT * from {};".format(table_name))
-
-        elif self.source_type.upper() == "FILE":
-            # delimiter not used with files
-            return bonobo.FileReader(table_name)
-
-        elif self.source_type.upper() == "CSV":
-            return bonobo.CsvReader(table_name, **kwargs)
-
-    # return getattr(bonobo, self.source_type.title() + "Reader")(table_name, **kwargs)
-
-    def transform(self, olapy_sep=';', *args, **kwargs):
-        """
-        Bonobo's second chain, transform data based on olapy rules.
-
-        :param args: :func:`extract` return line by line as args
-            if :func:`extract` from text file
-        :param kwargs: :func:`extract` return dict as kwargs
-            if :func:`extract` from csv file
-        :return: args or kwargs transformed
-        """
-        in_data = args if args else kwargs
-        if self.source_type.upper() == "FILE":
-            transformed_data = self._transform_file(in_data)
-
-        elif self.source_type.upper() == "CSV":
-            transformed_data = self._transform_csv(in_data)
-
-        else:
-            transformed_data = in_data
-        return olapy_sep.join(transformed_data)
-
-    def load(self, table_name):
-        """
-        Bonobo's third chain, load data transformed to olapy-data.
-
-        :param table_name: table name to generate
-        :return: generated table into olapy dir
-        """
-        if table_name == self.facts_table:
-            table_name = "Facts"
-        return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + ".csv"))
-        # return bonobo.CsvWriter(os.path.join(GEN_FOLDER, table_name + ".csv"))
-
-    def copy_2_olapy_dir(self):
-        """
-        Right now, bonobo can't export (save) to path (bonobo bug) so we copy
-        all generated tables directly to olapy dir.
-        """
-        if not os.path.isdir(os.path.join(self.olapy_cube_path, self.target_cube), ):
-            os.makedirs(os.path.join(self.olapy_cube_path, self.target_cube))
-
-        self.target_cube = os.path.join(self.olapy_cube_path, self.target_cube)
-
-        for file in os.listdir(GEN_FOLDER):
-            copyfile(
-                os.path.join(GEN_FOLDER, file),
-                os.path.join(self.target_cube, file),
-            )
-
-    def get_source_extension(self):
-        # type: () -> Text
-        """
-        Get source file extension based on :attr:`self.source_type`.
-
-        :return: .txt OR .csv
-        """
-        if self.source_type.upper() == "FILE":
-            return ".txt"
-
-        elif self.source_type.upper() == "CSV":
-            return ".csv"
-
-        elif self.source_type.upper() == "DB":
-            return ""
-
-        raise RuntimeError("Unknown source type: {}".format(self.source_type))
+    yield olapy_data_set
 
 
-def get_graph(etl, **options):
+@use('output_cube_path')
+def load_to_olapy(*args, **kwargs):
+    """
+    Bonobo's third chain, load data transformed to olapy-data.
+    :return: generated tables into olapy data folder
+    """
+    olapy_data_set = args[0]
+    if not isdir(kwargs.get('output_cube_path')):
+        os.mkdir(kwargs.get('output_cube_path'))
+    for df_name, df in olapy_data_set.items():
+        save_to = os.path.join(kwargs.get('output_cube_path'), df_name + '.csv')
+        df.to_csv(path_or_buf=save_to, sep=';', encoding='utf8')
+    print('Loaded in ' + kwargs.get('output_cube_path'))
+
+
+def get_graph(**options):
     # (Any) -> bonobo.Graph
-    return bonobo.Graph(
-        etl.extract(
-            options.get("extraction_source"),
-            delimiter=options.get("in_delimiter"),
-        ),
-        etl.transform,
-        etl.load(options.get("table")),
-    )
-
-
-def run_olapy_etl(dims_infos,
-                  facts_table,
-                  facts_ids,
-                  source_folder=INPUT_DIR,
-                  source_type="csv",
-                  in_delimiter=",",
-                  **kwargs):
     """
-    Run ETl Process on each table pass to it.
+    This function builds the graph that needs to be executed.
 
-    :param dims_infos: dict of Dimension name as key, column id name as value
+    :return: bonobo.Graph
 
-    example::
-
-        dims_infos = {
-                    'Geography': ['geography_key'],
-                    'Product': ['product_key']
-                     }
-
-    :param facts_ids: list of facts ids
-
-    example::
-
-        facts_ids = ['geography_key', 'product_key']
-
-    :param facts_table: facts table name
-    :param source_type: file -> .txt files in input || csv -> .csv files
-        in input
-    :param source_folder: from where you get your files
-        (if source is csv or text files)
-    :return: generate files to olapy dir
     """
+    graph = bonobo.Graph()
+    graph.add_chain(extract_excel_pd,
+                    transform,
+                    load_to_olapy
+                    )
 
-    # source_type -> file : .txt files in input
-    # source_type -> csv : .csv files in input
-    etl = ETL(
-        source_type=source_type,
-        facts_table=facts_table,
-        source_folder=source_folder,
-    )
+    return graph
 
-    for table in list(dims_infos.keys()) + [etl.facts_table]:
-        if etl.source_type.upper() != "DB":
-            extraction_source = os.path.join(
-                etl.source_folder,
-                table + etl.get_source_extension(),
-            )
+
+def get_services(input_file_path, cube_config, output_cube_path, **options):
+    """
+    This function builds the services dictionary, which is a simple dict of names-to-implementation used by bonobo
+    for runtime injection.
+
+    It will be used on top of the defaults provided by bonobo (fs, http, ...). You can override those defaults, or just
+    let the framework define them. You can also define your own services and naming is up to you.
+
+    :return: dict
+    """
+    return {
+        'output_cube_path': output_cube_path,
+        'cube_config': cube_config,
+        'input_file_path': input_file_path,
+    }
+
+
+@click.command()
+@click.option('--input_file_path', '-in_file', default=None, help='Input file')
+@click.option('--config_file', '-config', default=None, help='Configuration file path')
+@click.option('--output_cube_path', '-out_cube', default=None, help='Cube export path')
+def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=None):
+    """
+    Run ETl Process for passed excel file.
+
+    :param input_file_path: excel file path
+
+    :param config_file: config file path
+
+    example of config::
+
+        # in the config file you specify for each table, columns associate with it.
+        Facts: [Price, Quantity]
+        Accounts: ['Source Account', 'Destination Account']
+        Client: ['Client Activity', 'Client Role']
+
+    :param output_cube_path: cube folder path
+
+    :param cube_config: if you want to call run_etl as function, you can pass dict config directly as param, there an example::
+
+        @click.command()
+        @click.pass_context
+        def myETL(ctx):
+            # demo run_etl as function with config as dict
+            config = {
+                'Facts': ['Amount', 'Count'],
+                'Geography': ['Continent', 'Country', 'City'],
+                'Product': ['Company', 'Article', 'Licence'],
+                'Date': ['Year', 'Quarter', 'Month', 'Day']
+            }
+            ctx.invoke(run_etl, input_file_path='sales.xlsx', cube_config=config, output_cube_path='cube2')
+
+    """
+    parser = bonobo.get_argument_parser()
+    parser.add_argument('-in', "--input_file_path", help="Input file")
+    parser.add_argument("-cf", "--config_file", help="Configuration file path")
+    parser.add_argument("-out", "--output_cube_path", help="Cube export path")
+    with bonobo.parse_args(parser) as options:
+
+        if cube_config:
+            options['cube_config'] = cube_config
+        elif config_file:
+            with open(config_file) as config_file:
+                options['cube_config'] = yaml.load(config_file)
         else:
-            extraction_source = table
+            raise Exception('Config file is not specified')
 
-        # for each new file
-        etl.dim_first_row_headers = True
-        if table == etl.facts_table:
-            etl.current_dim_id_column = facts_ids
+        if input_file_path:
+            options['input_file_path'] = input_file_path
         else:
-            etl.current_dim_id_column = dims_infos[table]
+            raise Exception('Excel file is not specified')
 
-        # parser = bonobo.get_argument_parser()
-        # with bonobo.parse_args(parser):
+        if output_cube_path:
+            options['output_cube_path'] = output_cube_path
+        else:
+            options['output_cube_path'] = os.path.join(expanduser('~'), 'olapy-data', 'cubes',
+                                                       Path(input_file_path).stem)
+
         bonobo.run(
-            get_graph(
-                etl,
-                extraction_source=extraction_source,
-                in_delimiter=in_delimiter,
-                table=table,
-            ), )
+            get_graph(**options),
+            services=get_services(**options)
+        )
 
-    # temp ( bonobo can't export (save) to path (bonobo bug)
-    etl.copy_2_olapy_dir()
-    if os.path.isdir(GEN_FOLDER):
-        shutil.rmtree(GEN_FOLDER)
+
+# The __main__ block actually execute the graph.
+if __name__ == '__main__':
+    run_etl()

@@ -14,7 +14,7 @@
 
 
 
-######### for ETL #####
+######### for ETL_OLD #####
 #db_name : tutorial
 #driver : postgres        #mysql | postgres
 #--------- IMPORTANT ---------

@@ -1,16 +1,26 @@
-from olapy.etl.etl import run_olapy_etl
+import os
+
+import click
+
+from olapy.etl.etl import run_etl
+
+
+@click.command()
+@click.pass_context
+def main(ctx):
+    # demo cli etl
+    # after python setup.py install
+    os.system("etl --input_file_path=sales.xlsx --config_file=config.yml --output_cube_path='cube1'")
+
+    # demo run_etl as function with config as dict
+    config = {
+        'Facts': ['Amount', 'Count'],
+        'Geography': ['Continent', 'Country', 'City'],
+        'Product': ['Company', 'Article', 'Licence'],
+        'Date': ['Year', 'Quarter', 'Month', 'Day']
+    }
+    ctx.invoke(run_etl, input_file_path='sales.xlsx', cube_config=config, output_cube_path='cube2')
+
 
 if __name__ == '__main__':
-    dims_infos = {
-        # 'dimension': ['col_id'],
-        'Geography': ['geography_id'],
-        'Product': ['product_id']
-    }
-
-    facts_ids = ['geography_id', 'product_id']
-    # source_type = 'csv' | 'file' | 'db'
-    run_olapy_etl(
-        source_type='csv',
-        dims_infos=dims_infos,
-        facts_table='sales_facts',
-        facts_ids=facts_ids)
+    main()
