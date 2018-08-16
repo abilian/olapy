@@ -112,7 +112,8 @@ def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=Non
 
     :param output_cube_path: cube folder path
 
-    :param cube_config: if you want to call run_etl as function, you can pass dict config directly as param, there an example::
+    :param cube_config: if you want to call run_etl as function, you can pass dict config directly as param,
+    there an example::
 
         @click.command()
         @click.pass_context
