@@ -1,7 +1,7 @@
 Quick Start
 -----------
 
-olapy as XMLA server
+OlaPy as XMLA server
 ********************
 
 After :ref:`installation <installation>`, you can run the Olapy server with::
@@ -25,9 +25,10 @@ If you want to use olapy as a library to execute MDX queries, start by importing
 
     from olapy.core.mdx.executor.execute import MdxEngine
 
-In our example, we're going to use sales demo cube, so we instantiate *MdxEngine* with this cube::
+In our example, we're going to use sales demo cube::
 
-    executor = MdxEngine('sales')
+    executor = MdxEngine() # instantiate the MdxEngine
+    executor.load_cube('sales') # load sales cube
 
 We set an MDX query::
 
@@ -37,10 +38,10 @@ We set an MDX query::
     FROM [sales]
     """
 
-and execute::
+and execute it::
 
-    data_frame = executor.execute_mdx(query)['result']
-    print(data_frame)
+    df = executor.execute_mdx(query)['result']
+    print(df)
 
 Result:
 

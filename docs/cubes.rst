@@ -4,13 +4,13 @@
 Cubes creation
 ==============
 
-If you want to add new cube, this is very simple, put you CSV files in a folder
-(the folder name wil be the cube name), **make sure that they follow** :ref:`OLAPY CUBES RULES <OLAPY CUBES RULES>`,
-and move them to ``olapy-data/cubes`` folder,
-thus, the path to your cube will be like:
+To add new cube, put your CSV files in a folder (folder name <=> cube name),
+**make sure that they follow** :ref:`OLAPY CUBES RULES <OLAPY CUBES RULES>`,
+and move that folder under ``olapy-data/cubes``,
+thus, the path to your cube will be:
 
 - ``~/olapy-data/cubes/{YOUR_CUBE}/{YOU_CSV_FILES}`` for Mac/Linux,
-- and ``C:\\User\\{USER_NAME}\\olapy-data\\{YOUR_CUBE}\\{YOU_CSV_FILES}`` for Windows.
+- ``C:\\User\\{USER_NAME}\\olapy-data\\{YOUR_CUBE}\\{YOU_CSV_FILES}`` for Windows.
 
 OLAPY CUBES RULES
 ^^^^^^^^^^^^^^^^^
@@ -90,7 +90,7 @@ Cube 2
 Geography table
 ---------------
 
-+-----------+------------+
++------------+-----------+
 | Continent  | Country   |
 +============+===========+
 | America    | Canada    |

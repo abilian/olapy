@@ -36,19 +36,22 @@ Before running olapy, you have to initialize it with::
 Testing
 +++++++
 
-OlaPy is configured to run units and integrations tests suites. Before running tests, make sure you have Postgres and Mysql installed, and then set the environment variables to connect to each database management system with::
+OlaPy is configured to run units and integrations tests suites. Before running tests, make sure you have installed all development requirements with::
 
-      # for mysql
-      export MYSQL_URI = mysql://{USER}:{PASSWORD}@localhost:3306/{YourTestDataBase}
-      export SQLALCHEMY_DATABASE_URI_MYSQL=mysql://{USER}:{PASSWORD}@localhost:3306 #don't put database name here
-
-      # for postgres
-      export POSTGRES_URI=postgresql://{USER}:{PASSWORD}@localhost:5432/{YourTestDataBase}
-      export SQLALCHEMY_DATABASE_URI_POSTGRES=postgresql://{USER}:{PASSWORD}@localhost:5432 #don't put database name here
+   pip install -r dev-requirements.txt
 
 and then run::
 
     tox
+
+Test other databases
+~~~~~~~~~~~~~~~~~~~~
+
+The default database used with tests is sqlite, if you want to run tests against mysql or postgres, you need to install the appropriate driver and export a connection string like this ::
+
+    export SQLALCHEMY_DATABASE_URI = { dialect+driver://username:password@host:port/database }
+
+take a look to  `SQLAlchemy documentation <http://docs.sqlalchemy.org/en/latest/core/engines.html>`_ for more information.
 
 Olapy-data
 ----------
@@ -59,4 +62,4 @@ After Olapy initialization, you can take a look to `olapy-data` folder located u
 
     C:\User\{USER_NAME}\olapy-data     for Windows
 
-This folder contains some required files to configure olapy and some demo cubes under /cubes folder, we will deeply discuss about this in the :advanced configuration section:
+This folder contains some required files to configure olapy and some demo cubes under /cubes folder, we will deeply discuss about this in the :ref:`Cubes <cubes>` and :ref:`Cube Customization <customize>`
