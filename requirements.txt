@@ -7,7 +7,7 @@
 appdirs==1.4.3            # via fs
 attrs==18.1.0
 awesome-slugify==1.6.5
-bonobo-sqlalchemy==0.6.1
+bonobo-sqlalchemy==0.6.0
 bonobo==0.6.3
 certifi==2018.8.13        # via requests
 chardet==3.0.4            # via requests

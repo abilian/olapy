@@ -20,6 +20,6 @@ werkzeug
 
 #ETL
 bonobo
-bonobo-sqlalchemy
+bonobo-sqlalchemy<0.6.1
 awesome-slugify
 python-dotenv
