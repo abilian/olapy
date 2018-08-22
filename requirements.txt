@@ -41,5 +41,5 @@ typing==3.6.4
 unidecode==0.4.21         # via awesome-slugify, python-slugify
 urllib3==1.23             # via requests
 werkzeug==0.14.1
-whistle==1.0.1            # via bonobo
+whistle==1.0.0
 xmlwitch==0.3
