@@ -2,7 +2,7 @@ typing
 #grako
 pandas<1
 lxml
-spyne<3
+spyne==2.13.2a0
 #SQLAlchemy<1.2 # <1.2 required by bonobo
 SQLAlchemy
 xmlwitch
