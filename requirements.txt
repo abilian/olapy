@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 appdirs==1.4.3            # via fs
-attrs==18.1.0
+attrs==18.2.0
 awesome-slugify==1.6.5
 bonobo-sqlalchemy==0.6.0
 bonobo==0.6.3
@@ -28,7 +28,7 @@ psutil==5.4.7             # via bonobo
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3    # via pandas
 python-dotenv==0.9.1
-python-slugify==1.2.5     # via bonobo
+python-slugify==1.2.6     # via bonobo
 pytz==2018.5              # via fs, pandas, spyne
 pyyaml==3.13
 regex==2018.8.29
