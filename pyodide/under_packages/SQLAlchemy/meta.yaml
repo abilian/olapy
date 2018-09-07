@@ -1,0 +1,11 @@
+package:
+  name: SQLAlchemy
+  version: 1.2.0
+
+source:
+  url: https://files.pythonhosted.org/packages/be/d1/0008f4ee8d8eaae328efbf9cc513c1bee6f6793de11ab82cb31b3045ee06/SQLAlchemy-1.2.0.tar.gz
+  sha256: 7dda3e0b1b12215e3bb05368d1abbf7d747112a43738e0a4e6deb466b83fd88e
+
+test:
+  imports:
+    - sqlalchemy

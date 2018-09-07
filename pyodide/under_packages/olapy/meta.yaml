@@ -1,0 +1,28 @@
+package:
+  name: olapy
+#  version: '0.6.2'
+  version: 'pyodide_olapy'
+
+source:
+#  url: http://127.0.0.1:8000/olapy-0.6.2.tar.gz
+  url: https://github.com/abilian/olapy/archive/pyodide_olapy.zip
+
+  patches:
+    - patches/remove_libs.patch
+    - patches/remove_spyne_regex_attrs.patch
+    - patches/create_patch_olapy.patch
+    - patches/create_xmla_lib+use_olapy_patch.patch
+    - patches/change_xmla_class_logic.patch
+
+
+
+
+requirements:
+  run:
+    - pandas
+    - SQLAlchemy
+    - xmlwitch
+
+test:
+  imports:
+    - olapy

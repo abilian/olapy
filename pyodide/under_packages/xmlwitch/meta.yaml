@@ -1,0 +1,11 @@
+package:
+  name: xmlwitch
+  version: 0.3.0
+
+source:
+  url: https://files.pythonhosted.org/packages/0a/d4/02632fba90c3883d86d1f6c28db5fca5707498619d8e9efc9b98a377063c/xmlwitch-0.3.tar.gz
+  sha256: c5368319dfca28051abf78b41c0d9a6d99014389890a29ae539a0316e3f9760e
+
+test:
+  imports:
+    - xmlwitch

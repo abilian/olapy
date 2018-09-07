@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Python - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide.io/dist/iodide.pyodide-20180623.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "Python",
+  "languages": {
+    "js": {
+      "pluginType": "language",
+      "languageId": "js",
+      "displayName": "Javascript",
+      "codeMirrorMode": "javascript",
+      "module": "window",
+      "evaluator": "eval",
+      "keybinding": "j",
+      "url": ""
+    },
+    "py": {
+      "languageId": "py",
+      "displayName": "python",
+      "codeMirrorMode": "python",
+      "keybinding": "p",
+      "url": "http://localhost:8000/pyodide_dev.js",
+      "module": "pyodide",
+      "evaluator": "runPython",
+      "pluginType": "language"
+    }
+  },
+  "lastExport": "2018-05-04T17:13:00.489Z"
+}
+
+%% plugin
+{
+  "languageId": "py",
+  "displayName": "python",
+  "codeMirrorMode": "python",
+  "keybinding": "p",
+  "url": "http://localhost:8000/pyodide_dev.js",
+  "module": "pyodide",
+  "evaluator": "runPython",
+  "pluginType": "language"
+}
+
+
+%% js
+
+pyodide.loadPackage('olapy')
+
+%% code {"language":"py"}
+
+import pandas as pd
+import pyodide
+
+
+from olapy.core.services.xmla_lib import run_xmla
+config = {'cube': 'sales','request_type': 'DISCOVER_PROPERTIES','properties': {},'restrictions': {'PropertyName': 'ServerName'},'mdx_query': None}
+dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Facts.csv")),
+'Product':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Product.csv")),
+'Geography':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"))
+}
+run_xmla(xmla_config=config,dataframes=dataframes)
+
+
+%% code {"language":"py"}
+
+import pandas as pd
+import pyodide
+from olapy.core.services.xmla_lib import run_xmla
+
+dataframes = {
+    'Facts': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Facts.csv"), sep=';', encoding='utf-8'),
+    'Accounts': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Accounts.csv"), sep=';', encoding='utf-8'),
+    # 'Client': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Client.csv"),sep=';', encoding='utf-8'),
+    'Date': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Date.csv"), sep=';', encoding='utf-8'),
+    'Product': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Product.csv"), sep=';', encoding='utf-8'),
+    'Sales': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Sales.csv"), sep=';', encoding='utf-8'),
+    # 'Sender': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/sender.csv"),sep=';', encoding='utf-8'),
+    'Trade': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Trade.csv"), sep=';', encoding='utf-8'),
+    # 'Delivery': pd.read_csv(pyodide.open_url("olapy-data/cubes/Activity Export.Jan.Fev.2018/Delivery.csv"),sep=';', encoding='utf-8')
+}
+
+config = {'cube': 'Activity Export.Jan.Fev.2018',
+          'properties': {'AxisFormat': 'TupleFormat', 'Format': 'Multidimensional', 'Content': 'SchemaData',
+                         'Catalog': 'Activity Export.Jan.Fev.2018',
+                         'LocaleIdentifier': '1033', 'Timeout': '0'},
+          'mdx_query': """SELECT  FROM [Activity Export.Jan.Fev.2018] WHERE ([Measures].[Price]) CELL PROPERTIES VALUE,
+          FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""}
+
+
+run_xmla(xmla_config=config,dataframes=dataframes)
+
+
+</script>
+<div id='page'></div>
+<script src='https://iodide.io/dist/iodide.pyodide-20180623.js'></script>
+</body>
+</html>

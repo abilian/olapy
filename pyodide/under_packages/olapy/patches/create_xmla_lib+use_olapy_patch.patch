@@ -1,0 +1,122 @@
+From ff6dfb6f56147d891e99f994b97446b54f291c59 Mon Sep 17 00:00:00 2001
+From: mouadhkaabachi <mouadh.kaabachi@esprit.tn>
+Date: Fri, 7 Sep 2018 12:32:20 +0100
+Subject: [PATCH] create xmla_lib + apply patch
+
+---
+ olapy/core/services/xmla_discover_tools.py | 14 ++---
+ olapy/core/services/xmla_lib.py            | 70 ++++++++++++++++++++++
+ 2 files changed, 77 insertions(+), 7 deletions(-)
+ create mode 100644 olapy/core/services/xmla_lib.py
+
+diff --git a/olapy/core/services/xmla_discover_tools.py b/olapy/core/services/xmla_discover_tools.py
+index a912a16..19e7d58 100644
+--- a/olapy/core/services/xmla_discover_tools.py
++++ b/olapy/core/services/xmla_discover_tools.py
+@@ -60,11 +60,11 @@ class XmlaTools():
+         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
+         """
+         if self.selected_catalogue != new_catalogue:
+-            if (self.executor.cube_config and
+-                    new_catalogue == self.executor.cube_config["name"]):
+-                facts = self.executor.cube_config["facts"]["table_name"]
+-            else:
+-                facts = "Facts"
++            # if (self.executor.cube_config and
++            #         new_catalogue == self.executor.cube_config["name"]):
++            #     facts = self.executor.cube_config["facts"]["table_name"]
++            # else:
++            #     facts = "Facts"
+ 
+             self.selected_catalogue = new_catalogue
+             if "db" in self.executor.source_type:
+@@ -73,8 +73,8 @@ class XmlaTools():
+                     new_catalogue,
+                 )
+                 self.executor.sqla_engine = create_engine(new_sql_alchemy_uri)
+-            if self.executor.cube != new_catalogue:
+-                self.executor.load_cube(new_catalogue, fact_table_name=facts)
++            # if self.executor.cube != new_catalogue:
++            #     self.executor.load_cube(new_catalogue, fact_table_name=facts)
+ 
+     @staticmethod
+     def discover_datasources_response():
+diff --git a/olapy/core/services/xmla_lib.py b/olapy/core/services/xmla_lib.py
+new file mode 100644
+index 0000000..caac9b0
+--- /dev/null
++++ b/olapy/core/services/xmla_lib.py
+@@ -0,0 +1,70 @@
++from olapy.core.mdx.executor.execute import MdxEngine
++from olapy.core.patch.patch_olapy import patch
++from olapy.core.services.models import DiscoverRequest, Restriction, Property, Restrictionlist, Propertieslist, \
++    ExecuteRequest, Command
++from olapy.core.services.xmla import XmlaProviderService
++from olapy.core.services.xmla_discover_tools import XmlaTools
++
++
++def run_xmla(xmla_config, dataframes=None):
++    mdx_engine = MdxEngine()
++    patch(mdx_engine, dataframes)
++    xmla_tools = XmlaTools(mdx_engine)  # xmla tools prepares xmla responses
++    xmla_tools.change_catalogue(xmla_config.get('cube'))
++
++    xmla_service = XmlaProviderService(xmla_tools)  # xmla provider return xmla responses
++
++    property = Property(**xmla_config.get('properties'))
++    properties = Propertieslist()
++    properties.PropertyList = property
++
++    if xmla_config.get('mdx_query'):  #  Execute request
++        request = ExecuteRequest()
++        request.Command = Command(Statement=xmla_config.get('mdx_query'))
++
++        request.Properties = properties
++
++        return xmla_service.Execute(request)
++
++    else:  #  Discover request
++        request = DiscoverRequest()
++        restriction = Restriction(**xmla_config.get('restrictions'))
++        request.Restrictions = Restrictionlist(RestrictionList=restriction)
++
++        request.RequestType = xmla_config.get('request_type')
++        request.Properties = properties
++
++        return xmla_service.Discover(request)
++
++
++if __name__ == '__main__':
++    config1 = {
++        'cube': 'sales',
++        'request_type': 'DISCOVER_PROPERTIES',
++        'properties': {
++        },
++        'restrictions': {
++            'PropertyName': 'ServerName'
++        },
++        'mdx_query': None
++    }
++
++    config2 = {
++        'cube': 'Activity Export.Jan.Fev.2018',
++        'properties': {
++            'AxisFormat': 'TupleFormat',
++            'Format': 'Multidimensional',
++            'Content': 'SchemaData',
++            'Catalog': 'Activity Export.Jan.Fev.2018',
++            'LocaleIdentifier': '1033',
++            'Timeout': '0'
++        },
++        'mdx_query': """SELECT  FROM [Activity Export.Jan.Fev.2018] WHERE ([Measures].[Price]) CELL PROPERTIES VALUE,
++         FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
++    }
++
++    xmla_response = run_xmla(config1)
++    print(xmla_response)
++
++    xmla_response = run_xmla(config2)
++    print(xmla_response)
+-- 
+2.18.0
+
