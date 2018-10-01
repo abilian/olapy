@@ -11,7 +11,7 @@ bonobo-sqlalchemy==0.6.0
 bonobo==0.6.3
 certifi==2018.8.24        # via requests
 chardet==3.0.4            # via requests
-click==6.7
+click==7.0
 colorama==0.3.9           # via mondrian
 fs==2.1.0                 # via bonobo
 graphviz==0.8.4           # via bonobo
@@ -20,12 +20,12 @@ jinja2==2.10              # via bonobo
 lxml==4.2.5
 markupsafe==1.0           # via jinja2
 mondrian==0.8.0           # via bonobo
-numpy==1.15.1             # via pandas
+numpy==1.15.2             # via pandas
 packaging==17.1           # via bonobo
 pandas==0.23.4
 pbr==4.2.0                # via stevedore
 psutil==5.4.7             # via bonobo
-pyparsing==2.2.1          # via packaging
+pyparsing==2.2.2          # via packaging
 python-dateutil==2.7.3    # via pandas
 python-dotenv==0.9.1
 python-slugify==1.2.6     # via bonobo
