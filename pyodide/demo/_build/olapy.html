@@ -26,7 +26,7 @@
       "displayName": "python",
       "codeMirrorMode": "python",
       "keybinding": "p",
-      "url": "http://localhost:8000/pyodide_dev.js",
+      "url": "/pyodide_dev.js",
       "module": "pyodide",
       "evaluator": "runPython",
       "pluginType": "language"
@@ -41,7 +41,7 @@
   "displayName": "python",
   "codeMirrorMode": "python",
   "keybinding": "p",
-  "url": "http://localhost:8000/pyodide_dev.js",
+  "url": "/pyodide_dev.js",
   "module": "pyodide",
   "evaluator": "runPython",
   "pluginType": "language"
@@ -58,7 +58,7 @@ import pandas as pd
 import pyodide
 from olapy.core.services.xmla_lib import run_xmla
 
-config = {'cube': 'sales','request_type': 'DISCOVER_PROPERTIES','properties': {},
+xmla_request_params = {'cube': 'sales','request_type': 'DISCOVER_PROPERTIES','properties': {},
           'restrictions': {'PropertyName': 'ServerName'},'mdx_query': None}
 
 dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Facts.csv"),sep=';', encoding='utf8'),
@@ -66,7 +66,7 @@ dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Fac
 'Geography':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"),sep=';', encoding='utf8')
 }
 
-run_xmla(xmla_config=config,dataframes=dataframes)
+run_xmla(xmla_request_params=xmla_request_params, dataframes=dataframes)
 
 
 %% code {"language":"py"}
@@ -80,7 +80,7 @@ dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Fac
 'Geography':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"),sep=';', encoding='utf8')
 }
 
-config = {'cube': 'sales',
+xmla_request_params = {'cube': 'sales',
           'properties': {'AxisFormat': 'TupleFormat', 'Format': 'Multidimensional', 'Content': 'SchemaData',
                          'Catalog': 'sales',
                          'LocaleIdentifier': '1033', 'Timeout': '0'},
@@ -88,7 +88,7 @@ config = {'cube': 'sales',
           FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""}
 
 
-run_xmla(xmla_config=config,dataframes=dataframes)
+run_xmla(xmla_request_params=xmla_request_params, dataframes=dataframes)
 
 
 

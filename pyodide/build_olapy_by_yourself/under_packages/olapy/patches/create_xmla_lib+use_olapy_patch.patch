@@ -55,21 +55,21 @@ index 0000000..caac9b0
 +from olapy.core.services.xmla_discover_tools import XmlaTools
 +
 +
-+def run_xmla(xmla_config, dataframes=None):
++def run_xmla(xmla_request_params, dataframes=None):
 +    mdx_engine = MdxEngine()
 +    patch(mdx_engine, dataframes)
 +    xmla_tools = XmlaTools(mdx_engine)  # xmla tools prepares xmla responses
-+    xmla_tools.change_catalogue(xmla_config.get('cube'))
++    xmla_tools.change_catalogue(xmla_request_params.get('cube'))
 +
 +    xmla_service = XmlaProviderService(xmla_tools)  # xmla provider return xmla responses
 +
-+    property = Property(**xmla_config.get('properties'))
++    property = Property(**xmla_request_params.get('properties'))
 +    properties = Propertieslist()
 +    properties.PropertyList = property
 +
-+    if xmla_config.get('mdx_query'):  #  Execute request
++    if xmla_request_params.get('mdx_query'):  #  Execute request
 +        request = ExecuteRequest()
-+        request.Command = Command(Statement=xmla_config.get('mdx_query'))
++        request.Command = Command(Statement=xmla_request_params.get('mdx_query'))
 +
 +        request.Properties = properties
 +
@@ -77,10 +77,10 @@ index 0000000..caac9b0
 +
 +    else:  #  Discover request
 +        request = DiscoverRequest()
-+        restriction = Restriction(**xmla_config.get('restrictions'))
++        restriction = Restriction(**xmla_request_params.get('restrictions'))
 +        request.Restrictions = Restrictionlist(RestrictionList=restriction)
 +
-+        request.RequestType = xmla_config.get('request_type')
++        request.RequestType = xmla_request_params.get('request_type')
 +        request.Properties = properties
 +
 +        return xmla_service.Discover(request)
