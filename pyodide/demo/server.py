@@ -1,4 +1,4 @@
-from wsgiref.simple_server import make_server, WSGIRequestHandler
+from wsgiref.simple_server import make_server
 import os
 
 

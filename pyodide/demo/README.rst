@@ -1,13 +1,14 @@
 Demo
 ----
 
-Run the simple server with::
-
-    python server.py
-
-or with gunicorn ::
+install gunicorn with::
 
     pip install gunicorn
+
+
+run::
+
+
 
     gunicorn -w 4 server:app
 
