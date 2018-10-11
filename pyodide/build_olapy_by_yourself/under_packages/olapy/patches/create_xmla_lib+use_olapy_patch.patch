@@ -87,7 +87,7 @@ index 0000000..caac9b0
 +
 +
 +if __name__ == '__main__':
-+    config1 = {
++    xmla_request_params = {
 +        'cube': 'sales',
 +        'request_type': 'DISCOVER_PROPERTIES',
 +        'properties': {
@@ -98,24 +98,24 @@ index 0000000..caac9b0
 +        'mdx_query': None
 +    }
 +
-+    config2 = {
-+        'cube': 'Activity Export.Jan.Fev.2018',
++    xmla_request_params2 = {
++        'cube': 'sales',
 +        'properties': {
 +            'AxisFormat': 'TupleFormat',
 +            'Format': 'Multidimensional',
 +            'Content': 'SchemaData',
-+            'Catalog': 'Activity Export.Jan.Fev.2018',
++            'Catalog': 'sales',
 +            'LocaleIdentifier': '1033',
 +            'Timeout': '0'
 +        },
-+        'mdx_query': """SELECT  FROM [Activity Export.Jan.Fev.2018] WHERE ([Measures].[Price]) CELL PROPERTIES VALUE,
++        'mdx_query': """SELECT  FROM [sales] WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE,
 +         FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
 +    }
 +
-+    xmla_response = run_xmla(config1)
++    xmla_response = run_xmla(xmla_request_params)
 +    print(xmla_response)
 +
-+    xmla_response = run_xmla(config2)
++    xmla_response = run_xmla(xmla_request_params2)
 +    print(xmla_response)
 -- 
 2.18.0
