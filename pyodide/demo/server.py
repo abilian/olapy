@@ -2,11 +2,10 @@
 # https://gist.github.com/razor-x/9542707
 
 import os
-import sys
 import http.server
 import socketserver
 
-PORT = 8000
+PORT = 8080
 
 
 class HTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -32,17 +31,3 @@ def app(environ, start_response):
     httpd = server(port)
     print("\nserving from _build/ at localhost:" + str(port))
     httpd.serve_forever()
-
-
-if __name__ == "__main__":
-
-    port = PORT
-    httpd = server(port)
-    try:
-        os.chdir('_build')
-        print("\nserving from _build/ at localhost:" + str(port))
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\n...shutting down http server")
-        httpd.shutdown()
-sys.exit()
