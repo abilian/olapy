@@ -1,6 +1,6 @@
 from wsgiref.simple_server import make_server
 import os
-
+import http.server
 
 def content_type(path):
     if path.endswith(".css"):
@@ -10,6 +10,15 @@ def content_type(path):
     else:
         return "text/html"
 
+class HTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        # http.server.SimpleHTTPRequestHandler
+        Handler = http.server.SimpleHTTPRequestHandler
+        # IMPORTANT
+        Handler.extensions_map['.wasm'] = 'application/wasm'
+        Handler.end_headers(self)
+
 
 def app(environ, start_response):
     path_info = environ["PATH_INFO"]
@@ -17,6 +26,7 @@ def app(environ, start_response):
 
     headers = []
     headers.append(("Content-Type", content_type(resource)))
+    # headers.append(('Access-Control-Allow-Origin', '*'))
 
     if not resource:
         resource = "olapy.html"
@@ -35,5 +45,5 @@ def app(environ, start_response):
 
 
 def runserver(environ, start_response):
-    server = make_server("0.0.0.0", 8080, app)
+    server = make_server("0.0.0.0", 8080, app,handler_class=HTTPRequestHandler)
     server.serve_forever()
