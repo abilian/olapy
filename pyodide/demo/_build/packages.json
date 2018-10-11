@@ -1,20 +1,19 @@
 {
     "dependencies": {
-        "numpy": [],
-        "pandas": [
-            "numpy",
-            "python-dateutil",
-            "pytz"
-        ],
+        "pytz": [],
+        "kiwisolver": [],
+        "python-dateutil": [],
+        "pluggy": [],
+        "pyparsing": [],
         "olapy": [
             "pandas",
             "SQLAlchemy",
-            "xmlwitch",
-            "pytz",
-            "python-dateutil"
+            "xmlwitch"
         ],
-        "python-dateutil": [],
-        "pyparsing": [],
+        "nose": [
+            "setuptools"
+        ],
+        "py": [],
         "matplotlib": [
             "cycler",
             "kiwisolver",
@@ -23,10 +22,29 @@
             "python-dateutil",
             "pytz"
         ],
-        "SQLAlchemy": [],
+        "pytest": [
+            "atomicwrites",
+            "attrs",
+            "more-itertools",
+            "pluggy",
+            "py",
+            "setuptools"
+        ],
+        "attrs": [],
+        "more-itertools": [],
+        "setuptools": [
+            "pyparsing"
+        ],
         "cycler": [],
+        "atomicwrites": [],
+        "numpy": [],
+        "SQLAlchemy": [],
+        "pandas": [
+            "numpy",
+            "python-dateutil",
+            "pytz"
+        ],
         "xmlwitch": [],
-        "pytz": [],
-        "kiwisolver": []
+        "test": []
     }
 }
