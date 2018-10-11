@@ -1,0 +1,32 @@
+{
+    "dependencies": {
+        "numpy": [],
+        "pandas": [
+            "numpy",
+            "python-dateutil",
+            "pytz"
+        ],
+        "olapy": [
+            "pandas",
+            "SQLAlchemy",
+            "xmlwitch",
+            "pytz",
+            "python-dateutil"
+        ],
+        "python-dateutil": [],
+        "pyparsing": [],
+        "matplotlib": [
+            "cycler",
+            "kiwisolver",
+            "numpy",
+            "pyparsing",
+            "python-dateutil",
+            "pytz"
+        ],
+        "SQLAlchemy": [],
+        "cycler": [],
+        "xmlwitch": [],
+        "pytz": [],
+        "kiwisolver": []
+    }
+}

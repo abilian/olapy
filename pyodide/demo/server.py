@@ -25,8 +25,8 @@ if __name__ == "__main__":
     port = PORT
     httpd = server(port)
     try:
-        os.chdir('build')
-        print("\nserving from build/ at localhost:" + str(port))
+        os.chdir('_build')
+        print("\nserving from _build/ at localhost:" + str(port))
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("\n...shutting down http server")
