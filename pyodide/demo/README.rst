@@ -10,7 +10,7 @@ run::
 
 
 
-    gunicorn -w 4 server:app
+    gunicorn -w 4 -b 0.0.0.0 server:app
 
 
 and go to http://localhost:8000/olapy.html
