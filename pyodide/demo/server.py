@@ -5,6 +5,7 @@ from wsgiref.simple_server import make_server
 def app(environ, start_response):
     path_info = environ["PATH_INFO"]
     mimetypes.add_type('application/wasm', '.wasm')
+    mimetypes.add_type('text/html', '.data')
     if path_info == '/':
         path_info = "/olapy.html"
 
