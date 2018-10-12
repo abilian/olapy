@@ -66,7 +66,7 @@ dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Fac
 'Geography':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"),sep=';', encoding='utf8')
 }
 
-run_xmla(xmla_request_params=xmla_request_params, dataframes=dataframes)
+run_xmla(xmla_config=xmla_request_params, dataframes=dataframes)
 
 
 %% code {"language":"py"}
@@ -88,7 +88,7 @@ xmla_request_params = {'cube': 'sales',
           FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""}
 
 
-run_xmla(xmla_request_params=xmla_request_params, dataframes=dataframes)
+run_xmla(xmla_config=xmla_request_params, dataframes=dataframes)
 
 
 
