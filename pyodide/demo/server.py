@@ -1,16 +1,16 @@
-from mimetypes import guess_type
+import mimetypes
 from wsgiref.simple_server import make_server
 
 
 def app(environ, start_response):
     path_info = environ["PATH_INFO"]
-
+    mimetypes.add_type('application/wasm', '.wasm')
     if path_info == '/':
         path_info = "/olapy.html"
 
     resource = "_build" + path_info
     headers = []
-    headers.append(("Content-Type", guess_type(path_info.split("/")[-1])[0]))
+    headers.append(("Content-Type", mimetypes.guess_type(path_info.split("/")[-1])[0]))
     headers.append(('Access-Control-Allow-Origin', '*'))
 
     with open(resource, "rb") as f:
