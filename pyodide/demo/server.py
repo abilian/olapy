@@ -1,17 +1,5 @@
+from mimetypes import guess_type
 from wsgiref.simple_server import make_server
-
-
-def content_type(path):
-    if path.endswith(".css"):
-        return "text/css"
-    elif path.endswith(".js"):
-        return "text/javascript"
-    elif path.endswith('.wasm'):
-        return 'application/wasm'
-    elif path.endswith('.csv'):
-        return 'text/csv'
-    else:
-        return "text/html"
 
 
 def app(environ, start_response):
@@ -21,9 +9,8 @@ def app(environ, start_response):
         path_info = "/olapy.html"
 
     resource = "_build" + path_info
-
     headers = []
-    headers.append(("Content-Type", content_type(path_info.split("/")[-1])))
+    headers.append(("Content-Type", guess_type(path_info.split("/")[-1])[0]))
     headers.append(('Access-Control-Allow-Origin', '*'))
 
     with open(resource, "rb") as f:
