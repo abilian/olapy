@@ -4,7 +4,7 @@ pandas<1
 lxml
 #spyne==2.13.2a0
 #SQLAlchemy<1.2 # <1.2 required by bonobo
-SQLAlchemy
+#SQLAlchemy
 xmlwitch
 #attrs
 pyyaml

@@ -29,6 +29,9 @@ setup(
         "Programming Language :: Python :: 3.6",
         # "Topic :: Business intelligence",
     ],
+    extras_require={
+        'db': ["SQLAlchemy"],
+    },
     entry_points={'console_scripts': ['olapy = olapy.__main__:cli',
                                       'etl = olapy.etl.etl:run_etl', ]},
 )
