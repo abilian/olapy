@@ -60,11 +60,11 @@ class XmlaTools():
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
         if self.selected_catalogue != new_catalogue:
-            if (self.executor.cube_config and
-                    new_catalogue == self.executor.cube_config["name"]):
-                facts = self.executor.cube_config["facts"]["table_name"]
-            else:
-                facts = "Facts"
+            # if (self.executor.cube_config and
+            #         new_catalogue == self.executor.cube_config["name"]):
+            #     facts = self.executor.cube_config["facts"]["table_name"]
+            # else:
+            #     facts = "Facts"
 
             self.selected_catalogue = new_catalogue
             if "db" in self.executor.source_type:
@@ -73,8 +73,8 @@ class XmlaTools():
                     new_catalogue,
                 )
                 self.executor.sqla_engine = create_engine(new_sql_alchemy_uri)
-            if self.executor.cube != new_catalogue:
-                self.executor.load_cube(new_catalogue, fact_table_name=facts)
+            # if self.executor.cube != new_catalogue:
+            #     self.executor.load_cube(new_catalogue, fact_table_name=facts)
 
     @staticmethod
     def discover_datasources_response():

@@ -6,11 +6,13 @@ Parser for MDX queries, and Break it in parts.
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-import regex
+# import regex
 
 
 # FIXME: make this regex more readable (split it)
-REGEX = regex.compile(
+import re
+
+REGEX = re.compile(
     "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
     '\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
 
@@ -228,7 +230,7 @@ class Parser(object):
         :return: All groups as list of strings.
 
         """
-        return regex.findall(r"\(([^()]+)\)", self.mdx_query)
+        return re.findall(r"\(([^()]+)\)", self.mdx_query)
 
     def hierarchized_tuples(self):
         # type: () -> bool

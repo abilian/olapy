@@ -24,7 +24,7 @@ from os.path import expanduser
 
 from typing import List, Dict
 
-import attr
+# import attr
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
@@ -36,7 +36,7 @@ from .cube_loader_custom import CubeLoaderCustom
 from .cube_loader_db import CubeLoaderDB
 
 
-@attr.s
+# @attr.s
 class MdxEngine(object):
     """The main class for executing a query.
 
@@ -54,21 +54,36 @@ class MdxEngine(object):
     :param facts:  facts table name, Default **Facts**
 
     """
+    def __init__(self):
+        self.cube = None
+        self.facts = "Facts"
+        self.source_type = "csv"
+        self.parser = Parser()
+        self.csv_files_cubes = []
+        self.db_cubes = []
+        self.sqla_engine = None
+        self.olapy_data_location = os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data")
+        self.cube_config = None
+        self.tables_loaded = None
+        self.star_schema_dataframe = None
+        self.measures = None
+        self.selected_measures = None
+        self.cubes_folder = "cubes"
 
-    cube = attr.ib(default=None)
-    facts = attr.ib(default="Facts")
-    source_type = attr.ib(default="csv")
-    parser = attr.ib(default=Parser())
-    csv_files_cubes = attr.ib(default=attr.Factory(list))
-    db_cubes = attr.ib(default=attr.Factory(list))
-    sqla_engine = attr.ib(default=None)
-    olapy_data_location = attr.ib(default=os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"))
-    cube_config = attr.ib(default=None)
-    tables_loaded = attr.ib(default=None)
-    star_schema_dataframe = attr.ib(default=None)
-    measures = attr.ib(default=None)
-    selected_measures = attr.ib(default=None)
-    cubes_folder = attr.ib(default="cubes")
+    # cube = attr.ib(default=None)
+    # facts = attr.ib(default="Facts")
+    # source_type = attr.ib(default="csv")
+    # parser = attr.ib(default=Parser())
+    # csv_files_cubes = attr.ib(default=attr.Factory(list))
+    # db_cubes = attr.ib(default=attr.Factory(list))
+    # sqla_engine = attr.ib(default=None)
+    # olapy_data_location = attr.ib(default=os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"))
+    # cube_config = attr.ib(default=None)
+    # tables_loaded = attr.ib(default=None)
+    # star_schema_dataframe = attr.ib(default=None)
+    # measures = attr.ib(default=None)
+    # selected_measures = attr.ib(default=None)
+    # cubes_folder = attr.ib(default="cubes")
 
     # @olapy_data_location.default
     # def get_default_cubes_directory(self):
