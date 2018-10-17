@@ -1,3 +1,5 @@
+import importlib
+
 import pandas as pd
 
 from olapy.core.mdx.executor.execute import MdxEngine
@@ -5,13 +7,13 @@ from olapy.core.patch.patch_olapy import patch
 from olapy.core.services.models import DiscoverRequest, Restriction, Property, Restrictionlist, Propertieslist, \
     ExecuteRequest, Command
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaTools
 
 
-def run_xmla(xmla_request_params, dataframes=None):
+def run_xmla(xmla_request_params, dataframes=None, output='dict'):
     mdx_engine = MdxEngine()
     patch(mdx_engine, dataframes)
-    xmla_tools = XmlaTools(mdx_engine)  # xmla tools prepares xmla responses
+    module = importlib.import_module('olapy.core.services.' + output + '_discover_tools')
+    xmla_tools = getattr(module, output.title() + 'DiscoverTools')(mdx_engine)
     xmla_tools.change_catalogue(xmla_request_params.get('cube'))
 
     xmla_service = XmlaProviderService(xmla_tools)  # xmla provider return xmla responses
@@ -40,16 +42,16 @@ def run_xmla(xmla_request_params, dataframes=None):
 
 
 if __name__ == '__main__':
-    xmla_request_params = {
-        'cube': 'sales',
-        'request_type': 'DISCOVER_PROPERTIES',
-        'properties': {
-        },
-        'restrictions': {
-            'PropertyName': 'ServerName'
-        },
-        'mdx_query': None
-    }
+    # xmla_request_params = {
+    #     'cube': 'sales',
+    #     'request_type': 'DISCOVER_PROPERTIES',
+    #     'properties': {
+    #     },
+    #     'restrictions': {
+    #         'PropertyName': 'ServerName'
+    #     },
+    #     'mdx_query': None
+    # }
 
     xmla_request_params2 = {
         'cube': 'sales',
@@ -72,8 +74,8 @@ if __name__ == '__main__':
                                            encoding='utf8')
                   }
 
-    xmla_response = run_xmla(xmla_request_params, dataframes)
-    print(xmla_response)
+    # xmla_response = run_xmla(xmla_request_params, dataframes)
+    # print(xmla_response)
 
     xmla_response = run_xmla(xmla_request_params2, dataframes)
     print(xmla_response)
