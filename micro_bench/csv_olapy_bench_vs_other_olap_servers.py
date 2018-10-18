@@ -18,7 +18,7 @@ from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property
 from olapy.core.services.xmla import XmlaProviderService, get_spyne_app
-from olapy.core.services.xmla_discover_tools import XmlaTools
+from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverRequestHandler
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -413,7 +413,7 @@ def _get_xmla_tools():
     olapy_data = os.path.join(expanduser('~'), 'olapy-data')
     mdx_executor = MdxEngine()
     mdx_executor.load_cube(CUBE_NAME)
-    xmla_tools = XmlaTools(
+    xmla_tools = XmlaDiscoverRequestHandler(
         executor=mdx_executor,
         olapy_data=olapy_data,
         source_type='csv',
