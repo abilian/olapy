@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import xmlwitch
 
-from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
+from olapy.core.services.xmla_execute_tools import XmlaExecuteReqHandler
 
 from .queries import query11, query12, query14
 
@@ -42,7 +42,7 @@ def test_slicer_axis_query11(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('0')
 
-    xmla_tools = XmlaExecuteTools(executor, query11, False)
+    xmla_tools = XmlaExecuteReqHandler(executor, query11, False)
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
@@ -74,7 +74,7 @@ def test_slicer_axis_query12(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
-    xmla_tools = XmlaExecuteTools(executor, query12, False)
+    xmla_tools = XmlaExecuteReqHandler(executor, query12, False)
     assert str(xml) == xmla_tools.generate_slicer_axis()
 
 
@@ -100,5 +100,5 @@ def test_slicer_axis_query14(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('2')
 
-    xmla_tools = XmlaExecuteTools(executor, query14, False)
+    xmla_tools = XmlaExecuteReqHandler(executor, query14, False)
     assert str(xml) == xmla_tools.generate_slicer_axis()

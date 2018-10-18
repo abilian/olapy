@@ -11,12 +11,10 @@ import imp
 import logging
 import os
 import sys
-from datetime import datetime
 from os.path import expanduser, isfile
 from wsgiref.simple_server import make_server
 
 import click
-import xmlwitch
 from spyne import AnyXml, Application, Fault, ServiceBase, rpc
 from spyne.const.http import HTTP_200
 from spyne.error import InvalidCredentialsError
@@ -30,9 +28,8 @@ from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
-from .xmla_discover_tools import XmlaTools
-from .xmla_execute_tools import XmlaExecuteTools
-from .xmla_execute_xsds import execute_xsd
+from .xmla_discover_tools import XmlaDiscoverReqHandler
+from .xmla_execute_tools import XmlaExecuteReqHandler
 
 
 class XmlaSoap11(Soap11):
@@ -79,18 +76,18 @@ class XmlaProviderService(ServiceBase):
 
         """
         # ctx is the 'context' parameter used by Spyne
-        xmla_tools = ctx.app.config["xmla_tools"]
-        ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
-        config_parser = xmla_tools.executor.cube_config
+        discover_request_hanlder = ctx.app.config["discover_request_hanlder"]
+        ctx.out_header = Session(SessionId=str(discover_request_hanlder.session_id))
+        config_parser = discover_request_hanlder.executor.cube_config
         if (config_parser and config_parser["xmla_authentication"] and
-                ctx.transport.req_env["QUERY_STRING"] != "admin"):
+            ctx.transport.req_env["QUERY_STRING"] != "admin"):
             raise InvalidCredentialsError(
                 fault_string="You do not have permission to access this resource",
                 fault_object=None,
             )
 
         method_name = request.RequestType.lower() + "_response"
-        method = getattr(xmla_tools, method_name)
+        method = getattr(discover_request_hanlder, method_name)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return method()
@@ -113,72 +110,20 @@ class XmlaProviderService(ServiceBase):
         :return: XML Execute response as string
         """
 
-        xmla_tools = ctx.app.config["xmla_tools"]
-        ctx.out_header = Session(SessionId=str(xmla_tools.session_id))
+        # same session_id in discover and execute
+        ctx.out_header = Session(SessionId=str(ctx.app.config["discover_request_hanlder"].session_id))
+        # same executor instance as the discovery (not reloading the cube another time)
+        executor = ctx.app.config["discover_request_hanlder"].executor
         mdx_query = request.Command.Statement.encode().decode("utf8")
-        if mdx_query == "":
-            # check if command contains a query
-            xml = xmlwitch.Builder()
-            with xml["return"]:
-                xml.root(xmlns="urn:schemas-microsoft-com:xml-analysis:empty")
+        execute_request_hanlder = ctx.app.config["execute_request_hanlder"]
 
-            return str(xml)
-
+        # Hierarchize
+        if all(key in mdx_query for key in ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]):
+            convert2formulas = True
         else:
-            xmla_tools.change_catalogue(request.Properties.PropertyList.Catalog,
-                                        )
-            xml = xmlwitch.Builder()
-            executor = xmla_tools.executor
+            convert2formulas = False
 
-            # Hierarchize
-            if all(key in mdx_query
-                   for key in
-                   ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]):
-                convert2formulas = True
-            else:
-                convert2formulas = False
-
-            xmla_tools = XmlaExecuteTools(
-                executor,
-                mdx_query,
-                convert2formulas,
-            )
-
-            with xml["return"]:
-                with xml.root(
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
-                        **{
-                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                            "xmlns:xsi":
-                            "http://www.w3.org/2001/XMLSchema-instance",
-                        }):
-                    xml.write(execute_xsd)
-                    with xml.OlapInfo:
-                        with xml.CubeInfo:
-                            with xml.Cube:
-                                xml.CubeName("Sales")
-                                xml.LastDataUpdate(
-                                    datetime.now().strftime(
-                                        "%Y-%m-%dT%H:%M:%S",),
-                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
-                                )
-                                xml.LastSchemaUpdate(
-                                    datetime.now().strftime(
-                                        "%Y-%m-%dT%H:%M:%S",),
-                                    xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
-                                )
-                        xml.write(xmla_tools.generate_cell_info())
-                        with xml.AxesInfo:
-                            xml.write(xmla_tools.generate_axes_info())
-                            xml.write(xmla_tools.generate_axes_info_slicer())
-
-                    with xml.Axes:
-                        xml.write(xmla_tools.generate_xs0())
-                        xml.write(xmla_tools.generate_slicer_axis())
-
-                    with xml.CellData:
-                        xml.write(xmla_tools.generate_cell_data())
-            return str(xml)
+        return execute_request_hanlder.generate_response(executor, mdx_query, convert2formulas)
 
 
 home_directory = expanduser("~")
@@ -186,13 +131,13 @@ conf_file = os.path.join(home_directory, "olapy-data", "logs", "xmla.log")
 
 
 def get_mdx_engine(
-        cube_config,
-        sql_alchemy_uri,
-        olapy_data,
-        source_type,
-        direct_table_or_file,
-        columns,
-        measures,
+    cube_config,
+    sql_alchemy_uri,
+    olapy_data,
+    source_type,
+    direct_table_or_file,
+    columns,
+    measures,
 ):
     sqla_engine = None
     if sql_alchemy_uri:
@@ -219,10 +164,10 @@ def get_mdx_engine(
     return executor
 
 
-def get_spyne_app(xmla_tools):
+def get_spyne_app(discover_request_hanlder, execute_request_hanlder):
     """
 
-    :param xmla_tools: XmlaTools instance
+    :param xmla_tools: XmlaDiscoverReqHandler instance
     :return: spyne  Application
     """
     return Application(
@@ -230,7 +175,8 @@ def get_spyne_app(xmla_tools):
         "urn:schemas-microsoft-com:xml-analysis",
         in_protocol=XmlaSoap11(validator="soft"),
         out_protocol=XmlaSoap11(validator="soft"),
-        config={"xmla_tools": xmla_tools},
+        config={"discover_request_hanlder": discover_request_hanlder,
+                "execute_request_hanlder": execute_request_hanlder},
     )
 
 
@@ -240,8 +186,9 @@ def get_wsgi_application(mdx_engine):
     :param mdx_engine: MdxEngine instance
     :return: Wsgi Application
     """
-    xmla_tools = XmlaTools(mdx_engine)
-    application = get_spyne_app(xmla_tools)
+    discover_request_hanlder = XmlaDiscoverReqHandler(mdx_engine)
+    execute_request_hanlder = XmlaExecuteReqHandler()
+    application = get_spyne_app(discover_request_hanlder, execute_request_hanlder)
 
     # validator='soft' or nothing, this is important because spyne doesn't
     # support encodingStyle until now !!!!
@@ -287,7 +234,7 @@ def get_wsgi_application(mdx_engine):
     "-dbc",
     default=os.path.join(home_directory, "olapy-data", "olapy-config.yml"),
     help="Database configuration file path, DEFAULT : " +
-    os.path.join(home_directory, "olapy-data", "olapy-config.yml"),
+         os.path.join(home_directory, "olapy-data", "olapy-config.yml"),
 )
 @click.option(
     "--cube_config_file",
@@ -299,7 +246,7 @@ def get_wsgi_application(mdx_engine):
         "cubes-config.yml",
     ),
     help="Cube config file path, DEFAULT : " +
-    os.path.join(home_directory, "olapy-data", "cubes", "cubes-config.yml"),
+         os.path.join(home_directory, "olapy-data", "cubes", "cubes-config.yml"),
 )
 @click.option(
     "--direct_table_or_file",
@@ -320,18 +267,18 @@ def get_wsgi_application(mdx_engine):
     help="To explicitly specify measures if (construct cube from a single file)",
 )
 def runserver(
-        host,
-        port,
-        write_on_file,
-        log_file_path,
-        sql_alchemy_uri,
-        olapy_data,
-        source_type,
-        db_config_file,
-        cube_config_file,
-        direct_table_or_file,
-        columns,
-        measures,
+    host,
+    port,
+    write_on_file,
+    log_file_path,
+    sql_alchemy_uri,
+    olapy_data,
+    source_type,
+    db_config_file,
+    cube_config_file,
+    direct_table_or_file,
+    columns,
+    measures,
 ):
     """
     Start the xmla server.
@@ -351,7 +298,7 @@ def runserver(
     sqla_uri = None
     if "db" in source_type:
         if sql_alchemy_uri:
-            # just uri, and inside XmlaTools we gonna to change uri if cube changes and the create_engine
+            # just uri, and inside XmlaDiscoverReqHandler we gonna to change uri if cube changes and the create_engine
             sqla_uri = sql_alchemy_uri
         else:
             # if uri not passed with params, look up in the olapy-data config file
@@ -375,7 +322,7 @@ def runserver(
     # log to the file
     if write_on_file:
         if not os.path.isdir(
-                os.path.join(home_directory, "olapy-data", "logs"),):
+            os.path.join(home_directory, "olapy-data", "logs"), ):
             os.makedirs(os.path.join(home_directory, "olapy-data", "logs"))
         logging.basicConfig(level=logging.DEBUG, filename=log_file_path)
     else:

@@ -15,7 +15,7 @@ from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from olapy.core.services.xmla import get_spyne_app
-from olapy.core.services.xmla_discover_tools import XmlaTools
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
 
 from .micro_bench import MicBench
 
@@ -85,7 +85,7 @@ def main():
     db_conf = db_config.get_db_credentials(
         os.path.join(olapy_data, 'olapy-config.yml'))
 
-    xmla_tools = XmlaTools(
+    xmla_tools = XmlaDiscoverReqHandler(
         olapy_data=olapy_data,
         source_type='db',
         db_config=db_conf,

@@ -13,7 +13,7 @@ from werkzeug.serving import make_server
 
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaTools
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
@@ -85,7 +85,7 @@ def conn():
     create_insert(engine)
     executor = MdxEngine(sqla_engine=engine, source_type='db')
     executor.load_cube(cube_name='main', fact_table_name='facts')
-    xmla_tools = XmlaTools(executor)
+    xmla_tools = XmlaDiscoverReqHandler(executor)
 
     print("spawning server")
     application = Application(
