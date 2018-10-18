@@ -9,18 +9,26 @@ from olapy.core.services.models import DiscoverRequest, Restriction, Property, R
 from olapy.core.services.xmla import XmlaProviderService
 
 
-def run_xmla(xmla_request_params, dataframes=None, output='dict'):
+def get_response(xmla_request_params, dataframes=None, output='dict'):
+    # type: (dict, dict, str) -> dict
+    """
+    get xmla reponse
+    :param xmla_request_params: xmla request parameters
+    :param dataframes: dict of pandas dataframes {df_name : df}
+    :param output: xmla or dict output type
+    :return: xmla response
+    """
     mdx_engine = MdxEngine()
     patch(mdx_engine, dataframes)
     module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
     discover_request_handler = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)
-    discover_request_handler.change_catalogue(xmla_request_params.get('cube'))
+    discover_request_handler.change_cube(xmla_request_params.get('cube'))
 
     module = importlib.import_module('olapy.core.services.' + output + '_execute_request_handler')
     execute_request_handler = getattr(module, output.title() + 'ExecuteReqHandler')()
 
     xmla_service = XmlaProviderService(discover_request_handler,
-                                       execute_request_handler)  # xmla provider return xmla responses
+                                       execute_request_handler)
 
     property = Property(**xmla_request_params.get('properties'))
     properties = Propertieslist()
@@ -78,7 +86,7 @@ if __name__ == '__main__':
                                            encoding='utf8')
                   }
 
-    xmla_response = run_xmla(xmla_request_params, dataframes)
+    xmla_response = get_response(xmla_request_params, dataframes)
     print(xmla_response)
 
     # xmla_response = run_xmla(xmla_request_params2, dataframes)

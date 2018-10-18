@@ -51,7 +51,8 @@ class XmlaDiscoverReqHandler():
         parse_uri = urlparse(old_sqla_uri)
         return parse_uri.scheme + "://" + parse_uri.netloc + "/" + new_db
 
-    def change_catalogue(self, new_catalogue):
+    def change_cube(self, new_catalogue):
+        # todo remove this function
         """
         If you change the catalogue (cube) in any request, we have to
         instantiate the MdxEngine with the new catalogue.
@@ -173,7 +174,7 @@ class XmlaDiscoverReqHandler():
 
         if request.Restrictions.RestrictionList.PropertyName == "Catalog":
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(
+                self.change_cube(
                     request.Properties.PropertyList.Catalog.replace(
                         "[",
                         "",
@@ -221,7 +222,7 @@ class XmlaDiscoverReqHandler():
               "MdpropMdxSubqueries"):
 
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
+                self.change_cube(request.Properties.PropertyList.Catalog)
             return self._get_props(
                 discover_preperties_xsd,
                 "MdpropMdxSubqueries",
@@ -235,7 +236,7 @@ class XmlaDiscoverReqHandler():
         elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxDrillFunctions":
 
             if request.Properties.PropertyList.Catalog is not None:
-                self.change_catalogue(request.Properties.PropertyList.Catalog)
+                self.change_cube(request.Properties.PropertyList.Catalog)
             return self._get_props(
                 discover_preperties_xsd,
                 "MdpropMdxDrillFunctions",
@@ -294,7 +295,7 @@ class XmlaDiscoverReqHandler():
         restriction_list = request.Restrictions.RestrictionList
         if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES" and
                 request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
                 "CATALOG_NAME",
@@ -335,7 +336,7 @@ class XmlaDiscoverReqHandler():
 
         if (restriction_list.SchemaName == "MDSCHEMA_MEASURES" and
                 request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
                 "CATALOG_NAME",
@@ -469,7 +470,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
             with xml["return"]:
@@ -489,7 +490,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
             with xml["return"]:
@@ -525,7 +526,7 @@ class XmlaDiscoverReqHandler():
         if (request.Restrictions.RestrictionList.CUBE_NAME ==
                 self.selected_catalogue or
                 request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
 
             with xml["return"]:
@@ -556,7 +557,7 @@ class XmlaDiscoverReqHandler():
 
     def dbschema_tables_response(self, request):
         if request.Properties.PropertyList.Catalog is not None:
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
             with xml["return"]:
@@ -576,7 +577,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
 
@@ -614,7 +615,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             ord = 1
             xml = xmlwitch.Builder()
 
@@ -671,7 +672,7 @@ class XmlaDiscoverReqHandler():
         if (restriction_list.CUBE_NAME == self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             with xml["return"]:
                 with xml.root(
@@ -749,7 +750,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
 
@@ -814,7 +815,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             xml = xmlwitch.Builder()
 
@@ -842,7 +843,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             # rows = ""
             xml = xmlwitch.Builder()
 
@@ -924,7 +925,7 @@ class XmlaDiscoverReqHandler():
                 "19",
             ]
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             with xml["return"]:
                 with xml.root(
@@ -964,7 +965,7 @@ class XmlaDiscoverReqHandler():
                 self.selected_catalogue and
                 request.Properties.PropertyList.Catalog is not None and
                 request.Restrictions.RestrictionList.TREE_OP == 8):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executor.parser.split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,)
             joined = ".".join(separed_tuple[:-1])

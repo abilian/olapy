@@ -119,7 +119,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         restriction_list = request.Restrictions.RestrictionList
         if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES" and
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
                 "CATALOG_NAME",
@@ -160,7 +160,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
         if (restriction_list.SchemaName == "MDSCHEMA_MEASURES" and
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
                 "CATALOG_NAME",
@@ -288,7 +288,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         if (request.Restrictions.RestrictionList.CUBE_NAME ==
             self.selected_catalogue or
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             return {
                 'CATALOG_NAME': self.selected_catalogue,
@@ -308,14 +308,14 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     def dbschema_tables_response(self, request):
         if request.Properties.PropertyList.Catalog is not None:
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             return ''
 
     def mdschema_measures_response(self, request):
         if (request.Restrictions.RestrictionList.CUBE_NAME ==
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             return [{
                 'CATALOG_NAME': self.selected_catalogue,
@@ -340,7 +340,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             ord = 1
 
             rows = []
@@ -391,7 +391,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         if (restriction_list.CUBE_NAME == self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             if (restriction_list.HIERARCHY_VISIBILITY == 3 or
                 restriction_list.CATALOG_NAME ==
                 self.selected_catalogue):
@@ -461,7 +461,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             for tables in self.executor.get_all_tables_names(
                 ignore_fact=True, ):
@@ -511,7 +511,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         if (request.Restrictions.RestrictionList.CUBE_NAME ==
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             return {
                 "CATALOG_NAME": self.selected_catalogue,
@@ -526,7 +526,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         if (request.Restrictions.RestrictionList.CUBE_NAME ==
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             return [{"CATALOG_NAME": self.selected_catalogue,
                      "CUBE_NAME": self.selected_catalogue,
@@ -591,7 +591,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                 "19",
             ]
 
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
 
             return [{"CATALOG_NAME": self.selected_catalogue,
                      "PROPERTY_TYPE": "2",
@@ -609,7 +609,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             self.selected_catalogue and
             request.Properties.PropertyList.Catalog is not None and
             request.Restrictions.RestrictionList.TREE_OP == 8):
-            self.change_catalogue(request.Properties.PropertyList.Catalog)
+            self.change_cube(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executor.parser.split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME, )
             joined = ".".join(separed_tuple[:-1])
