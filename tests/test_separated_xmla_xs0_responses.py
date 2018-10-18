@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import xmlwitch
 
-from olapy.core.services.xmla_execute_tools import XmlaExecuteTools
+from olapy.core.services.xmla_execute_tools import XmlaExecuteReqHandler
 
 from .queries import query15
 
@@ -129,5 +129,5 @@ def test_xs0_axis_query15(executor):
                     xml.LNum('0')
                     xml.DisplayInfo('0')
 
-    xmla_tools = XmlaExecuteTools(executor, query15, False)
+    xmla_tools = XmlaExecuteReqHandler(executor, query15, False)
     assert str(xml) == xmla_tools.generate_xs0()

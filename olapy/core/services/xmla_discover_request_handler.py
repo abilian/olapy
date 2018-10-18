@@ -26,7 +26,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 # noinspection PyPep8Naming
 
 
-class XmlaDiscoverRequestHandler():
+class XmlaDiscoverReqHandler():
     """XmlaDiscoverTools for generating xmla discover responses."""
 
     def __init__(self, mdx_engine):
