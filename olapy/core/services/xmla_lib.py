@@ -8,6 +8,9 @@ from olapy.core.services.models import DiscoverRequest, Restriction, Property, R
     ExecuteRequest, Command
 from olapy.core.services.xmla import XmlaProviderService
 
+class XmlaProviderLib(XmlaProviderService):
+    # keep override xmla module
+    pass
 
 def get_response(xmla_request_params, dataframes=None, output='dict'):
     # type: (dict, dict, str) -> dict

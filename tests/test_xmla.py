@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import threading
+from wsgiref.simple_server import make_server
 
 import pytest
 import sqlalchemy
@@ -9,11 +10,10 @@ from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
-from werkzeug.serving import make_server
 
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
+from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
@@ -59,8 +59,7 @@ class WSGIServer:
         self._server = make_server(host, port, application, **kwargs)
         self.server_address = self._server.server_address
 
-        self.thread = threading.Thread(
-            name=self.__class__, target=self._server.serve_forever)
+        self.thread = threading.Thread(name=self.__class__, target=self._server.serve_forever)
 
     def __del__(self):
         self.stop()
