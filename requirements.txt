@@ -9,7 +9,7 @@ attrs==18.2.0
 awesome-slugify==1.6.5
 bonobo-sqlalchemy==0.6.0
 bonobo==0.6.3
-certifi==2018.8.24        # via requests
+certifi==2018.10.15       # via requests
 chardet==3.0.4            # via requests
 click==7.0
 colorama==0.3.9           # via mondrian
@@ -23,7 +23,7 @@ mondrian==0.8.0           # via bonobo
 numpy==1.15.2             # via pandas
 packaging==17.1           # via bonobo
 pandas==0.23.4
-pbr==4.3.0                # via stevedore
+pbr==5.0.0                # via stevedore
 psutil==5.4.7             # via bonobo
 pyparsing==2.2.2          # via packaging
 python-dateutil==2.7.3    # via pandas
@@ -40,6 +40,5 @@ stevedore==1.29.0         # via bonobo
 typing==3.6.6
 unidecode==0.4.21         # via awesome-slugify, python-slugify
 urllib3==1.23             # via requests
-werkzeug==0.14.1
 whistle==1.0.0
 xmlwitch==0.3
