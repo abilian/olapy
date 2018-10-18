@@ -12,8 +12,8 @@ from olapy.core.services.xmla import XmlaProviderService
 def run_xmla(xmla_request_params, dataframes=None, output='dict'):
     mdx_engine = MdxEngine()
     patch(mdx_engine, dataframes)
-    module = importlib.import_module('olapy.core.services.' + output + '_discover_tools')
-    xmla_tools = getattr(module, output.title() + 'DiscoverTools')(mdx_engine)
+    module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
+    xmla_tools = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)
     xmla_tools.change_catalogue(xmla_request_params.get('cube'))
 
     xmla_service = XmlaProviderService(xmla_tools)  # xmla provider return xmla responses
