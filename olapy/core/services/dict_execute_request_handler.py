@@ -7,30 +7,24 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import itertools
-import re
-from collections import OrderedDict
-
 import numpy as np
-# import xmlwitch
 from six import text_type
-from six.moves import zip
 
-from .xmla_execute_tools import XmlaExecuteTools
-from ..mdx.parser.parse import Parser
+from .xlma_execute_request_handler import XmlaExecuteReqHandler
 
 
-class DictExecuteTools(XmlaExecuteTools):
+class DictExecuteReqHandler(XmlaExecuteReqHandler):
     """XmlaExecuteTools for generating xmla execute responses."""
 
-    def __init__(self, executor, mdx_query, convert2formulas=False):
-        """
-
-        :param executor: MdxEngine instance
-        :param mdx_query: mdx query to execute
-        :param convert2formulas: mdx queries with  `excel convert formulas \
-            <https://exceljet.net/excel-functions/excel-convert-function>`_,
-        """
-        super().__init__(executor, mdx_query, convert2formulas)
+    # def __init__(self, executor, mdx_query, convert2formulas=False):
+    #     """
+    #
+    #     :param executor: MdxEngine instance
+    #     :param mdx_query: mdx query to execute
+    #     :param convert2formulas: mdx queries with  `excel convert formulas \
+    #         <https://exceljet.net/excel-functions/excel-convert-function>`_,
+    #     """
+    #     super().__init__(executor, mdx_query, convert2formulas)
 
     def _gen_measures_xs0(self, xml, tupls):
         xml['Member'] = {
@@ -441,7 +435,7 @@ class DictExecuteTools(XmlaExecuteTools):
 
                     else:
                         to_write = "[Measures]"
-                all_axis += {
+                all_axis['axis'] += {
                     'HierarchyInfo': {'name': to_write},
                     'UName': {'name': to_write + ".[MEMBER_UNIQUE_NAME]",
                               'type': "string"},
@@ -730,3 +724,33 @@ class DictExecuteTools(XmlaExecuteTools):
                 }
 
         return all_axis
+
+    def generate_response(self, executor, mdx_query, convert2formulas=False):
+
+        self.executor = executor
+        self.convert2formulas = convert2formulas
+        self.mdx_query = mdx_query
+
+        # todo change this
+        if convert2formulas:
+            self.mdx_execution_result = self._execute_convert_formulas_query()
+        elif self.mdx_query:
+            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
+        else:
+            self.mdx_execution_result = None
+        if isinstance(self.mdx_execution_result, dict):
+            self.columns_desc = self.mdx_execution_result.get("columns_desc")
+
+        if self.mdx_query == "":
+            # check if command contains a query
+            return ""
+
+        else:
+
+            return {
+                'cell_info': self.generate_cell_info(),
+                'axes_info': self.generate_axes_info(),
+                'axes_info_slicer': self.generate_axes_info_slicer(),
+                'xs0': self.generate_xs0(),
+                'slicer_axis': self.generate_slicer_axis()
+            }

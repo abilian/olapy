@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import os
-from .xmla_discover_request_handler import XmlaDiscoverRequestHandler
+from .xmla_discover_request_handler import XmlaDiscoverReqHandler
 from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
@@ -15,7 +15,7 @@ from ..services.xmla_discover_tools_utils import discover_literals_response_rows
 # noinspection PyPep8Naming
 
 
-class DictDiscoverReqHandler(XmlaDiscoverRequestHandler):
+class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
     """DictXmlaTools for generating xmla discover responses."""
 
     def __init__(self, mdx_engine):
