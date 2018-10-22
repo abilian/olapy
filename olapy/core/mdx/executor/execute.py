@@ -54,16 +54,17 @@ class MdxEngine(object):
     :param facts:  facts table name, Default **Facts**
 
     """
-    def __init__(self):
-        self.cube = None
-        self.facts = "Facts"
-        self.source_type = "csv"
+
+    def __init__(self, cube=None, facts='Facts', source_type="csv", sqla_engine=None, cube_config=None):
+        self.cube = cube
+        self.facts = facts
+        self.source_type = source_type
         self.parser = Parser()
         self.csv_files_cubes = []
         self.db_cubes = []
-        self.sqla_engine = None
+        self.sqla_engine = sqla_engine
         self.olapy_data_location = os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data")
-        self.cube_config = None
+        self.cube_config = cube_config
         self.tables_loaded = None
         self.star_schema_dataframe = None
         self.measures = None

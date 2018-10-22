@@ -10,12 +10,11 @@ from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
-# from werkzeug.serving import make_server
 
 from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.core.services.xlma_execute_request_handler import XmlaExecuteReqHandler
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
-from olapy.core.services.xmla_execute_tools import XmlaExecuteReqHandler
+from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
