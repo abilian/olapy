@@ -32,13 +32,13 @@ python-slugify==1.2.6     # via bonobo
 pytz==2018.5              # via fs, pandas, spyne
 pyyaml==3.13
 regex==2018.8.29
-requests==2.19.1          # via bonobo
+requests==2.20.0          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.13.2a0
 sqlalchemy==1.2.12
 stevedore==1.29.0         # via bonobo
 typing==3.6.6
 unidecode==0.4.21         # via awesome-slugify, python-slugify
-urllib3==1.23             # via requests
+urllib3==1.24             # via requests
 whistle==1.0.0
 xmlwitch==0.3
