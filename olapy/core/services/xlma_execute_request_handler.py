@@ -23,21 +23,36 @@ from ..mdx.parser.parse import Parser
 class XmlaExecuteReqHandler():
     """XmlaExecuteReqHandler for generating xmla execute responses."""
 
-    # def __init__(self):
-    #     """
-    #
-    #     :param executor: MdxEngine instance
-    #     :param mdx_query: mdx query to execute
-    #     :param convert2formulas: mdx queries with  `excel convert formulas \
-    #         <https://exceljet.net/excel-functions/excel-convert-function>`_,
-    #     """
-    #     # self.executor = None
-    #     # self.convert2formulas = False
-    #     # self.mdx_query = None
-    #     # self.mdx_execution_result = None
-    #     # self.columns_desc = None
+    def __init__(self, executor, mdx_query=None, convert2formulas=False):
+        """
 
-    def _execute_convert_formulas_query(self):
+        :param executor: MdxEngine instance
+        :param mdx_query: mdx query to execute
+        :param convert2formulas: mdx queries with  `excel convert formulas \
+            <https://exceljet.net/excel-functions/excel-convert-function>`_,
+        """
+        self.executor = executor
+        self.execute_mdx_query(mdx_query, convert2formulas)
+
+    def execute_mdx_query(self, mdx_query, convert2formulas=False):
+        """
+
+        :return:
+        """
+        self.mdx_query = mdx_query
+        self.convert2formulas = convert2formulas
+        if self.convert2formulas:
+            self.mdx_execution_result = self._execute_convert_formulas_query(mdx_query)
+        elif mdx_query:
+            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
+        else:
+            self.mdx_execution_result = None
+        if isinstance(self.mdx_execution_result, dict):
+            self.columns_desc = self.mdx_execution_result.get("columns_desc")
+        else:
+            self.columns_desc = None
+
+    def _execute_convert_formulas_query(self, mdx_query):
         """
             <Cell CellOrdinal="0">
                 <Value>[Measures].[Amount]</Value>
@@ -99,7 +114,7 @@ class XmlaExecuteReqHandler():
         # todo check
         return [
                    tup[0]
-                   for tup in re.compile(Parser.REG).findall(self.mdx_query)
+                   for tup in re.compile(Parser.REG).findall(mdx_query)
                    if "[Measures].[XL_SD" not in tup[0] and tup[1]
                ][::3]
 
@@ -1041,21 +1056,7 @@ class XmlaExecuteReqHandler():
 
         return str(xml)
 
-    def generate_response(self, executor, mdx_query, convert2formulas=False):
-
-        self.executor = executor
-        self.convert2formulas = convert2formulas
-        self.mdx_query = mdx_query
-
-        # todo change this
-        if convert2formulas:
-            self.mdx_execution_result = self._execute_convert_formulas_query()
-        elif self.mdx_query:
-            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
-        else:
-            self.mdx_execution_result = None
-        if isinstance(self.mdx_execution_result, dict):
-            self.columns_desc = self.mdx_execution_result.get("columns_desc")
+    def generate_response(self):
 
         if self.mdx_query == "":
             # check if command contains a query

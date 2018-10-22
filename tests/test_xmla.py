@@ -10,10 +10,12 @@ from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+# from werkzeug.serving import make_server
 
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
+from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
+from olapy.core.services.xmla_execute_tools import XmlaExecuteReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
@@ -74,7 +76,7 @@ class WSGIServer:
     @property
     def url(self):
         host, port = self.server_address
-        proto = 'http' if self._server.ssl_context is None else 'https'
+        proto = 'http'  # if self._server.ssl_context is None else 'https'
         return '{}://{}:{}'.format(proto, host, port)
 
 
@@ -84,7 +86,8 @@ def conn():
     create_insert(engine)
     executor = MdxEngine(sqla_engine=engine, source_type='db')
     executor.load_cube(cube_name='main', fact_table_name='facts')
-    xmla_tools = XmlaDiscoverReqHandler(executor)
+    discover_request_hanlder = XmlaDiscoverReqHandler(executor)
+    execute_request_hanlder = XmlaExecuteReqHandler(executor)
 
     print("spawning server")
     application = Application(
@@ -93,7 +96,8 @@ def conn():
         in_protocol=Soap11(validator='soft'),
         out_protocol=Soap11(validator='soft'),
         config={
-            'xmla_tools': xmla_tools
+            'discover_request_hanlder': discover_request_hanlder,
+            'execute_request_hanlder': execute_request_hanlder
         })
 
     wsgi_application = WsgiApplication(application)
