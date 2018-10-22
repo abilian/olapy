@@ -77,8 +77,7 @@ def executor(request):
     db_test = urlparse(sqlalchemy_uri).path.replace('/', '')
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     create_insert(engine, custom)
-    mdx_engine = MdxEngine(
-        sqla_engine=engine, source_type='db', cube_config=config)
+    mdx_engine = MdxEngine(sqla_engine=engine, source_type='db', cube_config=config)
     mdx_engine.load_cube(
         cube_name=db_test if db_test else 'main', fact_table_name='facts')
 
