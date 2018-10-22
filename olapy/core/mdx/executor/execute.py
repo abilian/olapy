@@ -30,10 +30,10 @@ import pandas as pd
 from pandas import DataFrame
 
 from ..parser.parse import Parser
-from ..tools.connection import get_dialect, get_dialect_name
+# from ..tools.connection import get_dialect, get_dialect_name
 from .cube_loader import CubeLoader
 from .cube_loader_custom import CubeLoaderCustom
-from .cube_loader_db import CubeLoaderDB
+# from .cube_loader_db import CubeLoaderDB
 
 
 # @attr.s

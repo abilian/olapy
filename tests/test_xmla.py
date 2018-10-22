@@ -1,10 +1,15 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+
 import threading
 from wsgiref.simple_server import make_server
 
 import pytest
+
+sqlalchemy = pytest.importorskip("sqlalchemy")
+spyne = pytest.importorskip("spyne")
+
 import sqlalchemy
 from olap.xmla import xmla
 from spyne import Application
@@ -21,7 +26,6 @@ from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230
-
 
 class Member(object):
     "Encapsulates xs0 response attributes."

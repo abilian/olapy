@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function, \
 
 import pytest
 
+sqlalchemy = pytest.importorskip("sqlalchemy")
+
 from .queries import custom_query1
 
 

@@ -1,11 +1,14 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+import pytest
 import xmlwitch
 
 from olapy.core.services.xlma_execute_request_handler import XmlaExecuteReqHandler
 
 from .queries import query11, query12, query14
+
+sqlalchemy = pytest.importorskip("sqlalchemy")
 
 
 def test_slicer_axis_query11(executor):

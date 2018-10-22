@@ -4,7 +4,12 @@ import os
 from collections import OrderedDict
 
 import pytest
-import sqlalchemy
+
+try:
+    import sqlalchemy
+except:
+    pass
+
 from six.moves.urllib.parse import urlparse
 
 from olapy.core.mdx.executor.execute import MdxEngine
@@ -13,11 +18,11 @@ from .db_creation_utils import create_insert, drop_tables
 
 cube_config = {
     'xmla_authentication':
-    False,
+        False,
     'source':
-    'db',
+        'db',
     'name':
-    'main',
+        'main',
     'facts': {
         'keys': {
             'warehouse_id': 'warehouse.id',
@@ -33,31 +38,31 @@ cube_config = {
         'columns': {}
     }, {
         'displayName':
-        'product',
+            'product',
         'name':
-        'product',
+            'product',
         'columns':
-        OrderedDict([('id', 'id'), ('brand_name', 'brand_name'),
-                     ('product_name', 'product_name'), ('sku',
-                                                        'stock_keeping_unit')])
+            OrderedDict([('id', 'id'), ('brand_name', 'brand_name'),
+                         ('product_name', 'product_name'), ('sku',
+                                                            'stock_keeping_unit')])
     }, {
         'displayName':
-        'store',
+            'store',
         'name':
-        'store',
+            'store',
         'columns':
-        OrderedDict([('id', 'id'), ('store_type', 'store_type'),
-                     ('store_name', 'store_name'), ('store_city', 'store_city'),
-                     ('store_country', 'country')])
+            OrderedDict([('id', 'id'), ('store_type', 'store_type'),
+                         ('store_name', 'store_name'), ('store_city', 'store_city'),
+                         ('store_country', 'country')])
     }, {
         'displayName':
-        'warehouse',
+            'warehouse',
         'name':
-        'warehouse',
+            'warehouse',
         'columns':
-        OrderedDict([('id', 'id'), ('warehouse_name', 'warehouse_name'),
-                     ('warehouse_city', 'warehouse_city'),
-                     ('warehouse_country', 'warehouse_country')])
+            OrderedDict([('id', 'id'), ('warehouse_name', 'warehouse_name'),
+                         ('warehouse_city', 'warehouse_city'),
+                         ('warehouse_country', 'warehouse_country')])
     }]
 }
 
