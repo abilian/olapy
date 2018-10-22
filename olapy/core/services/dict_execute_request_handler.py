@@ -725,21 +725,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
         return all_axis
 
-    def generate_response(self, executor, mdx_query, convert2formulas=False):
-
-        self.executor = executor
-        self.convert2formulas = convert2formulas
-        self.mdx_query = mdx_query
-
-        # todo change this
-        if convert2formulas:
-            self.mdx_execution_result = self._execute_convert_formulas_query()
-        elif self.mdx_query:
-            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
-        else:
-            self.mdx_execution_result = None
-        if isinstance(self.mdx_execution_result, dict):
-            self.columns_desc = self.mdx_execution_result.get("columns_desc")
+    def generate_response(self):
 
         if self.mdx_query == "":
             # check if command contains a query

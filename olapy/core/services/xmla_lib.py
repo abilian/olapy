@@ -28,7 +28,7 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     discover_request_handler.change_cube(xmla_request_params.get('cube'))
 
     module = importlib.import_module('olapy.core.services.' + output + '_execute_request_handler')
-    execute_request_handler = getattr(module, output.title() + 'ExecuteReqHandler')()
+    execute_request_handler = getattr(module, output.title() + 'ExecuteReqHandler')(mdx_engine)
 
     xmla_service = XmlaProviderService(discover_request_handler,
                                        execute_request_handler)
@@ -68,19 +68,19 @@ if __name__ == '__main__':
         'mdx_query': None
     }
 
-    # xmla_request_params2 = {
-    #     'cube': 'sales',
-    #     'properties': {
-    #         'AxisFormat': 'TupleFormat',
-    #         'Format': 'Multidimensional',
-    #         'Content': 'SchemaData',
-    #         'Catalog': 'sales',
-    #         'LocaleIdentifier': '1033',
-    #         'Timeout': '0'
-    #     },
-    #     'mdx_query': """SELECT  FROM [sales] WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE,
-    #      FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
-    # }
+    xmla_request_params2 = {
+        'cube': 'sales',
+        'properties': {
+            'AxisFormat': 'TupleFormat',
+            'Format': 'Multidimensional',
+            'Content': 'SchemaData',
+            'Catalog': 'sales',
+            'LocaleIdentifier': '1033',
+            'Timeout': '0'
+        },
+        'mdx_query': """SELECT  FROM [sales] WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE,
+         FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
+    }
 
     dataframes = {'Facts': pd.read_csv("olapy-data/cubes/sales/Facts.csv", sep=';', encoding='utf8'),
                   'Product': pd.read_csv("olapy-data/cubes/sales/Product.csv", sep=';',
@@ -92,5 +92,5 @@ if __name__ == '__main__':
     xmla_response = get_response(xmla_request_params, dataframes)
     print(xmla_response)
 
-    # xmla_response = run_xmla(xmla_request_params2, dataframes)
-    # print(xmla_response)
+    xmla_response = get_response(xmla_request_params2, dataframes)
+    print(xmla_response)
