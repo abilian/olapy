@@ -122,8 +122,8 @@ class XmlaProviderService(ServiceBase):
             convert2formulas = True
         else:
             convert2formulas = False
-
-        return execute_request_hanlder.generate_response(executor, mdx_query, convert2formulas)
+        execute_request_hanlder.execute_mdx_query(mdx_query, convert2formulas)
+        return execute_request_hanlder.generate_response()
 
 
 home_directory = expanduser("~")
@@ -187,7 +187,7 @@ def get_wsgi_application(mdx_engine):
     :return: Wsgi Application
     """
     discover_request_hanlder = XmlaDiscoverReqHandler(mdx_engine)
-    execute_request_hanlder = XmlaExecuteReqHandler()
+    execute_request_hanlder = XmlaExecuteReqHandler(mdx_engine)
     application = get_spyne_app(discover_request_hanlder, execute_request_hanlder)
 
     # validator='soft' or nothing, this is important because spyne doesn't

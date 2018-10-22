@@ -87,7 +87,7 @@ def conn():
     executor = MdxEngine(sqla_engine=engine, source_type='db')
     executor.load_cube(cube_name='main', fact_table_name='facts')
     discover_request_hanlder = XmlaDiscoverReqHandler(executor)
-    execute_request_hanlder = XmlaExecuteReqHandler()
+    execute_request_hanlder = XmlaExecuteReqHandler(executor)
 
     print("spawning server")
     application = Application(
