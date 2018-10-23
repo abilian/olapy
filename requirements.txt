@@ -20,7 +20,7 @@ jinja2==2.10              # via bonobo
 lxml==4.2.5
 markupsafe==1.0           # via jinja2
 mondrian==0.8.0           # via bonobo
-numpy==1.15.2             # via pandas
+numpy==1.15.3             # via pandas
 packaging==17.1           # via bonobo
 pandas==0.23.4
 pbr==5.0.0                # via stevedore
