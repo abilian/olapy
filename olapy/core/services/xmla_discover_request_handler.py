@@ -13,7 +13,7 @@ import xmlwitch
 from six.moves.urllib.parse import urlparse
 from sqlalchemy import create_engine
 
-from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
+from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
@@ -60,8 +60,8 @@ class XmlaDiscoverReqHandler():
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
         """
         if self.selected_catalogue != new_catalogue:
-            if (self.executor.cube_config and
-                    new_catalogue == self.executor.cube_config["name"]):
+            if (self.executor.cube_config
+                    and new_catalogue == self.executor.cube_config["name"]):
                 facts = self.executor.cube_config["facts"]["table_name"]
             else:
                 facts = "Facts"
@@ -85,7 +85,8 @@ class XmlaDiscoverReqHandler():
                     **{
                         "xmlns:EX":
                         "urn:schemas-microsoft-com:xml-analysis:exception",
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsd":
+                        "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi":
                         "http://www.w3.org/2001/XMLSchema-instance",
                     }):
@@ -158,7 +159,7 @@ class XmlaDiscoverReqHandler():
                         }):
                     xml.write(xsd)
                     for idx, prop_desc in enumerate(
-                            properties_names_n_description,):
+                            properties_names_n_description, ):
                         with xml.row:
                             xml.PropertyName(prop_desc)
                             xml.PropertyDescription(prop_desc)
@@ -180,7 +181,7 @@ class XmlaDiscoverReqHandler():
                     ).replace(
                         "]",
                         "",
-                    ),)
+                    ), )
                 value = self.selected_catalogue
             else:
                 value = self.catalogues[0]
@@ -279,21 +280,20 @@ class XmlaDiscoverReqHandler():
                         with xml.row:
                             xml.SchemaName(resp_row["SchemaName"])
                             xml.SchemaGuid(resp_row["SchemaGuid"])
-                            for idx, restriction in enumerate(
-                                    resp_row["restrictions"][
-                                        "restriction_names"],):
+                            for idx, restriction in enumerate(resp_row["restrictions"]["restriction_names"], ):
                                 with xml.Restrictions:
                                     xml.Name(restriction)
-                                    xml.Type(resp_row["restrictions"][
-                                        "restriction_types"][idx],)
+                                    xml.Type(
+                                        resp_row["restrictions"]
+                                        ["restriction_types"][idx], )
 
                             xml.RestrictionsMask(resp_row["RestrictionsMask"])
 
             return str(xml)
 
         restriction_list = request.Restrictions.RestrictionList
-        if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES" and
-                request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES"
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -333,8 +333,8 @@ class XmlaDiscoverReqHandler():
 
             return generate_resp(rows)
 
-        if (restriction_list.SchemaName == "MDSCHEMA_MEASURES" and
-                request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.SchemaName == "MDSCHEMA_MEASURES"
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -441,8 +441,8 @@ class XmlaDiscoverReqHandler():
 
     @staticmethod
     def discover_literals_response(request):
-        if (request.Properties.PropertyList.Content == "SchemaData" and
-                request.Properties.PropertyList.Format == "Tabular"):
+        if (request.Properties.PropertyList.Content == "SchemaData"
+                and request.Properties.PropertyList.Format == "Tabular"):
 
             rows = discover_literals_response_rows
 
@@ -465,9 +465,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_sets_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -485,9 +485,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_kpis_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -522,9 +522,9 @@ class XmlaDiscoverReqHandler():
         return str(xml)
 
     def mdschema_cubes_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue or
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                or request.Properties.PropertyList.Catalog is not None):
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
 
@@ -544,7 +544,7 @@ class XmlaDiscoverReqHandler():
                         xml.LAST_SCHEMA_UPDATE("2016-07-22T10:41:38")
                         xml.LAST_DATA_UPDATE("2016-07-22T10:41:38")
                         xml.DESCRIPTION(
-                            "MDX " + self.selected_catalogue + " results",)
+                            "MDX " + self.selected_catalogue + " results", )
                         xml.IS_DRILLTHROUGH_ENABLED("true")
                         xml.IS_LINKABLE("false")
                         xml.IS_WRITE_ENABLED("false")
@@ -572,9 +572,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_measures_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -608,11 +608,10 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_dimensions_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Restrictions.RestrictionList.CATALOG_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue and request.Restrictions.RestrictionList.
+                CATALOG_NAME == self.selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             ord = 1
@@ -628,7 +627,7 @@ class XmlaDiscoverReqHandler():
                         }):
                     xml.write(mdschema_dimensions_xsd)
                     for tables in self.executor.get_all_tables_names(
-                            ignore_fact=True,):
+                            ignore_fact=True, ):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.CUBE_NAME(self.selected_catalogue)
@@ -639,7 +638,7 @@ class XmlaDiscoverReqHandler():
                             xml.DIMENSION_TYPE("3")
                             xml.DIMENSION_CARDINALITY("23")
                             xml.DEFAULT_HIERARCHY(
-                                "[" + tables + "].[" + tables + "]",)
+                                "[" + tables + "].[" + tables + "]", )
                             xml.IS_VIRTUAL("false")
                             xml.IS_READWRITE("false")
                             xml.DIMENSION_UNIQUE_SETTINGS("1")
@@ -668,8 +667,8 @@ class XmlaDiscoverReqHandler():
         # Enumeration of hierarchies in all dimensions
         restriction_list = request.Restrictions.RestrictionList
 
-        if (restriction_list.CUBE_NAME == self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.CUBE_NAME == self.selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
@@ -682,9 +681,9 @@ class XmlaDiscoverReqHandler():
                             "http://www.w3.org/2001/XMLSchema-instance",
                         }):
                     xml.write(mdschema_hierarchies_xsd)
-                    if (restriction_list.HIERARCHY_VISIBILITY == 3 or
-                            restriction_list.CATALOG_NAME ==
-                            self.selected_catalogue):
+                    if (restriction_list.HIERARCHY_VISIBILITY == 3
+                            or restriction_list.CATALOG_NAME == self.
+                            selected_catalogue):
                         for table_name, df in self.executor.tables_loaded.items(
                         ):
                             if table_name == self.executor.facts:
@@ -696,10 +695,10 @@ class XmlaDiscoverReqHandler():
                                 xml.CATALOG_NAME(self.selected_catalogue)
                                 xml.CUBE_NAME(self.selected_catalogue)
                                 xml.DIMENSION_UNIQUE_NAME(
-                                    "[" + table_name + "]",)
+                                    "[" + table_name + "]", )
                                 xml.HIERARCHY_NAME(table_name)
                                 xml.HIERARCHY_UNIQUE_NAME(
-                                    "[{0}].[{0}]".format(table_name),)
+                                    "[{0}].[{0}]".format(table_name), )
                                 xml.HIERARCHY_CAPTION(table_name)
                                 xml.DIMENSION_TYPE("3")
                                 xml.HIERARCHY_CARDINALITY("6")
@@ -708,7 +707,7 @@ class XmlaDiscoverReqHandler():
                                         table_name,
                                         df.columns[0],
                                         column_attribut,
-                                    ),)
+                                    ), )
                                 xml.STRUCTURE("0")
                                 xml.IS_VIRTUAL("false")
                                 xml.IS_READWRITE("false")
@@ -729,8 +728,9 @@ class XmlaDiscoverReqHandler():
                             xml.HIERARCHY_CAPTION("Measures")
                             xml.DIMENSION_TYPE("2")
                             xml.HIERARCHY_CARDINALITY("0")
-                            xml.DEFAULT_MEMBER("[Measures].[{}]".format(
-                                self.executor.measures[0],),)
+                            xml.DEFAULT_MEMBER(
+                                "[Measures].[{}]".format(
+                                    self.executor.measures[0], ), )
                             xml.STRUCTURE("0")
                             xml.IS_VIRTUAL("false")
                             xml.IS_READWRITE("false")
@@ -745,9 +745,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_levels_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -764,7 +764,7 @@ class XmlaDiscoverReqHandler():
 
                     xml.write(mdschema_levels_xsd)
                     for tables in self.executor.get_all_tables_names(
-                            ignore_fact=True,):
+                            ignore_fact=True, ):
                         l_nb = 0
                         for col in self.executor.tables_loaded[tables].columns:
 
@@ -773,10 +773,10 @@ class XmlaDiscoverReqHandler():
                                 xml.CUBE_NAME(self.selected_catalogue)
                                 xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
                                 xml.HIERARCHY_UNIQUE_NAME(
-                                    "[{0}].[{0}]".format(tables),)
+                                    "[{0}].[{0}]".format(tables), )
                                 xml.LEVEL_NAME(str(col))
                                 xml.LEVEL_UNIQUE_NAME(
-                                    "[{0}].[{0}].[{1}]".format(tables, col),)
+                                    "[{0}].[{0}].[{1}]".format(tables, col), )
                                 xml.LEVEL_CAPTION(str(col))
                                 xml.LEVEL_NUMBER(str(l_nb))
                                 xml.LEVEL_CARDINALITY("0")
@@ -810,9 +810,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_measuregroups_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
 
@@ -838,9 +838,9 @@ class XmlaDiscoverReqHandler():
             return str(xml)
 
     def mdschema_measuregroup_dimensions_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             # rows = ""
@@ -856,7 +856,7 @@ class XmlaDiscoverReqHandler():
                         }):
                     xml.write(mdschema_measuresgroups_dimensions_xsd)
                     for tables in self.executor.get_all_tables_names(
-                            ignore_fact=True,):
+                            ignore_fact=True, ):
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_catalogue)
                             xml.CUBE_NAME(self.selected_catalogue)
@@ -867,14 +867,14 @@ class XmlaDiscoverReqHandler():
                             xml.DIMENSION_IS_VISIBLE("true")
                             xml.DIMENSION_IS_FACT_DIMENSION("false")
                             xml.DIMENSION_GRANULARITY(
-                                "[{0}].[{0}]".format(tables),)
+                                "[{0}].[{0}]".format(tables), )
 
             return str(xml)
 
     def mdschema_properties_response(self, request):
         xml = xmlwitch.Builder()
-        if (request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and
-                request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
+                and request.Properties.PropertyList.Catalog is not None):
             properties_names = [
                 "FONT_FLAGS",
                 "LANGUAGE",
@@ -960,46 +960,39 @@ class XmlaDiscoverReqHandler():
 
     def mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-                self.selected_catalogue and
-                request.Properties.PropertyList.Catalog is not None and
-                request.Restrictions.RestrictionList.TREE_OP == 8):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                selected_catalogue
+                and request.Properties.PropertyList.Catalog is not None
+                and request.Restrictions.RestrictionList.TREE_OP == 8):
             self.change_catalogue(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executor.parser.split_tuple(
-                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,)
+                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME, )
             joined = ".".join(separed_tuple[:-1])
             # exple
             # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
             # joined -> [Product].[Product].[Company]
 
-            last_attribut = "".join(
-                att for att in separed_tuple[-1] if att not in "[]").replace(
-                    "&",
-                    "&amp;",
-            )
+            last_attribut = "".join(att for att in separed_tuple[-1] if att not in "[]").replace("&", "&amp;", )
             xml = xmlwitch.Builder()
             with xml["return"]:
                 with xml.root(
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                        **{
-                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                            "xmlns:xsi":
-                            "http://www.w3.org/2001/XMLSchema-instance",
-                        }):
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                            "http://www.w3.org/2001/XMLSchema-instance", }):
                     xml.write(mdschema_members_xsd)
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_catalogue)
                         xml.CUBE_NAME(self.selected_catalogue)
                         xml.DIMENSION_UNIQUE_NAME(separed_tuple[0])
                         xml.HIERARCHY_UNIQUE_NAME("{0}.{0}".format(
-                            separed_tuple[0],))
+                            separed_tuple[0], ))
                         xml.LEVEL_UNIQUE_NAME(joined)
                         xml.LEVEL_NUMBER("0")
                         xml.MEMBER_ORDINAL("0")
                         xml.MEMBER_NAME(last_attribut)
-                        xml.MEMBER_UNIQUE_NAME(
-                            request.Restrictions.RestrictionList.
-                            MEMBER_UNIQUE_NAME,)
+                        xml.MEMBER_UNIQUE_NAME(request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME, )
                         xml.MEMBER_TYPE("1")
                         xml.MEMBER_CAPTION(last_attribut)
                         xml.CHILDREN_CARDINALITY("1")

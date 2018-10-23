@@ -18,7 +18,7 @@ from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property
 from olapy.core.services.xmla import XmlaProviderService, get_spyne_app
-from olapy.core.services.xmla_discover_tools import XmlaDiscoverReqHandler
+from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
