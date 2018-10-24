@@ -148,4 +148,4 @@ class DiscoverRequest(ComplexModel):
 
     RequestType = Unicode
     Restrictions = Restrictionlist
-Properties = Propertieslist
+    Properties = Propertieslist
