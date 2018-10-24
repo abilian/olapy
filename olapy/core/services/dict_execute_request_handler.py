@@ -288,7 +288,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
         return cells
 
     def generate_cell_data(self):
-        # type: () -> text_type
+        # # type: () -> list
         """
         Example of CellData::
 

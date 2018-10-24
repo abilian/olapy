@@ -70,7 +70,7 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     xmla_service = XmlaProviderLib(discover_request_handler,
                                    execute_request_handler)
 
-    property = Property(**xmla_request_params.get('properties'))
+    property = Property(**xmla_request_params.get('properties'))  # type: ignore
     properties = Propertieslist()
     properties.PropertyList = property
 
@@ -84,11 +84,11 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
 
     else:  #  Discover request
         request = DiscoverRequest()
-        restriction = Restriction(**xmla_request_params.get('restrictions'))
-        request.Restrictions = Restrictionlist(RestrictionList=restriction)
+        restriction = Restriction(**xmla_request_params.get('restrictions'))  # type: ignore
+        request.Restrictions = Restrictionlist(RestrictionList=restriction)  # type: ignore
 
-        request.RequestType = xmla_request_params.get('request_type')
-        request.Properties = properties
+        request.RequestType = xmla_request_params.get('request_type')  # type: ignore
+        request.Properties = properties  # type: ignore
 
         return xmla_service.Discover(request)
 
