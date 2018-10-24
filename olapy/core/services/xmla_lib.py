@@ -60,6 +60,7 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     """
     mdx_engine = MdxEngine()
     patch(mdx_engine, dataframes)
+
     module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
     discover_request_handler = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)
     discover_request_handler.change_cube(xmla_request_params.get('cube'))

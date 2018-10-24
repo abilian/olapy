@@ -306,8 +306,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.columns_desc["columns"].keys()) == 0 or len(self.columns_desc["rows"].keys()) == 0) and
-                self.executor.facts in self.columns_desc["all"].keys()):
+        if ((len(self.columns_desc["columns"].keys()) == 0 or len(
+                self.columns_desc["rows"].keys()) == 0) and self.executor.facts in self.columns_desc["all"].keys()):
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
                 self.mdx_execution_result["result"][measure]
@@ -399,11 +399,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             ignore_fact=True, )
         all_dimensions_names.append("Measures")
 
-        slicer_list = sorted(
-            list(
-                set(all_dimensions_names) -
-                {table_name
-                 for table_name in self.columns_desc["all"]}, ), )
+        slicer_list = sorted(list(set(all_dimensions_names) - {table_name for table_name in self.columns_desc["all"]}))
 
         if "Measures" in slicer_list:
             slicer_list.insert(
@@ -422,11 +418,9 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
                     # if measures > 1 we don't have to write measure
                     # Hierarchize
-                    if (self.executor.facts in self.columns_desc["all"] and
-                        (len(self.columns_desc["all"][self.executor.facts])
-                         > 1) or
-                        (not self.executor.parser.hierarchized_tuples() and
-                         not self.columns_desc["where"])):
+                    if (self.executor.facts in self.columns_desc["all"] and (
+                        len(self.columns_desc["all"][self.executor.facts]) > 1) or (
+                            not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
                         continue
 
                     else:
@@ -544,8 +538,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                 axes_info += self._gen_measures_one_axis_info(None)
             axes_info += self._generate_table_axis_info(None, axis_tables_without_facts)
             # Hierarchize
-            if (not self.executor.parser.hierarchized_tuples() and
-                    len(self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
+            if (not self.executor.parser.hierarchized_tuples() and len(
+                    self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
                 axes_info += self._gen_measures_one_axis_info(None)
 
         return axes_info
@@ -666,9 +660,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
         unused_dimensions = sorted(
             list(
-                set(self.executor.get_all_tables_names(ignore_fact=True)) -
-                {table_name
-                 for table_name in self.columns_desc["all"]}, ), )
+                set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
+                                                                             self.columns_desc["all"]}, ), )
         # xml = xmlwitch.Builder()
         all_axis = {
             'Axis': {'name': 'SlicerAxis'},
@@ -698,8 +691,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                 }
 
             # Hierarchize
-            if (len(self.executor.selected_measures) <= 1 and (self.executor.parser.hierarchized_tuples() or
-                                                               self.executor.facts in self.columns_desc["where"])):
+            if (len(self.executor.selected_measures) <= 1 and (
+                    self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc["where"])):
                 all_axis['Tuples'] += {
                     'Member': {'Hierarchy': "[Measures]"},
                     'UName': "[Measures].[{}]".format(

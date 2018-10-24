@@ -227,8 +227,7 @@ class XmlaDiscoverReqHandler():
                 "0.02  08-Mar-2016 08:41:28 GMT",
             )
 
-        elif (request.Restrictions.RestrictionList.PropertyName ==
-              "MdpropMdxSubqueries"):
+        elif (request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries"):
 
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(request.Properties.PropertyList.Catalog)

@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function, \
 
 import regex
 
+# flake8: noqa W605
 
 # FIXME: make this regex more readable (split it)
 REGEX = regex.compile(
@@ -19,6 +20,7 @@ class Parser(object):
     """
     Class for Parsing a MDX query
     """
+
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
 
@@ -85,7 +87,7 @@ class Parser(object):
             for tup_att in tup[0].replace(".Members", "").replace(
                 ".MEMBERS",
                 "",
-            ).split("].[",)
+            ).split("].[", )
             if tup_att
         ]
             for tup in REGEX.findall(query[start:stop])

@@ -651,8 +651,7 @@ class MdxEngine(object):
         """
         Check if the MDX Query is Hierarchized and contains many tuples groups.
         """
-        return (not self.parser.hierarchized_tuples() and
-                len(self.parser.get_nested_select()) >= 2)
+        return (not self.parser.hierarchized_tuples() and len(self.parser.get_nested_select()) >= 2)
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """

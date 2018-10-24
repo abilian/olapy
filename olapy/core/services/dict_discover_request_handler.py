@@ -382,8 +382,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                 and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
-            if (restriction_list.HIERARCHY_VISIBILITY == 3 or
-                    restriction_list.CATALOG_NAME == self.selected_cube):
+            if (restriction_list.HIERARCHY_VISIBILITY == 3 or restriction_list.CATALOG_NAME == self.selected_cube):
 
                 for table_name, df in self.executor.tables_loaded.items():
                     if table_name == self.executor.facts:

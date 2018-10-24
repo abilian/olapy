@@ -743,10 +743,7 @@ class XmlaExecuteReqHandler():
         xml = xmlwitch.Builder()
 
         slicer_list = sorted(
-            list(
-                set(all_dimensions_names) -
-                {table_name
-                 for table_name in self.columns_desc["all"]}, ), )
+            list(set(all_dimensions_names) - {table_name for table_name in self.columns_desc["all"]}, ), )
 
         if "Measures" in slicer_list:
             slicer_list.insert(
@@ -762,11 +759,9 @@ class XmlaExecuteReqHandler():
 
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
-                        if (self.executor.facts in self.columns_desc["all"] and
-                            (len(self.columns_desc["all"][self.executor.facts])
-                             > 1) or
-                            (not self.executor.parser.hierarchized_tuples()
-                             and not self.columns_desc["where"])):
+                        if (self.executor.facts in self.columns_desc["all"] and (
+                            len(self.columns_desc["all"][self.executor.facts]) > 1) or (
+                                not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
                             continue
 
                         else:
@@ -1083,9 +1078,8 @@ class XmlaExecuteReqHandler():
 
         unused_dimensions = sorted(
             list(
-                set(self.executor.get_all_tables_names(ignore_fact=True)) -
-                {table_name
-                 for table_name in self.columns_desc["all"]}, ), )
+                set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
+                                                                             self.columns_desc["all"]}, ), )
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
@@ -1113,9 +1107,9 @@ class XmlaExecuteReqHandler():
                                 xml.DisplayInfo("2")
 
                         # Hierarchize
-                        if (len(self.executor.selected_measures) <= 1 and
-                            (self.executor.parser.hierarchized_tuples() or
-                             self.executor.facts in self.columns_desc["where"])):
+                        if (len(self.executor.selected_measures) <= 1 and (
+                            self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc[
+                                "where"])):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName(
                                     "[Measures].[{}]".format(
