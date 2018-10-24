@@ -7,8 +7,8 @@ from wsgiref.simple_server import make_server
 
 import pytest
 
-sqlalchemy = pytest.importorskip("sqlalchemy")
-spyne = pytest.importorskip("spyne")
+# pytest.importorskip("sqlalchemy")
+# pytest.importorskip("spyne")
 
 import sqlalchemy
 from olap.xmla import xmla
@@ -27,6 +27,7 @@ from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230
+
 
 class Member(object):
     "Encapsulates xs0 response attributes."

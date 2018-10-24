@@ -16,7 +16,7 @@ def init():
         home_directory = expanduser("~")
 
     olapy_lib_dir = dirname(
-        os.path.join(os.path.dirname(os.path.realpath(__file__))),)
+        os.path.join(os.path.dirname(os.path.realpath(__file__))), )
 
     if not os.path.isdir(os.path.join(home_directory, "olapy-data", "cubes")):
         os.makedirs(os.path.join(home_directory, "olapy-data", "cubes"))
@@ -28,7 +28,7 @@ def init():
         print("Initializing demo cubes")
 
     if not os.path.isfile(
-            os.path.join(home_directory, "olapy-data", "olapy-config.yml"),):
+            os.path.join(home_directory, "olapy-data", "olapy-config.yml"), ):
         copyfile(
             os.path.join(olapy_lib_dir, "config", "olapy-config.yml"),
             os.path.join(home_directory, "olapy-data", "olapy-config.yml"),

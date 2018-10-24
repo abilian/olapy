@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
-import pytest
-
-sqlalchemy = pytest.importorskip("sqlalchemy")
+# import pytest
+# pytest.importorskip("sqlalchemy")
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal

@@ -11,7 +11,6 @@ from .xmla_discover_request_handler import XmlaDiscoverReqHandler
 from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
-
 # noinspection PyPep8Naming
 
 
@@ -40,13 +39,13 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     @staticmethod
     def _get_props(
-        xsd,
-        PropertyName,
-        PropertyDescription,
-        PropertyType,
-        PropertyAccessType,
-        IsRequired,
-        Value,
+            xsd,
+            PropertyName,
+            PropertyDescription,
+            PropertyType,
+            PropertyAccessType,
+            IsRequired,
+            Value,
     ):
 
         if PropertyName is not "":
@@ -77,8 +76,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             ]
 
             response = []
-            for idx, prop_desc in enumerate(
-                properties_names_n_description, ):
+            for idx, prop_desc in enumerate(properties_names_n_description, ):
                 response += {
                     'PropertyName': prop_desc,
                     'PropertyDescription': prop_desc,
@@ -103,12 +101,11 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                 }
                 restrictions = []
                 for idx, restriction in enumerate(
-                    resp_row["restrictions"][
-                        "restriction_names"], ):
+                        resp_row["restrictions"]["restriction_names"], ):
                     restrictions += {
                         'Name': restriction,
-                        'Type': resp_row["restrictions"][
-                            "restriction_types"][idx]
+                        'Type':
+                        resp_row["restrictions"]["restriction_types"][idx]
                     }
                 response['Restrictions'] = restrictions
                 response['RestrictionsMask'] = resp_row["RestrictionsMask"]
@@ -117,8 +114,8 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             return responses
 
         restriction_list = request.Restrictions.RestrictionList
-        if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES" and
-            request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.SchemaName == "MDSCHEMA_HIERARCHIES"
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -158,8 +155,8 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
             return generate_resp(rows)
 
-        if (restriction_list.SchemaName == "MDSCHEMA_MEASURES" and
-            request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.SchemaName == "MDSCHEMA_MEASURES"
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             restriction_names = [
@@ -266,8 +263,8 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     @staticmethod
     def discover_literals_response(request):
-        if (request.Properties.PropertyList.Content == "SchemaData" and
-            request.Properties.PropertyList.Format == "Tabular"):
+        if (request.Properties.PropertyList.Content == "SchemaData"
+                and request.Properties.PropertyList.Format == "Tabular"):
 
             rows = discover_literals_response_rows
 
@@ -280,29 +277,25 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     def dbschema_catalogs_response(self, request):
 
-        return {
-            'CATALOG_NAME': [catalogue for catalogue in self.catalogues]
-        }
+        return {'CATALOG_NAME': [catalogue for catalogue in self.cubes]}
 
     def mdschema_cubes_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue or
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                or request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             return {
-                'CATALOG_NAME': self.selected_catalogue,
-                'CUBE_NAME': self.selected_catalogue,
+                'CATALOG_NAME': self.selected_cube,
+                'CUBE_NAME': self.selected_cube,
                 'CUBE_TYPE': "CUBE",
                 'LAST_SCHEMA_UPDATE': "2016-07-22T10:41:38",
                 'LAST_DATA_UPDATE': "2016-07-22T10:41:38",
-                'DESCRIPTION':
-                    "MDX " + self.selected_catalogue + " results",
+                'DESCRIPTION': "MDX " + self.selected_cube + " results",
                 'IS_DRILLTHROUGH_ENABLED': "true",
                 'IS_LINKABLE': "false",
                 'IS_WRITE_ENABLED': "false",
                 'IS_SQL_ENABLED': "false",
-                'CUBE_CAPTION': self.selected_catalogue,
+                'CUBE_CAPTION': self.selected_cube,
                 'CUBE_SOURCE': "1"
             }
 
@@ -312,14 +305,13 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             return ''
 
     def mdschema_measures_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             return [{
-                'CATALOG_NAME': self.selected_catalogue,
-                'CUBE_NAME': self.selected_catalogue,
+                'CATALOG_NAME': self.selected_cube,
+                'CUBE_NAME': self.selected_cube,
                 'MEASURE_NAME': mes,
                 'MEASURE_UNIQUE_NAME': "[Measures].[" + mes + "]",
                 'MEASURE_CAPTION': mes,
@@ -334,29 +326,27 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             } for mes in self.executor.measures]
 
     def mdschema_dimensions_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Restrictions.RestrictionList.CATALOG_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+            and request.Restrictions.RestrictionList.
+                CATALOG_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
             ord = 1
 
             rows = []
             for tables in self.executor.get_all_tables_names(
-                ignore_fact=True, ):
+                    ignore_fact=True, ):
                 rows += {
-                    "CATALOG_NAME": self.selected_catalogue,
-                    "CUBE_NAME": self.selected_catalogue,
+                    "CATALOG_NAME": self.selected_cube,
+                    "CUBE_NAME": self.selected_cube,
                     "DIMENSION_NAME": tables,
                     "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
                     "DIMENSION_CAPTION": tables,
                     "DIMENSION_ORDINAL": str(ord),
                     "DIMENSION_TYPE": "3",
                     "DIMENSION_CARDINALITY": "23",
-                    "DEFAULT_HIERARCHY":
-                        "[" + tables + "].[" + tables + "]",
+                    "DEFAULT_HIERARCHY": "[" + tables + "].[" + tables + "]",
                     "IS_VIRTUAL": "false",
                     "IS_READWRITE": "false",
                     "DIMENSION_UNIQUE_SETTINGS": "1",
@@ -367,8 +357,8 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
             # for measure
             rows += {
-                "CATALOG_NAME": self.selected_catalogue,
-                "CUBE_NAME": self.selected_catalogue,
+                "CATALOG_NAME": self.selected_cube,
+                "CUBE_NAME": self.selected_cube,
                 "DIMENSION_NAME": "Measures",
                 "DIMENSION_UNIQUE_NAME": "[Measures]",
                 "DIMENSION_CAPTION": "Measures",
@@ -388,13 +378,12 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
         # Enumeration of hierarchies in all dimensions
         restriction_list = request.Restrictions.RestrictionList
         rows = []
-        if (restriction_list.CUBE_NAME == self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (restriction_list.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
             if (restriction_list.HIERARCHY_VISIBILITY == 3 or
-                restriction_list.CATALOG_NAME ==
-                self.selected_catalogue):
+                    restriction_list.CATALOG_NAME == self.selected_cube):
 
                 for table_name, df in self.executor.tables_loaded.items():
                     if table_name == self.executor.facts:
@@ -402,94 +391,143 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
                     column_attribut = df.iloc[0][0]
                     rows += {
-                        "CATALOG_NAME": self.selected_catalogue,
-                        "CUBE_NAME": self.selected_catalogue,
+                        "CATALOG_NAME":
+                        self.selected_cube,
+                        "CUBE_NAME":
+                        self.selected_cube,
                         "DIMENSION_UNIQUE_NAME":
-                            "[" + table_name + "]",
-                        "HIERARCHY_NAME": table_name,
+                        "[" + table_name + "]",
+                        "HIERARCHY_NAME":
+                        table_name,
                         "HIERARCHY_UNIQUE_NAME":
-                            "[{0}].[{0}]".format(table_name),
-                        "HIERARCHY_CAPTION": table_name,
-                        "DIMENSION_TYPE": "3",
-                        "HIERARCHY_CARDINALITY": "6",
+                        "[{0}].[{0}]".format(table_name),
+                        "HIERARCHY_CAPTION":
+                        table_name,
+                        "DIMENSION_TYPE":
+                        "3",
+                        "HIERARCHY_CARDINALITY":
+                        "6",
                         "DEFAULT_MEMBER":
-                            "[{0}].[{0}].[{1}].[{2}]".format(
-                                table_name,
-                                df.columns[0],
-                                column_attribut,
-                            ),
-                        "STRUCTURE": "0",
-                        "IS_VIRTUAL": "false",
-                        "IS_READWRITE": "false",
-                        "DIMENSION_UNIQUE_SETTINGS": "1",
-                        "DIMENSION_IS_VISIBLE": "true",
-                        "HIERARCHY_ORDINAL": "1",
-                        "DIMENSION_IS_SHARED": "true",
-                        "HIERARCHY_IS_VISIBLE": "true",
-                        "HIERARCHY_ORIGIN": "1",
-                        "INSTANCE_SELECTION": "0",
+                        "[{0}].[{0}].[{1}].[{2}]".format(
+                            table_name,
+                            df.columns[0],
+                            column_attribut,
+                        ),
+                        "STRUCTURE":
+                        "0",
+                        "IS_VIRTUAL":
+                        "false",
+                        "IS_READWRITE":
+                        "false",
+                        "DIMENSION_UNIQUE_SETTINGS":
+                        "1",
+                        "DIMENSION_IS_VISIBLE":
+                        "true",
+                        "HIERARCHY_ORDINAL":
+                        "1",
+                        "DIMENSION_IS_SHARED":
+                        "true",
+                        "HIERARCHY_IS_VISIBLE":
+                        "true",
+                        "HIERARCHY_ORIGIN":
+                        "1",
+                        "INSTANCE_SELECTION":
+                        "0",
                     }
 
                 rows += {
-                    "CATALOG_NAME": self.selected_catalogue,
-                    "CUBE_NAME": self.selected_catalogue,
-                    "DIMENSION_UNIQUE_NAME": "[Measures]",
-                    "HIERARCHY_NAME": "Measures",
-                    "HIERARCHY_UNIQUE_NAME": "[Measures]",
-                    "HIERARCHY_CAPTION": "Measures",
-                    "DIMENSION_TYPE": "2",
-                    "HIERARCHY_CARDINALITY": "0",
-                    "DEFAULT_MEMBER": "[Measures].[{}]".format(
-                        self.executor.measures[0], ),
-                    "STRUCTURE": "0",
-                    "IS_VIRTUAL": "false",
-                    "IS_READWRITE": "false",
-                    "DIMENSION_UNIQUE_SETTINGS": "1",
-                    "DIMENSION_IS_VISIBLE": "true",
-                    "HIERARCHY_ORDINAL": "1",
-                    "DIMENSION_IS_SHARED": "true",
-                    "HIERARCHY_IS_VISIBLE": "true",
-                    "HIERARCHY_ORIGIN": "1",
-                    "INSTANCE_SELECTION": "0",
+                    "CATALOG_NAME":
+                    self.selected_cube,
+                    "CUBE_NAME":
+                    self.selected_cube,
+                    "DIMENSION_UNIQUE_NAME":
+                    "[Measures]",
+                    "HIERARCHY_NAME":
+                    "Measures",
+                    "HIERARCHY_UNIQUE_NAME":
+                    "[Measures]",
+                    "HIERARCHY_CAPTION":
+                    "Measures",
+                    "DIMENSION_TYPE":
+                    "2",
+                    "HIERARCHY_CARDINALITY":
+                    "0",
+                    "DEFAULT_MEMBER":
+                    "[Measures].[{}]".format(self.executor.measures[0], ),
+                    "STRUCTURE":
+                    "0",
+                    "IS_VIRTUAL":
+                    "false",
+                    "IS_READWRITE":
+                    "false",
+                    "DIMENSION_UNIQUE_SETTINGS":
+                    "1",
+                    "DIMENSION_IS_VISIBLE":
+                    "true",
+                    "HIERARCHY_ORDINAL":
+                    "1",
+                    "DIMENSION_IS_SHARED":
+                    "true",
+                    "HIERARCHY_IS_VISIBLE":
+                    "true",
+                    "HIERARCHY_ORIGIN":
+                    "1",
+                    "INSTANCE_SELECTION":
+                    "0",
                 }
 
             return rows
 
     def mdschema_levels_response(self, request):
         rows = []
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             for tables in self.executor.get_all_tables_names(
-                ignore_fact=True, ):
+                    ignore_fact=True, ):
                 l_nb = 0
                 for col in self.executor.tables_loaded[tables].columns:
                     rows.append({
-                        "CATALOG_NAME": self.selected_catalogue,
-                        "CUBE_NAME": self.selected_catalogue,
-                        "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
-                        "HIERARCHY_UNIQUE_NAME": "[{0}].[{0}]".format(tables),
-                        "LEVEL_NAME": str(col),
-                        "LEVEL_UNIQUE_NAME": "[{0}].[{0}].[{1}]".format(tables, col),
-                        "LEVEL_CAPTION": str(col),
-                        "LEVEL_NUMBER": str(l_nb),
-                        "LEVEL_CARDINALITY": "0",
-                        "LEVEL_TYPE": "0",
-                        "CUSTOM_ROLLUP_SETTINGS": "0",
-                        "LEVEL_UNIQUE_SETTINGS": "0",
-                        "LEVEL_IS_VISIBLE": "true",
-                        "LEVEL_DBTYPE": "130",
-                        "LEVEL_KEY_CARDINALITY": "1",
-                        "LEVEL_ORIGIN": "2"
+                        "CATALOG_NAME":
+                        self.selected_cube,
+                        "CUBE_NAME":
+                        self.selected_cube,
+                        "DIMENSION_UNIQUE_NAME":
+                        "[" + tables + "]",
+                        "HIERARCHY_UNIQUE_NAME":
+                        "[{0}].[{0}]".format(tables),
+                        "LEVEL_NAME":
+                        str(col),
+                        "LEVEL_UNIQUE_NAME":
+                        "[{0}].[{0}].[{1}]".format(tables, col),
+                        "LEVEL_CAPTION":
+                        str(col),
+                        "LEVEL_NUMBER":
+                        str(l_nb),
+                        "LEVEL_CARDINALITY":
+                        "0",
+                        "LEVEL_TYPE":
+                        "0",
+                        "CUSTOM_ROLLUP_SETTINGS":
+                        "0",
+                        "LEVEL_UNIQUE_SETTINGS":
+                        "0",
+                        "LEVEL_IS_VISIBLE":
+                        "true",
+                        "LEVEL_DBTYPE":
+                        "130",
+                        "LEVEL_KEY_CARDINALITY":
+                        "1",
+                        "LEVEL_ORIGIN":
+                        "2"
                     })
                     l_nb += 1
 
             rows += {
-                "CATALOG_NAME": self.selected_catalogue,
-                "CUBE_NAME": self.selected_catalogue,
+                "CATALOG_NAME": self.selected_cube,
+                "CUBE_NAME": self.selected_cube,
                 "DIMENSION_UNIQUE_NAME": "[Measures]",
                 "HIERARCHY_UNIQUE_NAME": "[Measures]",
                 "LEVEL_NAME": "MeasuresLevel",
@@ -503,19 +541,19 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                 "LEVEL_IS_VISIBLE": "true",
                 "LEVEL_DBTYPE": "130",
                 "LEVEL_KEY_CARDINALITY": "1",
-                "LEVEL_ORIGIN": "2", }
+                "LEVEL_ORIGIN": "2",
+            }
 
             return rows
 
     def mdschema_measuregroups_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
             return {
-                "CATALOG_NAME": self.selected_catalogue,
-                "CUBE_NAME": self.selected_catalogue,
+                "CATALOG_NAME": self.selected_cube,
+                "CUBE_NAME": self.selected_cube,
                 "MEASUREGROUP_NAME": "default",
                 "DESCRIPTION": "-",
                 "IS_WRITE_ENABLED": "true",
@@ -523,25 +561,26 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             }
 
     def mdschema_measuregroup_dimensions_response(self, request):
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None):
             self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return [{"CATALOG_NAME": self.selected_catalogue,
-                     "CUBE_NAME": self.selected_catalogue,
-                     "MEASUREGROUP_NAME": "default",
-                     "MEASUREGROUP_CARDINALITY": "ONE",
-                     "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
-                     "DIMENSION_CARDINALITY": "MANY",
-                     "DIMENSION_IS_VISIBLE": "true",
-                     "DIMENSION_IS_FACT_DIMENSION": "false",
-                     "DIMENSION_GRANULARITY": "[{0}].[{0}]".format(tables),
-                     } for tables in self.executor.get_all_tables_names(ignore_fact=True)]
+            return [{
+                "CATALOG_NAME": self.selected_cube,
+                "CUBE_NAME": self.selected_cube,
+                "MEASUREGROUP_NAME": "default",
+                "MEASUREGROUP_CARDINALITY": "ONE",
+                "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
+                "DIMENSION_CARDINALITY": "MANY",
+                "DIMENSION_IS_VISIBLE": "true",
+                "DIMENSION_IS_FACT_DIMENSION": "false",
+                "DIMENSION_GRANULARITY": "[{0}].[{0}]".format(tables),
+            } for tables in self.executor.get_all_tables_names(
+                ignore_fact=True)]
 
     def mdschema_properties_response(self, request):
-        if (request.Restrictions.RestrictionList.PROPERTY_TYPE == 2 and
-            request.Properties.PropertyList.Catalog is not None):
+        if (request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
+                and request.Properties.PropertyList.Catalog is not None):
             properties_names = [
                 "FONT_FLAGS",
                 "LANGUAGE",
@@ -593,22 +632,22 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return [{"CATALOG_NAME": self.selected_catalogue,
-                     "PROPERTY_TYPE": "2",
-                     "PROPERTY_NAME": prop_name,
-                     "PROPERTY_CAPTION": properties_captions[idx],
-                     "DATA_TYPE": properties_datas[idx]} for idx, prop_name in enumerate(properties_names)
-                    ]
+            return [{
+                "CATALOG_NAME": self.selected_cube,
+                "PROPERTY_TYPE": "2",
+                "PROPERTY_NAME": prop_name,
+                "PROPERTY_CAPTION": properties_captions[idx],
+                "DATA_TYPE": properties_datas[idx]
+            } for idx, prop_name in enumerate(properties_names)]
 
         elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
             return ""
 
     def mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
-        if (request.Restrictions.RestrictionList.CUBE_NAME ==
-            self.selected_catalogue and
-            request.Properties.PropertyList.Catalog is not None and
-            request.Restrictions.RestrictionList.TREE_OP == 8):
+        if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                and request.Properties.PropertyList.Catalog is not None
+                and request.Restrictions.RestrictionList.TREE_OP == 8):
             self.change_cube(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executor.parser.split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME, )
@@ -618,28 +657,41 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
             # joined -> [Product].[Product].[Company]
 
             last_attribut = "".join(
-                att for att in separed_tuple[-1] if att not in "[]").replace(
-                "&",
-                "&amp;",
-            )
+                att for att in separed_tuple[-1] if att not in "[]").replace("&", "&amp;", )
 
-            return {"CATALOG_NAME": self.selected_catalogue,
-                    "CUBE_NAME": self.selected_catalogue,
-                    "DIMENSION_UNIQUE_NAME": separed_tuple[0],
-                    "HIERARCHY_UNIQUE_NAME": "{0}.{0}".format(
-                        separed_tuple[0], ),
-                    "LEVEL_UNIQUE_NAME": joined,
-                    "LEVEL_NUMBER": "0",
-                    "MEMBER_ORDINAL": "0",
-                    "MEMBER_NAME": last_attribut,
-                    "MEMBER_UNIQUE_NAME": request.Restrictions.RestrictionList.
-                        MEMBER_UNIQUE_NAME,
-                    "MEMBER_TYPE": "1",
-                    "MEMBER_CAPTION": last_attribut,
-                    "CHILDREN_CARDINALITY": "1",
-                    "PARENT_LEVEL": "0",
-                    "PARENT_COUNT": "0",
-                    "MEMBER_KEY": last_attribut,
-                    "IS_PLACEHOLDERMEMBER": "false",
-                    "IS_DATAMEMBER": "false"
-                    }
+            return {
+                "CATALOG_NAME":
+                self.selected_cube,
+                "CUBE_NAME":
+                self.selected_cube,
+                "DIMENSION_UNIQUE_NAME":
+                separed_tuple[0],
+                "HIERARCHY_UNIQUE_NAME":
+                "{0}.{0}".format(separed_tuple[0], ),
+                "LEVEL_UNIQUE_NAME":
+                joined,
+                "LEVEL_NUMBER":
+                "0",
+                "MEMBER_ORDINAL":
+                "0",
+                "MEMBER_NAME":
+                last_attribut,
+                "MEMBER_UNIQUE_NAME":
+                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,
+                "MEMBER_TYPE":
+                "1",
+                "MEMBER_CAPTION":
+                last_attribut,
+                "CHILDREN_CARDINALITY":
+                "1",
+                "PARENT_LEVEL":
+                "0",
+                "PARENT_COUNT":
+                "0",
+                "MEMBER_KEY":
+                last_attribut,
+                "IS_PLACEHOLDERMEMBER":
+                "false",
+                "IS_DATAMEMBER":
+                "false"
+            }

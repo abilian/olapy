@@ -52,7 +52,8 @@ def load_to_olapy(*args, **kwargs):
     if not isdir(kwargs.get('output_cube_path')):
         os.mkdir(kwargs.get('output_cube_path'))
     for df_name, df in olapy_data_set.items():
-        save_to = os.path.join(kwargs.get('output_cube_path'), df_name + '.csv')
+        save_to = os.path.join(
+            kwargs.get('output_cube_path'), df_name + '.csv')
         df.to_csv(path_or_buf=save_to, sep=';', encoding='utf8')
     print('Loaded in ' + kwargs.get('output_cube_path'))
 
@@ -66,10 +67,7 @@ def get_graph(**options):
 
     """
     graph = bonobo.Graph()
-    graph.add_chain(extract_excel_pd,
-                    transform,
-                    load_to_olapy
-                    )
+    graph.add_chain(extract_excel_pd, transform, load_to_olapy)
 
     return graph
 
@@ -93,9 +91,14 @@ def get_services(input_file_path, cube_config, output_cube_path, **options):
 
 @click.command()
 @click.option('--input_file_path', '-in_file', default=None, help='Input file')
-@click.option('--config_file', '-config', default=None, help='Configuration file path')
-@click.option('--output_cube_path', '-out_cube', default=None, help='Cube export path')
-def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=None):
+@click.option(
+    '--config_file', '-config', default=None, help='Configuration file path')
+@click.option(
+    '--output_cube_path', '-out_cube', default=None, help='Cube export path')
+def run_etl(input_file_path,
+            config_file,
+            output_cube_path=None,
+            cube_config=None):
     """
     Run ETl Process for passed excel file.
 
@@ -150,13 +153,11 @@ def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=Non
         if output_cube_path:
             options['output_cube_path'] = output_cube_path
         else:
-            options['output_cube_path'] = os.path.join(expanduser('~'), 'olapy-data', 'cubes',
-                                                       Path(input_file_path).stem)
+            options['output_cube_path'] = os.path.join(
+                expanduser('~'), 'olapy-data', 'cubes',
+                Path(input_file_path).stem)
 
-        bonobo.run(
-            get_graph(**options),
-            services=get_services(**options)
-        )
+        bonobo.run(get_graph(**options), services=get_services(**options))
 
 
 # The __main__ block actually execute the graph.

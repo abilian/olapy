@@ -90,8 +90,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
         }
         for tupls in itertools.chain(*tuples):
             tupl = {}
-            if (tupls[0][1] in self.executor.measures and
-                len(self.executor.selected_measures) > 1):
+            if (tupls[0][1] in self.executor.measures and len(self.executor.selected_measures) > 1):
                 self._gen_measures_xs0(tupl, tupls)
                 if tupls[0][-1] in self.executor.measures:
                     continue
@@ -226,10 +225,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             'Axis': {'name': 'SlicerAxis'},
             'Tuples': []
         }
-        for dim_diff in self.executor.get_all_tables_names(
-            ignore_fact=True, ):
-            column_attribut = self.executor.tables_loaded[
-                dim_diff].iloc[0][0]
+        for dim_diff in self.executor.get_all_tables_names(ignore_fact=True, ):
+            column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][0]
             all_axis['Tuples'] += {
                 'Member': {'Hierarchy': "[{0}].[{0}]".format(dim_diff)},
                 'UName': "[{0}].[{0}].[{1}].[{2}]".format(dim_diff,
@@ -309,9 +306,8 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.columns_desc["columns"].keys()) == 0 or
-             len(self.columns_desc["rows"].keys()) == 0) and
-            self.executor.facts in self.columns_desc["all"].keys()):
+        if ((len(self.columns_desc["columns"].keys()) == 0 or len(self.columns_desc["rows"].keys()) == 0) and
+                self.executor.facts in self.columns_desc["all"].keys()):
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
                 self.mdx_execution_result["result"][measure]
@@ -544,16 +540,12 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
         if axis_tables:
             # with xml.AxisInfo(name=Axis):
             # many measures , then write this on the top
-            if (self.executor.facts in axis_tables.keys() and
-                len(axis_tables[self.executor.facts]) > 1):
+            if (self.executor.facts in axis_tables.keys() and len(axis_tables[self.executor.facts]) > 1):
                 axes_info += self._gen_measures_one_axis_info(None)
             axes_info += self._generate_table_axis_info(None, axis_tables_without_facts)
             # Hierarchize
             if (not self.executor.parser.hierarchized_tuples() and
-                len(self.columns_desc["columns"].get(
-                    self.executor.facts,
-                    [1, 1],
-                ), ) == 1):
+                    len(self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
                 axes_info += self._gen_measures_one_axis_info(None)
 
         return axes_info
@@ -693,25 +685,21 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                     'Member': {'Hierarchy': {"[{0}].[{0}]".format(dim_diff)}},
                     'UName': "[{0}].[{0}].[{1}].[{2}]".format(
                         dim_diff,
-                        self.executor.tables_loaded[dim_diff]
-                            .columns[0],
+                        self.executor.tables_loaded[dim_diff].columns[0],
                         column_attribut,
                     ),
                     'Caption': str(column_attribut),
                     'LName': "[{0}].[{0}].[{1}]".format(
                         dim_diff,
-                        self.executor.tables_loaded[dim_diff]
-                            .columns[0],
+                        self.executor.tables_loaded[dim_diff].columns[0],
                     ),
                     'LNum': "0",
                     'DisplayInfo': "2"
                 }
 
             # Hierarchize
-            if (len(self.executor.selected_measures) <= 1 and
-                (self.executor.parser.hierarchized_tuples() or
-                 self.executor.facts in self.columns_desc["where"]
-                )):
+            if (len(self.executor.selected_measures) <= 1 and (self.executor.parser.hierarchized_tuples() or
+                                                               self.executor.facts in self.columns_desc["where"])):
                 all_axis['Tuples'] += {
                     'Member': {'Hierarchy': "[Measures]"},
                     'UName': "[Measures].[{}]".format(
