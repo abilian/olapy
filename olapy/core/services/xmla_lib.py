@@ -8,9 +8,46 @@ from olapy.core.services.models import DiscoverRequest, Restriction, Property, R
     ExecuteRequest, Command
 from olapy.core.services.xmla import XmlaProviderService
 
+
 class XmlaProviderLib(XmlaProviderService):
     # keep override xmla module
-    pass
+    def __init__(self, discover_request_hanlder, execute_request_hanlder):
+        self.discover_request_hanlder = discover_request_hanlder
+        self.execute_request_hanlder = execute_request_hanlder
+
+    def Discover(self, request):
+        """The first principle function of xmla protocol.
+        :param request: :class:`DiscoverRequest` object
+        :return: XML Discover response as string
+        """
+        method_name = request.RequestType.lower() + "_response"
+        method = getattr(self.discover_request_hanlder, method_name)
+
+        if request.RequestType == "DISCOVER_DATASOURCES":
+            return method()
+
+        return method(request)
+
+    def Execute(self, request):
+        """The second principle function of xmla protocol.
+        :param request: :class:`ExecuteRequest` object Execute.
+        :return: XML Execute response as string
+        """
+
+        # same session_id in discover and execute
+        # same executor instance as the discovery (not reloading the cube another time)
+        mdx_query = request.Command.Statement.encode().decode("utf8")
+
+        # Hierarchize
+        if all(key in mdx_query for key in ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]):
+            convert2formulas = True
+        else:
+            convert2formulas = False
+
+        self.execute_request_hanlder.execute_mdx_query(mdx_query, convert2formulas)
+
+        return self.execute_request_hanlder.generate_response()
+
 
 def get_response(xmla_request_params, dataframes=None, output='dict'):
     # type: (dict, dict, str) -> dict
@@ -30,8 +67,8 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     module = importlib.import_module('olapy.core.services.' + output + '_execute_request_handler')
     execute_request_handler = getattr(module, output.title() + 'ExecuteReqHandler')(mdx_engine)
 
-    xmla_service = XmlaProviderService(discover_request_handler,
-                                       execute_request_handler)
+    xmla_service = XmlaProviderLib(discover_request_handler,
+                                   execute_request_handler)
 
     property = Property(**xmla_request_params.get('properties'))
     properties = Propertieslist()
