@@ -8,7 +8,6 @@ import pandas as pd
 
 
 class CubeLoader(object):
-
     def __init__(self, cube_path=None, sep=";"):
         self.cube_path = cube_path
         self.sep = sep
@@ -41,19 +40,19 @@ class CubeLoader(object):
         :return: star schema DataFrame
         """
         # loading facts table
-        fusion = pd.read_csv(
+        df = pd.read_csv(
             os.path.join(self.cube_path, facts + ".csv"),
             sep=self.sep,
         )
         for file_name in os.listdir(self.cube_path):
             try:
-                fusion = fusion.merge(
+                df = df.merge(
                     pd.read_csv(
                         os.path.join(self.cube_path, file_name),
                         sep=self.sep,
-                    ),)
+                    ), )
             except BaseException:
                 print("No common column")
                 pass
 
-        return fusion
+        return df

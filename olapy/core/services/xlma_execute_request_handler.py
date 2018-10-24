@@ -20,7 +20,27 @@ from ..mdx.parser.parse import Parser
 
 
 class XmlaExecuteReqHandler():
-    """XmlaExecuteReqHandler for generating xmla execute responses."""
+    """The Execute method executes XMLA commands provided in the Command element and returns any resulting data
+    using the XMLA MDDataSet data type (for multidimensional result sets.)
+
+    Example::
+
+        <Execute xmlns="urn:schemas-microsoft-com:xml-analysis">
+           <Command>
+              <Statement>
+                 SELECT Hierarchize({[Measures].[amount]}) ON COLUMNS FROM [sales]
+              </Statement>
+           </Command>
+           <Properties>
+              <PropertyList>
+                 <DataSourceInfo>Provider=MSOLAP;Data Source=local;</DataSourceInfo>
+                 <Catalog>sales</Catalog>
+                 <Format>Multidimensional</Format>
+                 <AxisFormat>ClusterFormat</AxisFormat>
+              </PropertyList>
+           </Properties>
+        </Execute>
+    """
 
     def __init__(self, executor, mdx_query=None, convert2formulas=False):
         """
@@ -35,17 +55,18 @@ class XmlaExecuteReqHandler():
 
     def execute_mdx_query(self, mdx_query, convert2formulas=False):
         """
-
+        Use the MdxEngine instance to execute the provided mdx query
+        :param mdx_query: the mdx query
+        :param convert2formulas: convert2formulas True or False
         :return:
         """
+
         self.mdx_query = mdx_query
         self.convert2formulas = convert2formulas
         if self.convert2formulas:
-            self.mdx_execution_result = self._execute_convert_formulas_query(
-                mdx_query)
+            self.mdx_execution_result = self._execute_convert_formulas_query(mdx_query)
         elif mdx_query:
-            self.mdx_execution_result = self.executor.execute_mdx(
-                self.mdx_query)
+            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
         else:
             self.mdx_execution_result = None
         if isinstance(self.mdx_execution_result, dict):
@@ -55,7 +76,12 @@ class XmlaExecuteReqHandler():
 
     def _execute_convert_formulas_query(self, mdx_query):
         """
-            <Cell CellOrdinal="0">
+        convert Mdx Query to `excel formulas <https://exceljet.net/excel-functions/excel-convert-function>`_ response
+
+        :return: excel formuls
+            example::
+
+                <Cell CellOrdinal="0">
                 <Value>[Measures].[Amount]</Value>
             </Cell>
             <Cell CellOrdinal="1">
@@ -65,7 +91,7 @@ class XmlaExecuteReqHandler():
                 <Value>[Measures]</Value>
             </Cell>
             <Cell CellOrdinal="3">
-                <Value>[Geography].[Geo].[All Regions].&amp;[America]</Value>
+                <Value>[Geography].[Geo].[All Regions].[America]</Value>
             </Cell>
             <Cell CellOrdinal="4">
                 <Value>America</Value>
@@ -74,7 +100,7 @@ class XmlaExecuteReqHandler():
                 <Value>[Geography].[Geo].[Continent]</Value>
             </Cell>
             <Cell CellOrdinal="6">
-                <Value>[Geography].[Geo].[All Regions].&amp;[America].&amp;[US]</Value>
+                <Value>[Geography].[Geo].[All Regions].[America].[US]</Value>
             </Cell>
             <Cell CellOrdinal="7">
                 <Value>United States</Value>
@@ -82,44 +108,14 @@ class XmlaExecuteReqHandler():
             <Cell CellOrdinal="8">
                 <Value>[Geography].[Geo].[Country]</Value>
             </Cell>
-            <Cell CellOrdinal="9">
-                <Value>[Product].[Prod].[Company].&amp;[Crazy Development ]</Value>
-            </Cell>
-            <Cell CellOrdinal="10">
-                <Value>Crazy Development </Value>
-            </Cell>
-            <Cell CellOrdinal="11">
-                <Value>[Product].[Prod].[Company]</Value>
-            </Cell>
-            <Cell CellOrdinal="12">
-                <Value>[Product].[Prod].[Company].&amp;[Crazy Development ].&amp;[icCube]</Value>
-            </Cell>
-            <Cell CellOrdinal="13">
-                <Value>icCube</Value>
-            </Cell>
-            <Cell CellOrdinal="14">
-                <Value>[Product].[Prod].[Article]</Value>
-            </Cell>
-            <Cell CellOrdinal="15">
-                <Value>[Geography].[Geo].[All Regions].&amp;[Europe]</Value>
-            </Cell>
-            <Cell CellOrdinal="16">
-                <Value>Europe</Value>
-            </Cell>
-            <Cell CellOrdinal="17">
-                <Value>[Geography].[Geo].[Continent]</Value>
-            </Cell>
-        :return:
+
         """
 
-        # todo check
-        return [
-            tup[0] for tup in re.compile(Parser.REG).findall(mdx_query)
-            if "[Measures].[XL_SD" not in tup[0] and tup[1]
-        ][::3]
+        return [tup[0] for tup in re.compile(Parser.REG).findall(mdx_query)
+                if "[Measures].[XL_SD" not in tup[0] and tup[1]][::3]
 
     def split_dataframe(self):
-        """Split DataFrame into multiple ones by dimension.
+        """Split DataFrame into multiple dataframes by dimension.
 
         Example::
 
@@ -153,10 +149,8 @@ class XmlaExecuteReqHandler():
 
         :return: dict with multiple DataFrame
         """
-        return OrderedDict((
-            key,
-            self.mdx_execution_result["result"].reset_index()[list(value)],
-        ) for key, value in self.columns_desc["all"].items())
+        return OrderedDict((key, self.mdx_execution_result["result"].reset_index()[list(value)],) for key, value in
+                           self.columns_desc["all"].items())
 
     @staticmethod
     def get_tuple_without_nan(tuple):
@@ -178,21 +172,23 @@ class XmlaExecuteReqHandler():
 
         return tuple
 
-    def _generate_tuples_xs0(self, split_df, mdx_query_axis):
+    def _generate_tuples_xs0(self, splitted_df, mdx_query_axis):
+        """
+        generate elements representing axis 0 data contained by a root element that uses the MDDataSet data type.
+        :param splitted_df: spllited dataframes (with split_dataframe() function)
+        :param mdx_query_axis: from mdx query,  rows | columns | where (condition) | all (rows + columns + where)
+        :return: one xs0 reponse as xml format
+        """
 
         first_att = None
         # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
-        if list(self.columns_desc[mdx_query_axis].keys()) == [
-                self.executor.facts,
-        ]:
-            if len(self.columns_desc[mdx_query_axis][self.executor.
-                                                     facts]) == 1:
+        if list(self.columns_desc[mdx_query_axis].keys()) == [self.executor.facts]:
+            if len(self.columns_desc[mdx_query_axis][self.executor.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
                 # ['Facts', 'Amount', 'Amount']
-                tuples = [[[[self.executor.facts] + [mes] + [mes]]]
-                          for mes in self.executor.selected_measures]
+                tuples = [[[[self.executor.facts] + [mes] + [mes]]] for mes in self.executor.selected_measures]
                 first_att = 3
 
         # query with on columns and on rows (without measure)
@@ -200,8 +196,8 @@ class XmlaExecuteReqHandler():
             # Ex: ['Geography','America']
             tuples = [
                 zip(*[[[key] + list(row)
-                       for row in split_df[key].itertuples(index=False)]
-                      for key in split_df.keys()
+                       for row in splitted_df[key].itertuples(index=False)]
+                      for key in splitted_df.keys()
                       if key is not self.executor.facts]),
             ]
 
@@ -212,8 +208,8 @@ class XmlaExecuteReqHandler():
             # Ex: ['Geography','Amount','America']
             tuples = [
                 zip(*[[[key] + [mes] + list(row)
-                       for row in split_df[key].itertuples(index=False)]
-                      for key in split_df.keys()
+                       for row in splitted_df[key].itertuples(index=False)]
+                      for key in splitted_df.keys()
                       if key is not self.executor.facts])
                 for mes in self.executor.selected_measures
             ]
@@ -222,6 +218,11 @@ class XmlaExecuteReqHandler():
         return tuples, first_att
 
     def _gen_measures_xs0(self, xml, tupls):
+        """
+        add elements representing measures to axis 0 element.
+        :param xml: axis 0 tu update, in xml format
+        :param tupls: mdx query tuples
+        """
         with xml.Member(Hierarchy="[Measures]"):
             xml.UName("[Measures].[{}]".format(tupls[0][1]))
             xml.Caption("{}".format(tupls[0][1]))
@@ -231,20 +232,23 @@ class XmlaExecuteReqHandler():
             if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME("[Measures]")
 
-    def _gen_xs0_parent(self, xml, **kwargs):
+    def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
+        """
+        For hierarchical rowset, we need to add the tuple ( mdx query contains PARENT_UNIQUE_NAME keyword)
+        :param xml: axis 0 tu update, in xml format
+        :param tuple: tuple that you want to add his parent
+        :param splitted_df: spllited dataframes (with split_dataframe() function)
+        :param first_att: tuple first attribut
+        :return:
+        """
 
-        first_att = kwargs.get("first_att")
-        split_df = kwargs.get("split_df")
-        tuple = kwargs.get("tuple")
-
-        parent = ".".join(
-            map(lambda x: "[" + str(x) + "]", tuple[first_att - 1:-1]), )
+        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1:-1]), )
         if parent:
             parent = "." + parent
         xml.PARENT_UNIQUE_NAME(
             "[{0}].[{0}].[{1}]{2}".format(
                 tuple[0],
-                split_df[tuple[0]].columns[0],
+                splitted_df[tuple[0]].columns[0],
                 parent,
             ), )
 
@@ -256,8 +260,8 @@ class XmlaExecuteReqHandler():
             d_tup = split_df[tuple_without_minus_1[0]].columns[
                 len(tuple_without_minus_1) - first_att]
             with xml.Member(
-                    Hierarchy="[{0}].[{0}]".format(
-                        tuple_without_minus_1[0]), ):
+                Hierarchy="[{0}].[{0}]".format(
+                    tuple_without_minus_1[0]), ):
                 xml.UName(
                     "[{0}].[{0}].[{1}].{2}".format(
                         tuple_without_minus_1[0],
@@ -279,21 +283,28 @@ class XmlaExecuteReqHandler():
                     self._gen_xs0_parent(
                         xml,
                         tuple=tuple_without_minus_1,
-                        split_df=split_df,
+                        splitted_df=split_df,
                         first_att=first_att,
                     )
                 if "HIERARCHY_UNIQUE_NAME" in self.mdx_query.upper():
                     xml.HIERARCHY_UNIQUE_NAME(
                         "[{0}].[{0}]".format(tuple_without_minus_1[0], ), )
 
-    def tuples_2_xs0(self, tuples, split_df, first_att, axis):
+    def tuples_2_xs0(self, tuples, splitted_df, first_att, axis):
+        """
+        transform mdx query tuples (list) to xmla xs0
+        :param tuples: list of tuples
+        :param splitted_df: spllited dataframes (with split_dataframe() function)
+        :param first_att: tuple first attribut
+        :param axis: xs0 | xs1
+        :return: tuples axis in xml
+        """
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
                 for tupls in itertools.chain(*tuples):
                     with xml.Tuple:
-                        if (tupls[0][1] in self.executor.measures
-                                and len(self.executor.selected_measures) > 1):
+                        if (tupls[0][1] in self.executor.measures and len(self.executor.selected_measures) > 1):
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
@@ -301,7 +312,7 @@ class XmlaExecuteReqHandler():
                         self._gen_xs0_tuples(
                             xml,
                             tupls,
-                            split_df=split_df,
+                            split_df=splitted_df,
                             first_att=first_att,
                         )
                         # Hierarchize'
@@ -310,6 +321,12 @@ class XmlaExecuteReqHandler():
         return xml
 
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
+        """
+        generate xs0 axis form query with multiple data groups "exple: select (.. geography..)(..product..)(..time..)"
+        :param axis: ax0 | ax1 ( depends on the mdx query axes )
+        :param tuples_groups: list of tuples groups
+        :return: tuples axis groups in xml
+        """
         xml = xmlwitch.Builder()
         with xml.Axis(name=axis):
             with xml.Tuples:
@@ -338,11 +355,18 @@ class XmlaExecuteReqHandler():
         return str(xml)
 
     def generate_xs0_one_axis(
-            self,
-            split_df,
-            mdx_query_axis="all",
-            axis="Axis0",
+        self,
+        splitted_df,
+        mdx_query_axis="all",
+        axis="Axis0",
     ):
+        """
+
+        :param splitted_df: spllited dataframes (with split_dataframe() function)
+        :param mdx_query_axis: axis to which you want generate xs0 xml, (rows, columns or all)
+        :param axis: axis0 or axis1
+        :return:
+        """
         # patch 4 select (...) (...) (...) from bla bla bla
         if self.executor.check_nested_select():
             return self._gen_xs0_grouped_tuples(
@@ -352,9 +376,9 @@ class XmlaExecuteReqHandler():
 
         xml = xmlwitch.Builder()
 
-        tuples, first_att = self._generate_tuples_xs0(split_df, mdx_query_axis)
+        tuples, first_att = self._generate_tuples_xs0(splitted_df, mdx_query_axis)
         if tuples:
-            xml = self.tuples_2_xs0(tuples, split_df, first_att, axis)
+            xml = self.tuples_2_xs0(tuples, splitted_df, first_att, axis)
         elif self.columns_desc["columns"].keys() == [self.executor.facts]:
             with xml.Axis(name=axis):
                 with xml.Tuples:
@@ -371,6 +395,10 @@ class XmlaExecuteReqHandler():
         return str(xml)
 
     def _generate_xs0_convert2formulas(self):
+        """
+        generate xs0 xml for convert formulas request
+        :return:
+        """
         xml = xmlwitch.Builder()
         with xml.Axis(name="Axis0"):
             with xml.Tuples:
@@ -388,40 +416,49 @@ class XmlaExecuteReqHandler():
 
     def _generate_slicer_convert2formulas(self):
         """
-        <Axis name="SlicerAxis">
-            <Tuples>
-                <Tuple>
-                    <Member Hierarchy="[Geography].[Geo]">
-                        <UName>[Geography].[Geo].[All Regions]</UName>
-                        <Caption>All Regions</Caption>
-                        <LName>[Geography].[Geo].[All-Level]</LName>
-                        <LNum>0</LNum>
-                        <DisplayInfo>2</DisplayInfo>
-                    </Member>
-                    <Member Hierarchy="[Geography].[Economy]">
-                        <UName>[Geography].[Economy].[All]</UName>
-                        <Caption>All</Caption>
-                        <LName>[Geography].[Economy].[All-Level]</LName>
-                        <LNum>0</LNum>
-                        <DisplayInfo>3</DisplayInfo>
-                    </Member>
-                    <Member Hierarchy="[Product].[Prod]">
-                        <UName>[Product].[Prod].[Company].&amp;[Crazy Development ]</UName>
-                        <Caption>Crazy Development </Caption>
-                        <LName>[Product].[Prod].[Company]</LName>
-                        <LNum>0</LNum>
-                        <DisplayInfo>1</DisplayInfo>
-                    </Member>
-                    <Member Hierarchy="[Time].[Calendar]">
-                        <UName>[Time].[Calendar].[Year].&amp;[2010]</UName>
-                        <Caption>2010</Caption>
-                        <LName>[Time].[Calendar].[Year]</LName>
-                        <LNum>0</LNum>
-                        <DisplayInfo>4</DisplayInfo>
-                    </Member>
-                </Tuple>
-            </Tuples>
-        </Axis>
+        generate set et of hierarchies from which data is retrieved for a single member.
+        For more information about the slicer axis, see
+        `Specifying the Contents of a Slicer Axis (MDX) <https://docs.microsoft.com/en-us/sql/analysis-\
+        services/multidimensional-models/mdx/mdx-query-and-slicer-axes-specify-the-contents-of-a-slicer-\
+        axis?view=sql-server-2017>`_
+
+        example::
+
+
+            <Axis name="SlicerAxis">
+                <Tuples>
+                    <Tuple>
+                        <Member Hierarchy="[Geography].[Geo]">
+                            <UName>[Geography].[Geo].[All Regions]</UName>
+                            <Caption>All Regions</Caption>
+                            <LName>[Geography].[Geo].[All-Level]</LName>
+                            <LNum>0</LNum>
+                            <DisplayInfo>2</DisplayInfo>
+                        </Member>
+                        <Member Hierarchy="[Geography].[Economy]">
+                            <UName>[Geography].[Economy].[All]</UName>
+                            <Caption>All</Caption>
+                            <LName>[Geography].[Economy].[All-Level]</LName>
+                            <LNum>0</LNum>
+                            <DisplayInfo>3</DisplayInfo>
+                        </Member>
+                        <Member Hierarchy="[Product].[Prod]">
+                            <UName>[Product].[Prod].[Company].&amp;[Crazy Development ]</UName>
+                            <Caption>Crazy Development </Caption>
+                            <LName>[Product].[Prod].[Company]</LName>
+                            <LNum>0</LNum>
+                            <DisplayInfo>1</DisplayInfo>
+                        </Member>
+                        <Member Hierarchy="[Time].[Calendar]">
+                            <UName>[Time].[Calendar].[Year].&amp;[2010]</UName>
+                            <Caption>2010</Caption>
+                            <LName>[Time].[Calendar].[Year]</LName>
+                            <LNum>0</LNum>
+                            <DisplayInfo>4</DisplayInfo>
+                        </Member>
+                    </Tuple>
+                </Tuples>
+            </Axis>
 
         :return:
         """
@@ -429,25 +466,19 @@ class XmlaExecuteReqHandler():
         with xml.Axis(name="SlicerAxis"):
             with xml.Tuples:
                 with xml.Tuple:
-                    for dim_diff in self.executor.get_all_tables_names(
-                            ignore_fact=True, ):
-                        column_attribut = self.executor.tables_loaded[
-                            dim_diff].iloc[0][0]
-                        with xml.Member(
-                                Hierarchy="[{0}].[{0}]".format(dim_diff), ):
-                            xml.UName(
-                                "[{0}].[{0}].[{1}].[{2}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff].
-                                    columns[0],
-                                    column_attribut,
-                                ), )
+                    for dim_diff in self.executor.get_all_tables_names(ignore_fact=True, ):
+                        column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][0]
+                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff), ):
+                            xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
+                                dim_diff,
+                                self.executor.tables_loaded[dim_diff].columns[0],
+                                column_attribut,
+                            ), )
                             xml.Caption(str(column_attribut))
                             xml.LName(
                                 "[{0}].[{0}].[{1}]".format(
                                     dim_diff,
-                                    self.executor.tables_loaded[dim_diff].
-                                    columns[0],
+                                    self.executor.tables_loaded[dim_diff].columns[0],
                                 ), )
                             xml.LNum("0")
                             xml.DisplayInfo("2")
@@ -459,6 +490,9 @@ class XmlaExecuteReqHandler():
 
     def generate_xs0(self):
         """
+        generate tuples used to represent a single axis in a multidimensional dataset contained by an Axes
+        element that uses the MDDataSet data type, returned by the Execute method.
+
         Example of xs0::
 
             <Axis name="Axis0">
@@ -531,8 +565,7 @@ class XmlaExecuteReqHandler():
             )
 
         # only one measure selected
-        elif not self.columns_desc["rows"] and not self.columns_desc[
-                "columns"] and self.columns_desc["where"]:
+        elif not self.columns_desc["rows"] and not self.columns_desc["columns"] and self.columns_desc["where"]:
             return self.generate_xs0_one_axis(
                 dfs,
                 mdx_query_axis="where",
@@ -548,6 +581,8 @@ class XmlaExecuteReqHandler():
 
     def _generate_cells_data_convert2formulas(self):
         """
+        generate cells data for convert formulas query
+
         for each tuple:
         <Cell CellOrdinal="0">
             <Value>[Measures].[Amount]</Value>
@@ -591,6 +626,8 @@ class XmlaExecuteReqHandler():
     def generate_cell_data(self):
         # type: () -> text_type
         """
+        Returns Cell elements representing the cell data contained by a root element that uses the MDDataSet data type.
+
         Example of CellData::
 
             <Cell CellOrdinal="0">
@@ -607,8 +644,7 @@ class XmlaExecuteReqHandler():
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.columns_desc["columns"].keys()) == 0
-             or len(self.columns_desc["rows"].keys()) == 0)
+        if ((len(self.columns_desc["columns"].keys()) == 0 or len(self.columns_desc["rows"].keys()) == 0)
                 and self.executor.facts in self.columns_desc["all"].keys()):
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
@@ -637,7 +673,11 @@ class XmlaExecuteReqHandler():
 
         return str(xml)
 
-    def _generate_axes_info_sliver_convert2formulas(self):
+    def _generate_axes_info_slicer_convert2formulas(self):
+        """
+        generate Slicer Axes for convert formulas query
+        :return:
+        """
         xml = xmlwitch.Builder()
         with xml.AxisInfo(name="SlicerAxis"):
             for dim in self.executor.get_all_tables_names(ignore_fact=True):
@@ -665,7 +705,9 @@ class XmlaExecuteReqHandler():
 
     def generate_axes_info_slicer(self):
         """
-        Not used dimensions.
+        generates slicer axis which filters the data returned by the MDX SELECT statement,
+        restricting the returned data so that only data intersecting with the specified members will be returned
+        (Not used dimensions)
 
         Example AxisInfo::
 
@@ -692,7 +734,7 @@ class XmlaExecuteReqHandler():
         """
 
         if self.convert2formulas:
-            return self._generate_axes_info_sliver_convert2formulas()
+            return self._generate_axes_info_slicer_convert2formulas()
 
         all_dimensions_names = self.executor.get_all_tables_names(
             ignore_fact=True, )
@@ -755,6 +797,11 @@ class XmlaExecuteReqHandler():
         return str(xml)
 
     def _gen_measures_one_axis_info(self, xml):
+        """
+        Add AxisInfo elements, representing the axis metadata contained by the parent OlapInfo element \
+        for measures to the passed xml structure.
+        :param xml: xml structure to update
+        """
         with xml.HierarchyInfo(name="[Measures]"):
             xml.UName(name="[Measures].[MEMBER_UNIQUE_NAME]", type="xs:string")
             xml.Caption(name="[Measures].[MEMBER_CAPTION]", type="xs:string")
@@ -776,44 +823,52 @@ class XmlaExecuteReqHandler():
                 )
         return xml
 
-    def _generate_table_axis_info(self, xml, axis_tables):
-        for table_name in axis_tables:
-            with xml.HierarchyInfo(name="[{0}].[{0}]".format(table_name)):
+    def _generate_table_axis_info(self, xml, dimensions_names):
+        """
+        Add AxisInfo elements, representing the axis metadata contained by the parent OlapInfo element \
+        for Dimension to the passed xml structure.
+        :param xml: xml structure to update
+        :param dimensions_names: dimension names (without facts table)
+        """
+        for dimension_name in dimensions_names:
+            with xml.HierarchyInfo(name="[{0}].[{0}]".format(dimension_name)):
                 xml.UName(
-                    name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(table_name),
+                    name="[{0}].[{0}].[MEMBER_UNIQUE_NAME]".format(dimension_name),
                     type="xs:string",
                 )
                 xml.Caption(
-                    name="[{0}].[{0}].[MEMBER_CAPTION]".format(table_name),
+                    name="[{0}].[{0}].[MEMBER_CAPTION]".format(dimension_name),
                     type="xs:string",
                 )
                 xml.LName(
-                    name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(table_name),
+                    name="[{0}].[{0}].[LEVEL_UNIQUE_NAME]".format(dimension_name),
                     type="xs:string",
                 )
                 xml.LNum(
-                    name="[{0}].[{0}].[LEVEL_NUMBER]".format(table_name),
+                    name="[{0}].[{0}].[LEVEL_NUMBER]".format(dimension_name),
                     type="xs:int",
                 )
                 xml.DisplayInfo(
-                    name="[{0}].[{0}].[DISPLAY_INFO]".format(table_name),
+                    name="[{0}].[{0}].[DISPLAY_INFO]".format(dimension_name),
                     type="xs:unsignedInt",
                 )
 
                 if "Hierarchize" in self.mdx_query:
                     xml.PARENT_UNIQUE_NAME(
                         name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
-                            table_name, ),
+                            dimension_name, ),
                         type="xs:string",
                     )
                     xml.HIERARCHY_UNIQUE_NAME(
                         name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".format(
-                            table_name, ),
+                            dimension_name, ),
                         type="xs:string",
                     )
 
     def generate_one_axis_info(self, mdx_query_axis="columns", Axis="Axis0"):
         """
+        AxisInfo elements for one axis (axis0 or axis1)
+
         Example AxisInfo::
 
             <AxesInfo>
@@ -855,64 +910,61 @@ class XmlaExecuteReqHandler():
         if axis_tables:
             with xml.AxisInfo(name=Axis):
                 # many measures , then write this on the top
-                if (self.executor.facts in axis_tables.keys()
-                        and len(axis_tables[self.executor.facts]) > 1):
+                if (self.executor.facts in axis_tables.keys() and len(axis_tables[self.executor.facts]) > 1):
                     self._gen_measures_one_axis_info(xml)
                 self._generate_table_axis_info(xml, axis_tables_without_facts)
                 # Hierarchize
                 if (not self.executor.parser.hierarchized_tuples() and len(
-                        self.columns_desc["columns"].get(
-                            self.executor.facts,
-                            [1, 1],
-                        ), ) == 1):
+                        self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
                     self._gen_measures_one_axis_info(xml)
 
         return str(xml)
 
     def _generate_axes_info_convert2formulas(self):
         """
-        always:
+        AxisInfo elements when convert to formulas,
 
-        <AxisInfo name="Axis0">
-            <HierarchyInfo name="[Measures]">
-                <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-            </HierarchyInfo>
-        </AxisInfo>
-        <AxisInfo name="SlicerAxis">
-            <HierarchyInfo name="[Geography].[Geo]">
-                <UName name="[Geography].[Geo].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Geography].[Geo].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Geography].[Geo].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Geography].[Geo].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Geography].[Geo].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-            </HierarchyInfo>
-            <HierarchyInfo name="[Geography].[Economy]">
-                <UName name="[Geography].[Economy].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Geography].[Economy].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Geography].[Economy].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Geography].[Economy].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Geography].[Economy].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-            </HierarchyInfo>
-            <HierarchyInfo name="[Product].[Prod]">
-                <UName name="[Product].[Prod].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Product].[Prod].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Product].[Prod].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Product].[Prod].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Product].[Prod].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-            </HierarchyInfo>
-            <HierarchyInfo name="[Time].[Calendar]">
-                <UName name="[Time].[Calendar].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
-                <Caption name="[Time].[Calendar].[MEMBER_CAPTION]" type="xsd:string"/>
-                <LName name="[Time].[Calendar].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
-                <LNum name="[Time].[Calendar].[LEVEL_NUMBER]" type="xsd:int"/>
-                <DisplayInfo name="[Time].[Calendar].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
-            </HierarchyInfo>
-        </AxisInfo>
-        :return:
+        xml structure always Axis0 with measures and SlicerAxis with all dimensions like this::
+
+            <AxisInfo name="Axis0">
+                <HierarchyInfo name="[Measures]">
+                    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                    <Caption name="[Measures].[MEMBER_CAPTION]" type="xsd:string"/>
+                    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                    <LNum name="[Measures].[LEVEL_NUMBER]" type="xsd:int"/>
+                    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                </HierarchyInfo>
+            </AxisInfo>
+            <AxisInfo name="SlicerAxis">
+                <HierarchyInfo name="[Geography].[Geo]">
+                    <UName name="[Geography].[Geo].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                    <Caption name="[Geography].[Geo].[MEMBER_CAPTION]" type="xsd:string"/>
+                    <LName name="[Geography].[Geo].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                    <LNum name="[Geography].[Geo].[LEVEL_NUMBER]" type="xsd:int"/>
+                    <DisplayInfo name="[Geography].[Geo].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                </HierarchyInfo>
+                <HierarchyInfo name="[Geography].[Economy]">
+                    <UName name="[Geography].[Economy].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                    <Caption name="[Geography].[Economy].[MEMBER_CAPTION]" type="xsd:string"/>
+                    <LName name="[Geography].[Economy].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                    <LNum name="[Geography].[Economy].[LEVEL_NUMBER]" type="xsd:int"/>
+                    <DisplayInfo name="[Geography].[Economy].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                </HierarchyInfo>
+                <HierarchyInfo name="[Product].[Prod]">
+                    <UName name="[Product].[Prod].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                    <Caption name="[Product].[Prod].[MEMBER_CAPTION]" type="xsd:string"/>
+                    <LName name="[Product].[Prod].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                    <LNum name="[Product].[Prod].[LEVEL_NUMBER]" type="xsd:int"/>
+                    <DisplayInfo name="[Product].[Prod].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                </HierarchyInfo>
+                <HierarchyInfo name="[Time].[Calendar]">
+                    <UName name="[Time].[Calendar].[MEMBER_UNIQUE_NAME]" type="xsd:string"/>
+                    <Caption name="[Time].[Calendar].[MEMBER_CAPTION]" type="xsd:string"/>
+                    <LName name="[Time].[Calendar].[LEVEL_UNIQUE_NAME]" type="xsd:string"/>
+                    <LNum name="[Time].[Calendar].[LEVEL_NUMBER]" type="xsd:int"/>
+                    <DisplayInfo name="[Time].[Calendar].[DISPLAY_INFO]" type="xsd:unsignedInt"/>
+                </HierarchyInfo>
+            </AxisInfo>
         """
         xml = xmlwitch.Builder()
         with xml.AxisInfo(name="Axis0"):
@@ -940,6 +992,7 @@ class XmlaExecuteReqHandler():
 
     def generate_axes_info(self):
         """
+        Generate all AxisInfo elements
         :return: AxisInfo as string
         """
 
@@ -964,6 +1017,10 @@ class XmlaExecuteReqHandler():
         return self.generate_one_axis_info()
 
     def _generate_cell_info_convert2formuls(self):
+        """
+        CellInfo representation for convert to formulas
+        :return: CellInfo structure as string
+        """
         xml = xmlwitch.Builder()
         with xml.CellInfo:
             xml.Value(name="VALUE")
@@ -971,6 +1028,10 @@ class XmlaExecuteReqHandler():
         return str(xml)
 
     def generate_cell_info(self):
+        """
+        Generate CellInfo which represents the cell metadata contained by the parent OlapInfo element.
+        :return: CellInfo structure as string
+        """
 
         if self.convert2formulas:
             return self._generate_cell_info_convert2formuls()
@@ -988,6 +1049,8 @@ class XmlaExecuteReqHandler():
 
     def generate_slicer_axis(self):
         """
+        Generate SlicerAxis which contains elements (dimensions) that are not used in the request
+
         Example SlicerAxis::
 
             <Axis name="SlicerAxis">
@@ -1032,21 +1095,19 @@ class XmlaExecuteReqHandler():
                             column_attribut = self.executor.tables_loaded[
                                 dim_diff].iloc[0][0]
                             with xml.Member(
-                                    Hierarchy="[{0}].[{0}]".format(dim_diff),
+                                Hierarchy="[{0}].[{0}]".format(dim_diff),
                             ):
                                 xml.UName(
                                     "[{0}].[{0}].[{1}].[{2}]".format(
                                         dim_diff,
-                                        self.executor.tables_loaded[dim_diff].
-                                        columns[0],
+                                        self.executor.tables_loaded[dim_diff].columns[0],
                                         column_attribut,
                                     ), )
                                 xml.Caption(str(column_attribut))
                                 xml.LName(
                                     "[{0}].[{0}].[{1}]".format(
                                         dim_diff,
-                                        self.executor.tables_loaded[dim_diff].
-                                        columns[0],
+                                        self.executor.tables_loaded[dim_diff].columns[0],
                                     ), )
                                 xml.LNum("0")
                                 xml.DisplayInfo("2")
@@ -1068,6 +1129,10 @@ class XmlaExecuteReqHandler():
         return str(xml)
 
     def generate_response(self):
+        """
+        generate the xmla response
+        :return: xmla response as string
+        """
 
         if self.mdx_query == "":
             # check if command contains a query
@@ -1083,12 +1148,12 @@ class XmlaExecuteReqHandler():
 
             with xml["return"]:
                 with xml.root(
-                        xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
-                        **{
-                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                            "xmlns:xsi":
-                            "http://www.w3.org/2001/XMLSchema-instance",
-                        }):
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                    }
+                ):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:
                         with xml.CubeInfo:

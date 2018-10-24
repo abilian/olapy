@@ -130,7 +130,7 @@ class XmlaProviderService(ServiceBase):
 
 
 home_directory = expanduser("~")
-conf_file = os.path.join(home_directory, "olapy-data", "logs", "xmla.log")
+logs_file = os.path.join(home_directory, "olapy-data", "logs", "xmla.log")
 
 
 def get_mdx_engine(
@@ -214,8 +214,8 @@ def get_wsgi_application(mdx_engine):
 @click.option(
     "--log_file_path",
     "-lf",
-    default=conf_file,
-    help="Log file path. DEFAUL : " + conf_file,
+    default=logs_file,
+    help="Log file path. DEFAUL : " + logs_file,
 )
 @click.option(
     "--sql_alchemy_uri",

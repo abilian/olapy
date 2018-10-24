@@ -36,8 +36,7 @@ class Dialect(object):
         result = self.engine.execute(all_db_query)  # type: ignore
         available_tables = result.fetchall()
         return [
-            database[0]
-            for database in available_tables
+            database[0] for database in available_tables
             if database[0] not in [
                 "mysql",
                 "information_schema",
@@ -52,19 +51,16 @@ class Dialect(object):
 
 
 class PostgresDialect(Dialect):
-
     def gen_all_databases_query(self):
         return "SELECT datname FROM pg_database WHERE datistemplate = false;"
 
 
 class MysqlDialect(Dialect):
-
     def gen_all_databases_query(self):
         return "SHOW DATABASES"
 
 
 class OracleDialect(Dialect):
-
     @property
     def username(self):
         conn_string = str(self.engine.url)
@@ -79,7 +75,6 @@ class OracleDialect(Dialect):
 
 
 class SqliteDialect(Dialect):
-
     def get_all_databases(self):
         available_dbs = self.engine.execute("PRAGMA database_list;").fetchall()
         dbs = [available_dbs[0][-1].split("/")[-1]]
@@ -87,7 +82,6 @@ class SqliteDialect(Dialect):
 
 
 class MssqlDialect(Dialect):
-
     def gen_all_databases_query(self):
         """
         Each dbms has a different query to get user databases names.
