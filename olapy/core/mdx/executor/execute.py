@@ -2,12 +2,9 @@
 """
 Olapy main's module, this module manipulate Mdx Queries and execute them.
 Execution need two main objects:
-
     - table_loaded: which contains all tables needed to construct a cube
     - star_schema: which is the cube
-
 Those two objects are constructed in three ways:
-
     - manually with a config file, see :mod:`cube_loader_custom`
     - automatically from csv files, if they respect olapy's
       `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
@@ -24,27 +21,24 @@ from os.path import expanduser
 
 from typing import List, Dict
 
-# import attr
+import attr
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
 from ..parser.parse import Parser
-# from ..tools.connection import get_dialect, get_dialect_name
+from ..tools.connection import get_dialect, get_dialect_name
 from .cube_loader import CubeLoader
 from .cube_loader_custom import CubeLoaderCustom
-# from .cube_loader_db import CubeLoaderDB
+from .cube_loader_db import CubeLoaderDB
 
 
-# @attr.s
+@attr.s
 class MdxEngine(object):
     """The main class for executing a query.
-
     :param cube: It must be under ~/olapy-data/cubes/{cube_name}.
-
         example: if cube = 'sales'
         then full path -> *home_directory/olapy-data/cubes/sales*
-
     :param cubes_folder: which is under olapy-data, and contains all csv cubes by default * ~/olapy-data/cubes/...
     :param olapy_data_location: olapy-data path
     :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
@@ -52,39 +46,22 @@ class MdxEngine(object):
     :param source_type: source data input, Default csv
     :param parser: mdx query parser
     :param facts:  facts table name, Default **Facts**
-
     """
 
-    def __init__(self, cube=None, facts='Facts', source_type="csv", sqla_engine=None, cube_config=None):
-        self.cube = cube
-        self.facts = facts
-        self.source_type = source_type
-        self.parser = Parser()
-        self.csv_files_cubes = []
-        self.db_cubes = []
-        self.sqla_engine = sqla_engine
-        self.olapy_data_location = os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data")
-        self.cube_config = cube_config
-        self.tables_loaded = None
-        self.star_schema_dataframe = None
-        self.measures = None
-        self.selected_measures = None
-        self.cubes_folder = "cubes"
-
-    # cube = attr.ib(default=None)
-    # facts = attr.ib(default="Facts")
-    # source_type = attr.ib(default="csv")
-    # parser = attr.ib(default=Parser())
-    # csv_files_cubes = attr.ib(default=attr.Factory(list))
-    # db_cubes = attr.ib(default=attr.Factory(list))
-    # sqla_engine = attr.ib(default=None)
-    # olapy_data_location = attr.ib(default=os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"))
-    # cube_config = attr.ib(default=None)
-    # tables_loaded = attr.ib(default=None)
-    # star_schema_dataframe = attr.ib(default=None)
-    # measures = attr.ib(default=None)
-    # selected_measures = attr.ib(default=None)
-    # cubes_folder = attr.ib(default="cubes")
+    cube = attr.ib(default=None)
+    facts = attr.ib(default="Facts")
+    source_type = attr.ib(default="csv")
+    parser = attr.ib(default=Parser())
+    csv_files_cubes = attr.ib(default=attr.Factory(list))
+    db_cubes = attr.ib(default=attr.Factory(list))
+    sqla_engine = attr.ib(default=None)
+    olapy_data_location = attr.ib(default=os.path.join(os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"))
+    cube_config = attr.ib(default=None)
+    tables_loaded = attr.ib(default=None)
+    star_schema_dataframe = attr.ib(default=None)
+    measures = attr.ib(default=None)
+    selected_measures = attr.ib(default=None)
+    cubes_folder = attr.ib(default="cubes")
 
     # @olapy_data_location.default
     # def get_default_cubes_directory(self):
@@ -111,7 +88,6 @@ class MdxEngine(object):
     def _get_csv_cubes_names(cubes_location):
         """
         Get csv folder names
-
         :param cubes_location: OlaPy cubes path, which is under olapy-data,
             by default ~/olapy-data/cubes/...
         """
@@ -124,10 +100,8 @@ class MdxEngine(object):
     def get_cubes_names(self):
         """
         List all cubes (by default from csv folder only).
-
         You can explicitly specify csv folder and databases
         with *self.source_type = ('csv','db')*
-
         :return: list of all cubes
         """
 
@@ -152,7 +126,6 @@ class MdxEngine(object):
         """
         After instantiating MdxEngine(), load_cube construct the cube
         and load all tables.
-
         :param cube_name: cube name
         :param fact_table_name:  facts table name, Default **Facts**
         :param sep: separator used in csv files
@@ -180,7 +153,6 @@ class MdxEngine(object):
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.
-
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
@@ -233,10 +205,8 @@ class MdxEngine(object):
     def clean_data(star_schema_df, measures):
         """
         measure like this: 1 349 is not numeric so we try to transform it to 1349.
-
         :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
-
         :return: cleaned columns
         """
         if measures:
@@ -257,7 +227,6 @@ class MdxEngine(object):
     def get_star_schema_dataframe(self, sep, with_id_columns=False):
         """
         Merge all DataFrames as star schema.
-
         :param sep: csv files separator.
         :param with_id_columns: start schema dataFrame contains id columns or not
         :return: star schema DataFrame
@@ -297,7 +266,6 @@ class MdxEngine(object):
     def get_all_tables_names(self, ignore_fact=False):
         """
         Get list of tables names.
-
         :param ignore_fact: return all table name with or without facts table name
         :return: all tables names
         """
@@ -309,7 +277,6 @@ class MdxEngine(object):
     def get_cube_path(self):
         """
         Get path to the cube ( ~/olapy-data/cubes ).
-
         :return: path to the cube
         """
         if self.source_type.upper() == "CSV":
@@ -323,13 +290,9 @@ class MdxEngine(object):
     @staticmethod
     def change_measures(tuples_on_mdx):
         """Set measures to which exists in the query.
-
         :param tuples_on_mdx: List of tuples
-
             example ::
-
              [ '[Measures].[Amount]' , '[Geography].[Geography].[Continent]' ]
-
         :return: measures column's names *(Amount for the example)*
         """
 
@@ -342,23 +305,16 @@ class MdxEngine(object):
 
     def get_tables_and_columns(self, tuple_as_list):
         """Get used dimensions and columns in the MDX Query.
-
         Useful for DataFrame -> xmla response transformation.
-
         :param tuple_as_list: list of tuples
-
         example::
-
             [
             '[Measures].[Amount]',
             '[Product].[Product].[Crazy Development]',
             '[Geography].[Geography].[Continent]'
             ]
-
         :return: dimension and columns dict
-
         example::
-
             {
             Geography : ['Continent','Country'],
             Product : ['Company']
@@ -393,13 +349,9 @@ class MdxEngine(object):
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
         Filter a DataFrame (Dataframe_in) with one tuple.
-
         Example ::
-
             tuple = ['Geography','Geography','Continent','Europe','France','olapy']
-
             Dataframe_in in :
-
             +-------------+----------+---------+---------+---------+
             | Continent   | Country  | Company | Article | Amount  |
             +=============+==========+=========+=========+=========+
@@ -409,16 +361,12 @@ class MdxEngine(object):
             +-------------+----------+---------+---------+---------+
             |  .....      |  .....   | ......  | .....   | .....   |
             +-------------+----------+---------+---------+---------+
-
             out :
-
             +-------------+----------+---------+---------+---------+
             | Continent   | Country  | Company | Article | Amount  |
             +=============+==========+=========+=========+=========+
             | Europe      |  France  | AB      | olapy   | 41239   |
             +-------------+----------+---------+---------+---------+
-
-
         :param tuple_as_list: tuple as list
         :param dataframe_in: DataFrame in with you want to execute tuple
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
@@ -450,7 +398,6 @@ class MdxEngine(object):
     def add_missed_column(dataframe1, dataframe2):
         """
         if you want to concat two Dataframes with different columns like :
-
         +-------------+---------+
         | Continent   | Amount  |
         +=============+=========+
@@ -458,17 +405,13 @@ class MdxEngine(object):
         +-------------+---------+
         | Europe      | 41239   |
         +-------------+---------+
-
         and :
-
         +-------------+---------------+---------+
         | Continent   | Country_code  | Amount  |
         +=============+===============+=========+
         | America     | 1111          | 35150   |
         +-------------+---------------+---------+
-
         result :
-
         +-------------+--------------+---------+
         | Continent   | Country_code | Amount  |
         +=============+==============+=========+
@@ -476,11 +419,8 @@ class MdxEngine(object):
         +-------------+--------------+---------+
         | Europe      | NaN          |41239    |
         +-------------+--------------+---------+
-
         Country_code is converted to float,
-
         so the solution is to add a column to the fist DataFrame filled with -1, thus
-
         +-------------+---------------+---------+
         | Continent   | Country_code  | Amount  |
         +=============+===============+=========+
@@ -488,17 +428,13 @@ class MdxEngine(object):
         +-------------+---------------+---------+
         | Europe      | -1            | 41239   |
         +-------------+---------------+---------+
-
         and :
-
         +-------------+---------------+---------+
         | Continent   | Country_code  | Amount  |
         +=============+===============+=========+
         | America     | 1111          | 35150   |
         +-------------+---------------+---------+
-
         result :
-
         +-------------+--------------+---------+
         | Continent   | Country_code | Amount  |
         +=============+==============+=========+
@@ -506,10 +442,8 @@ class MdxEngine(object):
         +-------------+--------------+---------+
         | Europe      | -1           |41239    |
         +-------------+--------------+---------+
-
         :param dataframe1: first DataFrame
         :param dataframe2: second DataFrame
-
         :return: Two DataFrames with same columns
         """
         df_with_less_columns = dataframe1
@@ -530,47 +464,28 @@ class MdxEngine(object):
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
         """
         If we have multiple dimensions, with many columns like::
-
             columns_to_keep :
-
                 Geo  -> Continent,Country
-
                 Prod -> Company
-
                 Time -> Year,Month,Day
-
         we have to use only dimension's columns of current dimension that exist
         in tuple_as_list and keep other dimensions columns.
-
         So if tuple_as_list = ['Geography','Geography','Continent']
-
         then columns_to_keep will be::
-
             columns_to_keep :
-
                 Geo  -> Continent
-
                 Prod -> Company
-
                 Time -> Year,Month,Day
-
         we need columns_to_keep for grouping our columns in the DataFrame
-
         :param tuple_as_list:
-
             example::
-
                 ['Geography','Geography','Continent']
-
         :param columns_to_keep:
-
             example::
-
                 {
                 'Geography': ['Continent','Country'],
                 'Time': ['Year','Month','Day']
                 }
-
         :return: updated columns_to_keep
         """
 
@@ -588,7 +503,6 @@ class MdxEngine(object):
     def _uniquefy_tuples(tuples):
         """
         Remove redundant tuples.
-
         :param tuples: list of string of tuples.
         :return: list of string of unique tuples.
         """
@@ -602,16 +516,12 @@ class MdxEngine(object):
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
         """
         Construct DataFrame of many groups mdx query.
-
         many groups mdx query is something like:
-
         example with 3 groups::
-
             SELECT{ ([A].[A].[A])
                     ([B].[B].[B])
                     ([C].[C].[C]) }
             FROM [D]
-
         :param tuples_on_mdx_query: list of string of tuples.
         :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
         :return: Pandas DataFrame.
@@ -652,7 +562,6 @@ class MdxEngine(object):
     def fusion_dataframes(self, df_to_fusion):
         # type: (List[DataFrame]) -> DataFrame
         """Concat chunks of DataFrames.
-
         :param df_to_fusion: List of Pandas DataFrame.
         :return: a Pandas DataFrame.
         """
@@ -673,7 +582,6 @@ class MdxEngine(object):
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """
         Construct DataFrame of many groups.
-
         :param columns_to_keep: :func:`columns_to_keep`
             (useful for executing many tuples, for instance execute_mdx).
         :return: a list of Pandas DataFrame.
@@ -708,25 +616,18 @@ class MdxEngine(object):
 
     def execute_mdx(self, mdx_query):
         """Execute an MDX Query.
-
         Usage ::
-
             executor = MdxEngine()
             executor.load_cube('sales')
             query = "SELECT FROM [sales] WHERE ([Measures].[Amount])"
             executor.execute_mdx(query)
-
         :param mdx_query: Mdx Query
-
         :return: dict with DataFrame execution result and (dimension and columns used as dict)
-
         example::
-
             {
             'result': DataFrame result
             'columns_desc': dict of dimension and columns used
             }
-
         """
         query = self.clean_mdx_query(mdx_query)
         # use measures that exists on where or insides axes
