@@ -94,7 +94,8 @@ class MdxEngineLite(MdxEngine):
         tables = {}
         print("Connection string = " + str(self.sqla_engine.url))
         results = self.sqla_engine.execution_options(
-            stream_results=True,).execute("SELECT * FROM {}".format(self.cube),)
+            stream_results=True, ).execute(
+                "SELECT * FROM {}".format(self.cube), )
         # Fetch all the results of the query
         if self.columns:
             value = pd.DataFrame(

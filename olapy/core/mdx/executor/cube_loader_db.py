@@ -39,17 +39,16 @@ class CubeLoaderDB(CubeLoader):
             if "oracle" in dialect_name and table_name.upper() == "FACTS":
                 table_name = table_name.title()
             results = self.sqla_engine.execution_options(
-                stream_results=True,
-            ).execute("SELECT * FROM {}".format(table_name),)
+                stream_results=True, ).execute("SELECT * FROM {}".format(table_name), )
             # Fetch all the results of the query
-            value = pd.DataFrame(
+            df = pd.DataFrame(
                 iter(results),
                 columns=results.keys(),
             )  # Pass results as an iterator
             # with string_folding_wrapper we loose response time
             # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-            tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != "_id"
+            tables[table_name] = df[[
+                col for col in df.columns if col.lower()[-3:] != "_id"
             ]]
 
         return tables
@@ -63,7 +62,7 @@ class CubeLoaderDB(CubeLoader):
         :return: star schema DataFrame
         """
 
-        fusion = psql.read_sql_query(
+        df = psql.read_sql_query(
             "SELECT * FROM {}".format(facts),
             self.sqla_engine,
         )
@@ -76,11 +75,11 @@ class CubeLoaderDB(CubeLoader):
             #     if isinstance(db_table_name, Iterable):
             #         db_table_name = db_table_name[0]
             try:
-                fusion = fusion.merge(
+                df = df.merge(
                     psql.read_sql_query(
                         "SELECT * FROM {}".format(db_table_name),
                         self.sqla_engine,
-                    ),)
+                    ), )
             except BaseException:
                 print("No common column between {} and {}".format(
                     facts,
@@ -88,4 +87,4 @@ class CubeLoaderDB(CubeLoader):
                 ))
                 pass
 
-        return fusion
+        return df

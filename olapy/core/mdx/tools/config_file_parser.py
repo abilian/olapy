@@ -123,8 +123,8 @@ class ConfigParser:
         if "columns" in dimension:
             return OrderedDict((
                 column["name"],
-                column["name"] if "column_new_name" not in column else column[
-                    "column_new_name"],
+                column["name"] if "column_new_name" not in
+                column else column["column_new_name"],
             ) for column in dimension["columns"])
 
         else:
@@ -137,7 +137,7 @@ class ConfigParser:
                 "name": dimension["name"],
                 "displayName": dimension["displayName"],
                 "columns": self._get_columns(dimension),
-            },)
+            }, )
         return dimensions
 
     def _get_facts(self, config):

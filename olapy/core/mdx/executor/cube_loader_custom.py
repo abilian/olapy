@@ -63,8 +63,7 @@ class CubeLoaderCustom(CubeLoader):
                 df.rename(
                     columns=({
                         k: v
-                        for k, v in dimension["columns"].items()
-                        if v
+                        for k, v in dimension["columns"].items() if v
                     }),
                     inplace=True,
                 )
@@ -181,4 +180,6 @@ class CubeLoaderCustom(CubeLoader):
                 suffixes=("", "_y"),
             )
 
-        return fusion[[column for column in all_columns if "id" != column[-2:]]]
+        return fusion[[
+            column for column in all_columns if "id" != column[-2:]
+        ]]
