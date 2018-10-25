@@ -8,14 +8,16 @@ from __future__ import absolute_import, division, print_function, \
 
 import os
 from .xmla_discover_request_handler import XmlaDiscoverReqHandler
-from ..services.xmla_discover_tools_utils import discover_literals_response_rows, \
+from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 
 # noinspection PyPep8Naming
 
 
 class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
-    """DictXmlaTools for generating xmla discover responses."""
+    """DictDiscoverReqHandler handles information, such as the list of available databases or details about a \
+    specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
+    Discover method depends on the values of the parameters passed to it. ."""
 
     def __init__(self, mdx_engine):
         """

@@ -10,13 +10,18 @@ from olapy.core.services.xmla import XmlaProviderService
 
 
 class XmlaProviderLib(XmlaProviderService):
-    # keep override xmla module
+    """
+    XmlaProviderLib tu use olapy as library without running any server (no spyne, no wsgi...)
+    """
     def __init__(self, discover_request_hanlder, execute_request_hanlder):
         self.discover_request_hanlder = discover_request_hanlder
         self.execute_request_hanlder = execute_request_hanlder
 
     def Discover(self, request):
-        """The first principle function of xmla protocol.
+        """Retrieves information, such as the list of available databases, cubes, hierarchies or details about\
+         a specific object,from an instance of MdxEngine. The data retrieved with the Discover method \
+          depends on the values of the parameters passed to it.
+
         :param request: :class:`DiscoverRequest` object
         :return: XML Discover response as string
         """
@@ -29,7 +34,9 @@ class XmlaProviderLib(XmlaProviderService):
         return method(request)
 
     def Execute(self, request):
-        """The second principle function of xmla protocol.
+        """Sends xmla commands to an instance of MdxEngine. \
+        This includes requests involving data transfer, such as retrieving data on the server.
+
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string
         """

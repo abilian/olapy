@@ -68,7 +68,9 @@ class XmlaProviderService(ServiceBase):
         _throws=InvalidCredentialsError,
     )
     def Discover(ctx, request):
-        """The first principle function of xmla protocol.
+        """Retrieves information, such as the list of available databases, cubes, hierarchies or details about\
+         a specific object,from an instance of MdxEngine. The data retrieved with the Discover method \
+          depends on the values of the parameters passed to it.
 
         :param request: :class:`DiscoverRequest` object
 
@@ -105,7 +107,8 @@ class XmlaProviderService(ServiceBase):
         _out_header=Session,
     )
     def Execute(ctx, request):
-        """The second principle function of xmla protocol.
+        """Sends xmla commands to an instance of MdxEngine. \
+        This includes requests involving data transfer, such as retrieving data on the server.
 
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string

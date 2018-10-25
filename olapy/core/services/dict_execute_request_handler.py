@@ -8,13 +8,13 @@ from __future__ import absolute_import, division, print_function, \
 
 import itertools
 import numpy as np
-from six import text_type
 
 from .xmla_execute_request_handler import XmlaExecuteReqHandler
 
 
 class DictExecuteReqHandler(XmlaExecuteReqHandler):
-    """XmlaExecuteTools for generating xmla execute responses."""
+    """DictExecuteReqHandler handles xmla commands to an instance of MdxEngine. \
+    This includes requests involving data transfer, such as retrieving data on the server."""
 
     # def __init__(self, executor, mdx_query, convert2formulas=False):
     #     """
