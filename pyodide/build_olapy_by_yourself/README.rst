@@ -14,8 +14,13 @@ next, in pyodide project::
 
 - *if you are asked to put file to patch, them put the same asked file path*
 
-finally to test a demo, run the server from pyodide root folder with::
+finally to test a demo, you should install gunicorn::
 
-    python server.py
+    pip install gunicorn
+
+
+ and then run the server from pyodide root folder with::
+
+    gunicorn -w 4 -b 0.0.0.0 server:app
 
 and go to http://localhost:8000/olapy.html
