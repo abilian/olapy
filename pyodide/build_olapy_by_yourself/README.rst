@@ -21,6 +21,6 @@ finally to test a demo, you should install gunicorn::
 
  and then run the server from pyodide root folder with::
 
-    gunicorn -w 4 -b 0.0.0.0 server:app
+    gunicorn -D -w 4 -b 0.0.0.0 -t 300 server:app
 
 and go to http://localhost:8000/olapy.html
