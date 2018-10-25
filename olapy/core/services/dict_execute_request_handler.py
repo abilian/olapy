@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 from six import text_type
 
-from .xlma_execute_request_handler import XmlaExecuteReqHandler
+from .xmla_execute_request_handler import XmlaExecuteReqHandler
 
 
 class DictExecuteReqHandler(XmlaExecuteReqHandler):

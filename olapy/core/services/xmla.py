@@ -29,7 +29,7 @@ from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
 from .xmla_discover_request_handler import XmlaDiscoverReqHandler
-from .xlma_execute_request_handler import XmlaExecuteReqHandler
+from .xmla_execute_request_handler import XmlaExecuteReqHandler
 
 
 class XmlaSoap11(Soap11):

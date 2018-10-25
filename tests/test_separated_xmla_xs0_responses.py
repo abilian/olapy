@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, \
 import pytest
 import xmlwitch
 
-from olapy.core.services.xlma_execute_request_handler import XmlaExecuteReqHandler
+from olapy.core.services.xmla_execute_request_handler import XmlaExecuteReqHandler
 
 from .queries import query15
 
