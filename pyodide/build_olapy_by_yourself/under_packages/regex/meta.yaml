@@ -1,0 +1,10 @@
+package:
+  name: regex
+  version: 2018.08.29
+
+source:
+    url: https://files.pythonhosted.org/packages/2a/0a/944977367c8a6cfcfa6fcb8ac6b1f0f9a667c1f34194091c766b5d7c44d7/regex-2018.08.29.tar.gz
+
+test:
+  imports:
+    - regex

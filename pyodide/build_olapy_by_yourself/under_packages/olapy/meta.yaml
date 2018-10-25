@@ -1,27 +1,20 @@
 package:
   name: olapy
-#  version: '0.6.2'
-  version: 'pyodide_olapy'
+  version: 'ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9'
 
 source:
-#  url: http://127.0.0.1:8000/olapy-0.6.2.tar.gz
-  url: https://github.com/abilian/olapy/archive/pyodide_olapy.zip
+  url: https://github.com/abilian/olapy/archive/ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9.zip
 
   patches:
-    - patches/remove_libs.patch
-    - patches/remove_spyne_regex_attrs.patch
-    - patches/create_patch_olapy.patch
-    - patches/create_xmla_lib+use_olapy_patch.patch
-    - patches/change_xmla_class_logic.patch
-
-
+    - patches/remove_unuseful_libs_(spyne-sqlalchemy-click-pyyaml).patch
 
 
 requirements:
   run:
     - pandas
-    - SQLAlchemy
     - xmlwitch
+    - attrs
+    - regex
 
 test:
   imports:
