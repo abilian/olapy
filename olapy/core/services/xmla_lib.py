@@ -3,7 +3,7 @@ import importlib
 import pandas as pd
 
 from olapy.core.mdx.executor.execute import MdxEngine
-from olapy.core.patch.patch_olapy import patch
+from olapy.core.patch.patch_olapy import patch_mdx_engine
 from olapy.core.services.models import DiscoverRequest, Restriction, Property, Restrictionlist, Propertieslist, \
     ExecuteRequest, Command
 from olapy.core.services.xmla import XmlaProviderService
@@ -59,7 +59,7 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     :return: xmla response
     """
     mdx_engine = MdxEngine()
-    patch(mdx_engine, dataframes)
+    patch_mdx_engine(mdx_engine, dataframes)
 
     module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
     discover_request_handler = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)

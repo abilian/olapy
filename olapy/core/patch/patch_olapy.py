@@ -61,7 +61,7 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
     ]]
 
 
-def patch(mdx_engine, dataframes, facts_table='Facts', cube_name='sales'):
+def patch_mdx_engine(mdx_engine, dataframes, facts_table='Facts', cube_name='sales'):
     mdx_engine.csv_files_cubes.append(cube_name)
 
     mdx_engine.cube = cube_name
