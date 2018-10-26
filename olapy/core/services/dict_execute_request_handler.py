@@ -307,7 +307,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             return self._generate_cells_data_convert2formulas()
 
         if ((len(self.columns_desc["columns"].keys()) == 0 or len(
-            self.columns_desc["rows"].keys()) == 0) and self.executor.facts in self.columns_desc["all"].keys()):
+                self.columns_desc["rows"].keys()) == 0) and self.executor.facts in self.columns_desc["all"].keys()):
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
                 self.mdx_execution_result["result"][measure]
@@ -418,7 +418,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                     # Hierarchize
                     if (self.executor.facts in self.columns_desc["all"] and (
                         len(self.columns_desc["all"][self.executor.facts]) > 1) or (
-                        not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
+                            not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
                         continue
 
                     else:
@@ -537,7 +537,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             axes_info += self._generate_table_axis_info(None, axis_tables_without_facts)
             # Hierarchize
             if (not self.executor.parser.hierarchized_tuples() and len(
-                self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
+                    self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
                 axes_info += self._gen_measures_one_axis_info(None)
 
         return axes_info
@@ -690,7 +690,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
             # Hierarchize
             if (len(self.executor.selected_measures) <= 1 and (
-                self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc["where"])):
+                    self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc["where"])):
                 all_axis['Tuples'] += {
                     'Member': {'Hierarchy': "[Measures]"},
                     'UName': "[Measures].[{}]".format(
