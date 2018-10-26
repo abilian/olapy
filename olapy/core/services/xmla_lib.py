@@ -1,3 +1,5 @@
+# -*- encoding: utf8 -*-
+
 import importlib
 from pprint import pprint
 
@@ -58,8 +60,8 @@ class XmlaProviderLib(XmlaProviderService):
         return self.execute_request_hanlder.generate_response()
 
 
-def get_response(xmla_request_params, dataframes=None, output='dict', facts_table_name='Facts'):
-    # type: (dict, dict, str, str) -> dict
+def get_response(xmla_request_params, dataframes=None, output='dict', facts_table_name='Facts', mdx_engine=None):
+    # type: (dict, dict, str, str, MdxEngine) -> dict
     """
     get xmla reponse
     :param xmla_request_params: xmla request parameters
@@ -67,7 +69,10 @@ def get_response(xmla_request_params, dataframes=None, output='dict', facts_tabl
     :param output: xmla or dict output type
     :return: xmla response
     """
-    mdx_engine = MdxEngine(facts=facts_table_name)
+    if mdx_engine:
+        mdx_engine = mdx_engine
+    else:
+        mdx_engine = MdxEngine(facts=facts_table_name)
     patch_mdx_engine(mdx_engine, dataframes, facts_table_name=facts_table_name)
 
     module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')

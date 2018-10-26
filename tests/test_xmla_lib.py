@@ -1,3 +1,4 @@
+# -*- encoding: utf8 -*-
 from olapy.core.services.xmla_lib import get_response
 
 
@@ -16,8 +17,9 @@ def test_dict_execute(executor):
          FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
     }
 
-    # del executor.tables_loaded['time']  # todo remove this
-    xmla_response = get_response(xmla_request_params, executor.tables_loaded, output='dict', facts_table_name='facts')
+    del executor.tables_loaded['time']  # todo remove this
+    xmla_response = get_response(xmla_request_params, executor.tables_loaded, output='dict', facts_table_name='facts',
+                                 mdx_engine=executor)
     assert xmla_response['cell_data'] == [1023]
 
 
@@ -34,7 +36,8 @@ def test_dict_discover(executor):
     }
 
     # del executor.tables_loaded['time']  # todo remove this
-    xmla_response = get_response(xmla_request_params, executor.tables_loaded, output='dict', facts_table_name='facts')
+    xmla_response = get_response(xmla_request_params, executor.tables_loaded, output='dict', facts_table_name='facts',
+                                 mdx_engine=executor)
     assert xmla_response == [{'IsRequired': 'false',
                               'PropertyAccessType': 'Read',
                               'PropertyDescription': 'ServerName',
