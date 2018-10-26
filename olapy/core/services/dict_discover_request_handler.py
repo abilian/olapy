@@ -19,14 +19,6 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
     specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
     Discover method depends on the values of the parameters passed to it. ."""
 
-    def __init__(self, mdx_engine):
-        """
-
-        :param mdx_engine: mdx_engine engine instance
-
-        """
-        super().__init__(mdx_engine)
-
     @staticmethod
     def discover_datasources_response():
         return {
