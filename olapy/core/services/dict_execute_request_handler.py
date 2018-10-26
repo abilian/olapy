@@ -307,7 +307,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             return self._generate_cells_data_convert2formulas()
 
         if ((len(self.columns_desc["columns"].keys()) == 0 or len(
-                self.columns_desc["rows"].keys()) == 0) and self.executor.facts in self.columns_desc["all"].keys()):
+            self.columns_desc["rows"].keys()) == 0) and self.executor.facts in self.columns_desc["all"].keys()):
             # iterate DataFrame horizontally
             columns_loop = itertools.chain(*[
                 self.mdx_execution_result["result"][measure]
@@ -322,20 +322,18 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                     index=False, )
             ])
 
-        cells = []
-        index = 0
+        # cells = []
+        # index = 0
+        #
+        # for value in columns_loop:
+        #     cells += {
+        #         'Cell': {'CellOrdinal': str(index)},
+        #         'Value': str(value)
+        #     }
+        #
+        #     index += 1
 
-        for value in columns_loop:
-            if np.isnan(value):
-                value = ""
-            cells += {
-                'Cell': {'CellOrdinal': str(index)},
-                'Value': (str(value))
-            }
-
-            index += 1
-
-        return cells
+        return [cell_value for cell_value in columns_loop]
 
     def _generate_axes_info_sliver_convert2formulas(self):
         all_axis = {
@@ -420,7 +418,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
                     # Hierarchize
                     if (self.executor.facts in self.columns_desc["all"] and (
                         len(self.columns_desc["all"][self.executor.facts]) > 1) or (
-                            not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
+                        not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
                         continue
 
                     else:
@@ -539,7 +537,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
             axes_info += self._generate_table_axis_info(None, axis_tables_without_facts)
             # Hierarchize
             if (not self.executor.parser.hierarchized_tuples() and len(
-                    self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
+                self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
                 axes_info += self._gen_measures_one_axis_info(None)
 
         return axes_info
@@ -692,7 +690,7 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
             # Hierarchize
             if (len(self.executor.selected_measures) <= 1 and (
-                    self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc["where"])):
+                self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc["where"])):
                 all_axis['Tuples'] += {
                     'Member': {'Hierarchy': "[Measures]"},
                     'UName': "[Measures].[{}]".format(
@@ -708,16 +706,11 @@ class DictExecuteReqHandler(XmlaExecuteReqHandler):
 
     def generate_response(self):
 
-        if self.mdx_query == "":
-            # check if command contains a query
-            return ""
-
-        else:
-
-            return {
-                'cell_info': self.generate_cell_info(),
-                'axes_info': self.generate_axes_info(),
-                'axes_info_slicer': self.generate_axes_info_slicer(),
-                'xs0': self.generate_xs0(),
-                'slicer_axis': self.generate_slicer_axis()
-            }
+        return {
+            'cell_info': self.generate_cell_info(),
+            'axes_info': self.generate_axes_info(),
+            'axes_info_slicer': self.generate_axes_info_slicer(),
+            'xs0': self.generate_xs0(),
+            'slicer_axis': self.generate_slicer_axis(),
+            'cell_data': self.generate_cell_data()
+        }
