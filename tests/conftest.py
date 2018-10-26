@@ -17,12 +17,9 @@ from olapy.core.mdx.executor.execute import MdxEngine
 from .db_creation_utils import create_insert, drop_tables
 
 cube_config = {
-    'xmla_authentication':
-        False,
-    'source':
-        'db',
-    'name':
-        'main',
+    'xmla_authentication': False,
+    'source': 'db',
+    'name': 'main',
     'facts': {
         'keys': {
             'warehouse_id': 'warehouse.id',
@@ -37,28 +34,21 @@ cube_config = {
         'name': 'food_facts',
         'columns': {}
     }, {
-        'displayName':
-            'product',
-        'name':
-            'product',
+        'displayName': 'product',
+        'name': 'product',
         'columns':
             OrderedDict([('id', 'id'), ('brand_name', 'brand_name'),
                          ('product_name', 'product_name'), ('sku',
                                                             'stock_keeping_unit')])
-    }, {
-        'displayName':
-            'store',
-        'name':
-            'store',
+    }, {'displayName': 'store',
+        'name': 'store',
         'columns':
             OrderedDict([('id', 'id'), ('store_type', 'store_type'),
                          ('store_name', 'store_name'), ('store_city', 'store_city'),
                          ('store_country', 'country')])
-    }, {
-        'displayName':
-            'warehouse',
-        'name':
-            'warehouse',
+        }, {
+        'displayName': 'warehouse',
+        'name': 'warehouse',
         'columns':
             OrderedDict([('id', 'id'), ('warehouse_name', 'warehouse_name'),
                          ('warehouse_city', 'warehouse_city'),
@@ -85,7 +75,6 @@ def executor(request):
     mdx_engine = MdxEngine(sqla_engine=engine, source_type='db', cube_config=config)
     mdx_engine.load_cube(
         cube_name=db_test if db_test else 'main', fact_table_name='facts')
-
     yield mdx_engine
 
     drop_tables(engine, custom)
