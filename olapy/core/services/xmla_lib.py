@@ -1,4 +1,5 @@
 import importlib
+from pprint import pprint
 
 import pandas as pd
 
@@ -13,6 +14,7 @@ class XmlaProviderLib(XmlaProviderService):
     """
     XmlaProviderLib tu use olapy as library without running any server (no spyne, no wsgi...)
     """
+
     def __init__(self, discover_request_hanlder, execute_request_hanlder):
         self.discover_request_hanlder = discover_request_hanlder
         self.execute_request_hanlder = execute_request_hanlder
@@ -56,8 +58,8 @@ class XmlaProviderLib(XmlaProviderService):
         return self.execute_request_hanlder.generate_response()
 
 
-def get_response(xmla_request_params, dataframes=None, output='dict'):
-    # type: (dict, dict, str) -> dict
+def get_response(xmla_request_params, dataframes=None, output='dict', facts_table_name='Facts'):
+    # type: (dict, dict, str, str) -> dict
     """
     get xmla reponse
     :param xmla_request_params: xmla request parameters
@@ -65,8 +67,8 @@ def get_response(xmla_request_params, dataframes=None, output='dict'):
     :param output: xmla or dict output type
     :return: xmla response
     """
-    mdx_engine = MdxEngine()
-    patch_mdx_engine(mdx_engine, dataframes)
+    mdx_engine = MdxEngine(facts=facts_table_name)
+    patch_mdx_engine(mdx_engine, dataframes, facts_table_name=facts_table_name)
 
     module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
     discover_request_handler = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)
@@ -134,8 +136,7 @@ if __name__ == '__main__':
                                            encoding='utf8')
                   }
 
-    xmla_response = get_response(xmla_request_params, dataframes)
-    print(xmla_response)
-
-    xmla_response = get_response(xmla_request_params2, dataframes)
-    print(xmla_response)
+    xmla_response = get_response(xmla_request_params, dataframes, output='dict')
+    pprint(xmla_response)
+    xmla_response = get_response(xmla_request_params2, dataframes, output='dict')
+    pprint(xmla_response)

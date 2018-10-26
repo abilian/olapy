@@ -61,11 +61,11 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
     ]]
 
 
-def patch_mdx_engine(mdx_engine, dataframes, facts_table='Facts', cube_name='sales'):
+def patch_mdx_engine(mdx_engine, dataframes, facts_table_name='Facts', cube_name='sales'):
     mdx_engine.csv_files_cubes.append(cube_name)
 
     mdx_engine.cube = cube_name
-    mdx_engine.facts = facts_table
+    mdx_engine.facts = facts_table_name
     # load cubes names
     mdx_engine.source_type = ""
 
