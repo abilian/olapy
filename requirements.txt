@@ -24,18 +24,18 @@ numpy==1.15.3             # via pandas
 packaging==17.1           # via bonobo
 pandas==0.23.4
 pbr==5.1.0                # via stevedore
-psutil==5.4.7             # via bonobo
-pyparsing==2.2.2          # via packaging
+psutil==5.4.8             # via bonobo
+pyparsing==2.3.0          # via packaging
 python-dateutil==2.7.5    # via pandas
 python-dotenv==0.9.1
 python-slugify==1.2.6     # via bonobo
 pytz==2018.7              # via fs, pandas, spyne
 pyyaml==3.13
-regex==2018.8.29
+regex==2018.11.2
 requests==2.20.0          # via bonobo
 six==1.11.0               # via fs, packaging, python-dateutil, stevedore
 spyne==2.13.2a0
-sqlalchemy==1.2.12
+sqlalchemy==1.2.13
 stevedore==1.30.0         # via bonobo
 typing==3.6.6
 unidecode==0.4.21         # via awesome-slugify, python-slugify
