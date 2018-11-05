@@ -6,20 +6,17 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import itertools
-import re
-from collections import OrderedDict
 from datetime import datetime
 
 import numpy as np
 import xmlwitch
 from six import text_type
-from six.moves import zip
 
+from ..services.dict_execute_request_handler import DictExecuteReqHandler
 from .xmla_execute_xsds import execute_xsd
-from ..mdx.parser.parse import Parser
 
 
-class XmlaExecuteReqHandler():
+class XmlaExecuteReqHandler(DictExecuteReqHandler):
     """The Execute method executes XMLA commands provided in the Command element and returns any resulting data
     using the XMLA MDDataSet data type (for multidimensional result sets.)
 
@@ -42,181 +39,6 @@ class XmlaExecuteReqHandler():
         </Execute>
     """
 
-    def __init__(self, executor, mdx_query=None, convert2formulas=False):
-        """
-
-        :param executor: MdxEngine instance
-        :param mdx_query: mdx query to execute
-        :param convert2formulas: mdx queries with  `excel convert formulas \
-            <https://exceljet.net/excel-functions/excel-convert-function>`_,
-        """
-        self.executor = executor
-        self.execute_mdx_query(mdx_query, convert2formulas)
-
-    def execute_mdx_query(self, mdx_query, convert2formulas=False):
-        """
-        Use the MdxEngine instance to execute the provided mdx query
-        :param mdx_query: the mdx query
-        :param convert2formulas: convert2formulas True or False
-        :return:
-        """
-
-        self.mdx_query = mdx_query
-        self.convert2formulas = convert2formulas
-        if self.convert2formulas:
-            self.mdx_execution_result = self._execute_convert_formulas_query(mdx_query)
-        elif mdx_query:
-            self.mdx_execution_result = self.executor.execute_mdx(self.mdx_query)
-        else:
-            self.mdx_execution_result = None
-        if isinstance(self.mdx_execution_result, dict):
-            self.columns_desc = self.mdx_execution_result.get("columns_desc")
-        else:
-            self.columns_desc = None
-
-    def _execute_convert_formulas_query(self, mdx_query):
-        """
-        convert Mdx Query to `excel formulas <https://exceljet.net/excel-functions/excel-convert-function>`_ response
-
-        :return: excel formuls
-            example::
-
-                <Cell CellOrdinal="0">
-                <Value>[Measures].[Amount]</Value>
-            </Cell>
-            <Cell CellOrdinal="1">
-                <Value>Amount</Value>
-            </Cell>
-            <Cell CellOrdinal="2">
-                <Value>[Measures]</Value>
-            </Cell>
-            <Cell CellOrdinal="3">
-                <Value>[Geography].[Geo].[All Regions].[America]</Value>
-            </Cell>
-            <Cell CellOrdinal="4">
-                <Value>America</Value>
-            </Cell>
-            <Cell CellOrdinal="5">
-                <Value>[Geography].[Geo].[Continent]</Value>
-            </Cell>
-            <Cell CellOrdinal="6">
-                <Value>[Geography].[Geo].[All Regions].[America].[US]</Value>
-            </Cell>
-            <Cell CellOrdinal="7">
-                <Value>United States</Value>
-            </Cell>
-            <Cell CellOrdinal="8">
-                <Value>[Geography].[Geo].[Country]</Value>
-            </Cell>
-
-        """
-
-        return [tup[0] for tup in re.compile(Parser.REG).findall(mdx_query)
-                if "[Measures].[XL_SD" not in tup[0] and tup[1]][::3]
-
-    def split_dataframe(self):
-        """Split DataFrame into multiple dataframes by dimension.
-
-        Example::
-
-            in :
-
-            +-------------+----------+----------+---------+---------+
-            | Continent   | Country  | Company  |Article  | Amount  |
-            +=============+==========+==========+=========+=========+
-            | America     | US       | MS       |Crazy De | 35150   |
-            +-------------+----------+----------+---------+---------+
-
-            out :
-
-            'Geography':
-
-                +-------------+----------+---------+
-                | Continent   | Country  | Amount  |
-                +=============+==========+=========+
-                | America     | US       | 35150   |
-                +-------------+----------+---------+
-
-
-            'Product':
-
-                +----------+---------+---------+
-                | Company  |Article  | Amount  |
-                +==========+=========+=========+
-                | MS       |Crazy De | 35150   |
-                +----------+---------+---------+
-
-
-        :return: dict with multiple DataFrame
-        """
-        return OrderedDict((key, self.mdx_execution_result["result"].reset_index()[list(value)],) for key, value in
-                           self.columns_desc["all"].items())
-
-    @staticmethod
-    def get_tuple_without_nan(tuple):
-        """Remove nan from tuple.
-
-        Example:
-
-            in  : ['Geography','Continent','-1']
-
-            out : ['Geography','Continent']
-
-        :param tuple: tuple as list
-        :return: tuple as list without -1
-
-        """
-        for att in tuple[::-1]:
-            if att != -1:
-                return tuple[:tuple.index(att) + 1]
-
-        return tuple
-
-    def _generate_tuples_xs0(self, splitted_df, mdx_query_axis):
-        """
-        generate elements representing axis 0 data contained by a root element that uses the MDDataSet data type.
-        :param splitted_df: spllited dataframes (with split_dataframe() function)
-        :param mdx_query_axis: from mdx query,  rows | columns | where (condition) | all (rows + columns + where)
-        :return: one xs0 reponse as xml format
-        """
-
-        first_att = None
-        # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
-        if list(self.columns_desc[mdx_query_axis].keys()) == [self.executor.facts]:
-            if len(self.columns_desc[mdx_query_axis][self.executor.facts]) == 1:
-                # to ignore for tupls in itertools.chain(*tuples)
-                tuples = []
-            else:
-                # ['Facts', 'Amount', 'Amount']
-                tuples = [[[[self.executor.facts] + [mes] + [mes]]] for mes in self.executor.selected_measures]
-                first_att = 3
-
-        # query with on columns and on rows (without measure)
-        elif self.columns_desc["columns"] and self.columns_desc["rows"]:
-            # Ex: ['Geography','America']
-            tuples = [
-                zip(*[[[key] + list(row)
-                       for row in splitted_df[key].itertuples(index=False)]
-                      for key in splitted_df.keys()
-                      if key is not self.executor.facts]),
-            ]
-
-            first_att = 2
-
-        # query with 'on columns' and 'on rows' (many measures selected)
-        else:
-            # Ex: ['Geography','Amount','America']
-            tuples = [
-                zip(*[[[key] + [mes] + list(row)
-                       for row in splitted_df[key].itertuples(index=False)]
-                      for key in splitted_df.keys()
-                      if key is not self.executor.facts])
-                for mes in self.executor.selected_measures
-            ]
-            first_att = 3
-
-        return tuples, first_att
-
     def _gen_measures_xs0(self, xml, tupls):
         """
         add elements representing measures to axis 0 element.
@@ -232,7 +54,7 @@ class XmlaExecuteReqHandler():
             if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME("[Measures]")
 
-    def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
+    def _gen_xs0_parent(self, xml, **kwargs):
         """
         For hierarchical rowset, we need to add the tuple ( mdx query contains PARENT_UNIQUE_NAME keyword)
         :param xml: axis 0 tu update, in xml format
@@ -241,6 +63,10 @@ class XmlaExecuteReqHandler():
         :param first_att: tuple first attribut
         :return:
         """
+
+        first_att = kwargs.get("first_att")
+        splitted_df = kwargs.get("split_df")
+        tuple = kwargs.get("tuple")
 
         parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1:-1]), )
         if parent:
@@ -487,97 +313,6 @@ class XmlaExecuteReqHandler():
 
     def _generate_axes_convert2formulas(self):
         return self._generate_xs0_convert2formulas()
-
-    def generate_xs0(self):
-        """
-        generate tuples used to represent a single axis in a multidimensional dataset contained by an Axes
-        element that uses the MDDataSet data type, returned by the Execute method.
-
-        Example of xs0::
-
-            <Axis name="Axis0">
-                <Tuples>
-                    <Tuple>
-                        <Member Hierarchy="[Geography].[Geography]">
-                            <UName>[Geography].[Geography].[Continent].[America]</UName>
-                            <Caption>America</Caption>
-                            <LName>[Geography].[Geography].[Continent]</LName>
-                            <LNum>0</LNum>
-                            <DisplayInfo>131076</DisplayInfo>
-                        <HIERARCHY_UNIQUE_NAME>[Geography].[Geography]</HIERARCHY_UNIQUE_NAME>
-                        </Member>
-
-                        <Member Hierarchy="[Product].[Product]">
-                            <UName>[Product].[Product].[Company].[Crazy Development]</UName>
-                            <Caption>Crazy Development</Caption>
-                            <LName>[Product].[Product].[Company]</LName>
-                            <LNum>0</LNum>
-                            <DisplayInfo>131076</DisplayInfo>
-                        <HIERARCHY_UNIQUE_NAME>[Product].[Product]</HIERARCHY_UNIQUE_NAME>
-                        </Member>
-                        </Tuple>
-
-                    <Tuple>
-                        <Member Hierarchy="[Geography].[Geography]">
-                            <UName>[Geography].[Geography].[Continent].[Europe]</UName>
-                            <Caption>Europe</Caption>
-                            <LName>[Geography].[Geography].[Continent]</LName>
-                            <LNum>0</LNum>
-                            <DisplayInfo>131076</DisplayInfo>
-                        <HIERARCHY_UNIQUE_NAME>[Geography].[Geography]</HIERARCHY_UNIQUE_NAME>
-                        </Member>
-
-                        <Member Hierarchy="[Product].[Product]">
-                            <UName>[Product].[Product].[Company].[Crazy Development]</UName>
-                            <Caption>Crazy Development</Caption>
-                            <LName>[Product].[Product].[Company]</LName>
-                            <LNum>0</LNum>
-                            <DisplayInfo>131076</DisplayInfo>
-                        <HIERARCHY_UNIQUE_NAME>[Product].[Product]</HIERARCHY_UNIQUE_NAME>
-                        </Member>
-                    </Tuple>
-                </Tuples>
-            </Axis>
-
-        :return: xs0 xml as string
-        """
-        # TODO must be OPTIMIZED every time!!!!!
-
-        if self.convert2formulas:
-            return self._generate_axes_convert2formulas()
-
-        dfs = self.split_dataframe()
-        if self.columns_desc["rows"] and self.columns_desc["columns"]:
-            return """
-            {}
-            {}
-            """.format(
-                self.generate_xs0_one_axis(
-                    dfs,
-                    mdx_query_axis="columns",
-                    axis="Axis0",
-                ),
-                self.generate_xs0_one_axis(
-                    dfs,
-                    mdx_query_axis="rows",
-                    axis="Axis1",
-                ),
-            )
-
-        # only one measure selected
-        elif not self.columns_desc["rows"] and not self.columns_desc["columns"] and self.columns_desc["where"]:
-            return self.generate_xs0_one_axis(
-                dfs,
-                mdx_query_axis="where",
-                axis="Axis0",
-            )
-
-        # one axis
-        return self.generate_xs0_one_axis(
-            dfs,
-            mdx_query_axis="columns",
-            axis="Axis0",
-        )
 
     def _generate_cells_data_convert2formulas(self):
         """
@@ -984,32 +719,6 @@ class XmlaExecuteReqHandler():
                 )
 
         return str(xml)
-
-    def generate_axes_info(self):
-        """
-        Generate all AxisInfo elements
-        :return: AxisInfo as string
-        """
-
-        if self.convert2formulas:
-            return self._generate_axes_info_convert2formulas()
-
-        if self.columns_desc["rows"]:
-            return """
-            {}
-            {}
-            """.format(
-                self.generate_one_axis_info(
-                    mdx_query_axis="columns",
-                    Axis="Axis0",
-                ),
-                self.generate_one_axis_info(
-                    mdx_query_axis="rows",
-                    Axis="Axis1",
-                ),
-            )
-
-        return self.generate_one_axis_info()
 
     def _generate_cell_info_convert2formuls(self):
         """

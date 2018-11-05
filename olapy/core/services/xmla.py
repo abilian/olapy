@@ -23,6 +23,7 @@ from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 from sqlalchemy import create_engine
 
+from .xmla_lib import XmlaProviderLib
 from ..mdx.executor.execute import MdxEngine
 from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
@@ -46,7 +47,7 @@ class XmlaSoap11(Soap11):
         return Soap11.create_in_document(self, ctx, charset)
 
 
-class XmlaProviderService(ServiceBase):
+class XmlaProviderService(ServiceBase, XmlaProviderLib):
     """
     The main class to activate SOAP services between xmla clients and olapy.
     """

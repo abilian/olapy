@@ -13,6 +13,7 @@ import xmlwitch
 from six.moves.urllib.parse import urlparse
 from sqlalchemy import create_engine
 
+from ..services.dict_discover_request_handler import DictDiscoverReqHandler
 from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
@@ -26,24 +27,10 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
 # noinspection PyPep8Naming
 
 
-class XmlaDiscoverReqHandler():
+class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
     """XmlaDiscoverReqHandler handles information, such as the list of available databases or details about a \
     specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
     Discover method depends on the values of the parameters passed to it. ."""
-
-    def __init__(self, mdx_engine):
-        """
-
-        :param mdx_engine: mdx_engine engine instance
-
-        """
-        self.executor = mdx_engine
-        if self.executor.sqla_engine:
-            # save sqla uri so we can change it with new database
-            self.sql_alchemy_uri = str(self.executor.sqla_engine.url,)
-        self.cubes = self.executor.get_cubes_names()
-        self.selected_cube = None
-        self.session_id = uuid.uuid1()
 
     def _change_db_uri(self, old_sqla_uri, new_db):
         # scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
@@ -174,101 +161,6 @@ class XmlaDiscoverReqHandler():
                             xml.Value(values[idx])
 
         return str(xml)
-
-    def discover_properties_response(self, request):
-        """
-        Returns a list of information and values about the standard and provider-specific properties that are supported\
-        by OlaPy for the specified data source
-        :param request:
-        :return:
-        """
-
-        if request.Restrictions.RestrictionList.PropertyName == "Catalog":
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_cube(
-                    request.Properties.PropertyList.Catalog.replace(
-                        "[",
-                        "",
-                    ).replace(
-                        "]",
-                        "",
-                    ), )
-                value = self.selected_cube
-            else:
-                value = self.cubes[0]
-
-            return self._get_props(
-                discover_preperties_xsd,
-                "Catalog",
-                "Catalog",
-                "string",
-                "ReadWrite",
-                "false",
-                value,
-            )
-
-        elif request.Restrictions.RestrictionList.PropertyName == "ServerName":
-            return self._get_props(
-                discover_preperties_xsd,
-                "ServerName",
-                "ServerName",
-                "string",
-                "Read",
-                "false",
-                "Mouadh",
-            )
-
-        elif request.Restrictions.RestrictionList.PropertyName == "ProviderVersion":
-            return self._get_props(
-                discover_preperties_xsd,
-                "ProviderVersion",
-                "ProviderVersion",
-                "string",
-                "Read",
-                "false",
-                "0.02  08-Mar-2016 08:41:28 GMT",
-            )
-
-        elif (request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries"):
-
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_cube(request.Properties.PropertyList.Catalog)
-            return self._get_props(
-                discover_preperties_xsd,
-                "MdpropMdxSubqueries",
-                "MdpropMdxSubqueries",
-                "int",
-                "Read",
-                "false",
-                "15",
-            )
-
-        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxDrillFunctions":
-
-            if request.Properties.PropertyList.Catalog is not None:
-                self.change_cube(request.Properties.PropertyList.Catalog)
-            return self._get_props(
-                discover_preperties_xsd,
-                "MdpropMdxDrillFunctions",
-                "MdpropMdxDrillFunctions",
-                "int",
-                "Read",
-                "false",
-                "3",
-            )
-
-        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxNamedSets":
-            return self._get_props(
-                discover_preperties_xsd,
-                "MdpropMdxNamedSets",
-                "MdpropMdxNamedSets",
-                "int",
-                "Read",
-                "false",
-                "15",
-            )
-
-        return self._get_props(discover_preperties_xsd, "", "", "", "", "", "")
 
     def discover_schema_rowsets_response(self, request):
         """

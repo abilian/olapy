@@ -7,17 +7,52 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import os
-from .xmla_discover_request_handler import XmlaDiscoverReqHandler
+import uuid
+
+from ..services.xmla_discover_xsds import discover_preperties_xsd
 from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
+
 
 # noinspection PyPep8Naming
 
 
-class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
+class DictDiscoverReqHandler():
     """DictDiscoverReqHandler handles information, such as the list of available databases or details about a \
     specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
     Discover method depends on the values of the parameters passed to it. ."""
+
+    def __init__(self, mdx_engine):
+        """
+
+        :param mdx_engine: mdx_engine engine instance
+
+        """
+        self.executor = mdx_engine
+        if self.executor.sqla_engine:
+            # save sqla uri so we can change it with new database
+            self.sql_alchemy_uri = str(self.executor.sqla_engine.url, )
+        self.cubes = self.executor.get_cubes_names()
+        self.selected_cube = None
+        self.session_id = uuid.uuid1()
+
+    def change_cube(self, new_cube):
+        """
+        If you change the cube in any request, we have to
+        instantiate the MdxEngine with the new cube.
+
+        :param new_cube: cube name
+        :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
+        """
+        if self.selected_cube != new_cube:
+            if (self.executor.cube_config and new_cube == self.executor.cube_config["name"]):
+                facts = self.executor.cube_config["facts"]["table_name"]
+            else:
+                facts = "Facts"
+
+            self.selected_cube = new_cube
+            if self.executor.cube != new_cube:
+                self.executor.load_cube(new_cube, fact_table_name=facts)
 
     @staticmethod
     def discover_datasources_response():
@@ -33,13 +68,13 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     @staticmethod
     def _get_props(
-            xsd,
-            PropertyName,
-            PropertyDescription,
-            PropertyType,
-            PropertyAccessType,
-            IsRequired,
-            Value,
+        xsd,
+        PropertyName,
+        PropertyDescription,
+        PropertyType,
+        PropertyAccessType,
+        IsRequired,
+        Value,
     ):
 
         if PropertyName is not "":
@@ -82,6 +117,101 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
         return response
 
+    def discover_properties_response(self, request):
+        """
+        Returns a list of information and values about the standard and provider-specific properties that are supported\
+        by OlaPy for the specified data source
+        :param request:
+        :return:
+        """
+
+        if request.Restrictions.RestrictionList.PropertyName == "Catalog":
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(
+                    request.Properties.PropertyList.Catalog.replace(
+                        "[",
+                        "",
+                    ).replace(
+                        "]",
+                        "",
+                    ), )
+                value = self.selected_cube
+            else:
+                value = self.cubes[0]
+
+            return self._get_props(
+                discover_preperties_xsd,
+                "Catalog",
+                "Catalog",
+                "string",
+                "ReadWrite",
+                "false",
+                value,
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "ServerName":
+            return self._get_props(
+                discover_preperties_xsd,
+                "ServerName",
+                "ServerName",
+                "string",
+                "Read",
+                "false",
+                "Mouadh",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "ProviderVersion":
+            return self._get_props(
+                discover_preperties_xsd,
+                "ProviderVersion",
+                "ProviderVersion",
+                "string",
+                "Read",
+                "false",
+                "0.02  08-Mar-2016 08:41:28 GMT",
+            )
+
+        elif (request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries"):
+
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(request.Properties.PropertyList.Catalog)
+            return self._get_props(
+                discover_preperties_xsd,
+                "MdpropMdxSubqueries",
+                "MdpropMdxSubqueries",
+                "int",
+                "Read",
+                "false",
+                "15",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxDrillFunctions":
+
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(request.Properties.PropertyList.Catalog)
+            return self._get_props(
+                discover_preperties_xsd,
+                "MdpropMdxDrillFunctions",
+                "MdpropMdxDrillFunctions",
+                "int",
+                "Read",
+                "false",
+                "3",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxNamedSets":
+            return self._get_props(
+                discover_preperties_xsd,
+                "MdpropMdxNamedSets",
+                "MdpropMdxNamedSets",
+                "int",
+                "Read",
+                "false",
+                "15",
+            )
+
+        return self._get_props(discover_preperties_xsd, "", "", "", "", "", "")
+
     def discover_schema_rowsets_response(self, request):
 
         rows = discover_schema_rowsets_response_rows
@@ -94,12 +224,11 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                     'SchemaGuid': resp_row["SchemaGuid"],
                 }
                 restrictions = []
-                for idx, restriction in enumerate(
-                        resp_row["restrictions"]["restriction_names"], ):
+                for idx, restriction in enumerate(resp_row["restrictions"]["restriction_names"], ):
                     restrictions += {
                         'Name': restriction,
                         'Type':
-                        resp_row["restrictions"]["restriction_types"][idx]
+                            resp_row["restrictions"]["restriction_types"][idx]
                     }
                 response['Restrictions'] = restrictions
                 response['RestrictionsMask'] = resp_row["RestrictionsMask"]
@@ -321,16 +450,14 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
     def mdschema_dimensions_response(self, request):
         if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Restrictions.RestrictionList.
-                CATALOG_NAME == self.selected_cube
+            and request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_cube
                 and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
             ord = 1
 
             rows = []
-            for tables in self.executor.get_all_tables_names(
-                    ignore_fact=True, ):
+            for tables in self.executor.get_all_tables_names(ignore_fact=True, ):
                 rows += {
                     "CATALOG_NAME": self.selected_cube,
                     "CUBE_NAME": self.selected_cube,
@@ -385,88 +512,88 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
                     column_attribut = df.iloc[0][0]
                     rows += {
                         "CATALOG_NAME":
-                        self.selected_cube,
+                            self.selected_cube,
                         "CUBE_NAME":
-                        self.selected_cube,
+                            self.selected_cube,
                         "DIMENSION_UNIQUE_NAME":
-                        "[" + table_name + "]",
+                            "[" + table_name + "]",
                         "HIERARCHY_NAME":
-                        table_name,
-                        "HIERARCHY_UNIQUE_NAME":
-                        "[{0}].[{0}]".format(table_name),
-                        "HIERARCHY_CAPTION":
-                        table_name,
-                        "DIMENSION_TYPE":
-                        "3",
-                        "HIERARCHY_CARDINALITY":
-                        "6",
-                        "DEFAULT_MEMBER":
-                        "[{0}].[{0}].[{1}].[{2}]".format(
                             table_name,
-                            df.columns[0],
-                            column_attribut,
-                        ),
+                        "HIERARCHY_UNIQUE_NAME":
+                            "[{0}].[{0}]".format(table_name),
+                        "HIERARCHY_CAPTION":
+                            table_name,
+                        "DIMENSION_TYPE":
+                            "3",
+                        "HIERARCHY_CARDINALITY":
+                            "6",
+                        "DEFAULT_MEMBER":
+                            "[{0}].[{0}].[{1}].[{2}]".format(
+                                table_name,
+                                df.columns[0],
+                                column_attribut,
+                            ),
                         "STRUCTURE":
-                        "0",
+                            "0",
                         "IS_VIRTUAL":
-                        "false",
+                            "false",
                         "IS_READWRITE":
-                        "false",
+                            "false",
                         "DIMENSION_UNIQUE_SETTINGS":
-                        "1",
+                            "1",
                         "DIMENSION_IS_VISIBLE":
-                        "true",
+                            "true",
                         "HIERARCHY_ORDINAL":
-                        "1",
+                            "1",
                         "DIMENSION_IS_SHARED":
-                        "true",
+                            "true",
                         "HIERARCHY_IS_VISIBLE":
-                        "true",
+                            "true",
                         "HIERARCHY_ORIGIN":
-                        "1",
+                            "1",
                         "INSTANCE_SELECTION":
-                        "0",
+                            "0",
                     }
 
                 rows += {
                     "CATALOG_NAME":
-                    self.selected_cube,
+                        self.selected_cube,
                     "CUBE_NAME":
-                    self.selected_cube,
+                        self.selected_cube,
                     "DIMENSION_UNIQUE_NAME":
-                    "[Measures]",
+                        "[Measures]",
                     "HIERARCHY_NAME":
-                    "Measures",
+                        "Measures",
                     "HIERARCHY_UNIQUE_NAME":
-                    "[Measures]",
+                        "[Measures]",
                     "HIERARCHY_CAPTION":
-                    "Measures",
+                        "Measures",
                     "DIMENSION_TYPE":
-                    "2",
+                        "2",
                     "HIERARCHY_CARDINALITY":
-                    "0",
+                        "0",
                     "DEFAULT_MEMBER":
-                    "[Measures].[{}]".format(self.executor.measures[0], ),
+                        "[Measures].[{}]".format(self.executor.measures[0], ),
                     "STRUCTURE":
-                    "0",
+                        "0",
                     "IS_VIRTUAL":
-                    "false",
+                        "false",
                     "IS_READWRITE":
-                    "false",
+                        "false",
                     "DIMENSION_UNIQUE_SETTINGS":
-                    "1",
+                        "1",
                     "DIMENSION_IS_VISIBLE":
-                    "true",
+                        "true",
                     "HIERARCHY_ORDINAL":
-                    "1",
+                        "1",
                     "DIMENSION_IS_SHARED":
-                    "true",
+                        "true",
                     "HIERARCHY_IS_VISIBLE":
-                    "true",
+                        "true",
                     "HIERARCHY_ORIGIN":
-                    "1",
+                        "1",
                     "INSTANCE_SELECTION":
-                    "0",
+                        "0",
                 }
 
             return rows
@@ -478,43 +605,42 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
 
-            for tables in self.executor.get_all_tables_names(
-                    ignore_fact=True, ):
+            for tables in self.executor.get_all_tables_names(ignore_fact=True, ):
                 l_nb = 0
                 for col in self.executor.tables_loaded[tables].columns:
                     rows.append({
                         "CATALOG_NAME":
-                        self.selected_cube,
+                            self.selected_cube,
                         "CUBE_NAME":
-                        self.selected_cube,
+                            self.selected_cube,
                         "DIMENSION_UNIQUE_NAME":
-                        "[" + tables + "]",
+                            "[" + tables + "]",
                         "HIERARCHY_UNIQUE_NAME":
-                        "[{0}].[{0}]".format(tables),
+                            "[{0}].[{0}]".format(tables),
                         "LEVEL_NAME":
-                        str(col),
+                            str(col),
                         "LEVEL_UNIQUE_NAME":
-                        "[{0}].[{0}].[{1}]".format(tables, col),
+                            "[{0}].[{0}].[{1}]".format(tables, col),
                         "LEVEL_CAPTION":
-                        str(col),
+                            str(col),
                         "LEVEL_NUMBER":
-                        str(l_nb),
+                            str(l_nb),
                         "LEVEL_CARDINALITY":
-                        "0",
+                            "0",
                         "LEVEL_TYPE":
-                        "0",
+                            "0",
                         "CUSTOM_ROLLUP_SETTINGS":
-                        "0",
+                            "0",
                         "LEVEL_UNIQUE_SETTINGS":
-                        "0",
+                            "0",
                         "LEVEL_IS_VISIBLE":
-                        "true",
+                            "true",
                         "LEVEL_DBTYPE":
-                        "130",
+                            "130",
                         "LEVEL_KEY_CARDINALITY":
-                        "1",
+                            "1",
                         "LEVEL_ORIGIN":
-                        "2"
+                            "2"
                     })
                     l_nb += 1
 
@@ -639,7 +765,7 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
     def mdschema_members_response(self, request):
         # Enumeration of hierarchies in all dimensions
         if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-                and request.Properties.PropertyList.Catalog is not None
+            and request.Properties.PropertyList.Catalog is not None
                 and request.Restrictions.RestrictionList.TREE_OP == 8):
             self.change_cube(request.Properties.PropertyList.Catalog)
             separed_tuple = self.executor.parser.split_tuple(
@@ -654,37 +780,37 @@ class DictDiscoverReqHandler(XmlaDiscoverReqHandler):
 
             return {
                 "CATALOG_NAME":
-                self.selected_cube,
+                    self.selected_cube,
                 "CUBE_NAME":
-                self.selected_cube,
+                    self.selected_cube,
                 "DIMENSION_UNIQUE_NAME":
-                separed_tuple[0],
+                    separed_tuple[0],
                 "HIERARCHY_UNIQUE_NAME":
-                "{0}.{0}".format(separed_tuple[0], ),
+                    "{0}.{0}".format(separed_tuple[0], ),
                 "LEVEL_UNIQUE_NAME":
-                joined,
+                    joined,
                 "LEVEL_NUMBER":
-                "0",
+                    "0",
                 "MEMBER_ORDINAL":
-                "0",
+                    "0",
                 "MEMBER_NAME":
-                last_attribut,
+                    last_attribut,
                 "MEMBER_UNIQUE_NAME":
-                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,
+                    request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME,
                 "MEMBER_TYPE":
-                "1",
+                    "1",
                 "MEMBER_CAPTION":
-                last_attribut,
+                    last_attribut,
                 "CHILDREN_CARDINALITY":
-                "1",
+                    "1",
                 "PARENT_LEVEL":
-                "0",
+                    "0",
                 "PARENT_COUNT":
-                "0",
+                    "0",
                 "MEMBER_KEY":
-                last_attribut,
+                    last_attribut,
                 "IS_PLACEHOLDERMEMBER":
-                "false",
+                    "false",
                 "IS_DATAMEMBER":
-                "false"
+                    "false"
             }

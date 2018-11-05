@@ -1,18 +1,19 @@
 # -*- encoding: utf8 -*-
 
-import importlib
-from pprint import pprint
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
+import importlib
 import pandas as pd
 
+from pprint import pprint
 from olapy.core.mdx.executor.execute import MdxEngine
 from olapy.core.patch.patch_olapy import patch_mdx_engine
-from olapy.core.services.models import DiscoverRequest, Restriction, Property, Restrictionlist, Propertieslist, \
-    ExecuteRequest, Command
-from olapy.core.services.xmla import XmlaProviderService
+from olapy.core.services.request_properties_models import DiscoverRequest, Restriction, Property, Restrictionlist, \
+    Propertieslist, ExecuteRequest, Command
 
 
-class XmlaProviderLib(XmlaProviderService):
+class XmlaProviderLib():
     """
     XmlaProviderLib tu use olapy as library without running any server (no spyne, no wsgi...)
     """
