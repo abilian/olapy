@@ -142,7 +142,7 @@ if __name__ == '__main__':
                                            encoding='utf8')
                   }
 
-    xmla_response = get_response(xmla_request_params, dataframes, output='dict')
+    xmla_response = get_response(xmla_request_params, dataframes, output='xmla')
     pprint(xmla_response)
-    xmla_response = get_response(xmla_request_params2, dataframes, output='dict')
+    xmla_response = get_response(xmla_request_params2, dataframes, output='xmla')
     pprint(xmla_response)
