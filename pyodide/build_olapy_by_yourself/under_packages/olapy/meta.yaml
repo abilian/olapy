@@ -1,12 +1,14 @@
 package:
   name: olapy
-  version: 'ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9'
+#  version: 'ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9'
+    version: master
 
 source:
-  url: https://github.com/abilian/olapy/archive/ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9.zip
+#  url: https://github.com/abilian/olapy/archive/ec03b9f3c2b9ca6802dc34491c42ad4e61f689c9.zip
+  url: https://github.com/abilian/olapy/archive/master.zip
 
-  patches:
-    - patches/remove_unuseful_libs_(spyne-sqlalchemy-click-pyyaml).patch
+#  patches:
+#    - patches/remove_unuseful_libs_(spyne-sqlalchemy-click-pyyaml).patch
 
 
 requirements:
@@ -19,3 +21,4 @@ requirements:
 test:
   imports:
     - olapy
+
