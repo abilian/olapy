@@ -54,7 +54,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME("[Measures]")
 
-    def _gen_xs0_parent(self, xml, **kwargs):
+    def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
         """
         For hierarchical rowset, we need to add the tuple ( mdx query contains PARENT_UNIQUE_NAME keyword)
         :param xml: axis 0 tu update, in xml format
@@ -63,10 +63,6 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         :param first_att: tuple first attribut
         :return:
         """
-
-        first_att = kwargs.get("first_att")
-        splitted_df = kwargs.get("split_df")
-        tuple = kwargs.get("tuple")
 
         parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1:-1]), )
         if parent:
