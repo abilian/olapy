@@ -7,17 +7,20 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import os
-import uuid
 
 import xmlwitch
 from six.moves.urllib.parse import urlparse
-from sqlalchemy import create_engine
+
+try:
+    from sqlalchemy import create_engine
+except ModuleNotFoundError:
+    pass
 
 from ..services.dict_discover_request_handler import DictDiscoverReqHandler
 from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
-    discover_datasources_xsd, discover_literals_xsd, discover_preperties_xsd, \
+    discover_datasources_xsd, discover_literals_xsd, \
     discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
     mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd, \
     mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd, \
