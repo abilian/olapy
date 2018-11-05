@@ -88,18 +88,18 @@ def get_response(xmla_request_params, dataframes=None, output='dict', facts_tabl
 
     property = Property(**xmla_request_params.get('properties'))  # type: ignore
     properties = Propertieslist()
-    properties.PropertyList = property
+    properties.PropertyList = property  # type: ignore
 
     if xmla_request_params.get('mdx_query'):  #  Execute request
         request = ExecuteRequest()
-        request.Command = Command(Statement=xmla_request_params.get('mdx_query'))
+        request.Command = Command(Statement=xmla_request_params.get('mdx_query'))  # type: ignore
 
-        request.Properties = properties
+        request.Properties = properties  # type: ignore
 
         return xmla_service.Execute(request)
 
     else:  #  Discover request
-        request = DiscoverRequest()
+        request = DiscoverRequest()  #  type: ignore
         restriction = Restriction(**xmla_request_params.get('restrictions'))  # type: ignore
         request.Restrictions = Restrictionlist(RestrictionList=restriction)  # type: ignore
 
