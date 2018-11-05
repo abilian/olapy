@@ -99,7 +99,7 @@ def get_response(xmla_request_params, dataframes=None, output='dict', facts_tabl
         return xmla_service.Execute(request)
 
     else:  #  Discover request
-        request = DiscoverRequest()  #  type: ignore
+        request = DiscoverRequest()  # type: ignore
         restriction = Restriction(**xmla_request_params.get('restrictions'))  # type: ignore
         request.Restrictions = Restrictionlist(RestrictionList=restriction)  # type: ignore
 
