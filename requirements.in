@@ -1,24 +1,10 @@
 typing
-#grako
 pandas<1
 lxml
 spyne==2.13.2a0
-#SQLAlchemy<1.2 # <1.2 required by bonobo
 SQLAlchemy
 xmlwitch
 attrs
 pyyaml
 regex
 click
-
-
-# Tools
-#psutil
-#pympler
-
-#ETL
-bonobo
-bonobo-sqlalchemy<0.6.1
-awesome-slugify
-python-dotenv
-whistle<1.0.1 # used by bonobo, 1.0.1 does not work well with py2.7

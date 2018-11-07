@@ -4,41 +4,17 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-appdirs==1.4.3            # via fs
 attrs==18.2.0
-awesome-slugify==1.6.5
-bonobo-sqlalchemy==0.6.0
-bonobo==0.6.3
-certifi==2018.10.15       # via requests
-chardet==3.0.4            # via requests
 click==7.0
-colorama==0.3.9           # via mondrian
-fs==2.1.1                 # via bonobo
-graphviz==0.8.4           # via bonobo
-idna==2.7                 # via requests
-jinja2==2.10              # via bonobo
 lxml==4.2.5
-markupsafe==1.0           # via jinja2
-mondrian==0.8.0           # via bonobo
 numpy==1.15.4             # via pandas
-packaging==17.1           # via bonobo
 pandas==0.23.4
-pbr==5.1.0                # via stevedore
-psutil==5.4.8             # via bonobo
-pyparsing==2.3.0          # via packaging
 python-dateutil==2.7.5    # via pandas
-python-dotenv==0.9.1
-python-slugify==1.2.6     # via bonobo
-pytz==2018.7              # via fs, pandas, spyne
+pytz==2018.7              # via pandas, spyne
 pyyaml==3.13
-regex==2018.11.3
-requests==2.20.0          # via bonobo
-six==1.11.0               # via fs, packaging, python-dateutil, stevedore
+regex==2018.11.7
+six==1.11.0               # via python-dateutil
 spyne==2.13.2a0
 sqlalchemy==1.2.13
-stevedore==1.30.0         # via bonobo
 typing==3.6.6
-unidecode==0.4.21         # via awesome-slugify, python-slugify
-urllib3==1.24.1           # via requests
-whistle==1.0.0
 xmlwitch==0.3

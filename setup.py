@@ -29,6 +29,10 @@ setup(
         "Programming Language :: Python :: 3.6",
         # "Topic :: Business intelligence",
     ],
+    extras_require={
+        'etl': ["bonobo", "bonobo-sqlalchemy<0.6.1", "awesome-slugify", "python-dotenv", "whistle<1.0.1"],
+    },
     entry_points={'console_scripts': ['olapy = olapy.__main__:cli',
                                       'etl = olapy.etl.etl:run_etl', ]},
+    # whistle<1.0.1 # used by bonobo, 1.0.1 does not work well with py2.7
 )
