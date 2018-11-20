@@ -5,13 +5,17 @@ The purpose of OlaPy-Pyodide package is to show you how to use [OlaPy](https://g
 
 Since there's no server side, Sharing a notebook become very easy as passing around a single HTML file.
 
-how could this happens? well, thanks to [iodide](https://github.com/iodide-project/iodide) and [pyodide](https://github.com/iodide-project/pyodide) projects
+how could this happens? well, thanks to [iodide](https://github.com/iodide-project/iodide) and 
+[pyodide](https://github.com/iodide-project/pyodide) projects which feature Python running entirely in the browser, allowing portable and reproducible data science using Python without having to install anything.
+
+### [Online Demo](http://bulma.abilian.com:8000/olapy.html)
+
 
 ![OlaPy-Pyodide](https://raw.githubusercontent.com/abilian/olapy/master/pyodide/docs/img/olapy-pyodide.gif)
 
 
-Build OlaPy with Pyodide
-------------------------
+Build OlaPy with Pyodide by yourself
+------------------------------------
 
 After building [pyodide project](https://github.com/iodide-project/pyodide)
 
@@ -35,3 +39,4 @@ finally to test a demo, you should install gunicorn:
     gunicorn -D -w 4 -b 0.0.0.0 -t 300 server:app
 
 and go to [http://localhost:8000/olapy.html](http://localhost:8000/olapy.html)
+
