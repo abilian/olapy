@@ -7,7 +7,7 @@ Since there's no server side, Sharing a notebook become very easy as passing aro
 
 how could this happens? well, thanks to [iodide](https://github.com/iodide-project/iodide) and [pyodide](https://github.com/iodide-project/pyodide) projects
 
-![OlaPy-Pyodide](https://raw.githubusercontent.com/abilian/olapy/pyodide/docs/img/olapy-pyodide.gif)
+![OlaPy-Pyodide](https://raw.githubusercontent.com/abilian/olapy/master/pyodide/docs/img/olapy-pyodide.gif)
 
 
 Build OlaPy with Pyodide
