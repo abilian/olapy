@@ -12,7 +12,7 @@ pandas==0.23.4
 python-dateutil==2.7.5    # via pandas
 pytz==2018.7              # via pandas, spyne
 pyyaml==3.13
-regex==2018.11.7
+regex==2018.11.22
 six==1.11.0               # via python-dateutil
 spyne==2.13.2a0
 sqlalchemy==1.2.14
