@@ -43,26 +43,32 @@ and go to [http://localhost:8000/olapy.html](http://localhost:8000/olapy.html)
 Add cubes
 ---------
 
-you can add new cubes under pyodide build folder, for instance 
+You can add new cubes under the pyodide build folder, for instance 
 
 <i>{PYODIDE_ROOT_DIR}/build/olapy-data/cubes/{YOUR_CUBE_FOLDER}/{YOUR_FILES.csv}</i>
 
 and them from iodide, you pass them to olapy as parameter:
     
-    import pandas as pd
-    import pyodide
-    from olapy.core.services.xmla_lib import get_response
+~~~python
+import pandas as pd
+import pyodide
+from olapy.core.services.xmla_lib import get_response
 
-    # get cube tables    
-    dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/Facts.csv"),sep=';', encoding='utf8'),
-    'Table_name_as_you_want1':pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/table1.csv"),sep=';', encoding='utf8'),
-    'Table_name_as_you_want2':pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/table2.csv"),sep=';', encoding='utf8')
-    }
-    
-    # discover request parameters
-    xmla_request_params = {'cube': 'sales','request_type': 'DISCOVER_PROPERTIES','properties': {},
-          'restrictions': {'PropertyName': 'ServerName'},'mdx_query': None}
-      
+# get cube tables
+dataframes = {
+  'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/Facts.csv"),sep=';', encoding='utf8'),
+  'Table_name_as_you_want1':pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/table1.csv"),sep=';', encoding='utf8'),
+  'Table_name_as_you_want2':pd.read_csv(pyodide.open_url("olapy-data/cubes/my_cube/table2.csv"),sep=';', encoding='utf8')
+}
 
-    get_response(xmla_request_params=xmla_request_params, dataframes=dataframes, output='xmla')
+# discover request parameters
+xmla_request_params = {
+  'cube': 'sales',
+  'request_type': 'DISCOVER_PROPERTIES',
+  'properties': {},
+  'restrictions': {'PropertyName': 'ServerName'},
+  'mdx_query': None,
+}
 
+get_response(xmla_request_params=xmla_request_params, dataframes=dataframes, output='xmla')
+~~~
