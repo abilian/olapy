@@ -21,7 +21,7 @@ class SparkMdxEngine(MdxEngine):
         if self.facts in list(self.tables_loaded.keys()):
             return [
                 col[0] for col in self.tables_loaded[self.facts].dtypes
-                    if col[0].lower()[-2:] != "id" and not col[1].startswith('string')
+                if col[0].lower()[-2:] != "id" and not col[1].startswith('string')
             ]
 
     @staticmethod

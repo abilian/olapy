@@ -31,6 +31,7 @@ setup(
     ],
     extras_require={
         'etl': ["bonobo", "bonobo-sqlalchemy<0.6.1", "awesome-slugify", "python-dotenv", "whistle<1.0.1"],
+        'spark': ["pyspark<3"],
     },
     entry_points={'console_scripts': ['olapy = olapy.__main__:cli',
                                       'etl = olapy.etl.etl:run_etl', ]},
