@@ -34,7 +34,7 @@ from ..parser.parse import Parser
 try:
     from ..tools.connection import get_dialect, get_dialect_name
     from .cube_loader_db import CubeLoaderDB
-except ModuleNotFoundError:
+except ImportError:
     pass
 
 from .cube_loader import CubeLoader
