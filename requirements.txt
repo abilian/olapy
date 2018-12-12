@@ -15,6 +15,6 @@ pyyaml==3.13
 regex==2018.11.22
 six==1.12.0               # via python-dateutil
 spyne==2.13.2a0
-sqlalchemy==1.2.14
+sqlalchemy==1.2.15
 typing==3.6.6
 xmlwitch==0.3
