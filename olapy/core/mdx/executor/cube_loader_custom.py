@@ -8,7 +8,7 @@ import pandas.io.sql as psql
 from pandas import DataFrame
 from typing import Dict
 
-from . import CubeLoader
+from .cube_loader import CubeLoader
 
 
 class CubeLoaderCustom(CubeLoader):

@@ -8,7 +8,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, asc
 from typing import List
 
-from olapy.core.mdx.executor import MdxEngine
+from .execute import MdxEngine
 
 
 class SparkMdxEngine(MdxEngine):

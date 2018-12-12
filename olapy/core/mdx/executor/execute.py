@@ -37,7 +37,7 @@ try:
 except ModuleNotFoundError:
     pass
 
-from . import CubeLoader
+from .cube_loader import CubeLoader
 from .cube_loader_custom import CubeLoaderCustom
 
 
