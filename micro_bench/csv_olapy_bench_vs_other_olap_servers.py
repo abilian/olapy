@@ -13,7 +13,7 @@ from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
 from tests.test_xmla import WSGIServer
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.core.mdx.executor import MdxEngine
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, \
     Propertieslist, Property

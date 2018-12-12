@@ -26,7 +26,7 @@ Package ``olapy.core.mdx.executor``
 
 to import the package use::
 
-    import olapy.core.mdx.executor.execute
+    import olapy.core.mdx.executor
 
 
 .. automodule:: olapy.core.mdx.executor.execute

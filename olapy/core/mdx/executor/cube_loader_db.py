@@ -9,7 +9,7 @@ from pandas import DataFrame
 from sqlalchemy import inspect
 
 from ..tools.connection import get_dialect_name
-from .cube_loader import CubeLoader
+from . import CubeLoader
 
 
 class CubeLoaderDB(CubeLoader):

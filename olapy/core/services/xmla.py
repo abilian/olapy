@@ -24,7 +24,7 @@ from spyne.server.wsgi import WsgiApplication
 from sqlalchemy import create_engine
 
 from .xmla_lib import XmlaProviderLib
-from ..mdx.executor.execute import MdxEngine
+from ..mdx.executor import MdxEngine
 from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser

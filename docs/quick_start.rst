@@ -23,7 +23,7 @@ Olapy as a library
 
 If you want to use olapy as a library to execute MDX queries, start by importing the MDX engine::
 
-    from olapy.core.mdx.executor.execute import MdxEngine
+    from olapy.core.mdx.executor import MdxEngine
 
 In our example, we're going to use sales demo cube::
 

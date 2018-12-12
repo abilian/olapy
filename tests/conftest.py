@@ -12,7 +12,7 @@ except:
 
 from six.moves.urllib.parse import urlparse
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.core.mdx.executor import MdxEngine
 
 from .db_creation_utils import create_insert, drop_tables
 
