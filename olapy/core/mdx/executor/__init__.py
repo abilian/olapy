@@ -12,7 +12,8 @@ try:
     logging.warning(' **************************************************** ')
     logging.warning(' ***************** OlaPy with Spark ***************** ')
     logging.warning(' **************************************************** ')
-except ModuleNotFoundError:
+except ImportError:
+
     from .cube_loader import CubeLoader
     from .execute import MdxEngine
 
