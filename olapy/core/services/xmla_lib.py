@@ -7,9 +7,9 @@ import importlib
 import pandas as pd
 
 from pprint import pprint
-from olapy.core.mdx.executor import MdxEngine
-from olapy.core.patch.patch_olapy import patch_mdx_engine
-from olapy.core.services.request_properties_models import DiscoverRequest, Restriction, Property, Restrictionlist, \
+from ..mdx.executor import MdxEngine
+from ..patch.patch_olapy import patch_mdx_engine
+from ..services.request_properties_models import DiscoverRequest, Restriction, Property, Restrictionlist, \
     Propertieslist, ExecuteRequest, Command
 
 
