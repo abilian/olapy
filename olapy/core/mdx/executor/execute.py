@@ -182,19 +182,19 @@ class MdxEngine(object):
                 cube_path=cubes_folder_path,
                 sqla_engine=self.sqla_engine,
                 sep=sep,
-            )  # type: CubeLoader
+            )
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
             if "postgres" in dialect_name:
                 self.facts = self.facts.lower()
-            cube_loader = CubeLoaderDB(self.sqla_engine)
+            cube_loader = CubeLoaderDB(self.sqla_engine)  # type: ignore
         # if not tables:
         #     raise Exception(
         #         'unable to load tables, check that the database is not empty',
         #     )
         # elif self.cube in self.csv_files_cubes:
         else:
-            cube_loader = CubeLoader(cubes_folder_path, sep)
+            cube_loader = CubeLoader(cubes_folder_path, sep)  # type: ignore
         return cube_loader.load_tables()
 
     def get_measures(self):
