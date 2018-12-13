@@ -643,7 +643,11 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             if table_name == self.executor.facts:
                                 continue
 
-                            column_attribut = df.iloc[0][0]
+                            # todo solve this another way (inheritance)
+                            try:
+                                column_attribut = df.iloc[0][0]
+                            except AttributeError:
+                                column_attribut = df.first()[0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
