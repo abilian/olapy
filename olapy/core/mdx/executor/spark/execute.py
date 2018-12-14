@@ -5,10 +5,10 @@ import itertools
 from collections import OrderedDict
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import lit, asc
+from pyspark.sql.functions import lit
 from typing import List
 
-from .execute import MdxEngine
+from ..execute import MdxEngine
 
 
 class SparkMdxEngine(MdxEngine):

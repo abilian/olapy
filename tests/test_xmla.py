@@ -18,8 +18,8 @@ from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.mdx.executor import MdxEngine
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
-from olapy.core.services.xmla_execute_request_handler import XmlaExecuteReqHandler
+from olapy.core.services import XmlaDiscoverReqHandler
+from olapy.core.services import XmlaExecuteReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0

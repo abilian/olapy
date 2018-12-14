@@ -5,7 +5,7 @@ import os
 
 from typing import Dict, Text
 
-from .cube_loader import CubeLoader
+from ..cube_loader import CubeLoader
 
 from pyspark.sql import DataFrame, SparkSession
 

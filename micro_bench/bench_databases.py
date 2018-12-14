@@ -15,7 +15,7 @@ from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
 from olapy.core.services.xmla import get_spyne_app
-from olapy.core.services.xmla_discover_request_handler import XmlaDiscoverReqHandler
+from olapy.core.services import XmlaDiscoverReqHandler
 
 from .micro_bench import MicBench
 
