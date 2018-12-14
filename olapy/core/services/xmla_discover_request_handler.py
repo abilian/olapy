@@ -13,7 +13,7 @@ from six.moves.urllib.parse import urlparse
 
 try:
     from sqlalchemy import create_engine
-except ModuleNotFoundError:
+except ImportError:
     pass
 
 from ..services.dict_discover_request_handler import DictDiscoverReqHandler

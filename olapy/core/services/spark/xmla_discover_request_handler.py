@@ -27,22 +27,21 @@ class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
         restriction_list = request.Restrictions.RestrictionList
 
         if (restriction_list.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None):
+                and request.Properties.PropertyList.Catalog is not None):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
             xml = xmlwitch.Builder()
             with xml["return"]:
                 with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi":
+                        xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                        **{
+                            "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                            "xmlns:xsi":
                             "http://www.w3.org/2001/XMLSchema-instance",
-                    }):
+                        }):
                     xml.write(mdschema_hierarchies_xsd)
                     if (restriction_list.HIERARCHY_VISIBILITY == 3
-                        or restriction_list.CATALOG_NAME == self.
-                            selected_cube):
+                            or restriction_list.CATALOG_NAME == self.selected_cube):
                         for table_name, df in self.executor.tables_loaded.items(
                         ):
                             if table_name == self.executor.facts:
@@ -87,9 +86,8 @@ class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
                             xml.HIERARCHY_CAPTION("Measures")
                             xml.DIMENSION_TYPE("2")
                             xml.HIERARCHY_CARDINALITY("0")
-                            xml.DEFAULT_MEMBER(
-                                "[Measures].[{}]".format(
-                                    self.executor.measures[0], ), )
+                            xml.DEFAULT_MEMBER("[Measures].[{}]".format(
+                                self.executor.measures[0], ), )
                             xml.STRUCTURE("0")
                             xml.IS_VIRTUAL("false")
                             xml.IS_READWRITE("false")

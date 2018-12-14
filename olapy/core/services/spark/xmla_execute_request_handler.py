@@ -183,27 +183,30 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         with xml.Axis(name="SlicerAxis"):
             with xml.Tuples:
                 with xml.Tuple:
-                    for dim_diff in self.executor.get_all_tables_names(ignore_fact=True, ):
-                        column_attribut = self.executor.tables_loaded[dim_diff].select(
-                            self.executor.tables_loaded[dim_diff].columns[0]).first()[0]
+                    for dim_diff in self.executor.get_all_tables_names(
+                            ignore_fact=True, ):
+                        column_attribut = self.executor.tables_loaded[
+                            dim_diff].select(self.executor.tables_loaded[
+                                dim_diff].columns[0]).first()[0]
 
-                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff), ):
+                        with xml.Member(
+                                Hierarchy="[{0}].[{0}]".format(dim_diff), ):
                             xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
                                 dim_diff,
-                                self.executor.tables_loaded[dim_diff].columns[0],
+                                self.executor.tables_loaded[dim_diff].columns[
+                                    0],
                                 column_attribut,
                             ), )
                             xml.Caption(str(column_attribut))
-                            xml.LName(
-                                "[{0}].[{0}].[{1}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff].columns[0],
-                                ), )
+                            xml.LName("[{0}].[{0}].[{1}]".format(
+                                dim_diff,
+                                self.executor.tables_loaded[dim_diff].columns[
+                                    0],
+                            ), )
                             xml.LNum("0")
                             xml.DisplayInfo("2")
 
         return str(xml)
-
 
     def generate_cell_data(self):
         # # type: () -> text_type
@@ -224,24 +227,26 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
         measures_agg = [
-            column
-            for column in self.mdx_execution_result["result"].columns
+            column for column in self.mdx_execution_result["result"].columns
             if 'sum(' in column
         ]
         if ((len(self.columns_desc["columns"].keys()) == 0
              or len(self.columns_desc["rows"].keys()) == 0)
-            and self.executor.facts in self.columns_desc["all"].keys()):
+                and self.executor.facts in self.columns_desc["all"].keys()):
 
             columns_loop = []
             for column in measures_agg:
                 for row in self.mdx_execution_result["result"].select(
-                    column).rdd.collect():
+                        column).rdd.collect():
                     columns_loop.append(row[0])
 
         else:
             # iterate DataFrame vertically
-            columns_loop = itertools.chain(*[column_value for column_value in
-                                             self.mdx_execution_result["result"].select(measures_agg).rdd.collect()])
+            columns_loop = itertools.chain(*[
+                column_value
+                for column_value in self.mdx_execution_result["result"].select(
+                    measures_agg).rdd.collect()
+            ])
 
         xml = xmlwitch.Builder()
         index = 0
@@ -290,9 +295,8 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             return self._generate_slicer_convert2formulas()
 
         unused_dimensions = sorted(
-            list(
-                set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
-                                                                             self.columns_desc["all"]}, ), )
+            list(set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
+                                                                              self.columns_desc["all"]}, ), )
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
@@ -301,33 +305,32 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
                         for dim_diff in unused_dimensions:
                             column_attribut = self.executor.tables_loaded[
                                 dim_diff].select(self.executor.tables_loaded[
-                                                     dim_diff].columns[0]).first()[0]
+                                    dim_diff].columns[0]).first()[0]
                             with xml.Member(
-                                Hierarchy="[{0}].[{0}]".format(dim_diff),
+                                    Hierarchy="[{0}].[{0}]".format(dim_diff),
                             ):
-                                xml.UName(
-                                    "[{0}].[{0}].[{1}].[{2}]".format(
-                                        dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[0],
-                                        column_attribut,
-                                    ), )
+                                xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
+                                    dim_diff,
+                                    self.executor.tables_loaded[dim_diff]
+                                    .columns[0],
+                                    column_attribut,
+                                ), )
                                 xml.Caption(str(column_attribut))
-                                xml.LName(
-                                    "[{0}].[{0}].[{1}]".format(
-                                        dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[0],
-                                    ), )
+                                xml.LName("[{0}].[{0}].[{1}]".format(
+                                    dim_diff,
+                                    self.executor.tables_loaded[dim_diff]
+                                    .columns[0],
+                                ), )
                                 xml.LNum("0")
                                 xml.DisplayInfo("2")
 
                         # Hierarchize
                         if (len(self.executor.selected_measures) <= 1 and (
                             self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc[
-                            "where"])):
+                                "where"])):
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(
-                                    "[Measures].[{}]".format(
-                                        self.executor.measures[0], ), )
+                                xml.UName("[Measures].[{}]".format(
+                                    self.executor.measures[0], ), )
                                 xml.Caption("{}".format(
                                     self.executor.measures[0], ))
                                 xml.LName("[Measures]")

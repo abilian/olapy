@@ -7,6 +7,5 @@ try:
 
 except ImportError:
 
-
-    from .xmla_discover_request_handler import XmlaDiscoverReqHandler
-    from .xmla_execute_request_handler import XmlaExecuteReqHandler
+    from .xmla_discover_request_handler import XmlaDiscoverReqHandler  # type: ignore
+    from .xmla_execute_request_handler import XmlaExecuteReqHandler  # type: ignore
