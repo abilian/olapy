@@ -33,6 +33,7 @@ You can install it directly from the `Python Package Index <https://pypi.python.
 
     pip install olapy
 
+
 Install from Github
 ~~~~~~~~~~~~~~~~~~~
 
@@ -52,6 +53,15 @@ or just::
 
     pip install -e .
 
+**[OPTIONAL]**
+
+you can use `Spark <https://spark.apache.org/docs/0.9.0/python-programming-guide.html>`_  instead of `Pandas <https://pandas.pydata.org/>`_, to do so, you need just to install it::
+
+    pip install pyspark
+
+and if you want to go back to pandas just uninstall spark with::
+
+    pip uninstall pyspark
 
 Usage
 -----
