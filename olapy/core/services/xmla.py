@@ -29,8 +29,8 @@ from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
-from .xmla_discover_request_handler import XmlaDiscoverReqHandler
-from .xmla_execute_request_handler import XmlaExecuteReqHandler
+from . import XmlaDiscoverReqHandler
+from . import XmlaExecuteReqHandler
 
 
 class XmlaSoap11(Soap11):
@@ -330,6 +330,7 @@ def runserver(
     # log to the console
     # logging.basicConfig(level=logging.DEBUG")
     # log to the file
+
     if write_on_file:
         if not os.path.isdir(
                 os.path.join(home_directory, "olapy-data", "logs"), ):

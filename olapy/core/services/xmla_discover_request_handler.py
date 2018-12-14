@@ -638,16 +638,11 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     if (restriction_list.HIERARCHY_VISIBILITY == 3
                             or restriction_list.CATALOG_NAME == self.
                             selected_cube):
-                        for table_name, df in self.executor.tables_loaded.items(
-                        ):
+                        for table_name, df in self.executor.tables_loaded.items():
                             if table_name == self.executor.facts:
                                 continue
 
-                            # todo solve this another way (inheritance)
-                            try:
-                                column_attribut = df.iloc[0][0]
-                            except AttributeError:
-                                column_attribut = df.first()[0]
+                            column_attribut = df.iloc[0][0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)

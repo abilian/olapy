@@ -12,7 +12,7 @@ import numpy as np
 import xmlwitch
 from six import text_type
 
-from ..services.dict_execute_request_handler import DictExecuteReqHandler
+from .dict_execute_request_handler import DictExecuteReqHandler
 from .xmla_execute_xsds import execute_xsd
 
 
