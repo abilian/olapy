@@ -3,7 +3,7 @@ import logging
 try:
     # if pyspark install, use it instead of pandas
 
-    from .spark.cube_loader import CubeLoader
+    from .spark.cube_loader import SparkCubeLoader as CubeLoader
     from .spark.execute import SparkMdxEngine as MdxEngine
 
     logging.warning(' **************************************************** ')
