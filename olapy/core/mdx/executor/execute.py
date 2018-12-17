@@ -38,7 +38,9 @@ try:
 except ImportError:
     pass
 
-from . import CubeLoader
+
+# from . import CubeLoader
+# from ..executor import CubeLoader
 
 
 @attr.s
@@ -173,7 +175,6 @@ class MdxEngine(object):
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-
         cubes_folder_path = self.get_cube_path()
 
         if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
@@ -194,6 +195,13 @@ class MdxEngine(object):
         #     )
         # elif self.cube in self.csv_files_cubes:
         else:
+            # from ..executor import CubeLoader
+            # todo why from ..executor import CubeLoader
+            try:
+                from .spark.cube_loader import SparkCubeLoader as CubeLoader
+            except ImportError:
+                from .cube_loader import CubeLoader  # type: ignore
+
             cube_loader = CubeLoader(cubes_folder_path, sep)  # type: ignore
         return cube_loader.load_tables()
 
@@ -251,6 +259,15 @@ class MdxEngine(object):
         :param with_id_columns: start schema dataFrame contains id columns or not
         :return: star schema DataFrame
         """
+
+        # from ..executor import CubeLoader
+
+        # todo why from ..executor import CubeLoader
+        try:
+            from .spark.cube_loader import SparkCubeLoader as CubeLoader
+        except ImportError:
+            from .cube_loader import CubeLoader
+
         if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
             self.facts = self.cube_config["facts"]["table_name"]
             # measures in config-file only
