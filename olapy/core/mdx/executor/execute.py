@@ -39,10 +39,6 @@ except ImportError:
     pass
 
 
-# from . import CubeLoader
-# from ..executor import CubeLoader
-
-
 @attr.s
 class MdxEngine(object):
     """The main class for executing a query.
@@ -195,13 +191,9 @@ class MdxEngine(object):
         #     )
         # elif self.cube in self.csv_files_cubes:
         else:
-            # from ..executor import CubeLoader
-            # todo why from ..executor import CubeLoader
-            try:
-                from .spark.cube_loader import SparkCubeLoader as CubeLoader
-            except ImportError:
-                from .cube_loader import CubeLoader  # type: ignore
 
+            # force reimport CubeLoader every instance call (MdxEngine or SparkMdxEngine)
+            from ..executor import CubeLoader
             cube_loader = CubeLoader(cubes_folder_path, sep)  # type: ignore
         return cube_loader.load_tables()
 
@@ -259,14 +251,8 @@ class MdxEngine(object):
         :param with_id_columns: start schema dataFrame contains id columns or not
         :return: star schema DataFrame
         """
-
-        # from ..executor import CubeLoader
-
-        # todo why from ..executor import CubeLoader
-        try:
-            from .spark.cube_loader import SparkCubeLoader as CubeLoader
-        except ImportError:
-            from .cube_loader import CubeLoader
+        # force reimport CubeLoader every instance call (MdxEngine or SparkMdxEngine)
+        from ..executor import CubeLoader
 
         if (self.cube_config and self.cube_config["facts"] and self.cube == self.cube_config["name"]):
             self.facts = self.cube_config["facts"]["table_name"]
