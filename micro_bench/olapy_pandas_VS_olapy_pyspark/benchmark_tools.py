@@ -12,12 +12,11 @@ from spyne.server.wsgi import WsgiApplication
 from mdx_queries import query1, query3, query2
 
 from tests.test_xmla import WSGIServer
+
 from olapy.core.services.xmla import get_spyne_app
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -25,7 +24,6 @@ BENCH_CUBE = 'foodmart'
 
 
 def olapy_mdx_benchmark(queries, mdx_engine):
-    # mdx_engine.load_cube(BENCH_CUBE)
     return [Timer(lambda: mdx_engine.execute_mdx(query)).timeit(
         number=1)
         for query in queries]
@@ -66,7 +64,7 @@ def draw_table(bench_result, of='mdx'):
         table.add_row([
             'Query ' + (str(idx + 1)),
             bench_result['pandas'][of][idx],
-            bench_result['spark'][of][idx]
+            bench_result.get('spark', '')[of][idx]
         ])
     return table
 
@@ -91,7 +89,7 @@ def save_benchmark_result(bench_result):
 def plot_bar_chart(bench_result, of='mdx', label="Execution time", title="Execution time by mdx query",
                    out_file="img/pandas_spark_mdx_exec.png"):
     pandas_exec_time = bench_result['pandas'][of]
-    Spark_exec_time = bench_result['spark'][of]
+    Spark_exec_time = bench_result.get('spark', '')[of]
 
     ind = np.arange(len(pandas_exec_time))  # the x locations for the groups
     width = 0.35  # the width of the bars
