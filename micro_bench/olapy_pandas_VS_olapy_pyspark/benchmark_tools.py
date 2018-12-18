@@ -2,7 +2,9 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 import datetime
+import threading
 from timeit import Timer
+from wsgiref.simple_server import make_server
 
 from cpuinfo import cpuinfo
 from olap.xmla import xmla
@@ -10,8 +12,6 @@ from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
 
 from mdx_queries import query1, query3, query2
-
-from tests.test_xmla import WSGIServer
 
 from olapy.core.services.xmla import get_spyne_app
 
@@ -21,6 +21,35 @@ import matplotlib.pyplot as plt
 HOST = "127.0.0.1"
 PORT = 8000
 BENCH_CUBE = 'foodmart'
+
+
+class WSGIServer:
+    """HTTP server running a WSGI application in its own thread.
+
+    Copy/pasted from pytest_localserver w/ slight changes.
+    """
+
+    def __init__(self, host='127.0.0.1', port=8000, application=None, **kwargs):
+        self._server = make_server(host, port, application, **kwargs)
+        self.server_address = self._server.server_address
+
+        self.thread = threading.Thread(name=self.__class__, target=self._server.serve_forever)
+
+    def __del__(self):
+        self.stop()
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self._server.shutdown()
+        self.thread.join()
+
+    @property
+    def url(self):
+        host, port = self.server_address
+        proto = 'http'  # if self._server.ssl_context is None else 'https'
+        return '{}://{}:{}'.format(proto, host, port)
 
 
 def olapy_mdx_benchmark(queries, mdx_engine):

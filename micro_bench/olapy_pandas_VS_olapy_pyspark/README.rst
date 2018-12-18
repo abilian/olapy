@@ -73,6 +73,9 @@ Running Benchmarks by yourself
 
 To run benchmarks
 
+after installing OlaPy with *python setup.py install*
+
+
 from olapy_pandas_VS_olapy_pyspark directory
 
 1) pip install -r requirements.txt
