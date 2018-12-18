@@ -1,6 +1,16 @@
 Changelog for Olapy
 ===================
 
+0.6.5 (2018-12-18)
+------------------
+
+- Big Refactor and API cleanup
+- Python 3.7 support
+- Optionally use PySpark (beta)
+- Bonobo ETL is now optional in installation
+- OlaPy can run in browser with Pyodide
+- Many bugs fixes
+
 0.6.2 (2018-04-16)
 ------------------
 
