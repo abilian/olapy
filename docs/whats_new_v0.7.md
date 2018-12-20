@@ -1,6 +1,6 @@
 ## OlaPy 0.7, What’s New?
 
-v0.7 (May 15, 2018)
+v0.7 (Dec 19, 2018)
 This is a major release from 0.6 and includes a number of API changes, 
 new features, enhancements, and performance improvements along 
 with a large number of bug fixes.
