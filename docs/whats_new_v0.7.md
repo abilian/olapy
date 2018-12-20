@@ -55,7 +55,8 @@ For more information see [OlaPy-Pyodide](https://github.com/abilian/olapy/tree/m
 
 ---
 
-You can check some projects built on top of olapy
+**_You can check some projects built on top of OlaPy_**
+
 
 [OlaPy-Web](https://github.com/abilian/olapy-web)
 
