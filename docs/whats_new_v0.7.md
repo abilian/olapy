@@ -43,6 +43,7 @@ OlaPy v0.6 includes by default Bonobo ETL, starting from v0.7 Bonobo will be ins
 *If you have a single excel file containing your data and you want to use olapy, you can use bonobo-etl 
 [module](https://github.com/abilian/olapy/blob/master/olapy/etl/etl.py) included 
 in olapy package to extract data from your excel file, make transformations, and load then into olapy data folder.*
+[here](https://github.com/abilian/olapy/tree/master/demos/ETL) a demo of using olapy with bonobo-etl.
 
 * <a name="olapy_pyodide">OlaPy can run in browser with Pyodide</a>
 
