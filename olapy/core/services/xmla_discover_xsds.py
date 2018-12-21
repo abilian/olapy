@@ -771,3 +771,25 @@ discover_enumerators_xsd = """
    </xsd:sequence>
   </xsd:complexType>
  </xsd:schema>"""
+
+discover_keywords_xsd = """
+ <xsd:schema xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
+  targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:sql="urn:schemas-microsoft-com:xml-sql"
+  elementFormDefault="qualified">
+   <xsd:element name="root">
+    <xsd:complexType>
+     <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="row" type="row"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+  <xsd:complexType name="row">
+   <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+    <xsd:element name="Keyword" type="xsd:string" 
+     sql:field="Keyword"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:schema>"""

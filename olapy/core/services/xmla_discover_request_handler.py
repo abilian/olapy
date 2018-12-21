@@ -25,7 +25,7 @@ from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     mdschema_hierarchies_xsd, mdschema_kpis_xsd, mdschema_levels_xsd, \
     mdschema_measures_xsd, mdschema_measuresgroups_dimensions_xsd, \
     mdschema_measuresgroups_xsd, mdschema_members_xsd, \
-    mdschema_properties_properties_xsd, mdschema_sets_xsd
+    mdschema_properties_properties_xsd, mdschema_sets_xsd, discover_enumerators_xsd, discover_keywords_xsd
 
 
 # noinspection PyPep8Naming
@@ -181,12 +181,34 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     "xmlns:xsi":
                         "http://www.w3.org/2001/XMLSchema-instance",
                 }):
-                xml.write(discover_schema_rowsets_xsd)
+                xml.write(discover_enumerators_xsd)
 
                 with xml.row:
                     xml.EnumName('ProviderType')
                     xml.ElementName('TDP')
                     xml.EnumType('string')
+
+        return str(xml)
+
+    def discover_keywords_response(self, request):
+        """
+        todo
+        """
+
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                }):
+                xml.write(discover_keywords_xsd)
+                with xml.row:
+                    xml.Keyword('aggregate')
+                    xml.Keyword('ancestors')
 
         return str(xml)
 
