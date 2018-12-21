@@ -404,7 +404,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :return:
         """
         if (request.Properties.PropertyList.Content == "SchemaData"
-            and request.Properties.PropertyList.Format == "Tabular"):
+            or request.Properties.PropertyList.Format == "Tabular"):
 
             rows = discover_literals_response_rows
 
