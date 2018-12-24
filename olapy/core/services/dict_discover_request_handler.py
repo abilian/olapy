@@ -121,7 +121,7 @@ class DictDiscoverReqHandler():
         if request.Restrictions.RestrictionList.PropertyName == "Catalog":
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(
-                    request.Properties.PropertyList.Catalog.replace("[","",).replace("]","",), )
+                    request.Properties.PropertyList.Catalog.replace("[", "", ).replace("]", "", ), )
                 value = self.selected_cube
             else:
                 value = self.cubes[0]

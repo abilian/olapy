@@ -742,10 +742,10 @@ mdschema_members_xsd = """
 
 discover_enumerators_xsd = """
  <xsd:schema xmlns="urn:schemas-microsoft-com:xml-analysis:rowset"
-  targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:sql="urn:schemas-microsoft-com:xml-sql"  
+  xmlns:sql="urn:schemas-microsoft-com:xml-sql"
   elementFormDefault="qualified">
   <xsd:element name="root">
    <xsd:complexType>
@@ -756,17 +756,17 @@ discover_enumerators_xsd = """
   </xsd:element>
   <xsd:complexType  name="row">
    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-    <xsd:element name="EnumName" type="xsd:string" 
+    <xsd:element name="EnumName" type="xsd:string"
      sql:field="EnumName"/>
     <xsd:element name="EnumDescription" type="xsd:string"
      sql:field="EnumDescription" minOccurs="0"/>
-    <xsd:element name="ElementName" type="xsd:string" 
+    <xsd:element name="ElementName" type="xsd:string"
      sql:field="ElementName"/>
-    <xsd:element name="ElementDescription" type="xsd:string" 
+    <xsd:element name="ElementDescription" type="xsd:string"
      sql:field="ElementDescription" minOccurs="0"/>
-    <xsd:element name="ElementValue" type="xsd:string" 
+    <xsd:element name="ElementValue" type="xsd:string"
      sql:field="ElementValue" minOccurs="0"/>
-    <xsd:element name="EnumType" type="xsd:string" 
+    <xsd:element name="EnumType" type="xsd:string"
      sql:field="EnumType"/>
    </xsd:sequence>
   </xsd:complexType>
@@ -788,7 +788,7 @@ discover_keywords_xsd = """
    </xsd:element>
   <xsd:complexType name="row">
    <xsd:sequence maxOccurs="unbounded" minOccurs="0">
-    <xsd:element name="Keyword" type="xsd:string" 
+    <xsd:element name="Keyword" type="xsd:string"
      sql:field="Keyword"/>
    </xsd:sequence>
   </xsd:complexType>
