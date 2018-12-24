@@ -502,21 +502,21 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
-            selected_cube
-            or request.Properties.PropertyList.Catalog is not None):
-            self.change_cube(request.Properties.PropertyList.Catalog)
-            xml = xmlwitch.Builder()
+        xml = xmlwitch.Builder()
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi":
-                            "http://www.w3.org/2001/XMLSchema-instance",
-                    }):
-                    xml.write(mdschema_cubes_xsd)
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                }):
+                xml.write(mdschema_cubes_xsd)
+                if (request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                    or request.Properties.PropertyList.Catalog is not None):
+                    self.change_cube(request.Properties.PropertyList.Catalog)
+
                     with xml.row:
                         xml.CATALOG_NAME(self.selected_cube)
                         xml.CUBE_NAME(self.selected_cube)
@@ -531,8 +531,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         xml.IS_SQL_ENABLED("false")
                         xml.CUBE_CAPTION(self.selected_cube)
                         xml.CUBE_SOURCE("1")
-
-            return str(xml)
+        return str(xml)
 
     def dbschema_tables_response(self, request):
         """
@@ -603,24 +602,24 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (request.Restrictions.RestrictionList.CUBE_NAME == self.
-            selected_cube and request.Restrictions.RestrictionList.
-            CATALOG_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None):
+        xml = xmlwitch.Builder()
 
-            self.change_cube(request.Properties.PropertyList.Catalog)
-            ord = 1
-            xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                }):
+                xml.write(mdschema_dimensions_xsd)
+                if (request.Restrictions.RestrictionList.CUBE_NAME == self.
+                    selected_cube and request.Restrictions.RestrictionList.
+                    CATALOG_NAME == self.selected_cube
+                    and request.Properties.PropertyList.Catalog is not None):
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi":
-                            "http://www.w3.org/2001/XMLSchema-instance",
-                    }):
-                    xml.write(mdschema_dimensions_xsd)
+                    self.change_cube(request.Properties.PropertyList.Catalog)
+                    ord = 1
                     for tables in self.executor.get_all_tables_names(
                         ignore_fact=True, ):
                         with xml.row:
@@ -656,7 +655,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         xml.DIMENSION_UNIQUE_SETTINGS("1")
                         xml.DIMENSION_IS_VISIBLE("true")
 
-            return str(xml)
+        return str(xml)
 
     def mdschema_hierarchies_response(self, request):
         """
@@ -1025,3 +1024,98 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         xml.IS_DATAMEMBER("false")
 
             return str(xml)
+
+    def discover_instances_response(self, request):
+        """
+        todo
+        :param request:
+        :return:
+        """
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                    }):
+                xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
+
+    def dmschema_mining_models_response(self, request):
+        """
+        todo
+        :param request:
+        :return:
+        """
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                    }):
+                xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
+
+    def mdschema_actions_response(self, request):
+        """
+        todo
+        :param request:
+        :return:
+        """
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                    }):
+                xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
+
+    def mdschema_functions_response(self, request):
+        """
+        todo
+        :param request:
+        :return:
+        """
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                    }):
+                xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
+
+    def mdschema_input_datasources_response(self, request):
+        """
+        todo
+        :param request:
+        :return:
+        """
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                    **{
+                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                        "xmlns:xsi":
+                        "http://www.w3.org/2001/XMLSchema-instance",
+                    }):
+                xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
