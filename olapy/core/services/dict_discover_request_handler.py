@@ -67,7 +67,7 @@ class DictDiscoverReqHandler():
         }
 
     @staticmethod
-    def _get_props(
+    def _get_properties(
         xsd,
         PropertyName,
         PropertyDescription,
@@ -117,101 +117,92 @@ class DictDiscoverReqHandler():
 
         return response
 
+    def _get_properties_by_restrictions(self, request):
+        if request.Restrictions.RestrictionList.PropertyName == "Catalog":
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(
+                    request.Properties.PropertyList.Catalog.replace("[","",).replace("]","",), )
+                value = self.selected_cube
+            else:
+                value = self.cubes[0]
+
+            return self._get_properties(
+                discover_preperties_xsd,
+                "Catalog",
+                "Catalog",
+                "string",
+                "ReadWrite",
+                "false",
+                value,
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "ServerName":
+            return self._get_properties(
+                discover_preperties_xsd,
+                "ServerName",
+                "ServerName",
+                "string",
+                "Read",
+                "false",
+                "Mouadh",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "ProviderVersion":
+            return self._get_properties(
+                discover_preperties_xsd,
+                "ProviderVersion",
+                "ProviderVersion",
+                "string",
+                "Read",
+                "false",
+                "0.02  08-Mar-2016 08:41:28 GMT",
+            )
+
+        elif (request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries"):
+
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(request.Properties.PropertyList.Catalog)
+            return self._get_properties(
+                discover_preperties_xsd,
+                "MdpropMdxSubqueries",
+                "MdpropMdxSubqueries",
+                "int",
+                "Read",
+                "false",
+                "15",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxDrillFunctions":
+
+            if request.Properties.PropertyList.Catalog is not None:
+                self.change_cube(request.Properties.PropertyList.Catalog)
+            return self._get_properties(
+                discover_preperties_xsd,
+                "MdpropMdxDrillFunctions",
+                "MdpropMdxDrillFunctions",
+                "int",
+                "Read",
+                "false",
+                "3",
+            )
+
+        elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxNamedSets":
+            return self._get_properties(
+                discover_preperties_xsd,
+                "MdpropMdxNamedSets",
+                "MdpropMdxNamedSets",
+                "int",
+                "Read",
+                "false",
+                "15",
+            )
+
+        return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
+
     def discover_properties_response(self, request):
-        """
-        Returns a list of information and values about the standard and provider-specific properties that are supported\
-        by OlaPy for the specified data source
-        :param request:
-        :return:
-        """
-
         if request.Restrictions.RestrictionList:
-            if request.Restrictions.RestrictionList.PropertyName == "Catalog":
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_cube(
-                        request.Properties.PropertyList.Catalog.replace(
-                            "[",
-                            "",
-                        ).replace(
-                            "]",
-                            "",
-                        ), )
-                    value = self.selected_cube
-                else:
-                    value = self.cubes[0]
-
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "Catalog",
-                    "Catalog",
-                    "string",
-                    "ReadWrite",
-                    "false",
-                    value,
-                )
-
-            elif request.Restrictions.RestrictionList.PropertyName == "ServerName":
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "ServerName",
-                    "ServerName",
-                    "string",
-                    "Read",
-                    "false",
-                    "Mouadh",
-                )
-
-            elif request.Restrictions.RestrictionList.PropertyName == "ProviderVersion":
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "ProviderVersion",
-                    "ProviderVersion",
-                    "string",
-                    "Read",
-                    "false",
-                    "0.02  08-Mar-2016 08:41:28 GMT",
-                )
-
-            elif (request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries"):
-
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_cube(request.Properties.PropertyList.Catalog)
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "MdpropMdxSubqueries",
-                    "MdpropMdxSubqueries",
-                    "int",
-                    "Read",
-                    "false",
-                    "15",
-                )
-
-            elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxDrillFunctions":
-
-                if request.Properties.PropertyList.Catalog is not None:
-                    self.change_cube(request.Properties.PropertyList.Catalog)
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "MdpropMdxDrillFunctions",
-                    "MdpropMdxDrillFunctions",
-                    "int",
-                    "Read",
-                    "false",
-                    "3",
-                )
-
-            elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxNamedSets":
-                return self._get_props(
-                    discover_preperties_xsd,
-                    "MdpropMdxNamedSets",
-                    "MdpropMdxNamedSets",
-                    "int",
-                    "Read",
-                    "false",
-                    "15",
-                )
-
-        return self._get_props(discover_preperties_xsd, "", "", "", "", "", "")
+            return self._get_properties_by_restrictions(request)
+        return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
 
     def discover_schema_rowsets_response(self, request):
 

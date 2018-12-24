@@ -99,7 +99,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     @staticmethod
-    def _get_props(
+    def _get_properties(
         xsd,
         PropertyName,
         PropertyDescription,
