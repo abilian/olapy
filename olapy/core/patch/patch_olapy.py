@@ -21,18 +21,11 @@ def _get_measures(dataframes, mdx_engine):
     # from postgres and oracle databases , all tables names are lowercase
     # col.lower()[-2:] != 'id' to ignore any id column
     facts_df = dataframes[mdx_engine.facts]
-    not_id_columns = [
-        column for column in facts_df.columns
-        if "id" not in column
-    ]
-    cleaned_facts = mdx_engine.clean_data(
-        facts_df,
-        not_id_columns,
-    )
+    not_id_columns = [column for column in facts_df.columns if "id" not in column]
+    cleaned_facts = mdx_engine.clean_data(facts_df, not_id_columns)
     return [
         col
-        for col in cleaned_facts.select_dtypes(include=[np.number],
-                                               ).columns
+        for col in cleaned_facts.select_dtypes(include=[np.number]).columns
         if col.lower()[-2:] != "id"
     ]
 
@@ -56,12 +49,12 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
 
     star_schema_df = mdx_engine.clean_data(fusion, mdx_engine.measures)
 
-    return star_schema_df[[
-        col for col in fusion.columns if col.lower()[-3:] != "_id"
-    ]]
+    return star_schema_df[[col for col in fusion.columns if col.lower()[-3:] != "_id"]]
 
 
-def patch_mdx_engine(mdx_engine, dataframes, facts_table_name='Facts', cube_name='sales'):
+def patch_mdx_engine(
+    mdx_engine, dataframes, facts_table_name="Facts", cube_name="sales"
+):
     mdx_engine.csv_files_cubes.append(cube_name)
 
     mdx_engine.cube = cube_name
@@ -79,4 +72,6 @@ def patch_mdx_engine(mdx_engine, dataframes, facts_table_name='Facts', cube_name
         mdx_engine.selected_measures = [mdx_engine.measures[0]]
     # construct star_schema
     if mdx_engine.tables_loaded:
-        mdx_engine.star_schema_dataframe = _get_star_schema_dataframe(dataframes, mdx_engine)
+        mdx_engine.star_schema_dataframe = _get_star_schema_dataframe(
+            dataframes, mdx_engine
+        )

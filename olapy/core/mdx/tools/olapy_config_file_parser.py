@@ -2,8 +2,7 @@
 OlaPy config file parser object contains credentials that allows olapy to access database \
 (of course this happens only if SQLALCHEMY_DATABASE_URI Environment variable is not specified
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 
@@ -26,9 +25,7 @@ class DbConfigParser:
 
             home_directory = expanduser("~")
             self.config_file_path = os.path.join(
-                home_directory,
-                "olapy-data",
-                "olapy-config.yml",
+                home_directory, "olapy-data", "olapy-config.yml"
             )
         else:
             self.config_file_path = config_file_path

@@ -3,8 +3,7 @@
 Do the same thing as MdxEngine, but with onle one file or database table
 (no need for a star schema tables).
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import numpy as np
 import pandas as pd
@@ -21,16 +20,13 @@ class MdxEngineLite(MdxEngine):
 
     """
 
-    def __init__(self,
-                 direct_table_or_file,
-                 columns=None,
-                 measures=None,
-                 sep=";",
-                 **kwargs):
+    def __init__(
+        self, direct_table_or_file, columns=None, measures=None, sep=";", **kwargs
+    ):
         MdxEngine.__init__(self, kwargs)
         self.cube = direct_table_or_file
         self.sep = sep
-        self._columns = columns,
+        self._columns = (columns,)
         if measures:
             self.measures = measures
         else:
@@ -64,8 +60,7 @@ class MdxEngineLite(MdxEngine):
         self.star_schema_dataframe = self.tables_loaded[table_name]
         # remove measures from
         self.tables_loaded[table_name] = self.tables_loaded[table_name].drop(
-            self.measures,
-            axis=1,
+            self.measures, axis=1
         )
 
     def get_measures(self):
@@ -74,9 +69,7 @@ class MdxEngineLite(MdxEngine):
         """
 
         table = pd.read_csv(self.cube, sep=self.sep)
-        not_id_columns = [
-            column for column in table.columns if "id" not in column
-        ]
+        not_id_columns = [column for column in table.columns if "id" not in column]
         cleaned_facts = self.clean_data(table, not_id_columns)
         return [
             col
@@ -93,25 +86,21 @@ class MdxEngineLite(MdxEngine):
 
         tables = {}
         print("Connection string = " + str(self.sqla_engine.url))
-        results = self.sqla_engine.execution_options(
-            stream_results=True, ).execute(
-                "SELECT * FROM {}".format(self.cube), )
+        results = self.sqla_engine.execution_options(stream_results=True).execute(
+            "SELECT * FROM {}".format(self.cube)
+        )
         # Fetch all the results of the query
         if self.columns:
-            value = pd.DataFrame(
-                iter(results),
-                columns=results.keys(),
-            )[self.columns]
+            value = pd.DataFrame(iter(results), columns=results.keys())[self.columns]
         else:
             value = pd.DataFrame(
-                iter(results),
-                columns=results.keys(),
+                iter(results), columns=results.keys()
             )  # Pass results as an iterator
         # with string_folding_wrapper we loose response time
         # value = pd.DataFrame(string_folding_wrapper(results),columns=results.keys())
-        tables[self.cube] = value[[
-            col for col in value.columns if col.lower()[-3:] != "_id"
-        ]]
+        tables[self.cube] = value[
+            [col for col in value.columns if col.lower()[-3:] != "_id"]
+        ]
 
         return tables
 
@@ -127,9 +116,9 @@ class MdxEngineLite(MdxEngine):
             value = pd.read_csv(self.cube, sep=self.sep)[self.columns]
         else:
             value = pd.read_csv(self.cube, sep=self.sep)
-        tables[table_name] = value[[
-            col for col in value.columns if col.lower()[-3:] != "_id"
-        ]]
+        tables[table_name] = value[
+            [col for col in value.columns if col.lower()[-3:] != "_id"]
+        ]
 
         return tables
 

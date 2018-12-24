@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 
@@ -33,8 +32,7 @@ class CubeLoaderCustom(CubeLoader):
         else:
             # load facts table
             table = psql.read_sql_query(
-                "SELECT * FROM {}".format(table_name),
-                self.sqla_engine,
+                "SELECT * FROM {}".format(table_name), self.sqla_engine
             )
         return table
 
@@ -61,16 +59,13 @@ class CubeLoaderCustom(CubeLoader):
 
                 # rename columns if value not None
                 df.rename(
-                    columns=({
-                        k: v
-                        for k, v in dimension["columns"].items() if v
-                    }),
+                    columns=({k: v for k, v in dimension["columns"].items() if v}),
                     inplace=True,
                 )
 
-            tables[table_name] = df[[
-                col for col in df.columns if col.lower()[-2:] != "id"
-            ]]
+            tables[table_name] = df[
+                [col for col in df.columns if col.lower()[-2:] != "id"]
+            ]
 
         return tables
 
@@ -84,8 +79,7 @@ class CubeLoaderCustom(CubeLoader):
         for fact_key, dimension_and_key in self.cube_config["facts"]["keys"].items():
             if self.cube_config["source"].upper() == "CSV":
                 file = os.path.join(
-                    self.cube_path,
-                    dimension_and_key.split(".")[0] + ".csv",
+                    self.cube_path, dimension_and_key.split(".")[0] + ".csv"
                 )
                 # with extension or not
                 if not os.path.isfile(file):
@@ -180,6 +174,4 @@ class CubeLoaderCustom(CubeLoader):
                 suffixes=("", "_y"),
             )
 
-        return fusion[[
-            column for column in all_columns if "id" != column[-2:]
-        ]]
+        return fusion[[column for column in all_columns if "id" != column[-2:]]]

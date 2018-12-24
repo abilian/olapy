@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from timeit import Timer
 
@@ -25,4 +24,5 @@ class MicBench:
         :return: float execution time in seconds
         """
         return Timer(lambda: connection.Execute(query, Catalog=cube)).timeit(
-            number=number)
+            number=number
+        )

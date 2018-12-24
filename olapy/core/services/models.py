@@ -3,8 +3,7 @@
 Models to construct xmla responses with Spyne
 """
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from spyne import ComplexModel, Integer, Unicode, XmlAttribute
 
@@ -17,16 +16,16 @@ class Tuple(object):
     """Tuple description (used by spyne)."""
 
     def __init__(
-            self,
-            Hierarchy,
-            UName,
-            Caption,
-            LName,
-            LNum,
-            DisplayInfo,
-            PARENT_UNIQUE_NAME,
-            HIERARCHY_UNIQUE_NAME,
-            Value,
+        self,
+        Hierarchy,
+        UName,
+        Caption,
+        LName,
+        LNum,
+        DisplayInfo,
+        PARENT_UNIQUE_NAME,
+        HIERARCHY_UNIQUE_NAME,
+        Value,
     ):
         self.hierarchy = Hierarchy
         self.uname = UName

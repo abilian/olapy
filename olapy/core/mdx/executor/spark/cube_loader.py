@@ -9,11 +9,10 @@ from ..cube_loader import CubeLoader
 
 from pyspark.sql import DataFrame, SparkSession
 
-spark = SparkSession.builder.appName('olapy').getOrCreate()
+spark = SparkSession.builder.appName("olapy").getOrCreate()
 
 
 class SparkCubeLoader(CubeLoader):
-
     def load_tables(self):
         # type: () -> Dict[Text, DataFrame]
         """
@@ -26,10 +25,14 @@ class SparkCubeLoader(CubeLoader):
             # to remove file extension ".csv"
             table_name = os.path.splitext(file)[0]
             value = spark.read.csv(
-                os.path.join(self.cube_path, file), header=True, sep=self.sep, inferSchema=True)
-            tables[table_name] = value[[
-                col for col in value.columns if col.lower()[-3:] != "_id"
-            ]]
+                os.path.join(self.cube_path, file),
+                header=True,
+                sep=self.sep,
+                inferSchema=True,
+            )
+            tables[table_name] = value[
+                [col for col in value.columns if col.lower()[-3:] != "_id"]
+            ]
         return tables
 
     def construct_star_schema(self, facts):
@@ -41,11 +44,19 @@ class SparkCubeLoader(CubeLoader):
         """
         # loading facts table
         fusion = spark.read.csv(
-            os.path.join(self.cube_path, facts + ".csv"), header=True, sep=self.sep, inferSchema=True)
+            os.path.join(self.cube_path, facts + ".csv"),
+            header=True,
+            sep=self.sep,
+            inferSchema=True,
+        )
         for file_name in os.listdir(self.cube_path):
             try:
                 df = spark.read.csv(
-                    os.path.join(self.cube_path, file_name), header=True, sep=self.sep, inferSchema=True)
+                    os.path.join(self.cube_path, file_name),
+                    header=True,
+                    sep=self.sep,
+                    inferSchema=True,
+                )
                 common_columns = list(set(df.columns).intersection(fusion.columns))
                 fusion = fusion.join(df, common_columns)
             except BaseException:

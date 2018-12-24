@@ -3,8 +3,7 @@
 Parser for MDX queries, and Break it in parts.
 """
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import regex
 
@@ -12,8 +11,10 @@ import regex
 
 # FIXME: make this regex more readable (split it)
 REGEX = regex.compile(
-    "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*" +
-    '\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ ' + "]+\])*\.?((Members)|(\[Q\d\]))?)")
+    "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*"
+    + '\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ '
+    + "]+\])*\.?((Members)|(\[Q\d\]))?)"
+)
 
 
 class Parser(object):
@@ -82,16 +83,18 @@ class Parser(object):
             stop = query.index(stop)
 
         # clean the query (remove All, Members...)
-        return [[
-            tup_att.replace("All ", "").replace("[", "").replace("]", "")
-            for tup_att in tup[0].replace(".Members", "").replace(
-                ".MEMBERS",
-                "",
-            ).split("].[", )
-            if tup_att
-        ]
+        return [
+            [
+                tup_att.replace("All ", "").replace("[", "").replace("]", "")
+                for tup_att in tup[0]
+                .replace(".Members", "")
+                .replace(".MEMBERS", "")
+                .split("].[")
+                if tup_att
+            ]
             for tup in REGEX.findall(query[start:stop])
-            if len(tup[0].split("].[")) > 1]
+            if len(tup[0].split("].[")) > 1
+        ]
 
     def decorticate_query(self, query):
         """Get all tuples that exists in the MDX Query by axes.
@@ -203,8 +206,7 @@ class Parser(object):
         :return: Separated tuples as list.
         """
         split_group = group.replace("\n", "").replace("\t", "").split("],")
-        return list(
-            map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
+        return list(map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
 
     def get_nested_select(self):
         """

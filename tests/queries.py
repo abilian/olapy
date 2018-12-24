@@ -1,4 +1,4 @@
-CUBE = 'sales'
+CUBE = "sales"
 
 query1 = """
     SELECT

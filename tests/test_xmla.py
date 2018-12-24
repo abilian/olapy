@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 import threading
@@ -61,11 +60,13 @@ class WSGIServer:
     Copy/pasted from pytest_localserver w/ slight changes.
     """
 
-    def __init__(self, host='127.0.0.1', port=8000, application=None, **kwargs):
+    def __init__(self, host="127.0.0.1", port=8000, application=None, **kwargs):
         self._server = make_server(host, port, application, **kwargs)
         self.server_address = self._server.server_address
 
-        self.thread = threading.Thread(name=self.__class__, target=self._server.serve_forever)
+        self.thread = threading.Thread(
+            name=self.__class__, target=self._server.serve_forever
+        )
 
     def __del__(self):
         self.stop()
@@ -80,29 +81,30 @@ class WSGIServer:
     @property
     def url(self):
         host, port = self.server_address
-        proto = 'http'  # if self._server.ssl_context is None else 'https'
-        return '{}://{}:{}'.format(proto, host, port)
+        proto = "http"  # if self._server.ssl_context is None else 'https'
+        return "{}://{}:{}".format(proto, host, port)
 
 
 @pytest.fixture(scope="module")
 def conn():
-    engine = sqlalchemy.create_engine('sqlite://')
+    engine = sqlalchemy.create_engine("sqlite://")
     create_insert(engine)
-    executor = MdxEngine(sqla_engine=engine, source_type='db')
-    executor.load_cube(cube_name='main', fact_table_name='facts')
+    executor = MdxEngine(sqla_engine=engine, source_type="db")
+    executor.load_cube(cube_name="main", fact_table_name="facts")
     discover_request_hanlder = XmlaDiscoverReqHandler(executor)
     execute_request_hanlder = XmlaExecuteReqHandler(executor)
 
     print("spawning server")
     application = Application(
         [XmlaProviderService],
-        'urn:schemas-microsoft-com:xml-analysis',
-        in_protocol=Soap11(validator='soft'),
-        out_protocol=Soap11(validator='soft'),
+        "urn:schemas-microsoft-com:xml-analysis",
+        in_protocol=Soap11(validator="soft"),
+        out_protocol=Soap11(validator="soft"),
         config={
-            'discover_request_hanlder': discover_request_hanlder,
-            'execute_request_hanlder': execute_request_hanlder
-        })
+            "discover_request_hanlder": discover_request_hanlder,
+            "execute_request_hanlder": execute_request_hanlder,
+        },
+    )
 
     wsgi_application = WsgiApplication(application)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
@@ -123,29 +125,29 @@ def test_connection(conn):
 
 def test_discover_properties(conn):
     discover = conn.Discover(
-        'DISCOVER_PROPERTIES',
-        properties={'LocaleIdentifier': '1036'},
-        restrictions={'PropertyName': 'Catalog'},
+        "DISCOVER_PROPERTIES",
+        properties={"LocaleIdentifier": "1036"},
+        restrictions={"PropertyName": "Catalog"},
     )[0]
-    assert discover['PropertyName'] == "Catalog"
-    assert discover['PropertyDescription'] == "Catalog"
-    assert discover['PropertyType'] == "string"
-    assert discover['PropertyAccessType'] == "ReadWrite"
-    assert discover['IsRequired'] == "false"
+    assert discover["PropertyName"] == "Catalog"
+    assert discover["PropertyDescription"] == "Catalog"
+    assert discover["PropertyType"] == "string"
+    assert discover["PropertyAccessType"] == "ReadWrite"
+    assert discover["IsRequired"] == "false"
     # assert discover['Value'] == "olapy Unspecified Catalog" not necessary
 
 
 def test_mdschema_cubes(conn):
     discover = conn.Discover(
         "MDSCHEMA_CUBES",
-        restrictions={'CUBE_NAME': 'main'},
-        properties={'Catalog': 'main'},
+        restrictions={"CUBE_NAME": "main"},
+        properties={"Catalog": "main"},
     )[0]
-    assert discover['CATALOG_NAME'] == "main"
-    assert discover['CUBE_NAME'] == "main"
-    assert discover['CUBE_TYPE'] == "CUBE"
-    assert discover['IS_DRILLTHROUGH_ENABLED'] == "true"
-    assert discover['CUBE_CAPTION'] == "main"
+    assert discover["CATALOG_NAME"] == "main"
+    assert discover["CUBE_NAME"] == "main"
+    assert discover["CUBE_TYPE"] == "CUBE"
+    assert discover["IS_DRILLTHROUGH_ENABLED"] == "true"
+    assert discover["CUBE_CAPTION"] == "main"
 
 
 def test_query1(conn):
@@ -162,8 +164,8 @@ def test_query1(conn):
     """
 
     res = conn.Execute(cmd, Catalog="main")
-    assert res.cellmap[0]['_CellOrdinal'] == '0'
-    assert res.cellmap[0]['Value'] == 1023
+    assert res.cellmap[0]["_CellOrdinal"] == "0"
+    assert res.cellmap[0]["Value"] == 1023
 
 
 def test_query2(conn):
@@ -201,8 +203,8 @@ def test_query2(conn):
     columns = []
     values = []
     for cell in res.cellmap.items():
-        columns.append(res.getAxisTuple('Axis0')[cell[0]])
-        values.append(cell[1]['Value'])
+        columns.append(res.getAxisTuple("Axis0")[cell[0]])
+        values.append(cell[1]["Value"])
     assert values == [768, 768, 768, 255, 4, 3, 2, 1, 248]
 
     expected = []
@@ -215,7 +217,9 @@ def test_query2(conn):
             LNum="0",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -225,7 +229,9 @@ def test_query2(conn):
             LNum="1",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[America]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -235,7 +241,9 @@ def test_query2(conn):
             LNum="2",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[America].[United States]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -245,7 +253,9 @@ def test_query2(conn):
             LNum="0",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -255,7 +265,9 @@ def test_query2(conn):
             LNum="1",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -265,7 +277,9 @@ def test_query2(conn):
             LNum="1",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -275,7 +289,9 @@ def test_query2(conn):
             LNum="2",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe].[Spain]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -285,7 +301,9 @@ def test_query2(conn):
             LNum="2",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe].[Spain]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     expected.append(
         Member(
             _Hierarchy="[geography].[geography]",
@@ -295,7 +313,9 @@ def test_query2(conn):
             LNum="1",
             DisplayInfo="131076",
             PARENT_UNIQUE_NAME="[geography].[geography].[continent].[Europe]",
-            HIERARCHY_UNIQUE_NAME="[geography].[geography]"))
+            HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+        )
+    )
     assert [Member(**dict(co)) for co in columns] == expected
 
 
@@ -331,68 +351,78 @@ def test_query3(conn):
     columns = []
     values = []
     for cell in res.cellmap.items():
-        columns.append(res.getAxisTuple('Axis0')[cell[0]])
-        values.append(cell[1]['Value'])
+        columns.append(res.getAxisTuple("Axis0")[cell[0]])
+        values.append(cell[1]["Value"])
 
     expected = []
-    expected.append([
-        Member(
-            _Hierarchy='[geography].[geography]',
-            UName='[geography].[geography].[continent].[America]',
-            Caption='America',
-            LName='[geography].[geography].[continent]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[geography].[geography].[continent]',
-            HIERARCHY_UNIQUE_NAME='[geography].[geography]'),
-        Member(
-            _Hierarchy='[product].[product]',
-            UName='[product].[product].[company].[Crazy Development]',
-            Caption='Crazy Development',
-            LName='[product].[product].[company]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[product].[product].[company]',
-            HIERARCHY_UNIQUE_NAME='[product].[product]'),
-        Member(
-            _Hierarchy='[time].[time]',
-            UName='[time].[time].[year].[2010]',
-            Caption='2010',
-            LName='[time].[time].[year]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[time].[time].[year]',
-            HIERARCHY_UNIQUE_NAME='[time].[time]')
-    ])
-    expected.append([
-        Member(
-            _Hierarchy='[geography].[geography]',
-            UName='[geography].[geography].[continent].[Europe]',
-            Caption='Europe',
-            LName='[geography].[geography].[continent]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[geography].[geography].[continent]',
-            HIERARCHY_UNIQUE_NAME='[geography].[geography]'),
-        Member(
-            _Hierarchy='[product].[product]',
-            UName='[product].[product].[company].[Crazy Development]',
-            Caption='Crazy Development',
-            LName='[product].[product].[company]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[product].[product].[company]',
-            HIERARCHY_UNIQUE_NAME='[product].[product]'),
-        Member(
-            _Hierarchy='[time].[time]',
-            UName='[time].[time].[year].[2010]',
-            Caption='2010',
-            LName='[time].[time].[year]',
-            LNum='0',
-            DisplayInfo='131076',
-            PARENT_UNIQUE_NAME='[time].[time].[year]',
-            HIERARCHY_UNIQUE_NAME='[time].[time]')
-    ])
+    expected.append(
+        [
+            Member(
+                _Hierarchy="[geography].[geography]",
+                UName="[geography].[geography].[continent].[America]",
+                Caption="America",
+                LName="[geography].[geography].[continent]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
+                HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+            ),
+            Member(
+                _Hierarchy="[product].[product]",
+                UName="[product].[product].[company].[Crazy Development]",
+                Caption="Crazy Development",
+                LName="[product].[product].[company]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[product].[product].[company]",
+                HIERARCHY_UNIQUE_NAME="[product].[product]",
+            ),
+            Member(
+                _Hierarchy="[time].[time]",
+                UName="[time].[time].[year].[2010]",
+                Caption="2010",
+                LName="[time].[time].[year]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[time].[time].[year]",
+                HIERARCHY_UNIQUE_NAME="[time].[time]",
+            ),
+        ]
+    )
+    expected.append(
+        [
+            Member(
+                _Hierarchy="[geography].[geography]",
+                UName="[geography].[geography].[continent].[Europe]",
+                Caption="Europe",
+                LName="[geography].[geography].[continent]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[geography].[geography].[continent]",
+                HIERARCHY_UNIQUE_NAME="[geography].[geography]",
+            ),
+            Member(
+                _Hierarchy="[product].[product]",
+                UName="[product].[product].[company].[Crazy Development]",
+                Caption="Crazy Development",
+                LName="[product].[product].[company]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[product].[product].[company]",
+                HIERARCHY_UNIQUE_NAME="[product].[product]",
+            ),
+            Member(
+                _Hierarchy="[time].[time]",
+                UName="[time].[time].[year].[2010]",
+                Caption="2010",
+                LName="[time].[time].[year]",
+                LNum="0",
+                DisplayInfo="131076",
+                PARENT_UNIQUE_NAME="[time].[time].[year]",
+                HIERARCHY_UNIQUE_NAME="[time].[time]",
+            ),
+        ]
+    )
 
     for idx, item in enumerate(columns):
         assert [Member(**dict(co)) for co in item] == expected[idx]
@@ -453,12 +483,30 @@ def test_query4(conn):
     columns = []
     values = []
     for cell in res.cellmap.items():
-        columns.append(res.getAxisTuple('Axis0')[cell[0]])
-        values.append(cell[1]['Value'])
+        columns.append(res.getAxisTuple("Axis0")[cell[0]])
+        values.append(cell[1]["Value"])
 
     assert values == [
-        768, 255, 4, 3, 248, 768, 255, 4, 3, 248, 576, 1304, 2, 925, 377, 576,
-        1304, 2, 925, 377
+        768,
+        255,
+        4,
+        3,
+        248,
+        768,
+        255,
+        4,
+        3,
+        248,
+        576,
+        1304,
+        2,
+        925,
+        377,
+        576,
+        1304,
+        2,
+        925,
+        377,
     ]
 
     strr = ""

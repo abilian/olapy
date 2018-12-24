@@ -393,8 +393,7 @@ discover_schema_rowsets_response_rows = [
                 "SET_NAME",
                 "SCOPE",
             ],
-            "restriction_types":
-                ["string", "string", "string", "string", "int"],
+            "restriction_types": ["string", "string", "string", "string", "int"],
         },
         "RestrictionsMask": "31",
     },

@@ -1,7 +1,6 @@
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import importlib
 import pandas as pd
@@ -9,11 +8,18 @@ import pandas as pd
 from pprint import pprint
 from ..mdx.executor import MdxEngine
 from ..patch.patch_olapy import patch_mdx_engine
-from ..services.request_properties_models import DiscoverRequest, Restriction, Property, Restrictionlist, \
-    Propertieslist, ExecuteRequest, Command
+from ..services.request_properties_models import (
+    DiscoverRequest,
+    Restriction,
+    Property,
+    Restrictionlist,
+    Propertieslist,
+    ExecuteRequest,
+    Command,
+)
 
 
-class XmlaProviderLib():
+class XmlaProviderLib:
     """
     XmlaProviderLib tu use olapy as library without running any server (no spyne, no wsgi...)
     """
@@ -51,7 +57,10 @@ class XmlaProviderLib():
         mdx_query = request.Command.Statement.encode().decode("utf8")
 
         # Hierarchize
-        if all(key in mdx_query for key in ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]):
+        if all(
+            key in mdx_query
+            for key in ["WITH MEMBER", "strtomember", "[Measures].[XL_SD0]"]
+        ):
             convert2formulas = True
         else:
             convert2formulas = False
@@ -61,7 +70,13 @@ class XmlaProviderLib():
         return self.execute_request_hanlder.generate_response()
 
 
-def get_response(xmla_request_params, dataframes=None, output='dict', facts_table_name='Facts', mdx_engine=None):
+def get_response(
+    xmla_request_params,
+    dataframes=None,
+    output="dict",
+    facts_table_name="Facts",
+    mdx_engine=None,
+):
     # type: (dict, dict, str, str, MdxEngine) -> dict
     """
     get xmla reponse
@@ -76,23 +91,32 @@ def get_response(xmla_request_params, dataframes=None, output='dict', facts_tabl
         mdx_engine = MdxEngine(facts=facts_table_name)
     patch_mdx_engine(mdx_engine, dataframes, facts_table_name=facts_table_name)
 
-    module = importlib.import_module('olapy.core.services.' + output + '_discover_request_handler')
-    discover_request_handler = getattr(module, output.title() + 'DiscoverReqHandler')(mdx_engine)
-    discover_request_handler.change_cube(xmla_request_params.get('cube'))
+    module = importlib.import_module(
+        "olapy.core.services." + output + "_discover_request_handler"
+    )
+    discover_request_handler = getattr(module, output.title() + "DiscoverReqHandler")(
+        mdx_engine
+    )
+    discover_request_handler.change_cube(xmla_request_params.get("cube"))
 
-    module = importlib.import_module('olapy.core.services.' + output + '_execute_request_handler')
-    execute_request_handler = getattr(module, output.title() + 'ExecuteReqHandler')(mdx_engine)
+    module = importlib.import_module(
+        "olapy.core.services." + output + "_execute_request_handler"
+    )
+    execute_request_handler = getattr(module, output.title() + "ExecuteReqHandler")(
+        mdx_engine
+    )
 
-    xmla_service = XmlaProviderLib(discover_request_handler,
-                                   execute_request_handler)
+    xmla_service = XmlaProviderLib(discover_request_handler, execute_request_handler)
 
-    property = Property(**xmla_request_params.get('properties'))  # type: ignore
+    property = Property(**xmla_request_params.get("properties"))  # type: ignore
     properties = Propertieslist()
     properties.PropertyList = property  # type: ignore
 
-    if xmla_request_params.get('mdx_query'):  #  Execute request
+    if xmla_request_params.get("mdx_query"):  #  Execute request
         request = ExecuteRequest()
-        request.Command = Command(Statement=xmla_request_params.get('mdx_query'))  # type: ignore
+        request.Command = Command(
+            Statement=xmla_request_params.get("mdx_query")
+        )  # type: ignore
 
         request.Properties = properties  # type: ignore
 
@@ -100,49 +124,55 @@ def get_response(xmla_request_params, dataframes=None, output='dict', facts_tabl
 
     else:  #  Discover request
         request = DiscoverRequest()  # type: ignore
-        restriction = Restriction(**xmla_request_params.get('restrictions'))  # type: ignore
-        request.Restrictions = Restrictionlist(RestrictionList=restriction)  # type: ignore
+        restriction = Restriction(
+            **xmla_request_params.get("restrictions")
+        )  # type: ignore
+        request.Restrictions = Restrictionlist(
+            RestrictionList=restriction
+        )  # type: ignore
 
-        request.RequestType = xmla_request_params.get('request_type')  # type: ignore
+        request.RequestType = xmla_request_params.get("request_type")  # type: ignore
         request.Properties = properties  # type: ignore
 
         return xmla_service.Discover(request)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     xmla_request_params = {
-        'cube': 'sales',
-        'request_type': 'DISCOVER_PROPERTIES',
-        'properties': {
-        },
-        'restrictions': {
-            'PropertyName': 'ServerName'
-        },
-        'mdx_query': None
+        "cube": "sales",
+        "request_type": "DISCOVER_PROPERTIES",
+        "properties": {},
+        "restrictions": {"PropertyName": "ServerName"},
+        "mdx_query": None,
     }
 
     xmla_request_params2 = {
-        'cube': 'sales',
-        'properties': {
-            'AxisFormat': 'TupleFormat',
-            'Format': 'Multidimensional',
-            'Content': 'SchemaData',
-            'Catalog': 'sales',
-            'LocaleIdentifier': '1033',
-            'Timeout': '0'
+        "cube": "sales",
+        "properties": {
+            "AxisFormat": "TupleFormat",
+            "Format": "Multidimensional",
+            "Content": "SchemaData",
+            "Catalog": "sales",
+            "LocaleIdentifier": "1033",
+            "Timeout": "0",
         },
-        'mdx_query': """SELECT  FROM [sales] WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE,
-         FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
+        "mdx_query": """SELECT  FROM [sales] WHERE ([Measures].[Amount]) CELL PROPERTIES VALUE,
+         FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS""",
     }
 
-    dataframes = {'Facts': pd.read_csv("olapy-data/cubes/sales/Facts.csv", sep=';', encoding='utf8'),
-                  'Product': pd.read_csv("olapy-data/cubes/sales/Product.csv", sep=';',
-                                         encoding='utf8'),
-                  'Geography': pd.read_csv("olapy-data/cubes/sales/Geography.csv", sep=';',
-                                           encoding='utf8')
-                  }
+    dataframes = {
+        "Facts": pd.read_csv(
+            "olapy-data/cubes/sales/Facts.csv", sep=";", encoding="utf8"
+        ),
+        "Product": pd.read_csv(
+            "olapy-data/cubes/sales/Product.csv", sep=";", encoding="utf8"
+        ),
+        "Geography": pd.read_csv(
+            "olapy-data/cubes/sales/Geography.csv", sep=";", encoding="utf8"
+        ),
+    }
 
-    xmla_response = get_response(xmla_request_params, dataframes, output='xmla')
+    xmla_response = get_response(xmla_request_params, dataframes, output="xmla")
     pprint(xmla_response)
-    xmla_response = get_response(xmla_request_params2, dataframes, output='xmla')
+    xmla_response = get_response(xmla_request_params2, dataframes, output="xmla")
     pprint(xmla_response)

@@ -2,8 +2,7 @@
 """
 Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import itertools
 from collections import OrderedDict
@@ -79,11 +78,12 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         splitted_dataframes = OrderedDict()
         for table, columns in self.columns_desc["all"].items():
 
-            if table.upper() == 'FACTS':
-                columns = ['sum(' + col + ')' for col in columns]
+            if table.upper() == "FACTS":
+                columns = ["sum(" + col + ")" for col in columns]
 
-            splitted_dataframes[table] = self.mdx_execution_result[
-                "result"].select(list(columns))
+            splitted_dataframes[table] = self.mdx_execution_result["result"].select(
+                list(columns)
+            )
 
         return splitted_dataframes
 
@@ -91,27 +91,29 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
         first_att = None
         # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
-        if list(self.columns_desc[mdx_query_axis].keys()) == [
-                self.executor.facts,
-        ]:
-            if len(self.columns_desc[mdx_query_axis][
-                    self.executor.facts]) == 1:
+        if list(self.columns_desc[mdx_query_axis].keys()) == [self.executor.facts]:
+            if len(self.columns_desc[mdx_query_axis][self.executor.facts]) == 1:
                 # to ignore for tupls in itertools.chain(*tuples)
                 tuples = []
             else:
                 # ['Facts', 'Amount', 'Amount']
-                tuples = [[[[self.executor.facts] + [mes] + [mes]]]
-                          for mes in self.executor.selected_measures]
+                tuples = [
+                    [[[self.executor.facts] + [mes] + [mes]]]
+                    for mes in self.executor.selected_measures
+                ]
                 first_att = 3
 
         # query with on columns and on rows (without measure)
         elif self.columns_desc["columns"] and self.columns_desc["rows"]:
             # Ex: ['Geography','America']
             tuples = [
-                zip(*[[[key] + list(row)
-                       for row in split_df[key].rdd.collect()]
-                      for key in split_df.keys()
-                      if key is not self.executor.facts]),
+                zip(
+                    *[
+                        [[key] + list(row) for row in split_df[key].rdd.collect()]
+                        for key in split_df.keys()
+                        if key is not self.executor.facts
+                    ]
+                )
             ]
 
             first_att = 2
@@ -121,10 +123,16 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             # Ex: ['Geography','Amount','America']
 
             tuples = [
-                zip(*[[[key] + [mes] + list(row)
-                       for row in split_df[key].rdd.collect()]
-                      for key in split_df.keys()
-                      if key is not self.executor.facts])
+                zip(
+                    *[
+                        [
+                            [key] + [mes] + list(row)
+                            for row in split_df[key].rdd.collect()
+                        ]
+                        for key in split_df.keys()
+                        if key is not self.executor.facts
+                    ]
+                )
                 for mes in self.executor.selected_measures
             ]
             first_att = 3
@@ -184,25 +192,29 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             with xml.Tuples:
                 with xml.Tuple:
                     for dim_diff in self.executor.get_all_tables_names(
-                            ignore_fact=True, ):
-                        column_attribut = self.executor.tables_loaded[
-                            dim_diff].select(self.executor.tables_loaded[
-                                dim_diff].columns[0]).first()[0]
+                        ignore_fact=True
+                    ):
+                        column_attribut = (
+                            self.executor.tables_loaded[dim_diff]
+                            .select(self.executor.tables_loaded[dim_diff].columns[0])
+                            .first()[0]
+                        )
 
-                        with xml.Member(
-                                Hierarchy="[{0}].[{0}]".format(dim_diff), ):
-                            xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
-                                dim_diff,
-                                self.executor.tables_loaded[dim_diff].columns[
-                                    0],
-                                column_attribut,
-                            ), )
+                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
+                            xml.UName(
+                                "[{0}].[{0}].[{1}].[{2}]".format(
+                                    dim_diff,
+                                    self.executor.tables_loaded[dim_diff].columns[0],
+                                    column_attribut,
+                                )
+                            )
                             xml.Caption(str(column_attribut))
-                            xml.LName("[{0}].[{0}].[{1}]".format(
-                                dim_diff,
-                                self.executor.tables_loaded[dim_diff].columns[
-                                    0],
-                            ), )
+                            xml.LName(
+                                "[{0}].[{0}].[{1}]".format(
+                                    dim_diff,
+                                    self.executor.tables_loaded[dim_diff].columns[0],
+                                )
+                            )
                             xml.LNum("0")
                             xml.DisplayInfo("2")
 
@@ -227,26 +239,32 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
         measures_agg = [
-            column for column in self.mdx_execution_result["result"].columns
-            if 'sum(' in column
+            column
+            for column in self.mdx_execution_result["result"].columns
+            if "sum(" in column
         ]
-        if ((len(self.columns_desc["columns"].keys()) == 0
-             or len(self.columns_desc["rows"].keys()) == 0)
-                and self.executor.facts in self.columns_desc["all"].keys()):
+        if (
+            len(self.columns_desc["columns"].keys()) == 0
+            or len(self.columns_desc["rows"].keys()) == 0
+        ) and self.executor.facts in self.columns_desc["all"].keys():
 
             columns_loop = []
             for column in measures_agg:
-                for row in self.mdx_execution_result["result"].select(
-                        column).rdd.collect():
+                for row in (
+                    self.mdx_execution_result["result"].select(column).rdd.collect()
+                ):
                     columns_loop.append(row[0])
 
         else:
             # iterate DataFrame vertically
-            columns_loop = itertools.chain(*[
-                column_value
-                for column_value in self.mdx_execution_result["result"].select(
-                    measures_agg).rdd.collect()
-            ])
+            columns_loop = itertools.chain(
+                *[
+                    column_value
+                    for column_value in self.mdx_execution_result["result"]
+                    .select(measures_agg)
+                    .rdd.collect()
+                ]
+            )
 
         xml = xmlwitch.Builder()
         index = 0
@@ -295,44 +313,56 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             return self._generate_slicer_convert2formulas()
 
         unused_dimensions = sorted(
-            list(set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
-                                                                              self.columns_desc["all"]}, ), )
+            list(
+                set(self.executor.get_all_tables_names(ignore_fact=True))
+                - {table_name for table_name in self.columns_desc["all"]}
+            )
+        )
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
                 with xml.Tuples:
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
-                            column_attribut = self.executor.tables_loaded[
-                                dim_diff].select(self.executor.tables_loaded[
-                                    dim_diff].columns[0]).first()[0]
-                            with xml.Member(
-                                    Hierarchy="[{0}].[{0}]".format(dim_diff),
-                            ):
-                                xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff]
-                                    .columns[0],
-                                    column_attribut,
-                                ), )
+                            column_attribut = (
+                                self.executor.tables_loaded[dim_diff]
+                                .select(
+                                    self.executor.tables_loaded[dim_diff].columns[0]
+                                )
+                                .first()[0]
+                            )
+                            with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
+                                xml.UName(
+                                    "[{0}].[{0}].[{1}].[{2}]".format(
+                                        dim_diff,
+                                        self.executor.tables_loaded[dim_diff].columns[
+                                            0
+                                        ],
+                                        column_attribut,
+                                    )
+                                )
                                 xml.Caption(str(column_attribut))
-                                xml.LName("[{0}].[{0}].[{1}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff]
-                                    .columns[0],
-                                ), )
+                                xml.LName(
+                                    "[{0}].[{0}].[{1}]".format(
+                                        dim_diff,
+                                        self.executor.tables_loaded[dim_diff].columns[
+                                            0
+                                        ],
+                                    )
+                                )
                                 xml.LNum("0")
                                 xml.DisplayInfo("2")
 
                         # Hierarchize
-                        if (len(self.executor.selected_measures) <= 1 and (
-                            self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc[
-                                "where"])):
+                        if len(self.executor.selected_measures) <= 1 and (
+                            self.executor.parser.hierarchized_tuples()
+                            or self.executor.facts in self.columns_desc["where"]
+                        ):
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName("[Measures].[{}]".format(
-                                    self.executor.measures[0], ), )
-                                xml.Caption("{}".format(
-                                    self.executor.measures[0], ))
+                                xml.UName(
+                                    "[Measures].[{}]".format(self.executor.measures[0])
+                                )
+                                xml.Caption("{}".format(self.executor.measures[0]))
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
                                 xml.DisplayInfo("0")

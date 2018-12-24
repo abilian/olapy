@@ -8,3 +8,4 @@ attrs
 pyyaml
 regex
 click
+black

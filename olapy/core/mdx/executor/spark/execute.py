@@ -12,7 +12,6 @@ from ..execute import MdxEngine
 
 
 class SparkMdxEngine(MdxEngine):
-
     def get_measures(self):
         """:return: all numerical columns in Facts table."""
 
@@ -20,8 +19,9 @@ class SparkMdxEngine(MdxEngine):
         # col.lower()[-2:] != 'id' to ignore any id column
         if self.facts in list(self.tables_loaded.keys()):
             return [
-                col[0] for col in self.tables_loaded[self.facts].dtypes
-                if col[0].lower()[-2:] != "id" and not col[1].startswith('string')
+                col[0]
+                for col in self.tables_loaded[self.facts].dtypes
+                if col[0].lower()[-2:] != "id" and not col[1].startswith("string")
             ]
 
     @staticmethod
@@ -36,15 +36,14 @@ class SparkMdxEngine(MdxEngine):
         """
         if measures:
             for measure in measures:
-                if star_schema_df.select(measure).dtypes[0][1] == 'string':
-                    star_schema_df[measure] = star_schema_df[
-                        measure].str.replace(
-                        " ",
-                        "",
+                if star_schema_df.select(measure).dtypes[0][1] == "string":
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(
+                        " ", ""
                     )
                     try:
-                        star_schema_df[measure] = star_schema_df[
-                            measure].astype("float", )
+                        star_schema_df[measure] = star_schema_df[measure].astype(
+                            "float"
+                        )
                     except:
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
@@ -101,8 +100,9 @@ class SparkMdxEngine(MdxEngine):
                 if tup_att.isdigit():
                     tup_att = int(tup_att)
 
-                df = df[(df[self.tables_loaded[tuple_as_list[0]].columns[idx]]
-                         == tup_att)]
+                df = df[
+                    (df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)
+                ]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -179,18 +179,20 @@ class SparkMdxEngine(MdxEngine):
                 df_with_more_columns = dataframe1
                 df_with_less_columns = dataframe2
             missed_columns = [
-                col for col in list(df_with_more_columns.columns)
+                col
+                for col in list(df_with_more_columns.columns)
                 if col not in list(df_with_less_columns.columns)
             ]
 
             for missed_column in missed_columns:
                 df_with_less_columns = df_with_less_columns.withColumn(
-                    missed_column, lit(-1))
+                    missed_column, lit(-1)
+                )
 
         # with spark, column order must be the same
         return [
             df_with_less_columns.select(df_with_more_columns.columns),
-            df_with_more_columns
+            df_with_more_columns,
         ]
 
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
@@ -237,11 +239,8 @@ class SparkMdxEngine(MdxEngine):
                 star_df = df
 
             df_to_fusion.append(
-                self.execute_one_tuple(
-                    tupl,
-                    star_df,
-                    columns_to_keep.values(),
-                ), )
+                self.execute_one_tuple(tupl, star_df, columns_to_keep.values())
+            )
 
         return df_to_fusion
 
@@ -295,7 +294,8 @@ class SparkMdxEngine(MdxEngine):
         columns_to_keep = OrderedDict(
             (table, columns)
             for table, columns in tables_n_columns["all"].items()
-            if table != self.facts)
+            if table != self.facts
+        )
 
         tuples_on_mdx_query = [
             tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
@@ -311,17 +311,14 @@ class SparkMdxEngine(MdxEngine):
         if tuples_on_mdx_query:
 
             if self.check_nested_select():
-                df_to_fusion = self.nested_tuples_to_dataframes(
-                    columns_to_keep, )
+                df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
             else:
                 df_to_fusion = self.tuples_to_dataframes(
-                    tuples_on_mdx_query,
-                    columns_to_keep,
+                    tuples_on_mdx_query, columns_to_keep
                 )
 
             df = self.fusion_dataframes(df_to_fusion)
-            cols = list(
-                itertools.chain.from_iterable(columns_to_keep.values(), ))
+            cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
@@ -336,7 +333,10 @@ class SparkMdxEngine(MdxEngine):
         else:
             # result = self.star_schema_dataframe[
             #     self.selected_measures].sum().to_frame().T
-            result = self.star_schema_dataframe[
-                self.selected_measures].groupBy().sum().select(
-                ['sum(' + mes + ')' for mes in self.selected_measures])
+            result = (
+                self.star_schema_dataframe[self.selected_measures]
+                .groupBy()
+                .sum()
+                .select(["sum(" + mes + ")" for mes in self.selected_measures])
+            )
         return {"result": result, "columns_desc": tables_n_columns}

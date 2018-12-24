@@ -272,12 +272,12 @@ def drop_tables(con, custom=False):
 
 
 def custom_drop_tables(con):
-    for table_name in ('food_facts', 'store', 'product', 'warehouse'):
+    for table_name in ("food_facts", "store", "product", "warehouse"):
         statement = "DROP TABLE {};".format(table_name)
         con.execute(statement)
 
 
 def normal_drop_tables(con):
-    for table_name in ('facts', 'geography', 'product', 'time'):
+    for table_name in ("facts", "geography", "product", "time"):
         statement = "DROP TABLE {};".format(table_name)
         con.execute(statement)

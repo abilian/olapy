@@ -2,8 +2,7 @@
 """
 Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import itertools
 from datetime import datetime
@@ -64,15 +63,14 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         :return:
         """
 
-        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1:-1]), )
+        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1: -1]))
         if parent:
             parent = "." + parent
         xml.PARENT_UNIQUE_NAME(
             "[{0}].[{0}].[{1}]{2}".format(
-                tuple[0],
-                splitted_df[tuple[0]].columns[0],
-                parent,
-            ), )
+                tuple[0], splitted_df[tuple[0]].columns[0], parent
+            )
+        )
 
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):
         first_att = kwargs.get("first_att")
@@ -80,24 +78,23 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         for tupl in tupls:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
             d_tup = split_df[tuple_without_minus_1[0]].columns[
-                len(tuple_without_minus_1) - first_att]
-            with xml.Member(
-                Hierarchy="[{0}].[{0}]".format(
-                    tuple_without_minus_1[0]), ):
+                len(tuple_without_minus_1) - first_att
+            ]
+            with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
                 xml.UName(
                     "[{0}].[{0}].[{1}].{2}".format(
                         tuple_without_minus_1[0],
                         d_tup,
-                        ".".join([
-                            "[" + str(i) + "]"
-                            for i in tuple_without_minus_1[first_att - 1:]
-                        ], ),
-                    ), )
+                        ".".join(
+                            [
+                                "[" + str(i) + "]"
+                                for i in tuple_without_minus_1[first_att - 1:]
+                            ]
+                        ),
+                    )
+                )
                 xml.Caption(str((tuple_without_minus_1[-1])))
-                xml.LName("[{0}].[{0}].[{1}]".format(
-                    tuple_without_minus_1[0],
-                    d_tup,
-                ))
+                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], d_tup))
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo("131076")
 
@@ -110,7 +107,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     )
                 if "HIERARCHY_UNIQUE_NAME" in self.mdx_query.upper():
                     xml.HIERARCHY_UNIQUE_NAME(
-                        "[{0}].[{0}]".format(tuple_without_minus_1[0], ), )
+                        "[{0}].[{0}]".format(tuple_without_minus_1[0])
+                    )
 
     def tuples_2_xs0(self, tuples, splitted_df, first_att, axis):
         """
@@ -126,16 +124,16 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             with xml.Tuples:
                 for tupls in itertools.chain(*tuples):
                     with xml.Tuple:
-                        if (tupls[0][1] in self.executor.measures and len(self.executor.selected_measures) > 1):
+                        if (
+                            tupls[0][1] in self.executor.measures
+                            and len(self.executor.selected_measures) > 1
+                        ):
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
 
                         self._gen_xs0_tuples(
-                            xml,
-                            tupls,
-                            split_df=splitted_df,
-                            first_att=first_att,
+                            xml, tupls, split_df=splitted_df, first_att=first_att
                         )
                         # Hierarchize'
                         if not self.executor.parser.hierarchized_tuples():
@@ -163,8 +161,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                                 displayinfo = "0"
                             else:
                                 hierarchy = "[{0}].[{0}]".format(split_tupl[0])
-                                l_name = "[{}]".format("].[".join(
-                                    split_tupl[:3], ))
+                                l_name = "[{}]".format("].[".join(split_tupl[:3]))
                                 lvl = len(split_tupl[4:])
                                 displayinfo = "131076"
 
@@ -176,12 +173,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                                 xml.DisplayInfo(displayinfo)
         return str(xml)
 
-    def generate_xs0_one_axis(
-        self,
-        splitted_df,
-        mdx_query_axis="all",
-        axis="Axis0",
-    ):
+    def generate_xs0_one_axis(self, splitted_df, mdx_query_axis="all", axis="Axis0"):
         """
 
         :param splitted_df: spllited dataframes (with split_dataframe() function)
@@ -192,8 +184,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         # patch 4 select (...) (...) (...) from bla bla bla
         if self.executor.check_nested_select():
             return self._gen_xs0_grouped_tuples(
-                axis,
-                self.executor.parser.get_nested_select(),
+                axis, self.executor.parser.get_nested_select()
             )
 
         xml = xmlwitch.Builder()
@@ -208,9 +199,10 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                         with xml.Member(Hierarchy="[Measures]"):
                             xml.UName(
                                 "[Measures].[{}]".format(
-                                    self.executor.selected_measures[0], ), )
-                            xml.Caption(
-                                str(self.executor.selected_measures[0]), )
+                                    self.executor.selected_measures[0]
+                                )
+                            )
+                            xml.Caption(str(self.executor.selected_measures[0]))
                             xml.LName("[Measures]")
                             xml.LNum("0")
                             xml.DisplayInfo("0")
@@ -228,8 +220,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     for idx in range(len(self.mdx_execution_result) * 3):
                         with xml.Tuple:
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName("[Measures].[{}]".format(
-                                    "XL_SD" + str(idx), ))
+                                xml.UName("[Measures].[{}]".format("XL_SD" + str(idx)))
                                 xml.Caption("XL_SD" + str(idx))
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
@@ -288,20 +279,27 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         with xml.Axis(name="SlicerAxis"):
             with xml.Tuples:
                 with xml.Tuple:
-                    for dim_diff in self.executor.get_all_tables_names(ignore_fact=True, ):
-                        column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][0]
-                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff), ):
-                            xml.UName("[{0}].[{0}].[{1}].[{2}]".format(
-                                dim_diff,
-                                self.executor.tables_loaded[dim_diff].columns[0],
-                                column_attribut,
-                            ), )
+                    for dim_diff in self.executor.get_all_tables_names(
+                        ignore_fact=True
+                    ):
+                        column_attribut = self.executor.tables_loaded[dim_diff].iloc[0][
+                            0
+                        ]
+                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
+                            xml.UName(
+                                "[{0}].[{0}].[{1}].[{2}]".format(
+                                    dim_diff,
+                                    self.executor.tables_loaded[dim_diff].columns[0],
+                                    column_attribut,
+                                )
+                            )
                             xml.Caption(str(column_attribut))
                             xml.LName(
                                 "[{0}].[{0}].[{1}]".format(
                                     dim_diff,
                                     self.executor.tables_loaded[dim_diff].columns[0],
-                                ), )
+                                )
+                            )
                             xml.LNum("0")
                             xml.DisplayInfo("2")
 
@@ -342,10 +340,9 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             else:
                 value = "{0}.{0}.[{1}]".format(
                     tupl2list[0],
-                    self.executor.tables_loaded[tupl2list[0].replace(
-                        "[",
-                        "",
-                    ).replace("]", "")].columns[len(tupl2list[4:])],
+                    self.executor.tables_loaded[
+                        tupl2list[0].replace("[", "").replace("]", "")
+                    ].columns[len(tupl2list[4:])],
                 )
 
             with xml.Cell(CellOrdinal=str(index)):
@@ -375,21 +372,28 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
 
-        if ((len(self.columns_desc["columns"].keys()) == 0 or len(self.columns_desc["rows"].keys()) == 0)
-                and self.executor.facts in self.columns_desc["all"].keys()):
+        if (
+            len(self.columns_desc["columns"].keys()) == 0
+            or len(self.columns_desc["rows"].keys()) == 0
+        ) and self.executor.facts in self.columns_desc["all"].keys():
             # iterate DataFrame horizontally
-            columns_loop = itertools.chain(*[
-                self.mdx_execution_result["result"][measure]
-                for measure in self.mdx_execution_result["result"].columns
-            ])
+            columns_loop = itertools.chain(
+                *[
+                    self.mdx_execution_result["result"][measure]
+                    for measure in self.mdx_execution_result["result"].columns
+                ]
+            )
 
         else:
             # iterate DataFrame vertically
-            columns_loop = itertools.chain(*[
-                tuple
-                for tuple in self.mdx_execution_result["result"].itertuples(
-                    index=False, )
-            ])
+            columns_loop = itertools.chain(
+                *[
+                    tuple
+                    for tuple in self.mdx_execution_result["result"].itertuples(
+                        index=False
+                    )
+                ]
+            )
 
         xml = xmlwitch.Builder()
         index = 0
@@ -414,22 +418,12 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             for dim in self.executor.get_all_tables_names(ignore_fact=True):
                 to_write = "[{0}].[{0}]".format(dim)
                 with xml.HierarchyInfo(name=to_write):
-                    xml.UName(
-                        name=to_write + ".[MEMBER_UNIQUE_NAME]",
-                        type="xs:string",
-                    )
-                    xml.Caption(
-                        name=to_write + ".[MEMBER_CAPTION]",
-                        type="xs:string",
-                    )
-                    xml.LName(
-                        name=to_write + ".[LEVEL_UNIQUE_NAME]",
-                        type="xs:string",
-                    )
+                    xml.UName(name=to_write + ".[MEMBER_UNIQUE_NAME]", type="xs:string")
+                    xml.Caption(name=to_write + ".[MEMBER_CAPTION]", type="xs:string")
+                    xml.LName(name=to_write + ".[LEVEL_UNIQUE_NAME]", type="xs:string")
                     xml.LNum(name=to_write + ".[LEVEL_NUMBER]", type="xs:int")
                     xml.DisplayInfo(
-                        name=to_write + ".[DISPLAY_INFO]",
-                        type="xs:unsignedInt",
+                        name=to_write + ".[DISPLAY_INFO]", type="xs:unsignedInt"
                     )
 
         return str(xml)
@@ -467,19 +461,21 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         if self.convert2formulas:
             return self._generate_axes_info_slicer_convert2formulas()
 
-        all_dimensions_names = self.executor.get_all_tables_names(
-            ignore_fact=True, )
+        all_dimensions_names = self.executor.get_all_tables_names(ignore_fact=True)
         all_dimensions_names.append("Measures")
 
         xml = xmlwitch.Builder()
 
         slicer_list = sorted(
-            list(set(all_dimensions_names) - {table_name for table_name in self.columns_desc["all"]}, ), )
+            list(
+                set(all_dimensions_names)
+                - {table_name for table_name in self.columns_desc["all"]}
+            )
+        )
 
         if "Measures" in slicer_list:
             slicer_list.insert(
-                len(slicer_list),
-                slicer_list.pop(slicer_list.index("Measures")),
+                len(slicer_list), slicer_list.pop(slicer_list.index("Measures"))
             )
 
         if slicer_list:
@@ -490,9 +486,14 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
                         # if measures > 1 we don't have to write measure
                         # Hierarchize
-                        if (self.executor.facts in self.columns_desc["all"] and (
-                            len(self.columns_desc["all"][self.executor.facts]) > 1) or (
-                                not self.executor.parser.hierarchized_tuples() and not self.columns_desc["where"])):
+                        if (
+                            self.executor.facts in self.columns_desc["all"]
+                            and (len(self.columns_desc["all"][self.executor.facts]) > 1)
+                            or (
+                                not self.executor.parser.hierarchized_tuples()
+                                and not self.columns_desc["where"]
+                            )
+                        ):
                             continue
 
                         else:
@@ -500,24 +501,17 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
                     with xml.HierarchyInfo(name=to_write):
                         xml.UName(
-                            name=to_write + ".[MEMBER_UNIQUE_NAME]",
-                            type="xs:string",
+                            name=to_write + ".[MEMBER_UNIQUE_NAME]", type="xs:string"
                         )
                         xml.Caption(
-                            name=to_write + ".[MEMBER_CAPTION]",
-                            type="xs:string",
+                            name=to_write + ".[MEMBER_CAPTION]", type="xs:string"
                         )
                         xml.LName(
-                            name=to_write + ".[LEVEL_UNIQUE_NAME]",
-                            type="xs:string",
+                            name=to_write + ".[LEVEL_UNIQUE_NAME]", type="xs:string"
                         )
-                        xml.LNum(
-                            name=to_write + ".[LEVEL_NUMBER]",
-                            type="xs:int",
-                        )
+                        xml.LNum(name=to_write + ".[LEVEL_NUMBER]", type="xs:int")
                         xml.DisplayInfo(
-                            name=to_write + ".[DISPLAY_INFO]",
-                            type="xs:unsignedInt",
+                            name=to_write + ".[DISPLAY_INFO]", type="xs:unsignedInt"
                         )
 
         return str(xml)
@@ -533,19 +527,14 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             xml.Caption(name="[Measures].[MEMBER_CAPTION]", type="xs:string")
             xml.LName(name="[Measures].[LEVEL_UNIQUE_NAME]", type="xs:string")
             xml.LNum(name="[Measures].[LEVEL_NUMBER]", type="xs:int")
-            xml.DisplayInfo(
-                name="[Measures].[DISPLAY_INFO]",
-                type="xs:unsignedInt",
-            )
+            xml.DisplayInfo(name="[Measures].[DISPLAY_INFO]", type="xs:unsignedInt")
             if "PARENT_UNIQUE_NAME" in self.mdx_query:
                 xml.PARENT_UNIQUE_NAME(
-                    name="[Measures].[PARENT_UNIQUE_NAME]",
-                    type="xs:string",
+                    name="[Measures].[PARENT_UNIQUE_NAME]", type="xs:string"
                 )
             if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
                 xml.HIERARCHY_UNIQUE_NAME(
-                    name="[Measures].[HIERARCHY_UNIQUE_NAME]",
-                    type="xs:string",
+                    name="[Measures].[HIERARCHY_UNIQUE_NAME]", type="xs:string"
                 )
         return xml
 
@@ -581,13 +570,13 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
                 if "Hierarchize" in self.mdx_query:
                     xml.PARENT_UNIQUE_NAME(
-                        name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(
-                            dimension_name, ),
+                        name="[{0}].[{0}].[PARENT_UNIQUE_NAME]".format(dimension_name),
                         type="xs:string",
                     )
                     xml.HIERARCHY_UNIQUE_NAME(
                         name="[{0}].[{0}].[HIERARCHY_UNIQUE_NAME]".format(
-                            dimension_name, ),
+                            dimension_name
+                        ),
                         type="xs:string",
                     )
 
@@ -628,7 +617,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         # Hierarchize !!
         axis_tables = self.columns_desc[mdx_query_axis]
         axis_tables_without_facts = [
-            table_name for table_name in axis_tables
+            table_name
+            for table_name in axis_tables
             if table_name != self.executor.facts
         ]
         xml = xmlwitch.Builder()
@@ -636,12 +626,20 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         if axis_tables:
             with xml.AxisInfo(name=Axis):
                 # many measures , then write this on the top
-                if (self.executor.facts in axis_tables.keys() and len(axis_tables[self.executor.facts]) > 1):
+                if (
+                    self.executor.facts in axis_tables.keys()
+                    and len(axis_tables[self.executor.facts]) > 1
+                ):
                     self._gen_measures_one_axis_info(xml)
                 self._generate_table_axis_info(xml, axis_tables_without_facts)
                 # Hierarchize
-                if (not self.executor.parser.hierarchized_tuples() and len(
-                        self.columns_desc["columns"].get(self.executor.facts, [1, 1], ), ) == 1):
+                if (
+                    not self.executor.parser.hierarchized_tuples()
+                    and len(
+                        self.columns_desc["columns"].get(self.executor.facts, [1, 1])
+                    )
+                    == 1
+                ):
                     self._gen_measures_one_axis_info(xml)
 
         return str(xml)
@@ -696,23 +694,11 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         with xml.AxisInfo(name="Axis0"):
             # many measures , then write this on the top
             with xml.HierarchyInfo(name="[Measures]"):
-                xml.UName(
-                    name="[Measures].[MEMBER_UNIQUE_NAME]",
-                    type="xs:string",
-                )
-                xml.Caption(
-                    name="[Measures].[MEMBER_CAPTION]",
-                    type="xs:string",
-                )
-                xml.LName(
-                    name="[Measures].[LEVEL_UNIQUE_NAME]",
-                    type="xs:string",
-                )
+                xml.UName(name="[Measures].[MEMBER_UNIQUE_NAME]", type="xs:string")
+                xml.Caption(name="[Measures].[MEMBER_CAPTION]", type="xs:string")
+                xml.LName(name="[Measures].[LEVEL_UNIQUE_NAME]", type="xs:string")
                 xml.LNum(name="[Measures].[LEVEL_NUMBER]", type="xs:int")
-                xml.DisplayInfo(
-                    name="[Measures].[DISPLAY_INFO]",
-                    type="xs:unsignedInt",
-                )
+                xml.DisplayInfo(name="[Measures].[DISPLAY_INFO]", type="xs:unsignedInt")
 
         return str(xml)
 
@@ -783,8 +769,10 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
         unused_dimensions = sorted(
             list(
-                set(self.executor.get_all_tables_names(ignore_fact=True)) - {table_name for table_name in
-                                                                             self.columns_desc["all"]}, ), )
+                set(self.executor.get_all_tables_names(ignore_fact=True))
+                - {table_name for table_name in self.columns_desc["all"]}
+            )
+        )
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):
@@ -792,35 +780,40 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     with xml.Tuple:
                         for dim_diff in unused_dimensions:
                             column_attribut = self.executor.tables_loaded[
-                                dim_diff].iloc[0][0]
-                            with xml.Member(
-                                Hierarchy="[{0}].[{0}]".format(dim_diff),
-                            ):
+                                dim_diff
+                            ].iloc[0][0]
+                            with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
                                 xml.UName(
                                     "[{0}].[{0}].[{1}].[{2}]".format(
                                         dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[0],
+                                        self.executor.tables_loaded[dim_diff].columns[
+                                            0
+                                        ],
                                         column_attribut,
-                                    ), )
+                                    )
+                                )
                                 xml.Caption(str(column_attribut))
                                 xml.LName(
                                     "[{0}].[{0}].[{1}]".format(
                                         dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[0],
-                                    ), )
+                                        self.executor.tables_loaded[dim_diff].columns[
+                                            0
+                                        ],
+                                    )
+                                )
                                 xml.LNum("0")
                                 xml.DisplayInfo("2")
 
                         # Hierarchize
-                        if (len(self.executor.selected_measures) <= 1 and (
-                            self.executor.parser.hierarchized_tuples() or self.executor.facts in self.columns_desc[
-                                "where"])):
+                        if len(self.executor.selected_measures) <= 1 and (
+                            self.executor.parser.hierarchized_tuples()
+                            or self.executor.facts in self.columns_desc["where"]
+                        ):
                             with xml.Member(Hierarchy="[Measures]"):
                                 xml.UName(
-                                    "[Measures].[{}]".format(
-                                        self.executor.measures[0], ), )
-                                xml.Caption("{}".format(
-                                    self.executor.measures[0], ))
+                                    "[Measures].[{}]".format(self.executor.measures[0])
+                                )
+                                xml.Caption("{}".format(self.executor.measures[0]))
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
                                 xml.DisplayInfo("0")
@@ -859,13 +852,11 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                             with xml.Cube:
                                 xml.CubeName("Sales")
                                 xml.LastDataUpdate(
-                                    datetime.now().strftime(
-                                        "%Y-%m-%dT%H:%M:%S", ),
+                                    datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                                 xml.LastSchemaUpdate(
-                                    datetime.now().strftime(
-                                        "%Y-%m-%dT%H:%M:%S", ),
+                                    datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
                                     xmlns="http://schemas.microsoft.com/analysisservices/2003/engine",
                                 )
                         xml.write(self.generate_cell_info())

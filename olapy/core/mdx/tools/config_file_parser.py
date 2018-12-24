@@ -2,8 +2,7 @@
 Parse cube configuration file and create cube parser object which
 can be passed to the MdxEngine.
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 from collections import OrderedDict
@@ -111,21 +110,20 @@ class ConfigParser:
 
             home_directory = expanduser("~")
 
-        return os.path.join(
-            home_directory,
-            "olapy-data",
-            "cubes",
-            "cubes-config.yml",
-        )
+        return os.path.join(home_directory, "olapy-data", "cubes", "cubes-config.yml")
 
     @staticmethod
     def _get_columns(dimension):
         if "columns" in dimension:
-            return OrderedDict((
-                column["name"],
-                column["name"] if "column_new_name" not in
-                column else column["column_new_name"],
-            ) for column in dimension["columns"])
+            return OrderedDict(
+                (
+                    column["name"],
+                    column["name"]
+                    if "column_new_name" not in column
+                    else column["column_new_name"],
+                )
+                for column in dimension["columns"]
+            )
 
         else:
             return {}
@@ -133,11 +131,13 @@ class ConfigParser:
     def _get_dimensions(self, config):
         dimensions = []
         for dimension in config["dimensions"]:
-            dimensions.append({
-                "name": dimension["name"],
-                "displayName": dimension["displayName"],
-                "columns": self._get_columns(dimension),
-            }, )
+            dimensions.append(
+                {
+                    "name": dimension["name"],
+                    "displayName": dimension["displayName"],
+                    "columns": self._get_columns(dimension),
+                }
+            )
         return dimensions
 
     def _get_facts(self, config):

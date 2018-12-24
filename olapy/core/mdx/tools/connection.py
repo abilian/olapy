@@ -36,13 +36,10 @@ class Dialect(object):
         result = self.engine.execute(all_db_query)  # type: ignore
         available_tables = result.fetchall()
         return [
-            database[0] for database in available_tables
-            if database[0] not in [
-                "mysql",
-                "information_schema",
-                "performance_schema",
-                "sys",
-            ]
+            database[0]
+            for database in available_tables
+            if database[0]
+            not in ["mysql", "information_schema", "performance_schema", "sys"]
         ]
 
     def __del__(self):
@@ -88,8 +85,10 @@ class MssqlDialect(Dialect):
 
         :return: SQL query to fetch all databases
         """
-        return ("SELECT name FROM sys.databases "
-                "WHERE name NOT IN ('master','tempdb','model','msdb');")
+        return (
+            "SELECT name FROM sys.databases "
+            "WHERE name NOT IN ('master','tempdb','model','msdb');"
+        )
 
 
 DIALECT_REGISTRY = {

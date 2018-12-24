@@ -8,10 +8,10 @@ mdx_query = """SELECT
 
 def main():
     executor = MdxEngine()
-    executor.load_cube('sales')
+    executor.load_cube("sales")
     execution_result = executor.execute_mdx(mdx_query)
-    print(execution_result['result'])
+    print(execution_result["result"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

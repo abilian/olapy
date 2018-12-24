@@ -1,50 +1,46 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 class Tuple(object):
-
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Property():
+class Property:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Restriction():
+class Restriction:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Session():
+class Session:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Restrictionlist():
+class Restrictionlist:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Propertieslist():
-
+class Propertieslist:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class Command():
+class Command:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class ExecuteRequest():
-
+class ExecuteRequest:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 
 
-class DiscoverRequest():
+class DiscoverRequest:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
