@@ -537,25 +537,26 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 }
             ):
                 xml.write(mdschema_cubes_xsd)
-                if (
-                    request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-                    or request.Properties.PropertyList.Catalog is not None
-                ):
-                    self.change_cube(request.Properties.PropertyList.Catalog)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        or request.Properties.PropertyList.Catalog is not None
+                    ):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-                    with xml.row:
-                        xml.CATALOG_NAME(self.selected_cube)
-                        xml.CUBE_NAME(self.selected_cube)
-                        xml.CUBE_TYPE("CUBE")
-                        xml.LAST_SCHEMA_UPDATE("2016-07-22T10:41:38")
-                        xml.LAST_DATA_UPDATE("2016-07-22T10:41:38")
-                        xml.DESCRIPTION("MDX " + self.selected_cube + " results")
-                        xml.IS_DRILLTHROUGH_ENABLED("true")
-                        xml.IS_LINKABLE("false")
-                        xml.IS_WRITE_ENABLED("false")
-                        xml.IS_SQL_ENABLED("false")
-                        xml.CUBE_CAPTION(self.selected_cube)
-                        xml.CUBE_SOURCE("1")
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_cube)
+                            xml.CUBE_NAME(self.selected_cube)
+                            xml.CUBE_TYPE("CUBE")
+                            xml.LAST_SCHEMA_UPDATE("2016-07-22T10:41:38")
+                            xml.LAST_DATA_UPDATE("2016-07-22T10:41:38")
+                            xml.DESCRIPTION("MDX " + self.selected_cube + " results")
+                            xml.IS_DRILLTHROUGH_ENABLED("true")
+                            xml.IS_LINKABLE("false")
+                            xml.IS_WRITE_ENABLED("false")
+                            xml.IS_SQL_ENABLED("false")
+                            xml.CUBE_CAPTION(self.selected_cube)
+                            xml.CUBE_SOURCE("1")
         return str(xml)
 
     def dbschema_tables_response(self, request):
