@@ -122,17 +122,17 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         Value,
     ):
         xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(xsd)
+                if PropertyName is not "":
 
-        if PropertyName is not "":
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(xsd)
                     with xml.row:
                         xml.PropertyName(PropertyName)
                         xml.PropertyDescription(PropertyDescription)
@@ -141,32 +141,23 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         xml.IsRequired(IsRequired)
                         xml.Value(Value)
 
-        else:
-            properties_names_n_description = [
-                "ServerName",
-                "ProviderVersion",
-                "MdpropMdxSubqueries",
-                "MdpropMdxDrillFunctions",
-                "MdpropMdxNamedSets",
-            ]
-            properties_types = ["string", "string", "int", "int", "int"]
-            values = [
-                os.getenv("USERNAME", "default"),
-                "0.0.3  25-Nov-2016 07:20:28 GMT",
-                "15",
-                "3",
-                "15",
-            ]
+                else:
+                    properties_names_n_description = [
+                        "ServerName",
+                        "ProviderVersion",
+                        "MdpropMdxSubqueries",
+                        "MdpropMdxDrillFunctions",
+                        "MdpropMdxNamedSets",
+                    ]
+                    properties_types = ["string", "string", "int", "int", "int"]
+                    values = [
+                        os.getenv("USERNAME", "default"),
+                        "0.0.3  25-Nov-2016 07:20:28 GMT",
+                        "15",
+                        "3",
+                        "15",
+                    ]
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(xsd)
                     for idx, prop_desc in enumerate(properties_names_n_description):
                         with xml.row:
                             xml.PropertyName(prop_desc)
@@ -175,52 +166,6 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.PropertyAccessType("Read")
                             xml.IsRequired("false")
                             xml.Value(values[idx])
-
-        return str(xml)
-
-    def discover_enumerators_response(self, request):
-        """
-        todo
-        """
-
-        xml = xmlwitch.Builder()
-
-        with xml["return"]:
-            with xml.root(
-                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                **{
-                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
-            ):
-                xml.write(discover_enumerators_xsd)
-
-                with xml.row:
-                    xml.EnumName("ProviderType")
-                    xml.ElementName("TDP")
-                    xml.EnumType("string")
-
-        return str(xml)
-
-    def discover_keywords_response(self, request):
-        """
-        todo
-        """
-
-        xml = xmlwitch.Builder()
-
-        with xml["return"]:
-            with xml.root(
-                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                **{
-                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
-            ):
-                xml.write(discover_keywords_xsd)
-                with xml.row:
-                    xml.Keyword("aggregate")
-                    xml.Keyword("ancestors")
 
         return str(xml)
 
@@ -1159,4 +1104,50 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 }
             ):
                 xml.write(discover_schema_rowsets_xsd)
+        return str(xml)
+
+    def discover_enumerators_response(self, request):
+        """
+        todo
+        """
+
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(discover_enumerators_xsd)
+
+                with xml.row:
+                    xml.EnumName("ProviderType")
+                    xml.ElementName("TDP")
+                    xml.EnumType("string")
+
+        return str(xml)
+
+    def discover_keywords_response(self, request):
+        """
+        todo
+        """
+
+        xml = xmlwitch.Builder()
+
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(discover_keywords_xsd)
+                with xml.row:
+                    xml.Keyword("aggregate")
+                    xml.Keyword("ancestors")
+
         return str(xml)
