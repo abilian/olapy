@@ -640,47 +640,48 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 }
             ):
                 xml.write(mdschema_dimensions_xsd)
-                if (
-                    request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-                    and request.Restrictions.RestrictionList.CATALOG_NAME
-                    == self.selected_cube
-                    and request.Properties.PropertyList.Catalog is not None
-                ):
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Restrictions.RestrictionList.CATALOG_NAME
+                        == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
 
-                    self.change_cube(request.Properties.PropertyList.Catalog)
-                    ord = 1
-                    for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
+                        ord = 1
+                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.CUBE_NAME(self.selected_cube)
+                                xml.DIMENSION_NAME(tables)
+                                xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
+                                xml.DIMENSION_CAPTION(tables)
+                                xml.DIMENSION_ORDINAL(str(ord))
+                                xml.DIMENSION_TYPE("3")
+                                xml.DIMENSION_CARDINALITY("23")
+                                xml.DEFAULT_HIERARCHY("[" + tables + "].[" + tables + "]")
+                                xml.IS_VIRTUAL("false")
+                                xml.IS_READWRITE("false")
+                                xml.DIMENSION_UNIQUE_SETTINGS("1")
+                                xml.DIMENSION_IS_VISIBLE("true")
+                            ord += 1
+
+                        # for measure
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_cube)
                             xml.CUBE_NAME(self.selected_cube)
-                            xml.DIMENSION_NAME(tables)
-                            xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
-                            xml.DIMENSION_CAPTION(tables)
+                            xml.DIMENSION_NAME("Measures")
+                            xml.DIMENSION_UNIQUE_NAME("[Measures]")
+                            xml.DIMENSION_CAPTION("Measures")
                             xml.DIMENSION_ORDINAL(str(ord))
-                            xml.DIMENSION_TYPE("3")
-                            xml.DIMENSION_CARDINALITY("23")
-                            xml.DEFAULT_HIERARCHY("[" + tables + "].[" + tables + "]")
+                            xml.DIMENSION_TYPE("2")
+                            xml.DIMENSION_CARDINALITY("0")
+                            xml.DEFAULT_HIERARCHY("[Measures]")
                             xml.IS_VIRTUAL("false")
                             xml.IS_READWRITE("false")
                             xml.DIMENSION_UNIQUE_SETTINGS("1")
                             xml.DIMENSION_IS_VISIBLE("true")
-                        ord += 1
-
-                    # for measure
-                    with xml.row:
-                        xml.CATALOG_NAME(self.selected_cube)
-                        xml.CUBE_NAME(self.selected_cube)
-                        xml.DIMENSION_NAME("Measures")
-                        xml.DIMENSION_UNIQUE_NAME("[Measures]")
-                        xml.DIMENSION_CAPTION("Measures")
-                        xml.DIMENSION_ORDINAL(str(ord))
-                        xml.DIMENSION_TYPE("2")
-                        xml.DIMENSION_CARDINALITY("0")
-                        xml.DEFAULT_HIERARCHY("[Measures]")
-                        xml.IS_VIRTUAL("false")
-                        xml.IS_READWRITE("false")
-                        xml.DIMENSION_UNIQUE_SETTINGS("1")
-                        xml.DIMENSION_IS_VISIBLE("true")
 
         return str(xml)
 
