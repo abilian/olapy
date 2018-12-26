@@ -1,7 +1,8 @@
 """
-To load DataFrames (csv files for instance), OlaPy uses some it own loaders (cube_loader, cube_loader_db, cube_loader_custom) modules,
+To load DataFrames (csv files for instance), OlaPy uses some it own loaders (cube_loader.py) modules,
 but when using pyodide, it's not possible to use them due to some file system access constraints,
-so the idea is that Pyodide load DataFrame with `pyodide.open_url <https://github.com/iodide-project/pyodide/blob/master/docs/api_reference.md#pyodideopen_urlurl>`_
+so the idea is that Pyodide load DataFrame with
+`pyodide.open_url <https://github.com/iodide-project/pyodide/blob/master/docs/api_reference.md#pyodideopen_urlurl>`_
 and them injects these Df to OlaPy.
 
 
