@@ -588,41 +588,43 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
+        xml = xmlwitch.Builder()
 
-            self.change_cube(request.Properties.PropertyList.Catalog)
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_measures_xsd)
 
-            xml = xmlwitch.Builder()
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_measures_xsd)
-                    for mes in self.executor.measures:
-                        with xml.row:
-                            xml.CATALOG_NAME(self.selected_cube)
-                            xml.CUBE_NAME(self.selected_cube)
-                            xml.MEASURE_NAME(mes)
-                            xml.MEASURE_UNIQUE_NAME("[Measures].[" + mes + "]")
-                            xml.MEASURE_CAPTION(mes)
-                            xml.MEASURE_AGGREGATOR("1")
-                            xml.DATA_TYPE("5")
-                            xml.NUMERIC_PRECISION("16")
-                            xml.NUMERIC_SCALE("-1")
-                            xml.MEASURE_IS_VISIBLE("true")
-                            xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
-                            xml.MEASURE_UNQUALIFIED_CAPTION(mes)
-                            xml.MEASUREGROUP_NAME("default")
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return str(xml)
+                        for mes in self.executor.measures:
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.CUBE_NAME(self.selected_cube)
+                                xml.MEASURE_NAME(mes)
+                                xml.MEASURE_UNIQUE_NAME("[Measures].[" + mes + "]")
+                                xml.MEASURE_CAPTION(mes)
+                                xml.MEASURE_AGGREGATOR("1")
+                                xml.DATA_TYPE("5")
+                                xml.NUMERIC_PRECISION("16")
+                                xml.NUMERIC_SCALE("-1")
+                                xml.MEASURE_IS_VISIBLE("true")
+                                xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
+                                xml.MEASURE_UNQUALIFIED_CAPTION(mes)
+                                xml.MEASUREGROUP_NAME("default")
+
+        return str(xml)
 
     def mdschema_dimensions_response(self, request):
         """
@@ -885,37 +887,41 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
 
-            self.change_cube(request.Properties.PropertyList.Catalog)
-            # rows = ""
-            xml = xmlwitch.Builder()
+        xml = xmlwitch.Builder()
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_measuresgroups_dimensions_xsd)
-                    for tables in self.executor.get_all_tables_names(ignore_fact=True):
-                        with xml.row:
-                            xml.CATALOG_NAME(self.selected_cube)
-                            xml.CUBE_NAME(self.selected_cube)
-                            xml.MEASUREGROUP_NAME("default")
-                            xml.MEASUREGROUP_CARDINALITY("ONE")
-                            xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
-                            xml.DIMENSION_CARDINALITY("MANY")
-                            xml.DIMENSION_IS_VISIBLE("true")
-                            xml.DIMENSION_IS_FACT_DIMENSION("false")
-                            xml.DIMENSION_GRANULARITY("[{0}].[{0}]".format(tables))
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_measuresgroups_dimensions_xsd)
 
-            return str(xml)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
+
+                        self.change_cube(request.Properties.PropertyList.Catalog)
+                        # rows = ""
+
+                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.CUBE_NAME(self.selected_cube)
+                                xml.MEASUREGROUP_NAME("default")
+                                xml.MEASUREGROUP_CARDINALITY("ONE")
+                                xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
+                                xml.DIMENSION_CARDINALITY("MANY")
+                                xml.DIMENSION_IS_VISIBLE("true")
+                                xml.DIMENSION_IS_FACT_DIMENSION("false")
+                                xml.DIMENSION_GRANULARITY("[{0}].[{0}]".format(tables))
+
+        return str(xml)
 
     def mdschema_properties_response(self, request):
         """
@@ -924,92 +930,80 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :return:
         """
         xml = xmlwitch.Builder()
-        if (
-            request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
-            and request.Properties.PropertyList.Catalog is not None
-        ):
-            properties_names = [
-                "FONT_FLAGS",
-                "LANGUAGE",
-                "style",
-                "ACTION_TYPE",
-                "FONT_SIZE",
-                "FORMAT_STRING",
-                "className",
-                "UPDATEABLE",
-                "BACK_COLOR",
-                "CELL_ORDINAL",
-                "FONT_NAME",
-                "VALUE",
-                "FORMATTED_VALUE",
-                "FORE_COLOR",
-            ]
-            properties_captions = [
-                "FONT_FLAGS",
-                "LANGUAGE",
-                "style",
-                "ACTION_TYPE",
-                "FONT_SIZE",
-                "FORMAT_STRING",
-                "className",
-                "UPDATEABLE",
-                "BACK_COLOR",
-                "CELL_ORDINAL",
-                "FONT_NAME",
-                "VALUE",
-                "FORMATTED_VALUE",
-                "FORE_COLOR",
-            ]
-            properties_datas = [
-                "3",
-                "19",
-                "130",
-                "19",
-                "18",
-                "130",
-                "130",
-                "19",
-                "19",
-                "19",
-                "130",
-                "12",
-                "130",
-                "19",
-            ]
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_properties_properties_xsd)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
+                        properties_names = [
+                            "FONT_FLAGS",
+                            "LANGUAGE",
+                            "style",
+                            "ACTION_TYPE",
+                            "FONT_SIZE",
+                            "FORMAT_STRING",
+                            "className",
+                            "UPDATEABLE",
+                            "BACK_COLOR",
+                            "CELL_ORDINAL",
+                            "FONT_NAME",
+                            "VALUE",
+                            "FORMATTED_VALUE",
+                            "FORE_COLOR",
+                        ]
+                        properties_captions = [
+                            "FONT_FLAGS",
+                            "LANGUAGE",
+                            "style",
+                            "ACTION_TYPE",
+                            "FONT_SIZE",
+                            "FORMAT_STRING",
+                            "className",
+                            "UPDATEABLE",
+                            "BACK_COLOR",
+                            "CELL_ORDINAL",
+                            "FONT_NAME",
+                            "VALUE",
+                            "FORMATTED_VALUE",
+                            "FORE_COLOR",
+                        ]
+                        properties_datas = [
+                            "3",
+                            "19",
+                            "130",
+                            "19",
+                            "18",
+                            "130",
+                            "130",
+                            "19",
+                            "19",
+                            "19",
+                            "130",
+                            "12",
+                            "130",
+                            "19",
+                        ]
 
-            self.change_cube(request.Properties.PropertyList.Catalog)
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_properties_properties_xsd)
-                    for idx, prop_name in enumerate(properties_names):
-                        with xml.row:
-                            xml.CATALOG_NAME(self.selected_cube)
-                            xml.PROPERTY_TYPE("2")
-                            xml.PROPERTY_NAME(prop_name)
-                            xml.PROPERTY_CAPTION(properties_captions[idx])
-                            xml.DATA_TYPE(properties_datas[idx])
+                        for idx, prop_name in enumerate(properties_names):
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.PROPERTY_TYPE("2")
+                                xml.PROPERTY_NAME(prop_name)
+                                xml.PROPERTY_CAPTION(properties_captions[idx])
+                                xml.DATA_TYPE(properties_datas[idx])
 
-            return str(xml)
-
-        elif request.Restrictions.RestrictionList.PROPERTY_TYPE == 1:
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_properties_properties_xsd)
-
-            return str(xml)
+        return str(xml)
 
     def mdschema_members_response(self, request):
         """
@@ -1018,55 +1012,58 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :return:
         """
         # Enumeration of hierarchies in all dimensions
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-            and request.Restrictions.RestrictionList.TREE_OP == 8
-        ):
-            self.change_cube(request.Properties.PropertyList.Catalog)
-            separed_tuple = self.executor.parser.split_tuple(
-                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
-            )
-            joined = ".".join(separed_tuple[:-1])
-            # exple
-            # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
-            # joined -> [Product].[Product].[Company]
 
-            last_attribut = "".join(
-                att for att in separed_tuple[-1] if att not in "[]"
-            ).replace("&", "&amp;")
-            xml = xmlwitch.Builder()
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_members_xsd)
-                    with xml.row:
-                        xml.CATALOG_NAME(self.selected_cube)
-                        xml.CUBE_NAME(self.selected_cube)
-                        xml.DIMENSION_UNIQUE_NAME(separed_tuple[0])
-                        xml.HIERARCHY_UNIQUE_NAME("{0}.{0}".format(separed_tuple[0]))
-                        xml.LEVEL_UNIQUE_NAME(joined)
-                        xml.LEVEL_NUMBER("0")
-                        xml.MEMBER_ORDINAL("0")
-                        xml.MEMBER_NAME(last_attribut)
-                        xml.MEMBER_UNIQUE_NAME(
+        xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_members_xsd)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                        and request.Restrictions.RestrictionList.TREE_OP == 8
+                    ):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
+                        separed_tuple = self.executor.parser.split_tuple(
                             request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
                         )
-                        xml.MEMBER_TYPE("1")
-                        xml.MEMBER_CAPTION(last_attribut)
-                        xml.CHILDREN_CARDINALITY("1")
-                        xml.PARENT_LEVEL("0")
-                        xml.PARENT_COUNT("0")
-                        xml.MEMBER_KEY(last_attribut)
-                        xml.IS_PLACEHOLDERMEMBER("false")
-                        xml.IS_DATAMEMBER("false")
+                        joined = ".".join(separed_tuple[:-1])
+                        # exple
+                        # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
+                        # joined -> [Product].[Product].[Company]
 
-            return str(xml)
+                        last_attribut = "".join(
+                            att for att in separed_tuple[-1] if att not in "[]"
+                        ).replace("&", "&amp;")
+
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_cube)
+                            xml.CUBE_NAME(self.selected_cube)
+                            xml.DIMENSION_UNIQUE_NAME(separed_tuple[0])
+                            xml.HIERARCHY_UNIQUE_NAME("{0}.{0}".format(separed_tuple[0]))
+                            xml.LEVEL_UNIQUE_NAME(joined)
+                            xml.LEVEL_NUMBER("0")
+                            xml.MEMBER_ORDINAL("0")
+                            xml.MEMBER_NAME(last_attribut)
+                            xml.MEMBER_UNIQUE_NAME(
+                                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
+                            )
+                            xml.MEMBER_TYPE("1")
+                            xml.MEMBER_CAPTION(last_attribut)
+                            xml.CHILDREN_CARDINALITY("1")
+                            xml.PARENT_LEVEL("0")
+                            xml.PARENT_COUNT("0")
+                            xml.MEMBER_KEY(last_attribut)
+                            xml.IS_PLACEHOLDERMEMBER("false")
+                            xml.IS_DATAMEMBER("false")
+
+        return str(xml)
 
     def discover_instances_response(self, request):
         """
