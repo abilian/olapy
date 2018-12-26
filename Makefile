@@ -87,6 +87,13 @@ update-deps:
 	pip-compile > /dev/null
 	git --no-pager diff requirements.txt
 
+#
+# update deps in windows OS
+#
+update-deps-win:
+	pip-compile -U
+	git --no-pager diff requirements.txt
+
 sync-deps:
 	pip install -r requirements.txt -r dev-requirements.txt -e .
 
