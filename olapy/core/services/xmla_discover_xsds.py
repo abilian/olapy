@@ -793,3 +793,42 @@ discover_keywords_xsd = """
    </xsd:sequence>
   </xsd:complexType>
  </xsd:schema>"""
+
+
+mdschema_functions_xsd = """
+<xsd:schema elementFormDefault="qualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
+xmlns:sql="urn:schemas-microsoft-com:xml-sql">
+    <xsd:element name="root">
+        <xsd:complexType>
+            <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+                <xsd:element name="row" type="row"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="uuid">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="xmlDocument">
+        <xsd:sequence>
+            <xsd:any/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="row">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="FUNCTION_NAME" sql:field="FUNCTION_NAME" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="DESCRIPTION" sql:field="DESCRIPTION" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="PARAMETER_LIST" sql:field="PARAMETER_LIST" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="RETURN_TYPE" sql:field="RETURN_TYPE" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="ORIGIN" sql:field="ORIGIN" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="INTERFACE_NAME" sql:field="INTERFACE_NAME" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="LIBRARY_NAME" sql:field="LIBRARY_NAME" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="DLL_NAME" sql:field="DLL_NAME" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="HELP_FILE" sql:field="HELP_FILE" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="HELP_CONTEXT" sql:field="HELP_CONTEXT" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="OBJECT" sql:field="OBJECT" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="CAPTION" sql:field="CAPTION" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>"""

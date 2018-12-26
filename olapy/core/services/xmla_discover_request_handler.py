@@ -39,7 +39,7 @@ from .xmla_discover_xsds import (
     mdschema_sets_xsd,
     discover_enumerators_xsd,
     discover_keywords_xsd,
-)
+    mdschema_functions_xsd)
 
 
 # noinspection PyPep8Naming
@@ -480,24 +480,25 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
-            self.change_cube(request.Properties.PropertyList.Catalog)
+        xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_kpis_xsd)
 
-            xml = xmlwitch.Builder()
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_kpis_xsd)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return str(xml)
+        return str(xml)
 
     def dbschema_catalogs_response(self, request):
         """
@@ -771,7 +772,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.HIERARCHY_ORIGIN("1")
                                 xml.INSTANCE_SELECTION("0")
 
-            return str(xml)
+        return str(xml)
 
     def mdschema_levels_response(self, request):
         """
@@ -779,68 +780,70 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
 
-            self.change_cube(request.Properties.PropertyList.Catalog)
+        xml = xmlwitch.Builder()
 
-            xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_levels_xsd)
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
 
-                    xml.write(mdschema_levels_xsd)
-                    for tables in self.executor.get_all_tables_names(ignore_fact=True):
-                        l_nb = 0
-                        for col in self.executor.tables_loaded[tables].columns:
-                            with xml.row:
-                                xml.CATALOG_NAME(self.selected_cube)
-                                xml.CUBE_NAME(self.selected_cube)
-                                xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
-                                xml.HIERARCHY_UNIQUE_NAME("[{0}].[{0}]".format(tables))
-                                xml.LEVEL_NAME(str(col))
-                                xml.LEVEL_UNIQUE_NAME(
-                                    "[{0}].[{0}].[{1}]".format(tables, col)
-                                )
-                                xml.LEVEL_CAPTION(str(col))
-                                xml.LEVEL_NUMBER(str(l_nb))
-                                xml.LEVEL_CARDINALITY("0")
-                                xml.LEVEL_TYPE("0")
-                                xml.CUSTOM_ROLLUP_SETTINGS("0")
-                                xml.LEVEL_UNIQUE_SETTINGS("0")
-                                xml.LEVEL_IS_VISIBLE("true")
-                                xml.LEVEL_DBTYPE("130")
-                                xml.LEVEL_KEY_CARDINALITY("1")
-                                xml.LEVEL_ORIGIN("2")
-                            l_nb += 1
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-                    with xml.row:
-                        xml.CATALOG_NAME(self.selected_cube)
-                        xml.CUBE_NAME(self.selected_cube)
-                        xml.DIMENSION_UNIQUE_NAME("[Measures]")
-                        xml.HIERARCHY_UNIQUE_NAME("[Measures]")
-                        xml.LEVEL_NAME("MeasuresLevel")
-                        xml.LEVEL_UNIQUE_NAME("[Measures]")
-                        xml.LEVEL_CAPTION("MeasuresLevel")
-                        xml.LEVEL_NUMBER("0")
-                        xml.LEVEL_CARDINALITY("0")
-                        xml.LEVEL_TYPE("0")
-                        xml.CUSTOM_ROLLUP_SETTINGS("0")
-                        xml.LEVEL_UNIQUE_SETTINGS("0")
-                        xml.LEVEL_IS_VISIBLE("true")
-                        xml.LEVEL_DBTYPE("130")
-                        xml.LEVEL_KEY_CARDINALITY("1")
-                        xml.LEVEL_ORIGIN("2")
+                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                            l_nb = 0
+                            for col in self.executor.tables_loaded[tables].columns:
+                                with xml.row:
+                                    xml.CATALOG_NAME(self.selected_cube)
+                                    xml.CUBE_NAME(self.selected_cube)
+                                    xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
+                                    xml.HIERARCHY_UNIQUE_NAME("[{0}].[{0}]".format(tables))
+                                    xml.LEVEL_NAME(str(col))
+                                    xml.LEVEL_UNIQUE_NAME(
+                                        "[{0}].[{0}].[{1}]".format(tables, col)
+                                    )
+                                    xml.LEVEL_CAPTION(str(col))
+                                    xml.LEVEL_NUMBER(str(l_nb))
+                                    xml.LEVEL_CARDINALITY("0")
+                                    xml.LEVEL_TYPE("0")
+                                    xml.CUSTOM_ROLLUP_SETTINGS("0")
+                                    xml.LEVEL_UNIQUE_SETTINGS("0")
+                                    xml.LEVEL_IS_VISIBLE("true")
+                                    xml.LEVEL_DBTYPE("130")
+                                    xml.LEVEL_KEY_CARDINALITY("1")
+                                    xml.LEVEL_ORIGIN("2")
+                                l_nb += 1
 
-            return str(xml)
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_cube)
+                            xml.CUBE_NAME(self.selected_cube)
+                            xml.DIMENSION_UNIQUE_NAME("[Measures]")
+                            xml.HIERARCHY_UNIQUE_NAME("[Measures]")
+                            xml.LEVEL_NAME("MeasuresLevel")
+                            xml.LEVEL_UNIQUE_NAME("[Measures]")
+                            xml.LEVEL_CAPTION("MeasuresLevel")
+                            xml.LEVEL_NUMBER("0")
+                            xml.LEVEL_CARDINALITY("0")
+                            xml.LEVEL_TYPE("0")
+                            xml.CUSTOM_ROLLUP_SETTINGS("0")
+                            xml.LEVEL_UNIQUE_SETTINGS("0")
+                            xml.LEVEL_IS_VISIBLE("true")
+                            xml.LEVEL_DBTYPE("130")
+                            xml.LEVEL_KEY_CARDINALITY("1")
+                            xml.LEVEL_ORIGIN("2")
+
+        return str(xml)
 
     def mdschema_measuregroups_response(self, request):
         """
@@ -848,32 +851,33 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
-            self.change_cube(request.Properties.PropertyList.Catalog)
+        xml = xmlwitch.Builder()
 
-            xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_measuresgroups_xsd)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_measuresgroups_xsd)
-                    with xml.row:
-                        xml.CATALOG_NAME(self.selected_cube)
-                        xml.CUBE_NAME(self.selected_cube)
-                        xml.MEASUREGROUP_NAME("default")
-                        xml.DESCRIPTION("-")
-                        xml.IS_WRITE_ENABLED("true")
-                        xml.MEASUREGROUP_CAPTION("default")
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_cube)
+                            xml.CUBE_NAME(self.selected_cube)
+                            xml.MEASUREGROUP_NAME("default")
+                            xml.DESCRIPTION("-")
+                            xml.IS_WRITE_ENABLED("true")
+                            xml.MEASUREGROUP_CAPTION("default")
 
-            return str(xml)
+        return str(xml)
 
     def mdschema_measuregroup_dimensions_response(self, request):
         """
@@ -1137,7 +1141,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 }
             ):
-                xml.write(discover_schema_rowsets_xsd)
+                xml.write(mdschema_functions_xsd)
+
         return str(xml)
 
     def mdschema_input_datasources_response(self, request):
