@@ -400,24 +400,24 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         :param request:
         :return:
         """
-        if (
-            request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
-            and request.Properties.PropertyList.Catalog is not None
-        ):
-            self.change_cube(request.Properties.PropertyList.Catalog)
+        xml = xmlwitch.Builder()
+        with xml["return"]:
+            with xml.root(
+                xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+                **{
+                    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                }
+            ):
+                xml.write(mdschema_sets_xsd)
+                if request.Restrictions.RestrictionList:
+                    if (
+                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        and request.Properties.PropertyList.Catalog is not None
+                    ):
+                        self.change_cube(request.Properties.PropertyList.Catalog)
 
-            xml = xmlwitch.Builder()
-            with xml["return"]:
-                with xml.root(
-                    xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-                    **{
-                        "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-                        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
-                ):
-                    xml.write(mdschema_sets_xsd)
-
-            return str(xml)
+        return str(xml)
 
     def mdschema_kpis_response(self, request):
         """
