@@ -129,6 +129,11 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
             convert2formulas = True
         else:
             convert2formulas = False
+
+        # change (or load cube) if direct execute handler without discover handler (which normally load the cube first)
+        if request.Properties and request.Properties.PropertyList.Catalog and not execute_request_hanlder.executor.cube:
+            execute_request_hanlder.executor.load_cube(request.Properties.PropertyList.Catalog)
+
         execute_request_hanlder.execute_mdx_query(mdx_query, convert2formulas)
         return execute_request_hanlder.generate_response()
 
@@ -191,7 +196,6 @@ def get_spyne_app(discover_request_hanlder, execute_request_hanlder):
 
 def get_wsgi_application(mdx_engine):
     """
-
     :param mdx_engine: MdxEngine instance
     :return: Wsgi Application
     """
