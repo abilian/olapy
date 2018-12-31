@@ -21,6 +21,7 @@ mastool
 pylint
 mccabe
 flake8
+black
 flake8-tidy-imports
 pre-commit
 
