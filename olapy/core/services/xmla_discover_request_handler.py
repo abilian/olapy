@@ -969,15 +969,16 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
             ):
                 xml.write(mdschema_members_xsd)
                 if request.Restrictions.RestrictionList:
+                    self.change_cube(request.Properties.PropertyList.Catalog)
+                    separed_tuple = self.executor.parser.split_tuple(
+                        request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
+                    )
                     if (
                         request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                         and request.Restrictions.RestrictionList.TREE_OP == 8
                     ):
-                        self.change_cube(request.Properties.PropertyList.Catalog)
-                        separed_tuple = self.executor.parser.split_tuple(
-                            request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
-                        )
+
                         joined = ".".join(separed_tuple[:-1])
                         # exple
                         # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
@@ -1007,6 +1008,64 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.MEMBER_KEY(last_attribut)
                             xml.IS_PLACEHOLDERMEMBER("false")
                             xml.IS_DATAMEMBER("false")
+
+                    elif request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME:
+                        # todo clean clean clean clean clean clean clean clean clean clean
+                        if len(separed_tuple) == 3:
+                            column_unique_values = self.executor.tables_loaded[separed_tuple[0]][
+                                separed_tuple[-1]].unique()
+                            for column_value in column_unique_values:
+                                with xml.row:
+                                    xml.CATALOG_NAME(self.selected_cube)
+                                    xml.CUBE_NAME(self.selected_cube)
+                                    xml.DIMENSION_UNIQUE_NAME('[' + separed_tuple[0] + ']')
+                                    xml.HIERARCHY_UNIQUE_NAME(
+                                        '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple[:-1]]))
+                                    xml.LEVEL_UNIQUE_NAME(
+                                        '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple]))
+                                    xml.LEVEL_NUMBER(str(len(separed_tuple[2:])))
+                                    xml.MEMBER_ORDINAL("0")
+                                    xml.MEMBER_NAME(column_value)
+                                    xml.MEMBER_UNIQUE_NAME(
+                                        '.'.join(['[' + tuple_att + ']' for tuple_att in
+                                                  separed_tuple]) + '.[' + column_value + ']'
+                                    )
+                                    xml.MEMBER_TYPE("1")
+                                    xml.MEMBER_CAPTION(column_value)
+                                    xml.CHILDREN_CARDINALITY("1")
+                                    xml.PARENT_LEVEL("0")
+                                    xml.PARENT_COUNT("0")
+                                    xml.PARENT_UNIQUE_NAME(
+                                        '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple[:-1]]))
+                                    xml.MEMBER_KEY(column_value)
+                                    xml.IS_PLACEHOLDERMEMBER("false")
+                                    xml.IS_DATAMEMBER("false")
+                        else:
+
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.CUBE_NAME(self.selected_cube)
+                                xml.DIMENSION_UNIQUE_NAME('[' + separed_tuple[0] + ']')
+                                xml.HIERARCHY_UNIQUE_NAME(
+                                    '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple[:-2]]))
+                                xml.LEVEL_UNIQUE_NAME(
+                                    '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple[:-1]]))
+                                xml.LEVEL_NUMBER(str(len(separed_tuple[2:])))
+                                xml.MEMBER_ORDINAL("0")
+                                xml.MEMBER_NAME(separed_tuple[-1])
+                                xml.MEMBER_UNIQUE_NAME(
+                                    '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple])
+                                )
+                                xml.MEMBER_TYPE("1")
+                                xml.MEMBER_CAPTION(separed_tuple[-1])
+                                xml.CHILDREN_CARDINALITY("1")
+                                xml.PARENT_LEVEL("0")
+                                xml.PARENT_COUNT("0")
+                                xml.PARENT_UNIQUE_NAME(
+                                    '.'.join(['[' + tuple_att + ']' for tuple_att in separed_tuple[:-1]]))
+                                xml.MEMBER_KEY(separed_tuple[-1])
+                                xml.IS_PLACEHOLDERMEMBER("false")
+                                xml.IS_DATAMEMBER("false")
 
         return str(xml)
 
