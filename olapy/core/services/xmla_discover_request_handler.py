@@ -659,54 +659,31 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                         self.change_cube(request.Properties.PropertyList.Catalog)
 
-                        if (
-                            request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3
-                            or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_cube
-                        ):
-                            for table_name, df in self.executor.tables_loaded.items():
-                                if table_name == self.executor.facts:
-                                    continue
+                        # if (
+                        #     request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3
+                        #     or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_cube
+                        # ):
+                        for table_name, df in self.executor.tables_loaded.items():
+                            if table_name == self.executor.facts:
+                                continue
 
-                                column_attribut = df.iloc[0][0]
-
-                                with xml.row:
-                                    xml.CATALOG_NAME(self.selected_cube)
-                                    xml.CUBE_NAME(self.selected_cube)
-                                    xml.DIMENSION_UNIQUE_NAME("[" + table_name + "]")
-                                    xml.HIERARCHY_NAME(table_name)
-                                    xml.HIERARCHY_UNIQUE_NAME(
-                                        "[{0}].[{0}]".format(table_name)
-                                    )
-                                    xml.HIERARCHY_CAPTION(table_name)
-                                    xml.DIMENSION_TYPE("3")
-                                    xml.HIERARCHY_CARDINALITY("6")
-                                    xml.DEFAULT_MEMBER(
-                                        "[{0}].[{0}].[{1}].[{2}]".format(
-                                            table_name, df.columns[0], column_attribut
-                                        )
-                                    )
-                                    xml.STRUCTURE("0")
-                                    xml.IS_VIRTUAL("false")
-                                    xml.IS_READWRITE("false")
-                                    xml.DIMENSION_UNIQUE_SETTINGS("1")
-                                    xml.DIMENSION_IS_VISIBLE("true")
-                                    xml.HIERARCHY_ORDINAL("1")
-                                    xml.DIMENSION_IS_SHARED("true")
-                                    xml.HIERARCHY_IS_VISIBLE("true")
-                                    xml.HIERARCHY_ORIGIN("1")
-                                    xml.INSTANCE_SELECTION("0")
+                            column_attribut = df.iloc[0][0]
 
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
                                 xml.CUBE_NAME(self.selected_cube)
-                                xml.DIMENSION_UNIQUE_NAME("[Measures]")
-                                xml.HIERARCHY_NAME("Measures")
-                                xml.HIERARCHY_UNIQUE_NAME("[Measures]")
-                                xml.HIERARCHY_CAPTION("Measures")
-                                xml.DIMENSION_TYPE("2")
-                                xml.HIERARCHY_CARDINALITY("0")
+                                xml.DIMENSION_UNIQUE_NAME("[" + table_name + "]")
+                                xml.HIERARCHY_NAME(table_name)
+                                xml.HIERARCHY_UNIQUE_NAME(
+                                    "[{0}].[{0}]".format(table_name)
+                                )
+                                xml.HIERARCHY_CAPTION(table_name)
+                                xml.DIMENSION_TYPE("3")
+                                xml.HIERARCHY_CARDINALITY("6")
                                 xml.DEFAULT_MEMBER(
-                                    "[Measures].[{}]".format(self.executor.measures[0])
+                                    "[{0}].[{0}].[{1}].[{2}]".format(
+                                        table_name, df.columns[0], column_attribut
+                                    )
                                 )
                                 xml.STRUCTURE("0")
                                 xml.IS_VIRTUAL("false")
@@ -718,6 +695,29 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.HIERARCHY_IS_VISIBLE("true")
                                 xml.HIERARCHY_ORIGIN("1")
                                 xml.INSTANCE_SELECTION("0")
+
+                        with xml.row:
+                            xml.CATALOG_NAME(self.selected_cube)
+                            xml.CUBE_NAME(self.selected_cube)
+                            xml.DIMENSION_UNIQUE_NAME("[Measures]")
+                            xml.HIERARCHY_NAME("Measures")
+                            xml.HIERARCHY_UNIQUE_NAME("[Measures]")
+                            xml.HIERARCHY_CAPTION("Measures")
+                            xml.DIMENSION_TYPE("2")
+                            xml.HIERARCHY_CARDINALITY("0")
+                            xml.DEFAULT_MEMBER(
+                                "[Measures].[{}]".format(self.executor.measures[0])
+                            )
+                            xml.STRUCTURE("0")
+                            xml.IS_VIRTUAL("false")
+                            xml.IS_READWRITE("false")
+                            xml.DIMENSION_UNIQUE_SETTINGS("1")
+                            xml.DIMENSION_IS_VISIBLE("true")
+                            xml.HIERARCHY_ORDINAL("1")
+                            xml.DIMENSION_IS_SHARED("true")
+                            xml.HIERARCHY_IS_VISIBLE("true")
+                            xml.HIERARCHY_ORIGIN("1")
+                            xml.INSTANCE_SELECTION("0")
 
         return str(xml)
 
@@ -970,9 +970,13 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 xml.write(mdschema_members_xsd)
                 if request.Restrictions.RestrictionList:
                     self.change_cube(request.Properties.PropertyList.Catalog)
-                    separed_tuple = self.executor.parser.split_tuple(
-                        request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
-                    )
+
+                    if request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME:
+                        member_lvl_name = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
+                    else:
+                        member_lvl_name = request.Restrictions.RestrictionList.LEVEL_UNIQUE_NAME
+
+                    separed_tuple = self.executor.parser.split_tuple(member_lvl_name)
                     if (
                         request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
@@ -997,9 +1001,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.LEVEL_NUMBER("0")
                             xml.MEMBER_ORDINAL("0")
                             xml.MEMBER_NAME(last_attribut)
-                            xml.MEMBER_UNIQUE_NAME(
-                                request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
-                            )
+                            xml.MEMBER_UNIQUE_NAME(member_lvl_name)
                             xml.MEMBER_TYPE("1")
                             xml.MEMBER_CAPTION(last_attribut)
                             xml.CHILDREN_CARDINALITY("1")
@@ -1009,8 +1011,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.IS_PLACEHOLDERMEMBER("false")
                             xml.IS_DATAMEMBER("false")
 
-                    elif request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME:
+                    elif member_lvl_name:
                         # todo clean clean clean clean clean clean clean clean clean clean
+                        # todo si on change les dataset
                         if len(separed_tuple) == 3:
                             column_unique_values = self.executor.tables_loaded[separed_tuple[0]][
                                 separed_tuple[-1]].unique()
