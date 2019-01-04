@@ -1,6 +1,6 @@
 package:
   name: olapy
-    version: master
+  version: master
 
 source:
   url: https://github.com/abilian/olapy/archive/master.zip
