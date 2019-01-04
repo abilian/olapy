@@ -6,7 +6,7 @@
 #
 attrs==18.2.0
 click==7.0
-lxml==4.2.5
+lxml==4.2.6
 numpy==1.15.4             # via pandas
 pandas==0.23.4
 python-dateutil==2.7.5    # via pandas
