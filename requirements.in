@@ -5,6 +5,6 @@ spyne==2.13.2a0
 SQLAlchemy
 xmlwitch
 attrs
-pyyaml
+pyyaml>=4.2b1
 regex
 click
