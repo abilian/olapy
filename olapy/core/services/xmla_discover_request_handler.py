@@ -958,7 +958,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         check if Los Angeles exist in City column ...
         :return:
         """
-        for idx, column_value in enumerate(tupl[3:]):
+        for idx, column_value in enumerate(tupl[2:]):
             if column_value not in df[df.columns[idx]].unique():
                 return False
         return True
@@ -1027,49 +1027,49 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     elif member_lvl_name:
                         df = self.executor.tables_loaded[separated_tuple[0]]
                         parent_level = ['[' + tuple_att + ']' for tuple_att in separated_tuple[:-1]]
-                        if len(separated_tuple) == 3:
-                            column_unique_values = df[separated_tuple[-1]].unique()
-                            for column_value in column_unique_values:
-                                with xml.row:
-                                    xml.CATALOG_NAME(self.selected_cube)
-                                    xml.CUBE_NAME(self.selected_cube)
-                                    xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
-                                    xml.HIERARCHY_UNIQUE_NAME('.'.join(parent_level))
-                                    xml.LEVEL_UNIQUE_NAME(member_lvl_name)
-                                    xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
-                                    xml.MEMBER_ORDINAL("0")
-                                    xml.MEMBER_NAME(column_value)
-                                    xml.MEMBER_UNIQUE_NAME(member_lvl_name + '.[' + column_value + ']')
-                                    xml.MEMBER_TYPE("1")
-                                    xml.MEMBER_CAPTION(column_value)
-                                    xml.CHILDREN_CARDINALITY("1")
-                                    xml.PARENT_LEVEL("0")
-                                    xml.PARENT_COUNT("0")
-                                    xml.PARENT_UNIQUE_NAME('.'.join(parent_level))
-                                    xml.MEMBER_KEY(column_value)
-                                    xml.IS_PLACEHOLDERMEMBER("false")
-                                    xml.IS_DATAMEMBER("false")
-                        else:
-                            if self._df_column_values_exist(separated_tuple, df):
-                                with xml.row:
-                                    xml.CATALOG_NAME(self.selected_cube)
-                                    xml.CUBE_NAME(self.selected_cube)
-                                    xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
-                                    xml.HIERARCHY_UNIQUE_NAME('.'.join(parent_level[:-1]))
-                                    xml.LEVEL_UNIQUE_NAME('.'.join(parent_level))
-                                    xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
-                                    xml.MEMBER_ORDINAL("0")
-                                    xml.MEMBER_NAME(separated_tuple[-1])
-                                    xml.MEMBER_UNIQUE_NAME(member_lvl_name)
-                                    xml.MEMBER_TYPE("1")
-                                    xml.MEMBER_CAPTION(separated_tuple[-1])
-                                    xml.CHILDREN_CARDINALITY("1")
-                                    xml.PARENT_LEVEL("0")
-                                    xml.PARENT_COUNT("0")
-                                    xml.PARENT_UNIQUE_NAME('.'.join(parent_level))
-                                    xml.MEMBER_KEY(separated_tuple[-1])
-                                    xml.IS_PLACEHOLDERMEMBER("false")
-                                    xml.IS_DATAMEMBER("false")
+                        # if len(separated_tuple) == 3:
+                        #     column_unique_values = df[separated_tuple[-1]].unique()
+                        #     for column_value in column_unique_values:
+                        #         with xml.row:
+                        #             xml.CATALOG_NAME(self.selected_cube)
+                        #             xml.CUBE_NAME(self.selected_cube)
+                        #             xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
+                        #             xml.HIERARCHY_UNIQUE_NAME('.'.join(parent_level))
+                        #             xml.LEVEL_UNIQUE_NAME(member_lvl_name)
+                        #             xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
+                        #             xml.MEMBER_ORDINAL("0")
+                        #             xml.MEMBER_NAME(column_value)
+                        #             xml.MEMBER_UNIQUE_NAME(member_lvl_name + '.[' + column_value + ']')
+                        #             xml.MEMBER_TYPE("1")
+                        #             xml.MEMBER_CAPTION(column_value)
+                        #             xml.CHILDREN_CARDINALITY("1")
+                        #             xml.PARENT_LEVEL("0")
+                        #             xml.PARENT_COUNT("0")
+                        #             xml.PARENT_UNIQUE_NAME('.'.join(parent_level))
+                        #             xml.MEMBER_KEY(column_value)
+                        #             xml.IS_PLACEHOLDERMEMBER("false")
+                        #             xml.IS_DATAMEMBER("false")
+                        # else:
+                        if self._df_column_values_exist(separated_tuple, df):
+                            with xml.row:
+                                xml.CATALOG_NAME(self.selected_cube)
+                                xml.CUBE_NAME(self.selected_cube)
+                                xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
+                                xml.HIERARCHY_UNIQUE_NAME('.'.join(parent_level[:-1]))
+                                xml.LEVEL_UNIQUE_NAME('.'.join(parent_level))
+                                xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
+                                xml.MEMBER_ORDINAL("0")
+                                xml.MEMBER_NAME(separated_tuple[-1])
+                                xml.MEMBER_UNIQUE_NAME(member_lvl_name)
+                                xml.MEMBER_TYPE("1")
+                                xml.MEMBER_CAPTION(separated_tuple[-1])
+                                xml.CHILDREN_CARDINALITY("1")
+                                xml.PARENT_LEVEL("0")
+                                xml.PARENT_COUNT("0")
+                                xml.PARENT_UNIQUE_NAME('.'.join(parent_level))
+                                xml.MEMBER_KEY(separated_tuple[-1])
+                                xml.IS_PLACEHOLDERMEMBER("false")
+                                xml.IS_DATAMEMBER("false")
 
         return str(xml)
 
