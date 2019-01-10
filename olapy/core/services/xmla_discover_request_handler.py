@@ -1051,11 +1051,15 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         #             xml.IS_DATAMEMBER("false")
                         # else:
                         if self._df_column_values_exist(separated_tuple, df):
+                            if len(separated_tuple) == 3:
+                                hierarchy_unique_name = '.'.join(parent_level)
+                            else:
+                                hierarchy_unique_name = '.'.join(parent_level[:-1])
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
                                 xml.CUBE_NAME(self.selected_cube)
                                 xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
-                                xml.HIERARCHY_UNIQUE_NAME('.'.join(parent_level[:-1]))
+                                xml.HIERARCHY_UNIQUE_NAME(hierarchy_unique_name)
                                 xml.LEVEL_UNIQUE_NAME('.'.join(parent_level))
                                 xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
                                 xml.MEMBER_ORDINAL("0")
