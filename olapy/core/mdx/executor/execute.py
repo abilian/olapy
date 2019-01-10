@@ -393,6 +393,13 @@ class MdxEngine(object):
             axes.update({axis: tables_columns})
         return axes
 
+    def _get_df_subset_from_tuple(self, df, tupl):
+        if tupl[-1] in df.columns:
+            return df[(df[tupl[-1]].notnull())]
+        else:
+            column_from_value = self.tables_loaded[tupl[0]].columns[len(tupl[3:])]
+            return df[(df[column_from_value] == tupl[-1])]
+
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
         Filter a DataFrame (Dataframe_in) with one tuple.
@@ -432,7 +439,7 @@ class MdxEngine(object):
         #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
         if len(tuple_as_list) == 3:
-            df = df[(df[tuple_as_list[-1]].notnull())]
+            df = self._get_df_subset_from_tuple(df, tuple_as_list)
 
         # tuple_as_list like['Geography', 'Geography', 'Continent' , 'America','US']
         # execute : df[(df['Continent'] == 'America')] and
