@@ -335,6 +335,19 @@ class MdxEngine(object):
 
         return list_measures
 
+    @staticmethod
+    def _df_column_values_exist(tupl, df):
+        """
+        for [Geography].[Geography].[Continent].[America].[Los Angeles]
+        check if America exist in Country column and
+        check if Los Angeles exist in City column ...
+        :return:
+        """
+        for idx, column_value in enumerate(tupl[2:]):
+            if column_value not in df[df.columns[idx]].unique():
+                return False
+        return True
+
     def get_tables_and_columns(self, tuple_as_list):
         """Get used dimensions and columns in the MDX Query.
 
@@ -376,17 +389,14 @@ class MdxEngine(object):
                         continue
 
                 else:
+                    df = self.tables_loaded[tupl[0]]
+                    if self.parser.hierarchized_tuples() or self._df_column_values_exist(tupl, df):
+                        query_used_column = tupl[2: None]
+                    else:
+                        query_used_column = tupl[-1]
                     tables_columns.update(
                         {
-                            tupl[0]: self.tables_loaded[tupl[0]].columns[
-                                : len(
-                                    tupl[
-                                        2: None
-                                        if self.parser.hierarchized_tuples()
-                                        else -1
-                                    ]
-                                )
-                            ]
+                            tupl[0]: df.columns[: len(query_used_column)]
                         }
                     )
 
@@ -438,22 +448,35 @@ class MdxEngine(object):
         df = dataframe_in
         #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
-        if len(tuple_as_list) == 3:
-            df = self._get_df_subset_from_tuple(df, tuple_as_list)
+        # if len(tuple_as_list) == 3:
+        #     df = self._get_df_subset_from_tuple(df, tuple_as_list)
 
         # tuple_as_list like['Geography', 'Geography', 'Continent' , 'America','US']
         # execute : df[(df['Continent'] == 'America')] and
         #           df[(df['Country'] == 'US')]
-        elif len(tuple_as_list) > 3:
-            for idx, tup_att in enumerate(tuple_as_list[3:]):
-                # df[(df['Year'] == 2010)]
-                # 2010 must be as int, otherwise , pandas generate exception
-                if tup_att.isdigit():
-                    tup_att = int(tup_att)
+        # elif len(tuple_as_list) > 3:
+        for idx, tup_att in enumerate(tuple_as_list[2:]):
 
-                df = df[
-                    (df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)
-                ]
+            # df[(df['Year'] == 2010)]
+            # 2010 must be as int, otherwise , pandas generate exception
+            if tup_att.isdigit():
+                tup_att = int(tup_att)
+
+            if tup_att in df.columns:
+                df = df[(df[tup_att].notnull())]
+            else:
+                column_from_value = self.tables_loaded[tuple_as_list[0]].columns[idx]
+                df = df[(df[column_from_value] == tup_att)]
+
+            # # df[(df['Year'] == 2010)]
+            # # 2010 must be as int, otherwise , pandas generate exception
+            # if tup_att.isdigit():
+            #     tup_att = int(tup_att)
+            # print(idx)
+            # print(tup_att)
+            # df = df[
+            #     (df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)
+            # ]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -757,6 +780,8 @@ class MdxEngine(object):
             if table != self.facts
         )
 
+        print(columns_to_keep)
+
         tuples_on_mdx_query = [
             tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
         ]
@@ -775,7 +800,6 @@ class MdxEngine(object):
                 df_to_fusion = self.tuples_to_dataframes(
                     tuples_on_mdx_query, columns_to_keep
                 )
-
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
