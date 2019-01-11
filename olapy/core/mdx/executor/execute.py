@@ -410,6 +410,11 @@ class MdxEngine(object):
             column_from_value = self.tables_loaded[tupl[0]].columns[len(tupl[3:])]
             return df[(df[column_from_value] == tupl[-1])]
 
+    def _get_column_name_from_value(self, df, column_value):
+        for column in df.columns:
+            if column_value in df[column].unique():
+                return column
+
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
         Filter a DataFrame (Dataframe_in) with one tuple.
@@ -465,7 +470,8 @@ class MdxEngine(object):
             if tup_att in df.columns:
                 df = df[(df[tup_att].notnull())]
             else:
-                column_from_value = self.tables_loaded[tuple_as_list[0]].columns[idx]
+                # todo check ex time
+                column_from_value = self._get_column_name_from_value(self.tables_loaded[tuple_as_list[0]], tup_att)
                 df = df[(df[column_from_value] == tup_att)]
 
             # # df[(df['Year'] == 2010)]
