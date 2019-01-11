@@ -187,7 +187,7 @@ SELECT {
 [geography].[geography].[country].[Europe].[Spain],[Measures].[amount]),
 ([product].[product].[licence].[Crazy Development].[olapy].[Personal],
 [geography].[geography].[country].[Europe].[France],[Measures].[amount]),
-([product].[product].[licence].[Crazy Development].[olapy].[partnership],
+([product].[product].[licence].[Crazy Development].[olapy].[Partnership],
 [geography].[geography].[country].[Europe].[Switzerland],[Measures].[amount])}
 ON 0
 FROM [sales]
