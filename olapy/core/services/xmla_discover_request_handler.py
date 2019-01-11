@@ -950,19 +950,6 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
         return str(xml)
 
-    @staticmethod
-    def _df_column_values_exist(tupl, df):
-        """
-        for [Geography].[Geography].[Continent].[America].[Los Angeles]
-        check if America exist in Country column and
-        check if Los Angeles exist in City column ...
-        :return:
-        """
-        for idx, column_value in enumerate(tupl[2:]):
-            if column_value not in df[df.columns[idx]].unique():
-                return False
-        return True
-
     def mdschema_members_response(self, request):
         """
         Describes the members.
@@ -1050,17 +1037,25 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                         #             xml.IS_PLACEHOLDERMEMBER("false")
                         #             xml.IS_DATAMEMBER("false")
                         # else:
-                        if self._df_column_values_exist(separated_tuple, df):
+                        if self.executor._df_column_values_exist(separated_tuple, df):
                             if len(separated_tuple) == 3:
                                 hierarchy_unique_name = '.'.join(parent_level)
+                                level_unique_name = '.'.join(['[' + tuple_att + ']' for tuple_att in separated_tuple])
                             else:
                                 hierarchy_unique_name = '.'.join(parent_level[:-1])
+                                level_unique_name = '.'.join(parent_level)
+
+                            # if len(separated_tuple) <= 3:
+                            #     level_unique_name = '.'.join(separated_tuple)
+                            # else:
+                            #     level_unique_name = '.'.join(parent_level)
+
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
                                 xml.CUBE_NAME(self.selected_cube)
                                 xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
                                 xml.HIERARCHY_UNIQUE_NAME(hierarchy_unique_name)
-                                xml.LEVEL_UNIQUE_NAME('.'.join(parent_level))
+                                xml.LEVEL_UNIQUE_NAME(level_unique_name)
                                 xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
                                 xml.MEMBER_ORDINAL("0")
                                 xml.MEMBER_NAME(separated_tuple[-1])

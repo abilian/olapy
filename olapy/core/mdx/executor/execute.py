@@ -608,18 +608,16 @@ class MdxEngine(object):
 
         :return: updated columns_to_keep
         """
-
-        columns = 2 if self.parser.hierarchized_tuples() else 3
-        if (
-            len(tuple_as_list) == 3
-            and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns
-        ):
+        df = self.tables_loaded[tuple_as_list[0]]
+        if self.parser.hierarchized_tuples() or self._df_column_values_exist(tuple_as_list, df):
+            used_columns = 2
+        else:
+            used_columns = 3
+        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
-            cols = self.tables_loaded[tuple_as_list[0]].columns[
-                : len(tuple_as_list[columns:])
-            ]
+            cols = df.columns[: len(tuple_as_list[used_columns:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -779,8 +777,6 @@ class MdxEngine(object):
             for table, columns in tables_n_columns["all"].items()
             if table != self.facts
         )
-
-        print(columns_to_keep)
 
         tuples_on_mdx_query = [
             tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
