@@ -20,19 +20,19 @@ def test_xs0_axis_query15(executor):
             with xml.Tuple:
                 with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        "[product].[product].[licence].[Crazy Development].[olapy].[Personal]"
+                        "[product].[product].[Crazy Development].[olapy].[Personal]"
                     )
                     xml.Caption("Personal")
-                    xml.LName("[product].[product].[licence]")
-                    xml.LNum("2")
+                    xml.LName("[product].[product].[Crazy Development]")
+                    xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        "[geography].[geography].[country].[Europe].[Switzerland]"
+                        "[geography].[geography].[Europe].[Switzerland]"
                     )
                     xml.Caption("Switzerland")
-                    xml.LName("[geography].[geography].[country]")
-                    xml.LNum("1")
+                    xml.LName("[geography].[geography].[Europe]")
+                    xml.LNum("0")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName("[Measures].[amount]")
@@ -43,19 +43,19 @@ def test_xs0_axis_query15(executor):
             with xml.Tuple:
                 with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        "[product].[product].[licence].[Crazy Development].[olapy].[Corporate]"
+                        "[product].[product].[Crazy Development].[olapy].[Corporate]"
                     )
                     xml.Caption("Corporate")
-                    xml.LName("[product].[product].[licence]")
-                    xml.LNum("2")
+                    xml.LName("[product].[product].[Crazy Development]")
+                    xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        "[geography].[geography].[country].[Europe].[Switzerland]"
+                        "[geography].[geography].[Europe].[Switzerland]"
                     )
                     xml.Caption("Switzerland")
-                    xml.LName("[geography].[geography].[country]")
-                    xml.LNum("1")
+                    xml.LName("[geography].[geography].[Europe]")
+                    xml.LNum("0")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName("[Measures].[amount]")
@@ -66,17 +66,17 @@ def test_xs0_axis_query15(executor):
             with xml.Tuple:
                 with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        "[product].[product].[licence].[Crazy Development].[olapy].[Personal]"
+                        "[product].[product].[Crazy Development].[olapy].[Personal]"
                     )
                     xml.Caption("Personal")
-                    xml.LName("[product].[product].[licence]")
-                    xml.LNum("2")
+                    xml.LName("[product].[product].[Crazy Development]")
+                    xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
-                    xml.UName("[geography].[geography].[country].[Europe].[Spain]")
+                    xml.UName("[geography].[geography].[Europe].[Spain]")
                     xml.Caption("Spain")
-                    xml.LName("[geography].[geography].[country]")
-                    xml.LNum("1")
+                    xml.LName("[geography].[geography].[Europe]")
+                    xml.LNum("0")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName("[Measures].[amount]")
@@ -87,17 +87,17 @@ def test_xs0_axis_query15(executor):
             with xml.Tuple:
                 with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        "[product].[product].[licence].[Crazy Development].[olapy].[Personal]"
+                        "[product].[product].[Crazy Development].[olapy].[Personal]"
                     )
                     xml.Caption("Personal")
-                    xml.LName("[product].[product].[licence]")
-                    xml.LNum("2")
+                    xml.LName("[product].[product].[Crazy Development]")
+                    xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
-                    xml.UName("[geography].[geography].[country].[Europe].[France]")
+                    xml.UName("[geography].[geography].[Europe].[France]")
                     xml.Caption("France")
-                    xml.LName("[geography].[geography].[country]")
-                    xml.LNum("1")
+                    xml.LName("[geography].[geography].[Europe]")
+                    xml.LNum("0")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName("[Measures].[amount]")
@@ -108,19 +108,19 @@ def test_xs0_axis_query15(executor):
             with xml.Tuple:
                 with xml.Member(Hierarchy="[product].[product]"):
                     xml.UName(
-                        "[product].[product].[licence].[Crazy Development].[olapy].[partnership]"
+                        "[product].[product].[Crazy Development].[olapy].[Partnership]"
                     )
-                    xml.Caption("partnership")
-                    xml.LName("[product].[product].[licence]")
-                    xml.LNum("2")
+                    xml.Caption("Partnership")
+                    xml.LName("[product].[product].[Crazy Development]")
+                    xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
                     xml.UName(
-                        "[geography].[geography].[country].[Europe].[Switzerland]"
+                        "[geography].[geography].[Europe].[Switzerland]"
                     )
                     xml.Caption("Switzerland")
-                    xml.LName("[geography].[geography].[country]")
-                    xml.LNum("1")
+                    xml.LName("[geography].[geography].[Europe]")
+                    xml.LNum("0")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[Measures]"):
                     xml.UName("[Measures].[amount]")
