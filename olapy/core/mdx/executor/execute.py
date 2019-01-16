@@ -474,15 +474,6 @@ class MdxEngine(object):
                 column_from_value = self._get_column_name_from_value(self.tables_loaded[tuple_as_list[0]], tup_att)
                 df = df[(df[column_from_value] == tup_att)]
 
-            # # df[(df['Year'] == 2010)]
-            # # 2010 must be as int, otherwise , pandas generate exception
-            # if tup_att.isdigit():
-            #     tup_att = int(tup_att)
-            # print(idx)
-            # print(tup_att)
-            # df = df[
-            #     (df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)
-            # ]
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -616,14 +607,14 @@ class MdxEngine(object):
         """
         df = self.tables_loaded[tuple_as_list[0]]
         if self.parser.hierarchized_tuples() or self._df_column_values_exist(tuple_as_list, df):
-            used_columns = 2
+            start_columns_used = 2
         else:
-            used_columns = 3
+            start_columns_used = 3
         if (len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns):
             # in case of [Geography].[Geography].[Country]
             cols = [tuple_as_list[-1]]
         else:
-            cols = df.columns[: len(tuple_as_list[used_columns:])]
+            cols = df.columns[: len(tuple_as_list[start_columns_used:])]
 
         columns_to_keep.update({tuple_as_list[0]: cols})
 
@@ -777,7 +768,6 @@ class MdxEngine(object):
             self.selected_measures = self.change_measures(query_axes["all"])
 
         tables_n_columns = self.get_tables_and_columns(query_axes)
-
         columns_to_keep = OrderedDict(
             (table, columns)
             for table, columns in tables_n_columns["all"].items()
