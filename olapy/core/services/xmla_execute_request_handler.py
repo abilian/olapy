@@ -94,27 +94,35 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         all_level_columns = self._get_lvl_column_by_dimension(all_tuples)
         for idx, tupl in enumerate(tupls):
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
-            d_tup = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
+            current_lvl_name = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
             current_dimension = tuple_without_minus_1[0]
             if all(used_column in self.executor.tables_loaded[current_dimension].columns for used_column in
                    all_level_columns[current_dimension]):
                 uname = "[{0}].[{0}].[{1}].{2}".format(
-                    tuple_without_minus_1[0],
-                    d_tup,
+                    current_dimension,
+                    current_lvl_name,
                     ".".join(
                         [
-                            "[" + str(i) + "]"
-                            for i in tuple_without_minus_1[first_att - 1:]
+                            "[" + str(tuple_value) + "]"
+                            for tuple_value in tuple_without_minus_1[first_att - 1:]
                         ]
                     ),
                 )
             else:
-                uname = ".".join(["[" + tuple_att + "]" for tuple_att in all_tuples[idx]])
+                uname = "[{0}].[{0}].{1}".format(
+                    current_dimension,
+                    ".".join(
+                        [
+                            "[" + str(tuple_value) + "]"
+                            for tuple_value in tuple_without_minus_1[first_att - 1:]
+                        ]
+                    ),
+                )
 
             with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
                 xml.UName(uname)
                 xml.Caption(str((tuple_without_minus_1[-1])))
-                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], d_tup))
+                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], current_lvl_name))
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo("131076")
 
