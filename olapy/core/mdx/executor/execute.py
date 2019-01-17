@@ -394,11 +394,13 @@ class MdxEngine(object):
                         query_used_column = tupl[2: None]
                     else:
                         query_used_column = tupl[-1]
-                    tables_columns.update(
-                        {
-                            tupl[0]: df.columns[: len(query_used_column)]
-                        }
-                    )
+
+                    if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(query_used_column)]):
+                        tables_columns.update(
+                            {
+                                tupl[0]: df.columns[: len(query_used_column)]
+                            }
+                        )
 
             axes.update({axis: tables_columns})
         return axes
@@ -768,6 +770,7 @@ class MdxEngine(object):
             self.selected_measures = self.change_measures(query_axes["all"])
 
         tables_n_columns = self.get_tables_and_columns(query_axes)
+
         columns_to_keep = OrderedDict(
             (table, columns)
             for table, columns in tables_n_columns["all"].items()
