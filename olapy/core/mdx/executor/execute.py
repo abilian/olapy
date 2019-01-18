@@ -393,7 +393,7 @@ class MdxEngine(object):
                     if self.parser.hierarchized_tuples() or self._df_column_values_exist(tupl, df):
                         query_used_column = tupl[2: None]
                     else:
-                        query_used_column = tupl[-1]
+                        query_used_column = tupl
 
                     if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(query_used_column)]):
                         tables_columns.update(
@@ -612,13 +612,14 @@ class MdxEngine(object):
             start_columns_used = 2
         else:
             start_columns_used = 3
+        # todo change to simplest solution
         if (len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns):
-            # in case of [Geography].[Geography].[Country]
-            cols = [tuple_as_list[-1]]
+            columns_to_keep.update({tuple_as_list[0]: [tuple_as_list[-1]]})
         else:
-            cols = df.columns[: len(tuple_as_list[start_columns_used:])]
+            # if len(columns_to_keep.get(tuple_as_list[0], [])) < len(
+            #     df.columns[: len(tuple_as_list[start_columns_used:])]):
+            columns_to_keep.update({tuple_as_list[0]: df.columns[: len(tuple_as_list[start_columns_used:])]})
 
-        columns_to_keep.update({tuple_as_list[0]: cols})
 
     @staticmethod
     def _uniquefy_tuples(tuples):
