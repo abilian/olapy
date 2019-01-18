@@ -620,7 +620,6 @@ class MdxEngine(object):
             #     df.columns[: len(tuple_as_list[start_columns_used:])]):
             columns_to_keep.update({tuple_as_list[0]: df.columns[: len(tuple_as_list[start_columns_used:])]})
 
-
     @staticmethod
     def _uniquefy_tuples(tuples):
         """
@@ -800,7 +799,6 @@ class MdxEngine(object):
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
-
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
