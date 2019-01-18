@@ -784,7 +784,7 @@ class MdxEngine(object):
         if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             # tuples_on_mdx_query.sort(key=lambda x: x[0])
-            tuples_on_mdx_query.sort()
+            tuples_on_mdx_query.sort(key=len)
 
         # if we have tuples in axes
         # to avoid prob with query like this:
