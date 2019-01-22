@@ -784,9 +784,10 @@ class MdxEngine(object):
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             # tuples_on_mdx_query.sort(key=lambda x: x[0])
         # sort by tuple length
-        tuples_on_mdx_query.sort(key=len)
-        # sort by tuple dimensions, we dont want something like [X].[Y].[X] But instead [X].[X].[Y]
-        tuples_on_mdx_query.sort(key=lambda x: x[0])
+        # tuples_on_mdx_query.sort(key=len)
+        # # sort by tuple dimensions, we dont want something like [X].[Y].[X] But instead [X].[X].[Y]
+        # tuples_on_mdx_query.sort(key=lambda x: x[0])
+        tuples_on_mdx_query.sort(key=lambda tupl: (tupl[0], len(tupl)))
 
         # if we have tuples in axes
         # to avoid prob with query like this:
