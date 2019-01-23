@@ -681,8 +681,13 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.DIMENSION_TYPE("3")
                                 xml.HIERARCHY_CARDINALITY("6")
                                 xml.DEFAULT_MEMBER(
-                                    "[{0}].[{0}].[{1}].[{2}]".format(
-                                        table_name, df.columns[0], column_attribut
+                                    "[{0}].[{0}].[{1}]".format(
+                                        table_name, column_attribut
+                                    )
+                                )
+                                xml.ALL_MEMBER(
+                                    "[{0}].[{0}].[{1}]".format(
+                                        table_name, column_attribut
                                     )
                                 )
                                 xml.STRUCTURE("0")
