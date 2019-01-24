@@ -344,6 +344,13 @@ class MdxEngine(object):
         :return:
         """
         for idx, column_value in enumerate(tupl[2:]):
+            # for numeric column values, pandas convert them to unicode, so try to convert to int
+            # ( exple Time dimension, with Year column value 2010 -> 2010 unicode)
+            try:
+                column_value = int(column_value)
+            except ValueError:
+                pass
+
             if column_value not in df[df.columns[idx]].unique():
                 return False
         return True
