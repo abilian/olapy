@@ -680,16 +680,22 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.HIERARCHY_CAPTION(table_name)
                                 xml.DIMENSION_TYPE("3")
                                 xml.HIERARCHY_CARDINALITY("6")
-                                xml.DEFAULT_MEMBER(
-                                    "[{0}].[{0}].[{1}]".format(
-                                        table_name, column_attribut
+                                # xml.DEFAULT_MEMBER(
+                                #     "[{0}].[{0}].[{1}]".format(
+                                #         table_name, column_attribut
+                                #     )
+                                # )
+
+                                # todo recheck
+                                if request.Properties.PropertyList.Format and \
+                                        request.Properties.PropertyList.Format.upper() == 'TABULAR':
+                                    # Format found in onlyoffice and not in excel
+                                    # ALL_MEMBER causes prob with excel
+                                    xml.ALL_MEMBER(
+                                        "[{0}].[{0}].[{1}]".format(
+                                            table_name, column_attribut
+                                        )
                                     )
-                                )
-                                xml.ALL_MEMBER(
-                                    "[{0}].[{0}].[{1}]".format(
-                                        table_name, column_attribut
-                                    )
-                                )
                                 xml.STRUCTURE("0")
                                 xml.IS_VIRTUAL("false")
                                 xml.IS_READWRITE("false")
