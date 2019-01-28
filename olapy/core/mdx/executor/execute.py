@@ -335,6 +335,26 @@ class MdxEngine(object):
 
         return list_measures
 
+    @staticmethod
+    def _df_column_values_exist(tupl, df):
+        """
+        for [Geography].[Geography].[Continent].[America].[Los Angeles]
+        check if America exist in Country column and
+        check if Los Angeles exist in City column ...
+        :return:
+        """
+        for idx, column_value in enumerate(tupl[2:]):
+            # for numeric column values, pandas convert them to unicode, so try to convert to int
+            # ( exple Time dimension, with Year column value 2010 -> 2010 unicode)
+            try:
+                column_value = int(column_value)
+            except ValueError:
+                pass
+
+            if column_value not in df[df.columns[idx]].unique():
+                return False
+        return True
+
     def get_tables_and_columns(self, tuple_as_list):
         """Get used dimensions and columns in the MDX Query.
 
@@ -376,22 +396,33 @@ class MdxEngine(object):
                         continue
 
                 else:
-                    tables_columns.update(
-                        {
-                            tupl[0]: self.tables_loaded[tupl[0]].columns[
-                                : len(
-                                    tupl[
-                                        2: None
-                                        if self.parser.hierarchized_tuples()
-                                        else -1
-                                    ]
-                                )
-                            ]
-                        }
-                    )
+                    df = self.tables_loaded[tupl[0]]
+                    if self.parser.hierarchized_tuples() or self._df_column_values_exist(tupl, df):
+                        query_used_column = tupl[2: None]
+                    else:
+                        query_used_column = tupl
+
+                    if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(query_used_column)]):
+                        tables_columns.update(
+                            {
+                                tupl[0]: df.columns[: len(query_used_column)]
+                            }
+                        )
 
             axes.update({axis: tables_columns})
         return axes
+
+    def _get_df_subset_from_tuple(self, df, tupl):
+        if tupl[-1] in df.columns:
+            return df[(df[tupl[-1]].notnull())]
+        else:
+            column_from_value = self.tables_loaded[tupl[0]].columns[len(tupl[3:])]
+            return df[(df[column_from_value] == tupl[-1])]
+
+    def _get_column_name_from_value(self, df, column_value):
+        for column in df.columns:
+            if column_value in df[column].unique():
+                return column
 
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
         """
@@ -431,22 +462,27 @@ class MdxEngine(object):
         df = dataframe_in
         #  tuple_as_list like ['Geography','Geography','Continent']
         #  return df with Continent column non empty
-        if len(tuple_as_list) == 3:
-            df = df[(df[tuple_as_list[-1]].notnull())]
+        # if len(tuple_as_list) == 3:
+        #     df = self._get_df_subset_from_tuple(df, tuple_as_list)
 
         # tuple_as_list like['Geography', 'Geography', 'Continent' , 'America','US']
         # execute : df[(df['Continent'] == 'America')] and
         #           df[(df['Country'] == 'US')]
-        elif len(tuple_as_list) > 3:
-            for idx, tup_att in enumerate(tuple_as_list[3:]):
-                # df[(df['Year'] == 2010)]
-                # 2010 must be as int, otherwise , pandas generate exception
-                if tup_att.isdigit():
-                    tup_att = int(tup_att)
+        # elif len(tuple_as_list) > 3:
+        for idx, tup_att in enumerate(tuple_as_list[2:]):
 
-                df = df[
-                    (df[self.tables_loaded[tuple_as_list[0]].columns[idx]] == tup_att)
-                ]
+            # df[(df['Year'] == 2010)]
+            # 2010 must be as int, otherwise , pandas generate exception
+            if tup_att.isdigit():
+                tup_att = int(tup_att)
+
+            if tup_att in df.columns:
+                df = df[(df[tup_att].notnull())]
+            else:
+                # todo check ex time
+                column_from_value = self._get_column_name_from_value(self.tables_loaded[tuple_as_list[0]], tup_att)
+                df = df[(df[column_from_value] == tup_att)]
+
         cols = list(itertools.chain.from_iterable(columns_to_keep))
         return df[cols + self.selected_measures]
 
@@ -578,20 +614,18 @@ class MdxEngine(object):
 
         :return: updated columns_to_keep
         """
-
-        columns = 2 if self.parser.hierarchized_tuples() else 3
-        if (
-            len(tuple_as_list) == 3
-            and tuple_as_list[-1] in self.tables_loaded[tuple_as_list[0]].columns
-        ):
-            # in case of [Geography].[Geography].[Country]
-            cols = [tuple_as_list[-1]]
+        df = self.tables_loaded[tuple_as_list[0]]
+        if self.parser.hierarchized_tuples() or self._df_column_values_exist(tuple_as_list, df):
+            start_columns_used = 2
         else:
-            cols = self.tables_loaded[tuple_as_list[0]].columns[
-                : len(tuple_as_list[columns:])
-            ]
-
-        columns_to_keep.update({tuple_as_list[0]: cols})
+            start_columns_used = 3
+        # todo change to simplest solution
+        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns):
+            columns_to_keep.update({tuple_as_list[0]: [tuple_as_list[-1]]})
+        else:
+            # if len(columns_to_keep.get(tuple_as_list[0], [])) < len(
+            #     df.columns[: len(tuple_as_list[start_columns_used:])]):
+            columns_to_keep.update({tuple_as_list[0]: df.columns[: len(tuple_as_list[start_columns_used:])]})
 
     @staticmethod
     def _uniquefy_tuples(tuples):
@@ -755,7 +789,12 @@ class MdxEngine(object):
         ]
         if not self.parser.hierarchized_tuples():
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
-            tuples_on_mdx_query.sort(key=lambda x: x[0])
+            # tuples_on_mdx_query.sort(key=lambda x: x[0])
+        # sort by tuple length
+        # tuples_on_mdx_query.sort(key=len)
+        # # sort by tuple dimensions, we dont want something like [X].[Y].[X] But instead [X].[X].[Y]
+        # tuples_on_mdx_query.sort(key=lambda x: x[0])
+        tuples_on_mdx_query.sort(key=lambda tupl: (tupl[0], len(tupl)))
 
         # if we have tuples in axes
         # to avoid prob with query like this:
@@ -768,11 +807,9 @@ class MdxEngine(object):
                 df_to_fusion = self.tuples_to_dataframes(
                     tuples_on_mdx_query, columns_to_keep
                 )
-
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
-
             sort = self.parser.hierarchized_tuples()
             # margins=True for columns total !!!!!
             result = df.groupby(cols, sort=sort).sum()[self.selected_measures]

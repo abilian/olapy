@@ -72,29 +72,57 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             )
         )
 
+    def _get_lvl_column_by_dimension(self, all_tuples):
+        """
+        todo
+        :param all_tuples:
+        :param used_tuples:
+        :return:
+        """
+        used_levels = {}
+        for tupl in all_tuples:
+            if not tupl[0].upper() == "MEASURES":
+                used_levels[tupl[0]] = list(used_levels.get(tupl[0], [])) + [tupl[2]]
+        return used_levels
+
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):
         first_att = kwargs.get("first_att")
         split_df = kwargs.get("split_df")
-        for tupl in tupls:
+        all_tuples = self.executor.parser.decorticate_query(self.mdx_query)['all']
+        # [Geography].[Geography].[Continent]  -> first_lvlname : Country
+        # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
+        all_level_columns = self._get_lvl_column_by_dimension(all_tuples)
+        for idx, tupl in enumerate(tupls):
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
-            d_tup = split_df[tuple_without_minus_1[0]].columns[
-                len(tuple_without_minus_1) - first_att
-            ]
-            with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
-                xml.UName(
-                    "[{0}].[{0}].[{1}].{2}".format(
-                        tuple_without_minus_1[0],
-                        d_tup,
-                        ".".join(
-                            [
-                                "[" + str(i) + "]"
-                                for i in tuple_without_minus_1[first_att - 1:]
-                            ]
-                        ),
-                    )
+            current_lvl_name = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
+            current_dimension = tuple_without_minus_1[0]
+            if all(used_column in self.executor.tables_loaded[current_dimension].columns for used_column in
+                   all_level_columns[current_dimension]):
+                uname = "[{0}].[{0}].[{1}].{2}".format(
+                    current_dimension,
+                    current_lvl_name,
+                    ".".join(
+                        [
+                            "[" + str(tuple_value) + "]"
+                            for tuple_value in tuple_without_minus_1[first_att - 1:]
+                        ]
+                    ),
                 )
+            else:
+                uname = "[{0}].[{0}].{1}".format(
+                    current_dimension,
+                    ".".join(
+                        [
+                            "[" + str(tuple_value) + "]"
+                            for tuple_value in tuple_without_minus_1[first_att - 1:]
+                        ]
+                    ),
+                )
+
+            with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
+                xml.UName(uname)
                 xml.Caption(str((tuple_without_minus_1[-1])))
-                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], d_tup))
+                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], current_lvl_name))
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo("131076")
 
@@ -131,7 +159,6 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                             self._gen_measures_xs0(xml, tupls)
                             if tupls[0][-1] in self.executor.measures:
                                 continue
-
                         self._gen_xs0_tuples(
                             xml, tupls, split_df=splitted_df, first_att=first_att
                         )
@@ -188,7 +215,6 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             )
 
         xml = xmlwitch.Builder()
-
         tuples, first_att = self._generate_tuples_xs0(splitted_df, mdx_query_axis)
         if tuples:
             xml = self.tuples_2_xs0(tuples, splitted_df, first_att, axis)
