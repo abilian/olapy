@@ -14,7 +14,7 @@ pytz==2018.9              # via pandas, spyne
 pyyaml==4.2b4
 regex==2019.1.24
 six==1.12.0               # via python-dateutil
-spyne==2.13.4a1
+spyne==2.13.3a0
 sqlalchemy==1.2.17
 typing==3.6.6
 xmlwitch==0.3
