@@ -635,12 +635,12 @@ class MdxEngine(object):
         :param tuples: list of string of tuples.
         :return: list of string of unique tuples.
         """
-        uniquefy = []
-        for tup in tuples:
-            if tup not in uniquefy:
-                uniquefy.append(tup)
+        unique_tuples = []
+        for tupl in tuples:
+            if tupl not in unique_tuples and tupl[0].upper() != "MEASURES":
+                unique_tuples.append(tupl)
 
-        return uniquefy
+        return unique_tuples
 
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
         """
@@ -784,12 +784,8 @@ class MdxEngine(object):
             if table != self.facts
         )
 
-        tuples_on_mdx_query = [
-            tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
-        ]
-        if not self.parser.hierarchized_tuples():
-            tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
-            # tuples_on_mdx_query.sort(key=lambda x: x[0])
+        tuples_on_mdx_query = self._uniquefy_tuples(query_axes["all"])
+        # tuples_on_mdx_query.sort(key=lambda x: x[0])
         # sort by tuple length
         # tuples_on_mdx_query.sort(key=len)
         # # sort by tuple dimensions, we dont want something like [X].[Y].[X] But instead [X].[X].[Y]
