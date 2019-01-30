@@ -14,7 +14,7 @@ from .queries import (
     query_posgres1,
     query_posgres2,
     query_postgres3,
-)
+    query16)
 
 
 def test_execution_query12(executor):
@@ -227,9 +227,7 @@ def test_execution_query7(executor):
                 "amount": [64, 16, 4, 1, 2, 8, 32, 128],
             }
         )
-        .groupby(
-            ["company", "year", "quarter", "month", "day", "continent"], sort=False
-        )
+        .groupby(["company", "year", "quarter", "month", "day", "continent"], sort=False)
         .sum()
     )
 
@@ -304,6 +302,48 @@ def test_execution_query9(executor):
         )
         .groupby(["year", "quarter", "month", "day", "continent"], sort=False)
         .sum()
+    )
+
+    assert_frame_equal(df, test_df)
+
+
+def test_execution_query16(executor):
+    df = executor.execute_mdx(query16)["result"]
+    test_df = (
+
+        pd.DataFrame(
+            {
+                "company": ["Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
+                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
+                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
+                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
+                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
+                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development"],
+                "article": [-1, -1, -1, -1, -1, -1, -1, -1, -1, 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy',
+                            'olapy',
+                            'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy'],
+                "licence": [-1, -1, -1, -1, -1, -1, -1, -1, -1, "Corporate", "Corporate", "Corporate", "Corporate",
+                            "Corporate",
+                            "Corporate", "Corporate", "Partnership", "Partnership", "Partnership", "Personal",
+                            "Personal",
+                            "Personal", "Personal", "Personal"],
+                "continent": ["America", "America", "America", "Europe", "Europe", "Europe", "Europe", "Europe",
+                              "Europe", "America", "America",
+                              "America", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe",
+                              "Europe", "Europe", "Europe", "Europe"],
+                "country": [-1, "United States", "United States", -1, "France", "France", "Switzerland", "Switzerland",
+                            "Switzerland", -1, "United States", "United States", -1, "Switzerland", "Switzerland",
+                            "Switzerland", -1, "Switzerland", "Switzerland", -1, "France", "France", "Switzerland",
+                            "Switzerland"],
+                "city": [-1, -1, "New York", -1, -1, "Paris", -1, "Geneva", "Lausanne", -1, -1, "New York", -1, -1,
+                         "Geneva",
+                         "Lausanne", -1, -1, "Lausanne", -1, -1, "Paris", -1, "Lausanne"],
+                "amount": [768, 768, 768, 255, 4, 4, 248, 128, 56, 768, 768, 768, 144, 144, 128, 16, 96, 96, 32, 15, 4,
+                           4, 8,
+                           8, ]
+            }
+        ).groupby(['company', 'article', 'licence', 'continent', 'country', 'city']).sum()
+
     )
 
     assert_frame_equal(df, test_df)

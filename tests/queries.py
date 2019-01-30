@@ -194,6 +194,24 @@ FROM [sales]
 CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
+query16 = """
+SELECT {
+[product].[product].[Crazy Development].[olapy].[Partnership],
+[product].[product].[Crazy Development].[olapy].[Personal],
+[product].[product].[Crazy Development].[olapy].[Corporate],
+[product].[product].[Crazy Development]}*{
+[geography].[geography].[America].[United States].[New York],
+[geography].[geography].[America].[United States],
+[geography].[geography].[America],
+[geography].[geography].[Europe].[Switzerland].[Geneva],
+[geography].[geography].[Europe].[Switzerland].[Lausanne],
+[geography].[geography].[Europe].[Switzerland],
+[geography].[geography].[Europe].[France].[Paris],
+[geography].[geography].[Europe].[France],
+[geography].[geography].[Europe],
+[geography].[geography].[America]} ON 0 FROM [sales]
+"""
+
 where = "WHERE [time].[calendar].[day].[May 12,2010]"
 
 query_posgres1 = """
