@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
 import threading
 from wsgiref.simple_server import make_server
 
@@ -513,3 +512,57 @@ def test_query4(conn):
     for item in columns:
         strr += str(item)
     assert strr == TEST_QUERY_AXIS0
+
+
+def test_mdschema_members_MEMBER_UNIQUE_NAME(conn):
+    discover = conn.Discover(
+        "MDSCHEMA_MEMBERS",
+        restrictions={"CUBE_NAME": "main",
+                      "MEMBER_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy].[Partnership]"},
+        properties={"Catalog": "main"},
+    )[0]
+    assert discover["CATALOG_NAME"] == "main"
+    assert discover["CUBE_NAME"] == "main"
+    assert discover["DIMENSION_UNIQUE_NAME"] == "[product]"
+    assert discover["HIERARCHY_UNIQUE_NAME"] == "[product].[product]"
+    assert discover["LEVEL_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert discover["LEVEL_NUMBER"] == "3"
+    assert discover["MEMBER_ORDINAL"] == "0"
+    assert discover["MEMBER_NAME"] == "Partnership"
+    assert discover["MEMBER_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy].[Partnership]"
+    assert discover["MEMBER_TYPE"] == "1"
+    assert discover["MEMBER_CAPTION"] == "Partnership"
+    assert discover["CHILDREN_CARDINALITY"] == "1"
+    assert discover["PARENT_LEVEL"] == "0"
+    assert discover["PARENT_COUNT"] == "0"
+    assert discover["PARENT_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert discover["MEMBER_KEY"] == "Partnership"
+    assert discover["IS_PLACEHOLDERMEMBER"] == "false"
+    assert discover["IS_DATAMEMBER"] == "false"
+
+
+def test_mdschema_members_LEVEL_UNIQUE_NAME(conn):
+    discover = conn.Discover(
+        "MDSCHEMA_MEMBERS",
+        restrictions={"CUBE_NAME": "main",
+                      "LEVEL_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy]"},
+        properties={"Catalog": "main"},
+    )[0]
+    assert discover["CATALOG_NAME"] == "main"
+    assert discover["CUBE_NAME"] == "main"
+    assert discover["DIMENSION_UNIQUE_NAME"] == "[product]"
+    assert discover["HIERARCHY_UNIQUE_NAME"] == "[product].[product]"
+    assert discover["LEVEL_UNIQUE_NAME"] == "[product].[product].[Crazy Development]"
+    assert discover["LEVEL_NUMBER"] == "2"
+    assert discover["MEMBER_ORDINAL"] == "0"
+    assert discover["MEMBER_NAME"] == "olapy"
+    assert discover["MEMBER_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert discover["MEMBER_TYPE"] == "1"
+    assert discover["MEMBER_CAPTION"] == "olapy"
+    assert discover["CHILDREN_CARDINALITY"] == "1"
+    assert discover["PARENT_LEVEL"] == "0"
+    assert discover["PARENT_COUNT"] == "0"
+    assert discover["PARENT_UNIQUE_NAME"] == "[product].[product].[Crazy Development]"
+    assert discover["MEMBER_KEY"] == "olapy"
+    assert discover["IS_PLACEHOLDERMEMBER"] == "false"
+    assert discover["IS_DATAMEMBER"] == "false"
