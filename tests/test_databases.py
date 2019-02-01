@@ -313,36 +313,30 @@ def test_execution_query16(executor):
 
         pd.DataFrame(
             {
-                "company": ["Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
-                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
-                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
-                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
-                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development",
-                            "Crazy Development", "Crazy Development", "Crazy Development", "Crazy Development"],
+                "company": ['Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
+                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
+                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
+                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
+                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
+                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development'],
                 "article": [-1, -1, -1, -1, -1, -1, -1, -1, -1, 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy',
-                            'olapy',
-                            'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy'],
-                "licence": [-1, -1, -1, -1, -1, -1, -1, -1, -1, "Corporate", "Corporate", "Corporate", "Corporate",
-                            "Corporate",
-                            "Corporate", "Corporate", "Partnership", "Partnership", "Partnership", "Personal",
-                            "Personal",
-                            "Personal", "Personal", "Personal"],
-                "continent": ["America", "America", "America", "Europe", "Europe", "Europe", "Europe", "Europe",
-                              "Europe", "America", "America",
-                              "America", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe", "Europe",
-                              "Europe", "Europe", "Europe", "Europe"],
-                "country": [-1, "United States", "United States", -1, "France", "France", "Switzerland", "Switzerland",
-                            "Switzerland", -1, "United States", "United States", -1, "Switzerland", "Switzerland",
-                            "Switzerland", -1, "Switzerland", "Switzerland", -1, "France", "France", "Switzerland",
-                            "Switzerland"],
-                "city": [-1, -1, "New York", -1, -1, "Paris", -1, "Geneva", "Lausanne", -1, -1, "New York", -1, -1,
-                         "Geneva",
-                         "Lausanne", -1, -1, "Lausanne", -1, -1, "Paris", -1, "Lausanne"],
-                "amount": [768, 768, 768, 255, 4, 4, 248, 128, 56, 768, 768, 768, 144, 144, 128, 16, 96, 96, 32, 15, 4,
-                           4, 8,
-                           8, ]
+                            'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy'],
+                "licence": [-1, -1, -1, -1, -1, -1, -1, -1, -1, 'Partnership', 'Partnership', 'Partnership', 'Personal',
+                            'Personal', 'Personal', 'Personal', 'Personal', 'Corporate', 'Corporate', 'Corporate',
+                            'Corporate', 'Corporate', 'Corporate', 'Corporate'],
+                "continent": ['America', 'Europe', 'America', 'Europe', 'Europe', 'America', 'Europe', 'Europe',
+                              'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
+                              'America', 'Europe', 'America', 'Europe', 'America', 'Europe', 'Europe'],
+                "country": [-1, -1, 'United States', 'Switzerland', 'France', 'United States', 'Switzerland',
+                            'Switzerland', 'France', -1, 'Switzerland', 'Switzerland', -1, 'Switzerland', 'France',
+                            'Switzerland', 'France', -1, -1, 'United States', 'Switzerland', 'United States',
+                            'Switzerland', 'Switzerland'],
+                "city": [-1, -1, -1, -1, -1, 'New York', 'Geneva', 'Lausanne', 'Paris', -1, -1, 'Lausanne', -1, -1, -1,
+                         'Lausanne', 'Paris', -1, -1, -1, -1, 'New York', 'Geneva', 'Lausanne'],
+                "amount": [768, 255, 768, 248, 4, 768, 128, 56, 4, 96, 96, 32, 15, 8, 4, 8, 4, 768, 144, 768, 144, 768,
+                           128, 16]
             }
-        ).groupby(['company', 'article', 'licence', 'continent', 'country', 'city']).sum()
+        ).groupby(['company', 'article', 'licence', 'continent', 'country', 'city'], sort=False).sum()
 
     )
 
