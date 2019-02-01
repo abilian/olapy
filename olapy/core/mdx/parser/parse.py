@@ -240,5 +240,4 @@ class Parser(object):
 
         :return: True | False
         """
-        # todo remove * (very bad solution)
-        return "Hierarchize" in self.mdx_query or '*' in self.mdx_query
+        return "Hierarchize" in self.mdx_query
