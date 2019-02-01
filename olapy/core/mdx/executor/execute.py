@@ -389,23 +389,16 @@ class MdxEngine(object):
             # we have to add measures directly to tables_columns
             for tupl in tuples:
                 if tupl[0].upper() == "MEASURES":
-                    if tupl[-1] not in measures:
-                        measures.append(tupl[-1])
-                        tables_columns.update({self.facts: measures})
-                    else:
-                        continue
+                    measures.append(tupl[-1])
+                    tables_columns.update({self.facts: measures})
 
                 else:
                     df = self.tables_loaded[tupl[0]]
-                    if self.parser.hierarchized_tuples() or self._df_column_values_exist(tupl, df):
-                        query_used_column = tupl[2: None]
-                    else:
-                        query_used_column = tupl
 
-                    if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(query_used_column)]):
+                    if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(tupl[2:])]):
                         tables_columns.update(
                             {
-                                tupl[0]: df.columns[: len(query_used_column)]
+                                tupl[0]: df.columns[: len(tupl[2:])]
                             }
                         )
 
@@ -777,7 +770,6 @@ class MdxEngine(object):
             self.selected_measures = self.change_measures(query_axes["all"])
 
         tables_n_columns = self.get_tables_and_columns(query_axes)
-
         columns_to_keep = OrderedDict(
             (table, columns)
             for table, columns in tables_n_columns["all"].items()
