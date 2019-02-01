@@ -12,6 +12,7 @@ About
 
 `https://olapy.readthedocs.io/en/latest/ <https://olapy.readthedocs.io/en/latest/>`_
 
+.. image:: docs/pictures/olapy.gif
 
 Status
 ~~~~~~
