@@ -54,20 +54,20 @@ class WSGIServer:
 
 
 def olapy_mdx_benchmark(queries, mdx_engine):
-    return [
-        Timer(lambda: mdx_engine.execute_mdx(query)).timeit(number=1)
-        for query in queries
-    ]
+    execution_time_results = []
+    for query in queries:
+        execution_time_results.append(Timer(lambda: mdx_engine.execute_mdx(query)).timeit(number=1))
+    return execution_time_results
 
 
 def olapy_xmla_benchmark(queries):
     provider = xmla.XMLAProvider()
     connection = provider.connect(location="http://{0}:{1}".format(HOST, PORT))
 
-    return [
-        Timer(lambda: connection.Execute(query, Catalog=BENCH_CUBE)).timeit(number=1)
-        for query in queries
-    ]
+    execution_time_results = []
+    for query in queries:
+        execution_time_results.append(Timer(lambda: connection.Execute(query, Catalog=BENCH_CUBE)).timeit(number=1))
+    return execution_time_results
 
 
 def get_olapy_server(Xmla_discover_request_handler, Xmla_execute_request_handler):
