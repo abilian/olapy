@@ -16,8 +16,8 @@ from olapy.core.mdx.executor import MdxEngine
 
 # do not remove this (used in profiler)
 from olapy.core.services.models import Command, ExecuteRequest, Propertieslist, Property
-from olapy.core.services.xmla import XmlaProviderService, get_spyne_app
-from olapy.core.services import XmlaDiscoverReqHandler
+from olapy.core.services.xmla import get_wsgi_application
+from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -353,7 +353,7 @@ def olapy_vs_iccube(file, mbench, conn):
         pass
 
 
-def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
+def olapy_query_execution_bench(file, mbench, conn, mdx_engine):
     t = PrettyTable(["Query", "olapy execution time"])
     cmd = (
         """SELECT FROM ["""
@@ -371,7 +371,7 @@ def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
         """SELECT NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{{
         [table0].[table0].[All table0A].Members}}}, {
         [table0].[table0].[table0A].["""
-        + str(xmla_tools.executor.star_schema_dataframe.table0A[1])
+        + str(mdx_engine.star_schema_dataframe.table0A[1])
         + """]})))
         DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
         ON COLUMNS FROM ["""
@@ -386,13 +386,13 @@ def olapy_query_execution_bench(file, mbench, conn, xmla_tools):
     t.add_row(["Query 2", mbench.bench(conn, cmd, CUBE_NAME)])
     tup = (
         "[table0].[table0].[table0A].["
-        + str(xmla_tools.executor.star_schema_dataframe.table0A[0])
+        + str(mdx_engine.star_schema_dataframe.table0A[0])
         + "]"
     )
     for d in range(REFINEMENT_LVL):
         tup += (
             ",\n[table0].[table0].[table0A].["
-            + str(xmla_tools.executor.star_schema_dataframe.table0A[d + 1])
+            + str(mdx_engine.star_schema_dataframe.table0A[d + 1])
             + "]"
         )
     cmd = (
@@ -469,20 +469,6 @@ xmla_p_server.Execute(xmla_p_server, request)
     os.remove("csv_olapy_bench_vs_other_olap_servers.py.profile")
 
 
-def _get_xmla_tools():
-    olapy_data = os.path.join(expanduser("~"), "olapy-data")
-    mdx_executor = MdxEngine()
-    mdx_executor.load_cube(CUBE_NAME)
-    xmla_tools = XmlaDiscoverReqHandler(
-        executor=mdx_executor,
-        olapy_data=olapy_data,
-        source_type="csv",
-        db_config=None,
-        cubes_config=None,
-    )
-    return xmla_tools
-
-
 def main():
     file = open(
         "bench_result" + str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")), "w"
@@ -492,14 +478,15 @@ def main():
     mbench = MicBench()
     file.write("Benchmarks are made with cpu :\n")
     file.write(cpuinfo.get_cpu_info()["brand"] + "\n\n")
-    xmla_tools = _get_xmla_tools()
-    application = get_spyne_app(xmla_tools)
-    wsgi_application = WsgiApplication(application)
+
+    mdx_engine = MdxEngine()
+    mdx_engine.load_cube(CUBE_NAME)
+    wsgi_application = get_wsgi_application(mdx_engine)
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
     server.start()
     provider = xmla.XMLAProvider()
     conn = provider.connect(location=server.url)
-    olapy_query_execution_bench(file, mbench, conn, xmla_tools)
+    olapy_query_execution_bench(file, mbench, conn, mdx_engine)
     olapy_vs_mondrian(file, mbench, conn)
     olapy_vs_iccube(file, mbench, conn)
     olapy_profile(file)

@@ -2,19 +2,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 import shutil
+from urllib.parse import urlparse
+
+import sqlalchemy
 import sys
 from os.path import expanduser
 
 from cpuinfo import cpuinfo, os
 from olap.xmla import xmla
 from prettytable import PrettyTable
-from spyne.server.wsgi import WsgiApplication
+
+from olapy.core.mdx.executor import MdxEngine
 from tests.queries import query1, query6, query7, query9
 from tests.test_xmla import WSGIServer
 
-from olapy.core.mdx.tools.olapy_config_file_parser import DbConfigParser
-from olapy.core.services.xmla import get_spyne_app
-from olapy.core.services import XmlaDiscoverReqHandler
+from olapy.core.services.xmla import get_wsgi_application
 
 from .micro_bench import MicBench
 
@@ -44,15 +46,15 @@ def fix_query_lowercase_db(query):
     # for postgres table names and columns are lowercase
     return (
         query.replace("Amount", "amount")
-        .replace("Time", "time")
-        .replace("Year", "year")
-        .replace("Quarter", "quarter")
-        .replace("Month", "month")
-        .replace("Product", "product")
-        .replace("Company", "company")
-        .replace("Day", "day")
-        .replace("Geography", "geography")
-        .replace("Continent", "continent")
+            .replace("Time", "time")
+            .replace("Year", "year")
+            .replace("Quarter", "quarter")
+            .replace("Month", "month")
+            .replace("Product", "product")
+            .replace("Company", "company")
+            .replace("Day", "day")
+            .replace("Geography", "geography")
+            .replace("Continent", "continent")
     )
 
 
@@ -92,16 +94,15 @@ def main():
             + "\n----------------------------------------------------------\n\n"
         )
 
-    olapy_data = os.path.join(expanduser("~"), "olapy-data")
-    db_config = DbConfigParser()
-    # todo conn string
-    db_conf = db_config.get_db_credentials(os.path.join(olapy_data, "olapy-config.yml"))
-
-    xmla_tools = XmlaDiscoverReqHandler(
-        olapy_data=olapy_data, source_type="db", db_config=db_conf, cubes_config=None
+    sqlalchemy_uri = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite://")
+    db = urlparse(sqlalchemy_uri).path.replace("/", "")
+    engine = sqlalchemy.create_engine(sqlalchemy_uri)
+    mdx_engine = MdxEngine(sqla_engine=engine, source_type="db")
+    mdx_engine.load_cube(
+        cube_name=db if db else "main", fact_table_name="facts"
     )
-    application = get_spyne_app(xmla_tools)
-    wsgi_application = WsgiApplication(application)
+    wsgi_application = get_wsgi_application(mdx_engine)
+
     server = WSGIServer(application=wsgi_application, host=HOST, port=PORT)
 
     server.start()
