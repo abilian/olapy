@@ -7,7 +7,7 @@ import pandas as pd
 
 from pprint import pprint
 from ..mdx.executor import MdxEngine
-from ..patch.patch_olapy import patch_mdx_engine
+from ..mdx.executor.utils import inject_dataframes
 from ..services.request_properties_models import (
     DiscoverRequest,
     Restriction,
@@ -86,25 +86,21 @@ def get_response(
     :return: xmla response
     """
     if mdx_engine:
-        mdx_engine = mdx_engine
+        executor = mdx_engine
     else:
-        mdx_engine = MdxEngine(facts=facts_table_name)
-    patch_mdx_engine(mdx_engine, dataframes, facts_table_name=facts_table_name)
+        executor = MdxEngine(facts=facts_table_name)
+    inject_dataframes(executor, dataframes, facts_table_name=facts_table_name)
 
     module = importlib.import_module(
         "olapy.core.services." + output + "_discover_request_handler"
     )
-    discover_request_handler = getattr(module, output.title() + "DiscoverReqHandler")(
-        mdx_engine
-    )
+    discover_request_handler = getattr(module, output.title() + "DiscoverReqHandler")(executor)
     discover_request_handler.change_cube(xmla_request_params.get("cube"))
 
     module = importlib.import_module(
         "olapy.core.services." + output + "_execute_request_handler"
     )
-    execute_request_handler = getattr(module, output.title() + "ExecuteReqHandler")(
-        mdx_engine
-    )
+    execute_request_handler = getattr(module, output.title() + "ExecuteReqHandler")(executor)
 
     xmla_service = XmlaProviderLib(discover_request_handler, execute_request_handler)
 

@@ -77,9 +77,7 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
     return star_schema_df[[col for col in fusion.columns if col.lower()[-3:] != "_id"]]
 
 
-def patch_mdx_engine(
-    mdx_engine, dataframes, facts_table_name="Facts", cube_name="sales"
-):
+def inject_dataframes(mdx_engine, dataframes, facts_table_name="Facts", cube_name="sales"):
     mdx_engine.csv_files_cubes.append(cube_name)
 
     mdx_engine.cube = cube_name
