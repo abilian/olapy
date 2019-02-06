@@ -131,7 +131,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 }
             ):
                 xml.write(xsd)
-                if PropertyName is not "":
+                if PropertyName:
 
                     with xml.row:
                         xml.PropertyName(PropertyName)

@@ -81,7 +81,7 @@ class DictDiscoverReqHandler:
         Value,
     ):
 
-        if PropertyName is not "":
+        if PropertyName:
             response = [
                 {
                     "PropertyName": PropertyName,
