@@ -235,14 +235,10 @@ class MdxEngine(object):
         if measures:
             for measure in measures:
                 if star_schema_df[measure].dtype == object:
-                    star_schema_df[measure] = star_schema_df[measure].str.replace(
-                        " ", ""
-                    )
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
                     try:
-                        star_schema_df[measure] = star_schema_df[measure].astype(
-                            "float"
-                        )
-                    except:
+                        star_schema_df[measure] = star_schema_df[measure].astype("float")
+                    except ValueError:
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 

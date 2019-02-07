@@ -40,7 +40,7 @@ class SparkMdxEngine(MdxEngine):
                     star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
                     # try:
                     star_schema_df[measure] = star_schema_df[measure].astype("float")
-                    # except:
+                    # except ValueError:
                     #     star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 
