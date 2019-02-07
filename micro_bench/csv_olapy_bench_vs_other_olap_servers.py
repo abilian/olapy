@@ -4,20 +4,16 @@ import cProfile
 import datetime
 import os
 import pstats
-from os.path import expanduser
+
 
 import cpuinfo
 from olap.xmla import xmla
 from prettytable import PrettyTable
-from spyne.server.wsgi import WsgiApplication
 from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.executor import MdxEngine
 
-# do not remove this (used in profiler)
-from olapy.core.services.models import Command, ExecuteRequest, Propertieslist, Property
 from olapy.core.services.xmla import get_wsgi_application
-from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -440,6 +436,10 @@ def olapy_profile(file):
                 FROM [sales]
                 WHERE ([Measures].[Amount])
                 CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS'''
+
+from os.path import expanduser
+from olapy.core.services.models import Command, ExecuteRequest, Propertieslist, Property
+from olapy.core.services import XmlaDiscoverReqHandler
 
 request = ExecuteRequest()
 request.Command = Command(Statement=cmd)

@@ -12,12 +12,11 @@ import pandas as pd
 import bonobo
 import yaml
 from bonobo.config import use
-from pandas import DataFrame
 
 
 @use("input_file_path")
 def extract_excel_pd(**kwargs):
-    # type: (dict) -> DataFrame
+    # type: (dict) -> pd.DataFrame
     """
     Bonobo's First chain, extract data from source.
     :return: Pandas DataFrame

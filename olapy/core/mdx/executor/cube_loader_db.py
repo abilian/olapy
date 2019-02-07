@@ -4,7 +4,7 @@ from typing import Dict, Text
 
 import pandas as pd
 import pandas.io.sql as psql
-from pandas import DataFrame
+from pandas.errors import MergeError
 from sqlalchemy import inspect
 
 from ..tools.connection import get_dialect_name
@@ -23,7 +23,7 @@ class CubeLoaderDB(CubeLoader):
         self.sqla_engine = sqla_engine
 
     def load_tables(self):
-        # type: () -> Dict[Text, DataFrame]
+        # type: () -> Dict[Text, pd.DataFrame]
         """
         Load tables from database.
 
@@ -53,7 +53,7 @@ class CubeLoaderDB(CubeLoader):
         return tables
 
     def construct_star_schema(self, facts):
-        # type: (Text) -> DataFrame
+        # type: (Text) -> pd.DataFrame
         """
         Construct star schema DataFrame from database.
 
@@ -76,7 +76,7 @@ class CubeLoaderDB(CubeLoader):
                         "SELECT * FROM {}".format(db_table_name), self.sqla_engine
                     )
                 )
-            except BaseException:
+            except MergeError:
                 print("No common column between {} and {}".format(facts, db_table_name))
 
         return df

@@ -10,6 +10,7 @@ from os.path import expanduser
 
 from cpuinfo import cpuinfo, os
 from olap.xmla import xmla
+from olap.xmla.interfaces import XMLAException
 from prettytable import PrettyTable
 
 from olapy.core.mdx.executor import MdxEngine
@@ -131,11 +132,10 @@ def main():
                 )
 
             file.write(str(t) + "\n\n")
-        except:
+        except XMLAException:
             type, value, traceback = sys.exc_info()
             print("Error opening %s" % (value))
             print("Can't connect to {0} database".format(dbms))
-            pass
     server.stop()
 
 

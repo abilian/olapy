@@ -26,7 +26,6 @@ from typing import List, Dict
 import attr
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
 
 from ..parser.parse import Parser
 
@@ -163,7 +162,7 @@ class MdxEngine(object):
             self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
-        # type: (str) -> Dict[str, DataFrame]
+        # type: (str) -> Dict[str, pd.DataFrame]
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.
@@ -679,7 +678,7 @@ class MdxEngine(object):
         return df_to_fusion
 
     def fusion_dataframes(self, df_to_fusion):
-        # type: (List[DataFrame]) -> DataFrame
+        # type: (List[pd.DataFrame]) -> pd.DataFrame
         """Concat chunks of DataFrames.
 
         :param df_to_fusion: List of Pandas DataFrame.

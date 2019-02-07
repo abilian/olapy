@@ -4,7 +4,6 @@ import os
 
 import pandas as pd
 import pandas.io.sql as psql
-from pandas import DataFrame
 from typing import Dict
 
 from .cube_loader import CubeLoader
@@ -37,7 +36,7 @@ class CubeLoaderCustom(CubeLoader):
         return table
 
     def load_tables(self):
-        # type: () -> Dict[str, DataFrame]
+        # type: () -> Dict[str, pd.DataFrame]
         """
         Load tables from config file.
         :return: tables dict with table name as key and DataFrame as value
@@ -55,13 +54,16 @@ class CubeLoaderCustom(CubeLoader):
                 table_name = dimension["name"]
 
             if "columns" in dimension and dimension["columns"]:
-                df = df[list(dimension["columns"].keys())]
+                try:
+                    df = df[list(dimension["columns"].keys())]
 
-                # rename columns if value not None
-                df.rename(
-                    columns=({k: v for k, v in dimension["columns"].items() if v}),
-                    inplace=True,
-                )
+                    # rename columns if value not None
+                    df.rename(
+                        columns=({k: v for k, v in dimension["columns"].items() if v}),
+                        inplace=True,
+                    )
+                except KeyError:
+                    pass
 
             tables[table_name] = df[
                 [col for col in df.columns if col.lower()[-2:] != "id"]
@@ -122,7 +124,7 @@ class CubeLoaderCustom(CubeLoader):
                 if table["columns"]:
                     df = df[table["columns"]]
 
-            except BaseException:
+            except KeyError:
                 print("table columns doesn't exist")
                 print("pass with all columns")
 
@@ -130,7 +132,7 @@ class CubeLoaderCustom(CubeLoader):
                 if table["new_names"]:
                     df = df.rename(columns=table["new_names"])
 
-            except BaseException:
+            except KeyError:
                 print("verify your old and new columns names")
                 print("pass with no change")
 

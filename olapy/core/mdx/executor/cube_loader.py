@@ -4,6 +4,7 @@ import os
 from typing import Dict, Text
 
 import pandas as pd
+from pandas.errors import MergeError
 
 
 class CubeLoader(object):
@@ -42,7 +43,7 @@ class CubeLoader(object):
                 df = df.merge(
                     pd.read_csv(os.path.join(self.cube_path, file_name), sep=self.sep)
                 )
-            except BaseException:
+            except MergeError:
                 print("No common column")
 
         return df

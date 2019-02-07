@@ -10,7 +10,6 @@ from olapy.core.services import XmlaExecuteReqHandler
 
 from benchmark_tools import (
     run_benchmark,
-    plot_bar_chart,
     save_benchmark_result,
     BENCH_CUBE,
 )

@@ -59,7 +59,7 @@ class SparkCubeLoader(CubeLoader):
                 )
                 common_columns = list(set(df.columns).intersection(fusion.columns))
                 fusion = fusion.join(df, common_columns)
-            except BaseException:
+            except IndexError:
                 print("No common column")
 
         return fusion

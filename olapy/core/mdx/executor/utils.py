@@ -24,6 +24,7 @@ get_response(xmla_request_params=xmla_request_params,dataframes=dataframes, outp
 """
 
 import numpy as np
+from pandas.errors import MergeError
 
 
 def _clean(dataframes):
@@ -68,7 +69,7 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
     for df in dataframes.values():
         try:
             fusion = fusion.merge(df)
-        except BaseException:
+        except MergeError:
             print("No common column")
 
     star_schema_df = mdx_engine.clean_data(fusion, mdx_engine.measures)

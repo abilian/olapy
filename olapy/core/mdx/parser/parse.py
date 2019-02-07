@@ -132,7 +132,7 @@ class Parser(object):
         # without Hierarchize -> ON 0
         try:
             query = query.decode("utf-8")
-        except:
+        except AttributeError:
             pass
 
         tuples_on_mdx_query = self.get_tuples(query)
