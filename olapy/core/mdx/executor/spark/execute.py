@@ -37,15 +37,11 @@ class SparkMdxEngine(MdxEngine):
         if measures:
             for measure in measures:
                 if star_schema_df.select(measure).dtypes[0][1] == "string":
-                    star_schema_df[measure] = star_schema_df[measure].str.replace(
-                        " ", ""
-                    )
-                    try:
-                        star_schema_df[measure] = star_schema_df[measure].astype(
-                            "float"
-                        )
-                    except:
-                        star_schema_df = star_schema_df.drop(measure, 1)
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
+                    # try:
+                    star_schema_df[measure] = star_schema_df[measure].astype("float")
+                    # except:
+                    #     star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
 
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
