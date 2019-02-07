@@ -61,6 +61,5 @@ class SparkCubeLoader(CubeLoader):
                 fusion = fusion.join(df, common_columns)
             except BaseException:
                 print("No common column")
-                pass
 
         return fusion

@@ -44,6 +44,5 @@ class CubeLoader(object):
                 )
             except BaseException:
                 print("No common column")
-                pass
 
         return df

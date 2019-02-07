@@ -78,6 +78,5 @@ class CubeLoaderDB(CubeLoader):
                 )
             except BaseException:
                 print("No common column between {} and {}".format(facts, db_table_name))
-                pass
 
         return df

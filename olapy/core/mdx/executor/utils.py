@@ -70,7 +70,6 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
             fusion = fusion.merge(df)
         except BaseException:
             print("No common column")
-            pass
 
     star_schema_df = mdx_engine.clean_data(fusion, mdx_engine.measures)
 
