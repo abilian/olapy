@@ -1,6 +1,11 @@
 Changelog for Olapy
 ===================
 
+0.7.5 (2019-02-08)
+------------------
+- Support OfficeJS Onlyoffice Spreadsheet (CUBEMEMBER, CUBEVALUE Formulas)
+- Refactor and API cleanup
+
 0.7.0 (2018-12-19)
 ------------------
 
