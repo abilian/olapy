@@ -4,13 +4,15 @@ OlaPy, an experimental OLAP engine based on Pandas
 About
 -----
 
-**OlaPy** is an OLAP_ engine with MDX_ support, web interface (slice & dice) and XMLA_ support for Excel clients.
+**OlaPy** is an OLAP_ engine based on Python, which gives you a set of tools for the development of reporting and analytical
+applications, multidimensional analysis, and browsing of aggregated data with MDX_ and XMLA_ support.
+
 
 .. _OLAP: https://en.wikipedia.org/wiki/Online_analytical_processing
 .. _MDX: https://en.wikipedia.org/wiki/MultiDimensional_eXpressions
 .. _XMLA: https://en.wikipedia.org/wiki/XML_for_Analysis
 
-`https://olapy.readthedocs.io/en/latest/ <https://olapy.readthedocs.io/en/latest/>`_
+`Documentation <https://olapy.readthedocs.io/en/latest/>`_
 
 .. image:: https://raw.githubusercontent.com/abilian/olapy/master/docs/pictures/olapy.gif
 
