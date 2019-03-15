@@ -1,7 +1,7 @@
 typing
 pandas<1
 lxml
-spyne==2.13.3a0  #2.13.4a1 causes prob with pyodide
+spyne>2.13.*
 SQLAlchemy
 xmlwitch
 attrs
