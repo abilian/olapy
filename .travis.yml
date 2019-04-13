@@ -24,9 +24,9 @@ python:
   - '3.7'
 
 env:
-  - DRIVER=sqlite
-  - DRIVER=postgres
-  - DRIVER=mysql
+  - SQLALCHEMY_DATABASE_URI=
+  - SQLALCHEMY_DATABASE_URI=postgresql://postgres@localhost/olapy_test
+  - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
 
 matrix:
   include:
