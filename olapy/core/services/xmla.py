@@ -89,7 +89,6 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
         ):
             raise InvalidCredentialsError(
                 fault_string="You do not have permission to access this resource",
-                fault_object=None,
             )
 
         method_name = request.RequestType.lower() + "_response"
@@ -183,8 +182,6 @@ def get_mdx_engine(
 
 def get_spyne_app(discover_request_hanlder, execute_request_hanlder):
     """
-
-    :param xmla_tools: XmlaDiscoverReqHandler instance
     :return: spyne  Application
     """
     return Application(

@@ -60,8 +60,6 @@ def _get_star_schema_dataframe(dataframes, mdx_engine):
     """
     Merge all DataFrames as star schema.
 
-    :param sep: csv files separator.
-    :param with_id_columns: start schema dataFrame contains id columns or not
     :return: star schema DataFrame
     """
 

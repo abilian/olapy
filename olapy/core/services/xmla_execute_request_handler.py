@@ -75,9 +75,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
     def _get_lvl_column_by_dimension(self, all_tuples):
         """
-        todo
+        TODO
         :param all_tuples:
-        :param used_tuples:
         :return:
         """
         used_levels = {}

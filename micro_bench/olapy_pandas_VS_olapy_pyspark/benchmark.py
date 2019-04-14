@@ -5,7 +5,7 @@ import subprocess
 from importlib import reload
 from pprint import pprint
 
-from benchmark_tools import BENCH_CUBE, run_benchmark, save_benchmark_result
+from .benchmark_tools import BENCH_CUBE, run_benchmark, save_benchmark_result
 
 from olapy.core.mdx.executor import MdxEngine
 from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler

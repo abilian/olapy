@@ -101,13 +101,13 @@ class DictExecuteReqHandler:
         if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
             xml["HIERARCHY_UNIQUE_NAME"] = "[Measures]"
 
-    def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
+    def _gen_xs0_parent(self, xml, tuple, split_df, first_att):
 
         parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1 : -1]))
         if parent:
             parent = "." + parent
         xml["PARENT_UNIQUE_NAME"] = "[{0}].[{0}].[{1}]{2}".format(
-            tuple[0], splitted_df[tuple[0]].columns[0], parent
+            tuple[0], split_df[tuple[0]].columns[0], parent
         )
 
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):

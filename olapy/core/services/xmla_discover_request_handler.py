@@ -33,9 +33,12 @@ except ImportError:
 
 
 class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
-    """XmlaDiscoverReqHandler handles information, such as the list of available databases or details about a \
-    specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
-    Discover method depends on the values of the parameters passed to it. ."""
+    """XmlaDiscoverReqHandler handles information, such as the list
+    of available databases or details about a specific object
+    (cube, dimensions, hierarchies...), from an instance of MdxEngine.
+    The data retrieved with the Discover method depends on the
+    values of the parameters passed to it.
+    """
 
     def _change_db_uri(self, old_sqla_uri, new_db):
         # scheme, netloc, path, params, query, fragment = urlparse(old_sqla_uri)
