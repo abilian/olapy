@@ -1,4 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 from typing import Dict, Text
 
@@ -7,8 +8,8 @@ import pandas.io.sql as psql
 from pandas.errors import MergeError
 from sqlalchemy import inspect
 
-from ..tools.connection import get_dialect_name
 from . import CubeLoader
+from ..tools.connection import get_dialect_name
 
 
 class CubeLoaderDB(CubeLoader):

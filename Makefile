@@ -58,27 +58,20 @@ lint-mypy:
 
 clean:
 	find . -name "*.pyc" -delete
-	find . -name yaka.db -delete
 	find . -name .DS_Store -delete
 	find . -name cache -type d -delete
 	find . -type d -empty -delete
 	rm -f migration.log
 	rm -rf build dist
-	rm -rf tests/data tests/integration/data
-	rm -rf tmp tests/tmp tests/integration/tmp
-	rm -rf cache tests/cache tests/integration/cache
 	rm -rf *.egg .coverage
 	rm -rf doc/_build
 	rm -rf static/gen static/.webassets-cache instance/webassets
-	rm -rf htmlcov junit-*.xml
+	rm -rf htmlcov
 
 tidy: clean
 	rm -rf .tox
 
 format:
-	isort -rc $(SRC) tests micro_bench demos *.py
-	yapf --style google -r -i $(SRC) tests micro_bench demos *.py
-	autopep8 --in-place -r -j3 --ignore E711 olapy tests micro_bench demos
 	black $(SRC) tests micro_bench demos *.py
 	isort -rc $(SRC) tests micro_bench demos *.py
 

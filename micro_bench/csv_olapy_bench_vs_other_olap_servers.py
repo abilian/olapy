@@ -1,10 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import cProfile
 import datetime
 import os
 import pstats
-
 
 import cpuinfo
 from olap.xmla import xmla
@@ -12,7 +12,6 @@ from prettytable import PrettyTable
 from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.executor import MdxEngine
-
 from olapy.core.services.xmla import get_wsgi_application
 
 from .cube_generator import CUBE_NAME, CubeGen

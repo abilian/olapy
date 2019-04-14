@@ -3,13 +3,12 @@ If you have a single excel file containing your data and you want to use olapy, 
 extract data from your excel file, make transformations, and load then into olapy data folder.
 """
 import os
-from os.path import isdir, expanduser
+from os.path import expanduser, isdir
 from pathlib import Path
 
+import bonobo
 import click
 import pandas as pd
-
-import bonobo
 import yaml
 from bonobo.config import use
 

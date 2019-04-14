@@ -3,7 +3,8 @@
 Do the same thing as MdxEngine, but with onle one file or database table
 (no need for a star schema tables).
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import numpy as np
 import pandas as pd

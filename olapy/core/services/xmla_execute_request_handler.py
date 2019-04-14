@@ -2,7 +2,8 @@
 """
 Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import itertools
 from datetime import datetime
@@ -63,7 +64,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         :return:
         """
 
-        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1: -1]))
+        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1 : -1]))
         if parent:
             parent = "." + parent
         xml.PARENT_UNIQUE_NAME(
@@ -88,23 +89,27 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
     def _gen_xs0_tuples(self, xml, tupls, **kwargs):
         first_att = kwargs.get("first_att")
         split_df = kwargs.get("split_df")
-        all_tuples = self.executor.parser.decorticate_query(self.mdx_query)['all']
+        all_tuples = self.executor.parser.decorticate_query(self.mdx_query)["all"]
         # [Geography].[Geography].[Continent]  -> first_lvlname : Country
         # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
         all_level_columns = self._get_lvl_column_by_dimension(all_tuples)
         for idx, tupl in enumerate(tupls):
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
-            current_lvl_name = split_df[tuple_without_minus_1[0]].columns[len(tuple_without_minus_1) - first_att]
+            current_lvl_name = split_df[tuple_without_minus_1[0]].columns[
+                len(tuple_without_minus_1) - first_att
+            ]
             current_dimension = tuple_without_minus_1[0]
-            if all(used_column in self.executor.tables_loaded[current_dimension].columns for used_column in
-                   all_level_columns[current_dimension]):
+            if all(
+                used_column in self.executor.tables_loaded[current_dimension].columns
+                for used_column in all_level_columns[current_dimension]
+            ):
                 uname = "[{0}].[{0}].[{1}].{2}".format(
                     current_dimension,
                     current_lvl_name,
                     ".".join(
                         [
                             "[" + str(tuple_value) + "]"
-                            for tuple_value in tuple_without_minus_1[first_att - 1:]
+                            for tuple_value in tuple_without_minus_1[first_att - 1 :]
                         ]
                     ),
                 )
@@ -114,7 +119,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     ".".join(
                         [
                             "[" + str(tuple_value) + "]"
-                            for tuple_value in tuple_without_minus_1[first_att - 1:]
+                            for tuple_value in tuple_without_minus_1[first_att - 1 :]
                         ]
                     ),
                 )
@@ -122,7 +127,11 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
             with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
                 xml.UName(uname)
                 xml.Caption(str((tuple_without_minus_1[-1])))
-                xml.LName("[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], current_lvl_name))
+                xml.LName(
+                    "[{0}].[{0}].[{1}]".format(
+                        tuple_without_minus_1[0], current_lvl_name
+                    )
+                )
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo("131076")
 

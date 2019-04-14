@@ -14,20 +14,20 @@ Those two objects are constructed in three ways:
       see :mod:`cube_loader`
     - automatically from database, also if they respect the start schema model, see :mod:`cube_loader_db`
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-
-from typing import List, Dict
+from typing import Dict, List
 
 import attr
 import numpy as np
 import pandas as pd
 
-from ..parser.parse import Parser
+from olapy.core.mdx.parser.parse import Parser
 
 try:
     from ..tools.connection import get_dialect, get_dialect_name
@@ -234,9 +234,13 @@ class MdxEngine(object):
         if measures:
             for measure in measures:
                 if star_schema_df[measure].dtype == object:
-                    star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(
+                        " ", ""
+                    )
                     try:
-                        star_schema_df[measure] = star_schema_df[measure].astype("float")
+                        star_schema_df[measure] = star_schema_df[measure].astype(
+                            "float"
+                        )
                     except ValueError:
                         star_schema_df = star_schema_df.drop(measure, 1)
         return star_schema_df
@@ -390,12 +394,10 @@ class MdxEngine(object):
                 else:
                     df = self.tables_loaded[tupl[0]]
 
-                    if len(tables_columns.get(tupl[0], [])) < len(df.columns[: len(tupl[2:])]):
-                        tables_columns.update(
-                            {
-                                tupl[0]: df.columns[: len(tupl[2:])]
-                            }
-                        )
+                    if len(tables_columns.get(tupl[0], [])) < len(
+                        df.columns[: len(tupl[2:])]
+                    ):
+                        tables_columns.update({tupl[0]: df.columns[: len(tupl[2:])]})
 
             axes.update({axis: tables_columns})
         return axes
@@ -468,7 +470,9 @@ class MdxEngine(object):
                 df = df[(df[tup_att].notnull())]
             else:
                 # todo check ex time
-                column_from_value = self._get_column_name_from_value(self.tables_loaded[tuple_as_list[0]], tup_att)
+                column_from_value = self._get_column_name_from_value(
+                    self.tables_loaded[tuple_as_list[0]], tup_att
+                )
                 df = df[(df[column_from_value] == tup_att)]
 
         cols = list(itertools.chain.from_iterable(columns_to_keep))
@@ -603,17 +607,25 @@ class MdxEngine(object):
         :return: updated columns_to_keep
         """
         df = self.tables_loaded[tuple_as_list[0]]
-        if self.parser.hierarchized_tuples() or self._df_column_values_exist(tuple_as_list, df):
+        if self.parser.hierarchized_tuples() or self._df_column_values_exist(
+            tuple_as_list, df
+        ):
             start_columns_used = 2
         else:
             start_columns_used = 3
         # todo change to simplest solution
-        if (len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns):
+        if len(tuple_as_list) == 3 and tuple_as_list[-1] in df.columns:
             columns_to_keep.update({tuple_as_list[0]: [tuple_as_list[-1]]})
         else:
             # if len(columns_to_keep.get(tuple_as_list[0], [])) < len(
             #     df.columns[: len(tuple_as_list[start_columns_used:])]):
-            columns_to_keep.update({tuple_as_list[0]: df.columns[: len(tuple_as_list[start_columns_used:])]})
+            columns_to_keep.update(
+                {
+                    tuple_as_list[0]: df.columns[
+                        : len(tuple_as_list[start_columns_used:])
+                    ]
+                }
+            )
 
     @staticmethod
     def _uniquefy_tuples(tuples):

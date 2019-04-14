@@ -794,7 +794,6 @@ discover_keywords_xsd = """
   </xsd:complexType>
  </xsd:schema>"""
 
-
 mdschema_functions_xsd = """
 <xsd:schema elementFormDefault="qualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset"
 xmlns:sql="urn:schemas-microsoft-com:xml-sql">

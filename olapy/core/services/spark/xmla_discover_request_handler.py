@@ -3,12 +3,13 @@ Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=s
 """
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import xmlwitch
 
-from ..xmla_discover_xsds import mdschema_hierarchies_xsd
 from ..xmla_discover_request_handler import XmlaDiscoverReqHandler
+from ..xmla_discover_xsds import mdschema_hierarchies_xsd
 
 
 class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):

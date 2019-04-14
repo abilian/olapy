@@ -1,22 +1,17 @@
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import importlib
+from pprint import pprint
+
 import pandas as pd
 
-from pprint import pprint
 from ..mdx.executor import MdxEngine
 from ..mdx.executor.utils import inject_dataframes
-from ..services.request_properties_models import (
-    DiscoverRequest,
-    Restriction,
-    Property,
-    Restrictionlist,
-    Propertieslist,
-    ExecuteRequest,
-    Command,
-)
+from ..services.request_properties_models import Command, DiscoverRequest, \
+    ExecuteRequest, Propertieslist, Property, Restriction, Restrictionlist
 
 
 class XmlaProviderLib:
@@ -94,13 +89,17 @@ def get_response(
     module = importlib.import_module(
         "olapy.core.services." + output + "_discover_request_handler"
     )
-    discover_request_handler = getattr(module, output.title() + "DiscoverReqHandler")(executor)
+    discover_request_handler = getattr(module, output.title() + "DiscoverReqHandler")(
+        executor
+    )
     discover_request_handler.change_cube(xmla_request_params.get("cube"))
 
     module = importlib.import_module(
         "olapy.core.services." + output + "_execute_request_handler"
     )
-    execute_request_handler = getattr(module, output.title() + "ExecuteReqHandler")(executor)
+    execute_request_handler = getattr(module, output.title() + "ExecuteReqHandler")(
+        executor
+    )
 
     xmla_service = XmlaProviderLib(discover_request_handler, execute_request_handler)
 

@@ -4,17 +4,16 @@ import os
 from collections import OrderedDict
 
 import pytest
-
-try:
-    import sqlalchemy
-except:
-    pass
-
 from six.moves.urllib.parse import urlparse
 
 from olapy.core.mdx.executor import MdxEngine
 
 from .db_creation_utils import create_insert, drop_tables
+
+try:
+    import sqlalchemy
+except:
+    pass
 
 cube_config = {
     "xmla_authentication": False,

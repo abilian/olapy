@@ -16,7 +16,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information -----------------------------------------------------
 
 project = "benchmark_olapy_pandas_spark"
@@ -27,7 +26,6 @@ author = "Mouadh Kaabachi"
 version = ""
 # The full version, including alpha/beta/rc tags
 release = ""
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -67,7 +65,6 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -96,12 +93,10 @@ html_static_path = ["_static"]
 #
 # html_sidebars = {}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "benchmark_olapy_pandas_sparkdoc"
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -133,7 +128,6 @@ latex_documents = [
     )
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
@@ -147,7 +141,6 @@ man_pages = [
         1,
     )
 ]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -166,7 +159,6 @@ texinfo_documents = [
     )
 ]
 
-
 # -- Options for Epub output -------------------------------------------------
 
 # Bibliographic Dublin Core info.
@@ -183,6 +175,5 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ["search.html"]
-
 
 # -- Extension configuration -------------------------------------------------

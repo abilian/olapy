@@ -1,20 +1,13 @@
 from __future__ import absolute_import, division, print_function
 
-# import pytest
-# pytest.importorskip("sqlalchemy")
-
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from .queries import (
-    query1,
-    query7,
-    query8,
-    query9,
-    query_posgres1,
-    query_posgres2,
-    query_postgres3,
-    query16)
+from .queries import query1, query7, query8, query9, query16, query_posgres1, \
+    query_posgres2, query_postgres3
+
+# import pytest
+# pytest.importorskip("sqlalchemy")
 
 
 def test_execution_query12(executor):
@@ -227,7 +220,9 @@ def test_execution_query7(executor):
                 "amount": [64, 16, 4, 1, 2, 8, 32, 128],
             }
         )
-        .groupby(["company", "year", "quarter", "month", "day", "continent"], sort=False)
+        .groupby(
+            ["company", "year", "quarter", "month", "day", "continent"], sort=False
+        )
         .sum()
     )
 
@@ -310,34 +305,197 @@ def test_execution_query9(executor):
 def test_execution_query16(executor):
     df = executor.execute_mdx(query16)["result"]
     test_df = (
-
         pd.DataFrame(
             {
-                "company": ['Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
-                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
-                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
-                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
-                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development',
-                            'Crazy Development', 'Crazy Development', 'Crazy Development', 'Crazy Development'],
-                "article": [-1, -1, -1, -1, -1, -1, -1, -1, -1, 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy',
-                            'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy', 'olapy'],
-                "licence": [-1, -1, -1, -1, -1, -1, -1, -1, -1, 'Partnership', 'Partnership', 'Partnership', 'Personal',
-                            'Personal', 'Personal', 'Personal', 'Personal', 'Corporate', 'Corporate', 'Corporate',
-                            'Corporate', 'Corporate', 'Corporate', 'Corporate'],
-                "continent": ['America', 'Europe', 'America', 'Europe', 'Europe', 'America', 'Europe', 'Europe',
-                              'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe', 'Europe',
-                              'America', 'Europe', 'America', 'Europe', 'America', 'Europe', 'Europe'],
-                "country": [-1, -1, 'United States', 'Switzerland', 'France', 'United States', 'Switzerland',
-                            'Switzerland', 'France', -1, 'Switzerland', 'Switzerland', -1, 'Switzerland', 'France',
-                            'Switzerland', 'France', -1, -1, 'United States', 'Switzerland', 'United States',
-                            'Switzerland', 'Switzerland'],
-                "city": [-1, -1, -1, -1, -1, 'New York', 'Geneva', 'Lausanne', 'Paris', -1, -1, 'Lausanne', -1, -1, -1,
-                         'Lausanne', 'Paris', -1, -1, -1, -1, 'New York', 'Geneva', 'Lausanne'],
-                "amount": [768, 255, 768, 248, 4, 768, 128, 56, 4, 96, 96, 32, 15, 8, 4, 8, 4, 768, 144, 768, 144, 768,
-                           128, 16]
+                "company": [
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                    "Crazy Development",
+                ],
+                "article": [
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                    "olapy",
+                ],
+                "licence": [
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    "Partnership",
+                    "Partnership",
+                    "Partnership",
+                    "Personal",
+                    "Personal",
+                    "Personal",
+                    "Personal",
+                    "Personal",
+                    "Corporate",
+                    "Corporate",
+                    "Corporate",
+                    "Corporate",
+                    "Corporate",
+                    "Corporate",
+                    "Corporate",
+                ],
+                "continent": [
+                    "America",
+                    "Europe",
+                    "America",
+                    "Europe",
+                    "Europe",
+                    "America",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "Europe",
+                    "America",
+                    "Europe",
+                    "America",
+                    "Europe",
+                    "America",
+                    "Europe",
+                    "Europe",
+                ],
+                "country": [
+                    -1,
+                    -1,
+                    "United States",
+                    "Switzerland",
+                    "France",
+                    "United States",
+                    "Switzerland",
+                    "Switzerland",
+                    "France",
+                    -1,
+                    "Switzerland",
+                    "Switzerland",
+                    -1,
+                    "Switzerland",
+                    "France",
+                    "Switzerland",
+                    "France",
+                    -1,
+                    -1,
+                    "United States",
+                    "Switzerland",
+                    "United States",
+                    "Switzerland",
+                    "Switzerland",
+                ],
+                "city": [
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    "New York",
+                    "Geneva",
+                    "Lausanne",
+                    "Paris",
+                    -1,
+                    -1,
+                    "Lausanne",
+                    -1,
+                    -1,
+                    -1,
+                    "Lausanne",
+                    "Paris",
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    "New York",
+                    "Geneva",
+                    "Lausanne",
+                ],
+                "amount": [
+                    768,
+                    255,
+                    768,
+                    248,
+                    4,
+                    768,
+                    128,
+                    56,
+                    4,
+                    96,
+                    96,
+                    32,
+                    15,
+                    8,
+                    4,
+                    8,
+                    4,
+                    768,
+                    144,
+                    768,
+                    144,
+                    768,
+                    128,
+                    16,
+                ],
             }
-        ).groupby(['company', 'article', 'licence', 'continent', 'country', 'city'], sort=False).sum()
-
+        )
+        .groupby(
+            ["company", "article", "licence", "continent", "country", "city"],
+            sort=False,
+        )
+        .sum()
     )
 
     assert_frame_equal(df, test_df)

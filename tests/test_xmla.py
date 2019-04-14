@@ -1,13 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import threading
 from wsgiref.simple_server import make_server
 
 import pytest
-
-# pytest.importorskip("sqlalchemy")
-# pytest.importorskip("spyne")
-
 import sqlalchemy
 from olap.xmla import xmla
 from spyne import Application
@@ -15,12 +12,14 @@ from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.mdx.executor import MdxEngine
+from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 from olapy.core.services.xmla import XmlaProviderService
-from olapy.core.services import XmlaDiscoverReqHandler
-from olapy.core.services import XmlaExecuteReqHandler
 
 from .db_creation_utils import create_insert, drop_tables
 from .xs0_responses import TEST_QUERY_AXIS0
+
+# pytest.importorskip("sqlalchemy")
+# pytest.importorskip("spyne")
 
 HOST = "127.0.0.1"
 PORT = 8230
@@ -517,25 +516,36 @@ def test_query4(conn):
 def test_mdschema_members_MEMBER_UNIQUE_NAME(conn):
     discover = conn.Discover(
         "MDSCHEMA_MEMBERS",
-        restrictions={"CUBE_NAME": "main",
-                      "MEMBER_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy].[Partnership]"},
+        restrictions={
+            "CUBE_NAME": "main",
+            "MEMBER_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy].[Partnership]",
+        },
         properties={"Catalog": "main"},
     )[0]
     assert discover["CATALOG_NAME"] == "main"
     assert discover["CUBE_NAME"] == "main"
     assert discover["DIMENSION_UNIQUE_NAME"] == "[product]"
     assert discover["HIERARCHY_UNIQUE_NAME"] == "[product].[product]"
-    assert discover["LEVEL_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert (
+        discover["LEVEL_UNIQUE_NAME"]
+        == "[product].[product].[Crazy Development].[olapy]"
+    )
     assert discover["LEVEL_NUMBER"] == "3"
     assert discover["MEMBER_ORDINAL"] == "0"
     assert discover["MEMBER_NAME"] == "Partnership"
-    assert discover["MEMBER_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy].[Partnership]"
+    assert (
+        discover["MEMBER_UNIQUE_NAME"]
+        == "[product].[product].[Crazy Development].[olapy].[Partnership]"
+    )
     assert discover["MEMBER_TYPE"] == "1"
     assert discover["MEMBER_CAPTION"] == "Partnership"
     assert discover["CHILDREN_CARDINALITY"] == "1"
     assert discover["PARENT_LEVEL"] == "0"
     assert discover["PARENT_COUNT"] == "0"
-    assert discover["PARENT_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert (
+        discover["PARENT_UNIQUE_NAME"]
+        == "[product].[product].[Crazy Development].[olapy]"
+    )
     assert discover["MEMBER_KEY"] == "Partnership"
     assert discover["IS_PLACEHOLDERMEMBER"] == "false"
     assert discover["IS_DATAMEMBER"] == "false"
@@ -544,8 +554,10 @@ def test_mdschema_members_MEMBER_UNIQUE_NAME(conn):
 def test_mdschema_members_LEVEL_UNIQUE_NAME(conn):
     discover = conn.Discover(
         "MDSCHEMA_MEMBERS",
-        restrictions={"CUBE_NAME": "main",
-                      "LEVEL_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy]"},
+        restrictions={
+            "CUBE_NAME": "main",
+            "LEVEL_UNIQUE_NAME": "[product].[product].[Crazy Development].[olapy]",
+        },
         properties={"Catalog": "main"},
     )[0]
     assert discover["CATALOG_NAME"] == "main"
@@ -556,7 +568,10 @@ def test_mdschema_members_LEVEL_UNIQUE_NAME(conn):
     assert discover["LEVEL_NUMBER"] == "2"
     assert discover["MEMBER_ORDINAL"] == "0"
     assert discover["MEMBER_NAME"] == "olapy"
-    assert discover["MEMBER_UNIQUE_NAME"] == "[product].[product].[Crazy Development].[olapy]"
+    assert (
+        discover["MEMBER_UNIQUE_NAME"]
+        == "[product].[product].[Crazy Development].[olapy]"
+    )
     assert discover["MEMBER_TYPE"] == "1"
     assert discover["MEMBER_CAPTION"] == "olapy"
     assert discover["CHILDREN_CARDINALITY"] == "1"

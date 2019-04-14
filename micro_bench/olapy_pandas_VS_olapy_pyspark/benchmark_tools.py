@@ -1,21 +1,20 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import datetime
 import threading
 from timeit import Timer
 from wsgiref.simple_server import make_server
 
+import matplotlib.pyplot as plt
+import numpy as np
 from cpuinfo import cpuinfo
+from mdx_queries import query1, query2, query3
 from olap.xmla import xmla
 from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
 
-from mdx_queries import query1, query3, query2
-
 from olapy.core.services.xmla import get_spyne_app
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -56,7 +55,9 @@ class WSGIServer:
 def olapy_mdx_benchmark(queries, mdx_engine):
     execution_time_results = []
     for query in queries:
-        execution_time_results.append(Timer(lambda: mdx_engine.execute_mdx(query)).timeit(number=1))
+        execution_time_results.append(
+            Timer(lambda: mdx_engine.execute_mdx(query)).timeit(number=1)
+        )
     return execution_time_results
 
 
@@ -66,7 +67,11 @@ def olapy_xmla_benchmark(queries):
 
     execution_time_results = []
     for query in queries:
-        execution_time_results.append(Timer(lambda: connection.Execute(query, Catalog=BENCH_CUBE)).timeit(number=1))
+        execution_time_results.append(
+            Timer(lambda: connection.Execute(query, Catalog=BENCH_CUBE)).timeit(
+                number=1
+            )
+        )
     return execution_time_results
 
 

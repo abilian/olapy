@@ -3,44 +3,31 @@ Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=s
 """
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
 
 import xmlwitch
 from six.moves.urllib.parse import urlparse
 
+from ..services.dict_discover_request_handler import DictDiscoverReqHandler
+from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
+    discover_schema_rowsets_response_rows
+from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
+    discover_datasources_xsd, discover_enumerators_xsd, \
+    discover_keywords_xsd, discover_literals_xsd, \
+    discover_schema_rowsets_xsd, mdschema_cubes_xsd, mdschema_dimensions_xsd, \
+    mdschema_functions_xsd, mdschema_hierarchies_xsd, mdschema_kpis_xsd, \
+    mdschema_levels_xsd, mdschema_measures_xsd, \
+    mdschema_measuresgroups_dimensions_xsd, mdschema_measuresgroups_xsd, \
+    mdschema_members_xsd, mdschema_properties_properties_xsd, \
+    mdschema_sets_xsd
+
 try:
     from sqlalchemy import create_engine
 except ImportError:
     pass
-
-from ..services.dict_discover_request_handler import DictDiscoverReqHandler
-from ..services.xmla_discover_request_utils import (
-    discover_literals_response_rows,
-    discover_schema_rowsets_response_rows,
-)
-from .xmla_discover_xsds import (
-    dbschema_catalogs_xsd,
-    dbschema_tables_xsd,
-    discover_datasources_xsd,
-    discover_literals_xsd,
-    discover_schema_rowsets_xsd,
-    mdschema_cubes_xsd,
-    mdschema_dimensions_xsd,
-    mdschema_hierarchies_xsd,
-    mdschema_kpis_xsd,
-    mdschema_levels_xsd,
-    mdschema_measures_xsd,
-    mdschema_measuresgroups_dimensions_xsd,
-    mdschema_measuresgroups_xsd,
-    mdschema_members_xsd,
-    mdschema_properties_properties_xsd,
-    mdschema_sets_xsd,
-    discover_enumerators_xsd,
-    discover_keywords_xsd,
-    mdschema_functions_xsd)
-
 
 # noinspection PyPep8Naming
 
@@ -412,7 +399,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 xml.write(mdschema_sets_xsd)
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
                         self.change_cube(request.Properties.PropertyList.Catalog)
@@ -438,7 +426,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
                         self.change_cube(request.Properties.PropertyList.Catalog)
@@ -485,7 +474,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 xml.write(mdschema_cubes_xsd)
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         or request.Properties.PropertyList.Catalog is not None
                     ):
                         self.change_cube(request.Properties.PropertyList.Catalog)
@@ -547,7 +537,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
 
@@ -590,7 +581,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 xml.write(mdschema_dimensions_xsd)
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Restrictions.RestrictionList.CATALOG_NAME
                         == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
@@ -598,7 +590,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                         self.change_cube(request.Properties.PropertyList.Catalog)
                         ord = 1
-                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                        for tables in self.executor.get_all_tables_names(
+                            ignore_fact=True
+                        ):
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
                                 xml.CUBE_NAME(self.selected_cube)
@@ -608,7 +602,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.DIMENSION_ORDINAL(str(ord))
                                 xml.DIMENSION_TYPE("3")
                                 xml.DIMENSION_CARDINALITY("23")
-                                xml.DEFAULT_HIERARCHY("[" + tables + "].[" + tables + "]")
+                                xml.DEFAULT_HIERARCHY(
+                                    "[" + tables + "].[" + tables + "]"
+                                )
                                 xml.IS_VIRTUAL("false")
                                 xml.IS_READWRITE("false")
                                 xml.DIMENSION_UNIQUE_SETTINGS("1")
@@ -653,7 +649,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
 
@@ -687,8 +684,11 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 # )
 
                                 # todo recheck
-                                if request.Properties.PropertyList.Format and \
-                                        request.Properties.PropertyList.Format.upper() == 'TABULAR':
+                                if (
+                                    request.Properties.PropertyList.Format
+                                    and request.Properties.PropertyList.Format.upper()
+                                    == "TABULAR"
+                                ):
                                     # Format found in onlyoffice and not in excel
                                     # ALL_MEMBER causes prob with excel
                                     xml.ALL_MEMBER(
@@ -753,20 +753,25 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
 
                         self.change_cube(request.Properties.PropertyList.Catalog)
 
-                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                        for tables in self.executor.get_all_tables_names(
+                            ignore_fact=True
+                        ):
                             l_nb = 0
                             for col in self.executor.tables_loaded[tables].columns:
                                 with xml.row:
                                     xml.CATALOG_NAME(self.selected_cube)
                                     xml.CUBE_NAME(self.selected_cube)
                                     xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
-                                    xml.HIERARCHY_UNIQUE_NAME("[{0}].[{0}]".format(tables))
+                                    xml.HIERARCHY_UNIQUE_NAME(
+                                        "[{0}].[{0}]".format(tables)
+                                    )
                                     xml.LEVEL_NAME(str(col))
                                     xml.LEVEL_UNIQUE_NAME(
                                         "[{0}].[{0}].[{1}]".format(tables, col)
@@ -822,7 +827,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 xml.write(mdschema_measuresgroups_xsd)
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
                         self.change_cube(request.Properties.PropertyList.Catalog)
@@ -858,14 +864,17 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
                 if request.Restrictions.RestrictionList:
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                     ):
 
                         self.change_cube(request.Properties.PropertyList.Catalog)
                         # rows = ""
 
-                        for tables in self.executor.get_all_tables_names(ignore_fact=True):
+                        for tables in self.executor.get_all_tables_names(
+                            ignore_fact=True
+                        ):
                             with xml.row:
                                 xml.CATALOG_NAME(self.selected_cube)
                                 xml.CUBE_NAME(self.selected_cube)
@@ -983,13 +992,18 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     self.change_cube(request.Properties.PropertyList.Catalog)
 
                     if request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME:
-                        member_lvl_name = request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
+                        member_lvl_name = (
+                            request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
+                        )
                     else:
-                        member_lvl_name = request.Restrictions.RestrictionList.LEVEL_UNIQUE_NAME
+                        member_lvl_name = (
+                            request.Restrictions.RestrictionList.LEVEL_UNIQUE_NAME
+                        )
 
                     separated_tuple = self.executor.parser.split_tuple(member_lvl_name)
                     if (
-                        request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
+                        request.Restrictions.RestrictionList.CUBE_NAME
+                        == self.selected_cube
                         and request.Properties.PropertyList.Catalog is not None
                         and request.Restrictions.RestrictionList.TREE_OP == 8
                     ):
@@ -1007,7 +1021,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.CATALOG_NAME(self.selected_cube)
                             xml.CUBE_NAME(self.selected_cube)
                             xml.DIMENSION_UNIQUE_NAME(separated_tuple[0])
-                            xml.HIERARCHY_UNIQUE_NAME("{0}.{0}".format(separated_tuple[0]))
+                            xml.HIERARCHY_UNIQUE_NAME(
+                                "{0}.{0}".format(separated_tuple[0])
+                            )
                             xml.LEVEL_UNIQUE_NAME(joined)
                             xml.LEVEL_NUMBER("0")
                             xml.MEMBER_ORDINAL("0")
@@ -1023,17 +1039,23 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.IS_DATAMEMBER("false")
 
                     elif member_lvl_name:
-                        parent_level = ['[' + tuple_att + ']' for tuple_att in separated_tuple[:-1]]
-                        hierarchy_unique_name = '.'.join(['[' + tuple_att + ']' for tuple_att in separated_tuple[:2]])
+                        parent_level = [
+                            "[" + tuple_att + "]" for tuple_att in separated_tuple[:-1]
+                        ]
+                        hierarchy_unique_name = ".".join(
+                            ["[" + tuple_att + "]" for tuple_att in separated_tuple[:2]]
+                        )
                         if len(separated_tuple) == 3:
-                            level_unique_name = '.'.join(['[' + tuple_att + ']' for tuple_att in separated_tuple])
+                            level_unique_name = ".".join(
+                                ["[" + tuple_att + "]" for tuple_att in separated_tuple]
+                            )
                         else:
-                            level_unique_name = '.'.join(parent_level)
+                            level_unique_name = ".".join(parent_level)
 
                         with xml.row:
                             xml.CATALOG_NAME(self.selected_cube)
                             xml.CUBE_NAME(self.selected_cube)
-                            xml.DIMENSION_UNIQUE_NAME('[' + separated_tuple[0] + ']')
+                            xml.DIMENSION_UNIQUE_NAME("[" + separated_tuple[0] + "]")
                             xml.HIERARCHY_UNIQUE_NAME(hierarchy_unique_name)
                             xml.LEVEL_UNIQUE_NAME(level_unique_name)
                             xml.LEVEL_NUMBER(str(len(separated_tuple[2:])))
@@ -1045,7 +1067,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.CHILDREN_CARDINALITY("1")
                             xml.PARENT_LEVEL("0")
                             xml.PARENT_COUNT("0")
-                            xml.PARENT_UNIQUE_NAME('.'.join(parent_level))
+                            xml.PARENT_UNIQUE_NAME(".".join(parent_level))
                             xml.MEMBER_KEY(separated_tuple[-1])
                             xml.IS_PLACEHOLDERMEMBER("false")
                             xml.IS_DATAMEMBER("false")

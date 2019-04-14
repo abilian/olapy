@@ -1,18 +1,14 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import subprocess
 from importlib import reload
 from pprint import pprint
 
-from olapy.core.mdx.executor import MdxEngine
-from olapy.core.services import XmlaDiscoverReqHandler
-from olapy.core.services import XmlaExecuteReqHandler
+from benchmark_tools import BENCH_CUBE, run_benchmark, save_benchmark_result
 
-from benchmark_tools import (
-    run_benchmark,
-    save_benchmark_result,
-    BENCH_CUBE,
-)
+from olapy.core.mdx.executor import MdxEngine
+from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 
 
 def benchmark():

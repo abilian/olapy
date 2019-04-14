@@ -6,8 +6,6 @@ requests and responses, and managing Spyne soap server.
 """
 from __future__ import absolute_import, division, print_function
 
-# unicode_literals This is heavily discouraged with click
-
 import imp
 import logging
 import os
@@ -24,14 +22,15 @@ from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 from sqlalchemy import create_engine
 
-from .xmla_lib import XmlaProviderLib
+from . import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 from ..mdx.executor import MdxEngine
 from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
-from . import XmlaDiscoverReqHandler
-from . import XmlaExecuteReqHandler
+from .xmla_lib import XmlaProviderLib
+
+# unicode_literals This is heavily discouraged with click
 
 
 class XmlaSoap11(Soap11):
@@ -131,8 +130,14 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
             convert2formulas = False
 
         # change (or load cube) if direct execute handler without discover handler (which normally load the cube first)
-        if request.Properties and request.Properties.PropertyList.Catalog and not execute_request_hanlder.executor.cube:
-            execute_request_hanlder.executor.load_cube(request.Properties.PropertyList.Catalog)
+        if (
+            request.Properties
+            and request.Properties.PropertyList.Catalog
+            and not execute_request_hanlder.executor.cube
+        ):
+            execute_request_hanlder.executor.load_cube(
+                request.Properties.PropertyList.Catalog
+            )
 
         execute_request_hanlder.execute_mdx_query(mdx_query, convert2formulas)
         return execute_request_hanlder.generate_response()

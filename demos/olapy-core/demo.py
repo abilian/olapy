@@ -1,5 +1,6 @@
 from olapy.core.mdx.executor import MdxEngine
 
+
 mdx_query = """SELECT
             Hierarchize({[Measures].[Amount]}) ON COLUMNS
             FROM

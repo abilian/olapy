@@ -1,10 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import pytest
 
-# pytest.importorskip("sqlalchemy")
-
 from .queries import custom_query1
+
+# pytest.importorskip("sqlalchemy")
 
 
 @pytest.mark.parametrize("executor", [True], indirect=True)

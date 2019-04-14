@@ -1,12 +1,13 @@
 # -*- encoding: utf8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import itertools
 from collections import OrderedDict
+from typing import List
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit
-from typing import List
 
 from ..execute import MdxEngine
 
@@ -37,7 +38,9 @@ class SparkMdxEngine(MdxEngine):
         if measures:
             for measure in measures:
                 if star_schema_df.select(measure).dtypes[0][1] == "string":
-                    star_schema_df[measure] = star_schema_df[measure].str.replace(" ", "")
+                    star_schema_df[measure] = star_schema_df[measure].str.replace(
+                        " ", ""
+                    )
                     # try:
                     star_schema_df[measure] = star_schema_df[measure].astype("float")
                     # except ValueError:

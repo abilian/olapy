@@ -1,13 +1,13 @@
 # -*- encoding: utf8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
-
 from typing import Dict, Text
 
-from ..cube_loader import CubeLoader
-
 from pyspark.sql import DataFrame, SparkSession
+
+from ..cube_loader import CubeLoader
 
 spark = SparkSession.builder.appName("olapy").getOrCreate()
 

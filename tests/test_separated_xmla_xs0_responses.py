@@ -1,9 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import pytest
 import xmlwitch
 
-from olapy.core.services.xmla_execute_request_handler import XmlaExecuteReqHandler
+from olapy.core.services.xmla_execute_request_handler import \
+    XmlaExecuteReqHandler
 
 from .queries import query15
 
@@ -27,9 +29,7 @@ def test_xs0_axis_query15(executor):
                     xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
-                    xml.UName(
-                        "[geography].[geography].[Europe].[Switzerland]"
-                    )
+                    xml.UName("[geography].[geography].[Europe].[Switzerland]")
                     xml.Caption("Switzerland")
                     xml.LName("[geography].[geography].[Europe]")
                     xml.LNum("0")
@@ -50,9 +50,7 @@ def test_xs0_axis_query15(executor):
                     xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
-                    xml.UName(
-                        "[geography].[geography].[Europe].[Switzerland]"
-                    )
+                    xml.UName("[geography].[geography].[Europe].[Switzerland]")
                     xml.Caption("Switzerland")
                     xml.LName("[geography].[geography].[Europe]")
                     xml.LNum("0")
@@ -115,9 +113,7 @@ def test_xs0_axis_query15(executor):
                     xml.LNum("1")
                     xml.DisplayInfo("131076")
                 with xml.Member(Hierarchy="[geography].[geography]"):
-                    xml.UName(
-                        "[geography].[geography].[Europe].[Switzerland]"
-                    )
+                    xml.UName("[geography].[geography].[Europe].[Switzerland]")
                     xml.Caption("Switzerland")
                     xml.LName("[geography].[geography].[Europe]")
                     xml.LNum("0")

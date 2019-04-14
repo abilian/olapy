@@ -1,10 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import os
+from typing import Dict
 
 import pandas as pd
 import pandas.io.sql as psql
-from typing import Dict
 
 from .cube_loader import CubeLoader
 
