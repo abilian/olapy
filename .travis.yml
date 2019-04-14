@@ -26,7 +26,7 @@ python:
 env:
   - SQLALCHEMY_DATABASE_URI=
   - SQLALCHEMY_DATABASE_URI=postgresql://postgres@localhost/olapy_test
-  - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
+  - SQLALCHEMY_DATABASE_URI=mysql+pymysql://travis@localhost/olapy_test
 
 matrix:
   include:
