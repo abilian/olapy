@@ -23,6 +23,9 @@ get_response(xmla_request_params=xmla_request_params,dataframes=dataframes, outp
 
 """
 
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 import numpy as np
 from pandas.errors import MergeError
 

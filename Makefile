@@ -50,7 +50,7 @@ lint-python:
 
 lint-py3k:
 	@echo "Checking Py3k (basic) compatibility"
-	-pylint --rcfile .pylint.rc --py3k *.py $(SRC) tests
+	-pylint --py3k *.py $(SRC) tests
 
 
 lint-mypy:

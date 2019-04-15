@@ -4,7 +4,8 @@ The main Module to manage `XMLA <https://technet.microsoft.com/fr-fr/library/ms1
 requests and responses, and managing Spyne soap server.
 
 """
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 import imp
 import logging

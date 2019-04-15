@@ -5,6 +5,8 @@
 # This file does only contain a selection of the most common options. For a
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 # -- Path setup --------------------------------------------------------------
 

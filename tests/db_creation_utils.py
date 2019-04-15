@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
+
 def create_insert(con, custom=False):
     if custom:
         custom_create_insert(con)

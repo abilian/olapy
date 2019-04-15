@@ -2,6 +2,9 @@
 If you have a single excel file containing your data and you want to use olapy, you should use this module to
 extract data from your excel file, make transformations, and load then into olapy data folder.
 """
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 import os
 from os.path import expanduser, isdir
 from pathlib import Path
