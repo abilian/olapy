@@ -61,6 +61,7 @@ clean:
 	find . -name .DS_Store -delete
 	find . -name cache -type d -delete
 	find . -type d -empty -delete
+	rm -rf .mypy_cache
 	rm -f migration.log
 	rm -rf build dist
 	rm -rf *.egg .coverage
