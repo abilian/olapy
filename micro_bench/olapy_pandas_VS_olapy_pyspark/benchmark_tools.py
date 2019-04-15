@@ -9,12 +9,13 @@ from wsgiref.simple_server import make_server
 import matplotlib.pyplot as plt
 import numpy as np
 from cpuinfo import cpuinfo
-from mdx_queries import query1, query2, query3
 from olap.xmla import xmla
 from prettytable import PrettyTable
 from spyne.server.wsgi import WsgiApplication
 
 from olapy.core.services.xmla import get_spyne_app
+
+from .mdx_queries import query1, query2, query3
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -75,20 +76,20 @@ def olapy_xmla_benchmark(queries):
     return execution_time_results
 
 
-def get_olapy_server(Xmla_discover_request_handler, Xmla_execute_request_handler):
+def get_olapy_server(xmla_discover_request_handler, xmla_execute_request_handler):
     application = get_spyne_app(
-        Xmla_discover_request_handler, Xmla_execute_request_handler
+        xmla_discover_request_handler, xmla_execute_request_handler
     )
     wsgi_application = WsgiApplication(application)
     return WSGIServer(application=wsgi_application, host=HOST, port=PORT)
 
 
 def run_benchmark(
-    mdx_engine, Xmla_discover_request_handler, Xmla_execute_request_handler
+    mdx_engine, xmla_discover_request_handler, xmla_execute_request_handler
 ):
     results = {}
     server = get_olapy_server(
-        Xmla_discover_request_handler, Xmla_execute_request_handler
+        xmla_discover_request_handler, xmla_execute_request_handler
     )
     server.start()
 

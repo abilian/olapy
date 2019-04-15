@@ -88,7 +88,7 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
             and ctx.transport.req_env["QUERY_STRING"] != "admin"
         ):
             raise InvalidCredentialsError(
-                fault_string="You do not have permission to access this resource",
+                fault_string="You do not have permission to access this resource"
             )
 
         method_name = request.RequestType.lower() + "_response"

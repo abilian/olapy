@@ -5,10 +5,10 @@ import subprocess
 from importlib import reload
 from pprint import pprint
 
-from .benchmark_tools import BENCH_CUBE, run_benchmark, save_benchmark_result
-
 from olapy.core.mdx.executor import MdxEngine
 from olapy.core.services import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
+
+from .benchmark_tools import BENCH_CUBE, run_benchmark, save_benchmark_result
 
 
 def benchmark():
@@ -16,11 +16,11 @@ def benchmark():
         cubes_folder="cubes_templates", olapy_data_location="../../../olapy"
     )
     mdx_executor.load_cube(BENCH_CUBE)
-    Xmla_discover_request_handler = XmlaDiscoverReqHandler(mdx_executor)
-    Xmla_execute_request_handler = XmlaExecuteReqHandler(mdx_executor)
+    xmla_discover_request_handler = XmlaDiscoverReqHandler(mdx_executor)
+    xmla_execute_request_handler = XmlaExecuteReqHandler(mdx_executor)
 
     return run_benchmark(
-        mdx_executor, Xmla_discover_request_handler, Xmla_execute_request_handler
+        mdx_executor, xmla_discover_request_handler, xmla_execute_request_handler
     )
 
 

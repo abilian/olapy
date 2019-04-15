@@ -39,7 +39,7 @@ lint: lint-python
 
 lint-python:
 	@echo "--> Linting Python files"
-	flake8
+	flake8 olapy tests
 
 	@make lint-py3k
 
