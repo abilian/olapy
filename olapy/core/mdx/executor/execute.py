@@ -195,7 +195,7 @@ class MdxEngine(object):
 
         else:
             # force reimport CubeLoader every instance call (MdxEngine or SparkMdxEngine)
-            from ..executor import CubeLoader
+            from . import CubeLoader
 
             cube_loader = CubeLoader(cubes_folder_path, sep)
 

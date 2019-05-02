@@ -9,7 +9,7 @@ from typing import List
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit
 
-from ..execute import MdxEngine
+from olapy.core.mdx.executor.execute import MdxEngine
 
 
 class SparkMdxEngine(MdxEngine):
