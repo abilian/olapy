@@ -28,10 +28,15 @@ import numpy as np
 import pandas as pd
 
 from olapy.core.mdx.parser.parse import Parser
-from olapy.core.mdx.tools.connection import get_dialect, get_dialect_name
 
-from .cube_loader_db import CubeLoaderDB
-from .cube_loader_custom import CubeLoaderCustom
+# Needed because SQLAlchemy doesn't work under pyiodide
+# FIXME: find another way
+try:
+    from ..tools.connection import get_dialect, get_dialect_name
+    from .cube_loader_db import CubeLoaderDB
+    from .cube_loader_custom import CubeLoaderCustom
+except ImportError:
+    pass
 
 
 @attr.s
