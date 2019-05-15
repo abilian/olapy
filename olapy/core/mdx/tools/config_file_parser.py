@@ -162,7 +162,7 @@ class ConfigParser:
             file_path = self.cube_config_file
 
         with open(file_path) as config_file:
-            config = yaml.load(config_file)
+            config = yaml.load(config_file, Loader=yaml.SafeLoader)
         # only one cube right now
         return {
             "xmla_authentication": bool(config["xmla_authentication"]),
