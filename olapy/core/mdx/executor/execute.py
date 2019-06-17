@@ -21,7 +21,7 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import attr
 import numpy as np
@@ -29,6 +29,8 @@ import pandas as pd
 
 from olapy.core.mdx.parser.parse import Parser
 
+# Needed because SQLAlchemy doesn't work under pyiodide
+# FIXME: find another way
 try:
     from ..tools.connection import get_dialect, get_dialect_name
     from .cube_loader_db import CubeLoaderDB
@@ -171,6 +173,7 @@ class MdxEngine(object):
         :return: dict with table names as keys and DataFrames as values.
         """
         cubes_folder_path = self.get_cube_path()
+        cube_loader = None  # type: Any
 
         if (
             self.cube_config
@@ -183,22 +186,24 @@ class MdxEngine(object):
                 sqla_engine=self.sqla_engine,
                 sep=sep,
             )
+
         elif self.cube in self.db_cubes:
             dialect_name = get_dialect_name(str(self.sqla_engine))
             if "postgres" in dialect_name:
                 self.facts = self.facts.lower()
-            cube_loader = CubeLoaderDB(self.sqla_engine)  # type: ignore
+            cube_loader = CubeLoaderDB(self.sqla_engine)
         # if not tables:
         #     raise Exception(
         #         'unable to load tables, check that the database is not empty',
         #     )
         # elif self.cube in self.csv_files_cubes:
+
         else:
-
             # force reimport CubeLoader every instance call (MdxEngine or SparkMdxEngine)
-            from ..executor import CubeLoader
+            from . import CubeLoader
 
-            cube_loader = CubeLoader(cubes_folder_path, sep)  # type: ignore
+            cube_loader = CubeLoader(cubes_folder_path, sep)
+
         return cube_loader.load_tables()
 
     def get_measures(self):

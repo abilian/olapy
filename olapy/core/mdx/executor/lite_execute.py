@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
 """
-Do the same thing as MdxEngine, but with onle one file or database table
+Do the same thing as MdxEngine, but with only one file or database table
 (no need for a star schema tables).
 """
 from __future__ import absolute_import, division, print_function, \
@@ -17,13 +17,15 @@ class MdxEngineLite(MdxEngine):
 
     example of usage::
 
-            olapy runserver -tf=/home/moddoy/olapy-data/cubes/sales/Facts.csv -c City,Licence,Amount,Count
+        olapy runserver -tf=$HOME/olapy-data/cubes/sales/Facts.csv \
+            -c City,Licence,Amount,Count
 
     """
 
     def __init__(
         self, direct_table_or_file, columns=None, measures=None, sep=";", **kwargs
     ):
+        # FIXME: probably buggy
         MdxEngine.__init__(self, kwargs)
         self.cube = direct_table_or_file
         self.sep = sep
@@ -48,7 +50,8 @@ class MdxEngineLite(MdxEngine):
         """
         After instantiating MdxEngine(), load_cube construct the cube and load all tables.
 
-        :param table_or_file: full file path, or just database table name if sql_alchemy_uri provided
+        :param table_or_file: full file path, or just database table name
+            if sql_alchemy_uri provided
         """
         self.cube = table_or_file
         if self.sqla_engine:

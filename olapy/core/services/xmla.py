@@ -70,14 +70,15 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
         _throws=InvalidCredentialsError,
     )
     def Discover(ctx, request):
-        """Retrieves information, such as the list of available databases, cubes, hierarchies or details about\
-         a specific object,from an instance of MdxEngine. The data retrieved with the Discover method \
-          depends on the values of the parameters passed to it.
+        """
+        Retrieves information, such as the list of available databases,
+        cubes, hierarchies or details about a specific object, from
+        an instance of MdxEngine. The data retrieved with the Discover
+        method depends on the values of the parameters passed to it.
 
         :param request: :class:`DiscoverRequest` object
 
         :return: XML Discover response as string
-
         """
         # ctx is the 'context' parameter used by Spyne
         discover_request_hanlder = ctx.app.config["discover_request_hanlder"]
@@ -100,13 +101,14 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
 
         return method(request)
 
-    # Execute function must take 2 argument ( JUST 2 ! ) Command and Properties
-    # we encapsulate them in ExecuteRequest object
+    # Execute function must take 2 arguments (JUST 2!): Command and Properties.
+    # We encapsulate them in ExecuteRequest object.
 
     @rpc(ExecuteRequest, _returns=AnyXml, _body_style="bare", _out_header=Session)
     def Execute(ctx, request):
-        """Sends xmla commands to an instance of MdxEngine. \
-        This includes requests involving data transfer, such as retrieving data on the server.
+        """Sends xmla commands to an instance of MdxEngine.
+
+        This includes requests involving data transfer, such as retrieving data from the server.
 
         :param request: :class:`ExecuteRequest` object Execute.
         :return: XML Execute response as string
@@ -129,7 +131,8 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
         else:
             convert2formulas = False
 
-        # change (or load cube) if direct execute handler without discover handler (which normally load the cube first)
+        # change (or load cube) if direct execute handler without discover
+        # handler (which normally load the cube first)
         if (
             request.Properties
             and request.Properties.PropertyList.Catalog

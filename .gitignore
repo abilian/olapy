@@ -10,6 +10,7 @@
 .ropeproject
 .mypy_cache
 .vscode
+.venv
 *,cover
 
 sandbox

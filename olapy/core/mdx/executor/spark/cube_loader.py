@@ -7,7 +7,7 @@ from typing import Dict, Text
 
 from pyspark.sql import DataFrame, SparkSession
 
-from ..cube_loader import CubeLoader
+from olapy.core.mdx.executor.cube_loader import CubeLoader
 
 spark = SparkSession.builder.appName("olapy").getOrCreate()
 
