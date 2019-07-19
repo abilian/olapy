@@ -9,7 +9,7 @@ install_requires = [str(req) for req in _install_requires]
 
 setup(
     name="olapy",
-    version="0.7.6",
+    version="0.7.7",
     packages=find_packages(),
     author="Abilian SAS",
     author_email="contact@abilian.com",
