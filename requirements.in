@@ -1,5 +1,7 @@
+# V. 0.25 is Py3k-only
+pandas<0.25
+
 typing
-pandas<1
 lxml
 spyne>2.13.*
 SQLAlchemy
