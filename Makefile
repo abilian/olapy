@@ -4,20 +4,28 @@
 SRC=olapy
 PKG=$(SRC)
 
+.PHONY:
 default: test lint
 
 
+.PHONY:
 run:
 	python manage.py runserver
 
 #
 # testing
 #
+.PHONY:
 test:
 	pytest . --durations=10
 
+.PHONY:
 test-with-coverage:
 	pytest --tb=short --cov $(PKG) --cov-report term-missing .
+
+.PHONY:
+tox:
+	tox
 
 #
 # setup
@@ -56,6 +64,10 @@ lint-py3k:
 lint-mypy:
 	mypy olapy tests
 
+
+#
+# Cleanup
+#
 clean:
 	find . -name "*.pyc" -delete
 	find . -name .DS_Store -delete
@@ -93,7 +105,7 @@ sync-deps:
 
 release:
 	git push --tags
-	rm -rf /tmp/olapy
-	git clone . /tmp/olapy
-	cd /tmp/olapy ; python setup.py sdist
-	cd /tmp/olapy ; python setup.py sdist upload
+	rm -rf /tmp/olapy-dist
+	git clone . /tmp/olapy-dist
+	cd /tmp/olapy-dist ; python setup.py sdist
+	cd /tmp/olapy-dist ; twine upload dist/*

@@ -7,6 +7,8 @@ from setuptools import find_packages, setup
 _install_requires = parse_requirements(open("requirements.in"))
 install_requires = [str(req) for req in _install_requires]
 
+VERSION = "0.7.7"
+
 setup(
     name="olapy",
     version="0.7.7",
@@ -27,6 +29,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         # "Topic :: Business intelligence",
     ],
     extras_require={

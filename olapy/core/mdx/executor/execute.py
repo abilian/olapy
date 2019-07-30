@@ -21,7 +21,7 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import attr
 import numpy as np
