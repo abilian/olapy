@@ -1,5 +1,5 @@
 dist: xenial
-sudo: required
+# sudo: required
 
 language: python
 cache:
