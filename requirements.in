@@ -1,6 +1,8 @@
-# V. 0.25 is Py3k-only
+# Later versions are py3k-only
 pandas<0.25
+numpy<1.17
 
+# Other deps
 typing
 lxml
 spyne>2.13.*
