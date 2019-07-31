@@ -7,10 +7,10 @@ from __future__ import absolute_import, division, print_function, \
 
 import itertools
 from datetime import datetime
+from typing import List, Text
 
 import numpy as np
 import xmlwitch
-from typing import Text, List
 
 from .dict_execute_request_handler import DictExecuteReqHandler
 from .xmla_execute_xsds import execute_xsd

@@ -8,8 +8,8 @@ import pandas.io.sql as psql
 from pandas.errors import MergeError
 from sqlalchemy import inspect
 
-from . import CubeLoader
 from ..tools.connection import get_dialect_name
+from . import CubeLoader
 
 
 class CubeLoaderDB(CubeLoader):

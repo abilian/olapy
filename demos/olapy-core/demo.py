@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function, \
 
 from olapy.core.mdx.executor import MdxEngine
 
-
 mdx_query = """SELECT
             Hierarchize({[Measures].[Amount]}) ON COLUMNS
             FROM

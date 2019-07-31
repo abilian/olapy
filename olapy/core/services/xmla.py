@@ -21,12 +21,12 @@ from spyne.server.http import HttpTransportContext
 from spyne.server.wsgi import WsgiApplication
 from sqlalchemy import create_engine
 
-from . import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 from ..mdx.executor import MdxEngine
 from ..mdx.executor.lite_execute import MdxEngineLite
 from ..mdx.tools.config_file_parser import ConfigParser
 from ..mdx.tools.olapy_config_file_parser import DbConfigParser
 from ..services.models import DiscoverRequest, ExecuteRequest, Session
+from . import XmlaDiscoverReqHandler, XmlaExecuteReqHandler
 from .xmla_lib import XmlaProviderLib
 
 # unicode_literals This is heavily discouraged with click
