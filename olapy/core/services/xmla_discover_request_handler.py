@@ -74,7 +74,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
     @staticmethod
     def discover_datasources_response():
-        """list of data sources that are available on the server.
+        """List the data sources available on the server.
 
         :return:
         """

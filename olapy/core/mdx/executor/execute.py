@@ -1,6 +1,7 @@
 # -*- encoding: utf8 -*-
-"""Olapy main's module, this module manipulate Mdx Queries and execute them.
-Execution need two main objects:
+"""Olapy's main module, this module manipulate MDX Queries and executes them.
+
+Execution needs two main objects:
 
     - table_loaded: which contains all tables needed to construct a cube
     - star_schema: which is the cube
@@ -20,7 +21,8 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-from typing import Any, Dict, List
+
+from typing import Dict, List, Text, Optional, Any
 
 import attr
 import numpy as np
@@ -59,7 +61,7 @@ class MdxEngine(object):
     cube = attr.ib(default=None)
     facts = attr.ib(default="Facts")
     source_type = attr.ib(default="csv")
-    parser = attr.ib(default=Parser())
+    parser = attr.ib(default=attr.Factory(Parser))
     csv_files_cubes = attr.ib(default=attr.Factory(list))
     db_cubes = attr.ib(default=attr.Factory(list))
     sqla_engine = attr.ib(default=None)
@@ -157,7 +159,7 @@ class MdxEngine(object):
             self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
     def load_tables(self, sep):
-        # type: (str) -> Dict[str, pd.DataFrame]
+        # type: (Text) -> Dict[Text, pd.DataFrame]
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.

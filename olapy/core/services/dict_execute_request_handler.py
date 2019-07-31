@@ -1,6 +1,7 @@
 # -*- encoding: utf8 -*-
-"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
+"""Managing all
+`EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_
+requests and responses."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -12,7 +13,8 @@ from ..mdx.parser.parse import REGEX
 
 
 class DictExecuteReqHandler:
-    """DictExecuteReqHandler handles xmla commands to an instance of MdxEngine. \
+    """DictExecuteReqHandler handles xmla commands to an instance of MdxEngine.
+
     This includes requests involving data transfer, such as retrieving data on the server."""
 
     def __init__(self, executor, mdx_query=None, convert2formulas=False):

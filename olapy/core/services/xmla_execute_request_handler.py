@@ -1,6 +1,7 @@
 # -*- encoding: utf8 -*-
-"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
+"""Managing all
+`EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_
+requests and responses."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -9,7 +10,7 @@ from datetime import datetime
 
 import numpy as np
 import xmlwitch
-from six import text_type
+from typing import Text, List
 
 from .dict_execute_request_handler import DictExecuteReqHandler
 from .xmla_execute_xsds import execute_xsd
@@ -18,7 +19,7 @@ from .xmla_execute_xsds import execute_xsd
 class XmlaExecuteReqHandler(DictExecuteReqHandler):
     """The Execute method executes XMLA commands provided in the Command
     element and returns any resulting data using the XMLA MDDataSet data type
-    (for multidimensional result sets.)
+    (for multidimensional result sets).
 
     Example::
 
@@ -213,7 +214,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
     def generate_xs0_one_axis(self, splitted_df, mdx_query_axis="all", axis="Axis0"):
         """
 
-        :param splitted_df: spllited dataframes (with split_dataframe() function)
+        :param splitted_df: splitted dataframes (with split_dataframe() function)
         :param mdx_query_axis: axis to which you want generate xs0 xml, (rows, columns or all)
         :param axis: axis0 or axis1
         :return:
@@ -380,7 +381,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def generate_cell_data(self):
-        # type: () -> text_type
+        # type: () -> Text
         """Returns Cell elements representing the cell data contained by a root
         element that uses the MDDataSet data type.
 
@@ -567,10 +568,11 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return xml
 
     def _generate_table_axis_info(self, xml, dimensions_names):
+        # type: (xmlwitch.Builder, List[Text]) -> None
         """Add AxisInfo elements, representing the axis metadata contained by
         the parent OlapInfo element for Dimension to the passed xml structure.
 
-        :param xml: xml structure to update
+        :param xml: xml structure to update (mutable)
         :param dimensions_names: dimension names (without facts table)
         """
         for dimension_name in dimensions_names:
@@ -609,7 +611,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     )
 
     def generate_one_axis_info(self, mdx_query_axis="columns", Axis="Axis0"):
-        """AxisInfo elements for one axis (axis0 or axis1)
+        """AxisInfo elements for one axis (axis0 or axis1).
 
         Example AxisInfo::
 

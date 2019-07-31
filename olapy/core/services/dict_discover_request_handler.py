@@ -1,6 +1,7 @@
-"""Managing all `DISCOVER <https://technet.microsoft.com/fr-
-fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 # -*- encoding: utf8 -*-
+"""Managing all
+`DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_
+requests and responses."""
 
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -8,6 +9,7 @@ from __future__ import absolute_import, division, print_function, \
 import os
 import uuid
 
+from olapy.core.mdx.executor import MdxEngine
 from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
     discover_schema_rowsets_response_rows
 from ..services.xmla_discover_xsds import discover_preperties_xsd
@@ -25,6 +27,7 @@ class DictDiscoverReqHandler:
     """
 
     def __init__(self, mdx_engine):
+        # type: (MdxEngine) -> None
         """
 
         :param mdx_engine: mdx_engine engine instance
@@ -168,9 +171,9 @@ class DictDiscoverReqHandler:
             )
 
         elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries":
-
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(request.Properties.PropertyList.Catalog)
+
             return self._get_properties(
                 discover_preperties_xsd,
                 "MdpropMdxSubqueries",
@@ -185,9 +188,9 @@ class DictDiscoverReqHandler:
             request.Restrictions.RestrictionList.PropertyName
             == "MdpropMdxDrillFunctions"
         ):
-
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(request.Properties.PropertyList.Catalog)
+
             return self._get_properties(
                 discover_preperties_xsd,
                 "MdpropMdxDrillFunctions",
@@ -217,7 +220,6 @@ class DictDiscoverReqHandler:
         return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
 
     def discover_schema_rowsets_response(self, request):
-
         rows = discover_schema_rowsets_response_rows
 
         def generate_resp(rows):
