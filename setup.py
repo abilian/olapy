@@ -7,11 +7,11 @@ from setuptools import find_packages, setup
 _install_requires = parse_requirements(open("requirements.in"))
 install_requires = [str(req) for req in _install_requires]
 
-VERSION = "0.7.7"
+VERSION = "0.7.8"
 
 setup(
     name="olapy",
-    version="0.7.7",
+    version=VERSION,
     packages=find_packages(),
     author="Abilian SAS",
     author_email="contact@abilian.com",
