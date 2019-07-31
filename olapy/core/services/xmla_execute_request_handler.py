@@ -568,8 +568,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
     def _generate_table_axis_info(self, xml, dimensions_names):
         """Add AxisInfo elements, representing the axis metadata contained by
-        the parent OlapInfo element for Dimension to the passed xml
-        structure.
+        the parent OlapInfo element for Dimension to the passed xml structure.
 
         :param xml: xml structure to update
         :param dimensions_names: dimension names (without facts table)

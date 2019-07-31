@@ -1,6 +1,7 @@
 # -*- encoding: utf8 -*-
-"""The main Module to manage `XMLA <https://technet.microsoft.com/fr-fr/library/ms187178(v=sql.90).aspx>`_
-requests and responses, and managing Spyne soap server."""
+"""The main Module to manage
+`XMLA <https://technet.microsoft.com/fr-fr/library/ms187178(v=sql.90).aspx>`_
+requests and responses, and the Spyne SOAP server."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -66,9 +67,11 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
         _throws=InvalidCredentialsError,
     )
     def Discover(ctx, request):
-        """Retrieves information, such as the list of available databases,
+        """Retrieve information, such as the list of available databases,
         cubes, hierarchies or details about a specific object, from an instance
-        of MdxEngine. The data retrieved with the Discover method depends on
+        of MdxEngine.
+
+        The data retrieved with the Discover method depends on
         the values of the parameters passed to it.
 
         :param request: :class:`DiscoverRequest` object

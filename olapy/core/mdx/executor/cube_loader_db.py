@@ -13,10 +13,10 @@ from ..tools.connection import get_dialect_name
 
 
 class CubeLoaderDB(CubeLoader):
-    """Part of :mod:`execute.py` module, here olapy construct cube from
-    DATABASE automatically based on `start schema model
-    <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-
-    schema.html>`_"""
+    """Part of :mod:`execute.py` module, here olapy constructs a cube from
+    the database automatically based on the `start schema model
+    <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_.
+    """
 
     def __init__(self, sqla_engine):
         CubeLoader.__init__(self)

@@ -16,8 +16,8 @@ class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
     available databases or details about a specific object (cube, dimensions,
     hierarchies...), from an instance of MdxEngine.
 
-    The data retrieved with the Discover method depends on the values
-    of the parameters passed to it. .
+    The data retrieved with the Discover method depends on the values of
+    the parameters passed to it. .
     """
 
     def mdschema_hierarchies_response(self, request):
