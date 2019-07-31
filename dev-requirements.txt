@@ -1,13 +1,13 @@
 # Tools / dev / testing
+pytest
+pytest-cov
 tox
 PrettyTable
 gprof2dot
 ipdb
-mccabe
 pip-tools
 py-cpuinfo
-pytest
-pytest-cov
+
 # xmla
 -e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
 
@@ -21,8 +21,8 @@ pytest-cov
 flake8
 flake8-tidy-imports
 mastool
-pylint
 mccabe
+pylint
 pre-commit
 
 # Formatting
