@@ -10,8 +10,7 @@ from .core.services.xmla import runserver
 
 
 def main(arg):
-    """
-    Execute xmla provider.
+    """Execute xmla provider.
 
     :param arg: -c | --console :  show logs in server console
     :return:

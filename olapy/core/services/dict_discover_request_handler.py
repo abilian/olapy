@@ -1,6 +1,5 @@
-"""
-Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `DISCOVER <https://technet.microsoft.com/fr-
+fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 # -*- encoding: utf8 -*-
 
 from __future__ import absolute_import, division, print_function, \
@@ -17,9 +16,13 @@ from ..services.xmla_discover_xsds import discover_preperties_xsd
 
 
 class DictDiscoverReqHandler:
-    """DictDiscoverReqHandler handles information, such as the list of available databases or details about a \
-    specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
-    Discover method depends on the values of the parameters passed to it. ."""
+    """Handles information, such as the list of
+    available databases or details about a specific object (cube, dimensions,
+    hierarchies...), from an instance of MdxEngine.
+
+    The data retrieved with the Discover method depend on the values
+    of the parameters passed to it.
+    """
 
     def __init__(self, mdx_engine):
         """
@@ -36,9 +39,8 @@ class DictDiscoverReqHandler:
         self.session_id = uuid.uuid1()
 
     def change_cube(self, new_cube):
-        """
-        If you change the cube in any request, we have to
-        instantiate the MdxEngine with the new cube.
+        """If you change the cube in any request, we have to instantiate the
+        MdxEngine with the new cube.
 
         :param new_cube: cube name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables

@@ -1,7 +1,5 @@
 # -*- encoding: utf8 -*-
-"""
-Parser for MDX queries, and Break it in parts.
-"""
+"""Parser for MDX queries, and Break it in parts."""
 
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -19,17 +17,14 @@ REGEX = regex.compile(
 
 
 class Parser(object):
-    """
-    Class for Parsing a MDX query
-    """
+    """Class for Parsing a MDX query."""
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
 
     @staticmethod
     def split_tuple(tupl):
-        """
-        Split Tuple (String) into items.
+        """Split Tuple (String) into items.
 
         example::
 
@@ -180,9 +175,9 @@ class Parser(object):
 
     @staticmethod
     def add_tuple_brackets(tupl):
-        """
-        After splitting tuple with :func:`split_group`, you got some tuple like **aa].[bb].[cc].[dd**
-        so add_tuple_brackets fix this by adding missed brackets **[aa].[bb].[cc].[dd]**.
+        """After splitting tuple with :func:`split_group`, you got some tuple
+        like **aa].[bb].[cc].[dd** so add_tuple_brackets fix this by adding
+        missed brackets **[aa].[bb].[cc].[dd]**.
 
         :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
         :return: [aa].[bb].[cc].[dd] as string.
@@ -210,8 +205,7 @@ class Parser(object):
         return list(map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
 
     def get_nested_select(self):
-        """
-        Get tuples groups in query like ::
+        """Get tuples groups in query like ::
 
                 Select {
                     ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
@@ -231,13 +225,13 @@ class Parser(object):
                     [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
 
         :return: All groups as list of strings.
-
         """
         return regex.findall(r"\(([^()]+)\)", self.mdx_query)
 
     def hierarchized_tuples(self):
         # type: () -> bool
-        """Check if `hierarchized <https://docs.microsoft.com/en-us/sql/mdx/hierarchize-mdx>`_  mdx query.
+        """Check if `hierarchized <https://docs.microsoft.com/en-
+        us/sql/mdx/hierarchize-mdx>`_  mdx query.
 
         :return: True | False
         """

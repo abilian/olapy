@@ -1,7 +1,6 @@
 # -*- encoding: utf8 -*-
-"""
-Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
+fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -28,8 +27,8 @@ class DictExecuteReqHandler:
         self.execute_mdx_query(mdx_query, convert2formulas)
 
     def execute_mdx_query(self, mdx_query, convert2formulas=False):
-        """
-        Use the MdxEngine instance to execute the provided mdx query
+        """Use the MdxEngine instance to execute the provided mdx query.
+
         :param mdx_query: the mdx query
         :param convert2formulas: convert2formulas True or False
         :return:
@@ -49,8 +48,8 @@ class DictExecuteReqHandler:
             self.columns_desc = None
 
     def _execute_convert_formulas_query(self, mdx_query):
-        """
-        convert Mdx Query to `excel formulas <https://exceljet.net/excel-functions/excel-convert-function>`_ response
+        """convert Mdx Query to `excel formulas <https://exceljet.net/excel-
+        functions/excel-convert-function>`_ response.
 
         :return: excel formuls
             example::
@@ -82,7 +81,6 @@ class DictExecuteReqHandler:
             <Cell CellOrdinal="8">
                 <Value>[Geography].[Geo].[Country]</Value>
             </Cell>
-
         """
 
         return [
@@ -230,8 +228,8 @@ class DictExecuteReqHandler:
         return all_axis
 
     def _generate_slicer_convert2formulas(self):
-        """
-        <Axis name="SlicerAxis">
+        """<Axis name="SlicerAxis">
+
             <Tuples>
                 <Tuple>
                     <Member Hierarchy="[Geography].[Geo]">
@@ -289,17 +287,11 @@ class DictExecuteReqHandler:
         return all_axis
 
     def _generate_cells_data_convert2formulas(self):
-        """
-        for each tuple:
-        <Cell CellOrdinal="0">
-            <Value>[Measures].[Amount]</Value>
-        </Cell>
-        <Cell CellOrdinal="1">
-            <Value>Amount</Value>
-        </Cell>
-        <Cell CellOrdinal="2">
-            <Value>[Measures]</Value>
-        </Cell>
+        """for each tuple:
+
+        <Cell CellOrdinal="0">     <Value>[Measures].[Amount]</Value>
+        </Cell> <Cell CellOrdinal="1">     <Value>Amount</Value> </Cell>
+        <Cell CellOrdinal="2">     <Value>[Measures]</Value> </Cell>
         """
         cells = []
         index = 0
@@ -332,8 +324,7 @@ class DictExecuteReqHandler:
 
     def generate_cell_data(self):
         # # type: () -> list
-        """
-        Example of CellData::
+        """Example of CellData::
 
             <Cell CellOrdinal="0">
                 <Value xsi:type="xsi:long">768</Value>
@@ -405,8 +396,7 @@ class DictExecuteReqHandler:
         return all_axis
 
     def generate_axes_info_slicer(self):
-        """
-        Not used dimensions.
+        """Not used dimensions.
 
         Example AxisInfo::
 
@@ -557,8 +547,7 @@ class DictExecuteReqHandler:
         return all_axis_info
 
     def generate_one_axis_info(self, mdx_query_axis="columns", Axis="Axis0"):
-        """
-        Example AxisInfo::
+        """Example AxisInfo::
 
             <AxesInfo>
                 <AxisInfo name="Axis0">
@@ -692,9 +681,9 @@ class DictExecuteReqHandler:
         }
 
     def generate_xs0(self):
-        """
-        generate tuples used to represent a single axis in a multidimensional dataset contained by an Axes
-        element that uses the MDDataSet data type, returned by the Execute method.
+        """generate tuples used to represent a single axis in a
+        multidimensional dataset contained by an Axes element that uses the
+        MDDataSet data type, returned by the Execute method.
 
         Example of xs0::
 
@@ -811,8 +800,9 @@ class DictExecuteReqHandler:
         )
 
     def _generate_tuples_xs0(self, splitted_df, mdx_query_axis):
-        """
-        generate elements representing axis 0 data contained by a root element that uses the MDDataSet data type.
+        """generate elements representing axis 0 data contained by a root
+        element that uses the MDDataSet data type.
+
         :param splitted_df: spllited dataframes (with split_dataframe() function)
         :param mdx_query_axis: from mdx query,  rows | columns | where (condition) | all (rows + columns + where)
         :return: one xs0 reponse as xml format
@@ -882,7 +872,6 @@ class DictExecuteReqHandler:
 
         :param tuple: tuple as list
         :return: tuple as list without -1
-
         """
         for att in tuple[::-1]:
             if att != -1:
@@ -891,8 +880,8 @@ class DictExecuteReqHandler:
         return tuple
 
     def generate_axes_info(self):
-        """
-        Generate all AxisInfo elements
+        """Generate all AxisInfo elements.
+
         :return: AxisInfo as string
         """
 
@@ -911,8 +900,7 @@ class DictExecuteReqHandler:
         return self.generate_one_axis_info()
 
     def generate_slicer_axis(self):
-        """
-        Example SlicerAxis::
+        """Example SlicerAxis::
 
             <Axis name="SlicerAxis">
                 <Tuples>

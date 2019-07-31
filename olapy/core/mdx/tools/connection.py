@@ -1,6 +1,4 @@
-"""
-Managing all database access
-"""
+"""Managing all database access."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -14,8 +12,7 @@ class Dialect(object):
 
     def __init__(self, sqla_engine=None):
         # type: (Optional[Engine]) -> None
-        """
-        Connect to cube from database
+        """Connect to cube from database.
 
         :param sqla_engine: SqlAlchemy engine instance
         """
@@ -24,8 +21,7 @@ class Dialect(object):
 
     def gen_all_databases_query(self):
         # type: () -> Text
-        """
-        Each dbms has different query to get user databases names.
+        """Each dbms has different query to get user databases names.
 
         :return: sql query to fetch all databases
         """
@@ -81,8 +77,7 @@ class SqliteDialect(Dialect):
 
 class MssqlDialect(Dialect):
     def gen_all_databases_query(self):
-        """
-        Each dbms has a different query to get user databases names.
+        """Each dbms has a different query to get user databases names.
 
         :return: SQL query to fetch all databases
         """
@@ -113,8 +108,7 @@ def get_dialect(sqla_engine):
 
 def get_dialect_name(conn_string):
     # type: (Text) -> Text
-    """
-    Get the dbms from the connection string.
+    """Get the dbms from the connection string.
 
     example:
     when connection string = 'oracle://scott:tiger@127.0.0.1:1521/sidname'

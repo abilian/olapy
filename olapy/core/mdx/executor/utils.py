@@ -1,10 +1,9 @@
-"""
-To load DataFrames (csv files for instance), OlaPy uses some it own loaders (cube_loader.py) modules,
-but when using pyodide, it's not possible to use them due to some file system access constraints,
-so the idea is that Pyodide load DataFrame with
-`pyodide.open_url <https://github.com/iodide-project/pyodide/blob/master/docs/api_reference.md#pyodideopen_urlurl>`_
-and them injects these Df to OlaPy.
-
+"""To load DataFrames (csv files for instance), OlaPy uses some it own loaders
+(cube_loader.py) modules, but when using pyodide, it's not possible to use them
+due to some file system access constraints, so the idea is that Pyodide load
+DataFrame with `pyodide.open_url <https://github.com/iodide-
+project/pyodide/blob/master/docs/api_reference.md#pyodideopen_urlurl>`_ and
+them injects these Df to OlaPy.
 
 import pandas as pd
 import pyodide
@@ -20,7 +19,6 @@ dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Fac
 
 # get_response uses the patch
 get_response(xmla_request_params=xmla_request_params,dataframes=dataframes, output='xmla') # or output='dict'
-
 """
 
 from __future__ import absolute_import, division, print_function, \
@@ -31,8 +29,8 @@ from pandas.errors import MergeError
 
 
 def _clean(dataframes):
-    """
-    remove *_id columns
+    """remove *_id columns.
+
     :param dataframes:
     :return:
     """
@@ -60,8 +58,7 @@ def _get_measures(dataframes, mdx_engine):
 
 
 def _get_star_schema_dataframe(dataframes, mdx_engine):
-    """
-    Merge all DataFrames as star schema.
+    """Merge all DataFrames as star schema.
 
     :return: star schema DataFrame
     """

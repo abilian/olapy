@@ -1,7 +1,5 @@
-"""
-Parse cube configuration file and create cube parser object which
-can be passed to the MdxEngine.
-"""
+"""Parse cube configuration file and create cube parser object which can be
+passed to the MdxEngine."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -149,8 +147,8 @@ class ConfigParser:
         }
 
     def get_cube_config(self, conf_file=None):
-        """
-        Construct parser cube obj (which can ben passed to MdxEngine) for excel
+        """Construct parser cube obj (which can ben passed to MdxEngine) for
+        excel.
 
         :param conf_file: full path to config file, Default : ~/olapy-data/cube/cubes-config.yml
         :return: Cube obj

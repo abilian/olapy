@@ -13,11 +13,10 @@ from ..tools.connection import get_dialect_name
 
 
 class CubeLoaderDB(CubeLoader):
-    """
-    Part of :mod:`execute.py` module, here olapy construct cube from DATABASE
-    automatically based on
-    `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_
-    """
+    """Part of :mod:`execute.py` module, here olapy construct cube from
+    DATABASE automatically based on `start schema model
+    <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-
+    schema.html>`_"""
 
     def __init__(self, sqla_engine):
         CubeLoader.__init__(self)
@@ -25,8 +24,7 @@ class CubeLoaderDB(CubeLoader):
 
     def load_tables(self):
         # type: () -> Dict[Text, pd.DataFrame]
-        """
-        Load tables from database.
+        """Load tables from database.
 
         :return: tables dict with table name as key and dataframe as value
         """
@@ -55,8 +53,7 @@ class CubeLoaderDB(CubeLoader):
 
     def construct_star_schema(self, facts):
         # type: (Text) -> pd.DataFrame
-        """
-        Construct star schema DataFrame from database.
+        """Construct star schema DataFrame from database.
 
         :param facts: Facts table name
         :return: star schema DataFrame

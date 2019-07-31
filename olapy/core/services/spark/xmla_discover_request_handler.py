@@ -1,6 +1,5 @@
-"""
-Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `DISCOVER <https://technet.microsoft.com/fr-
+fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 # -*- encoding: utf8 -*-
 
 from __future__ import absolute_import, division, print_function, \
@@ -13,13 +12,17 @@ from ..xmla_discover_xsds import mdschema_hierarchies_xsd
 
 
 class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
-    """XmlaDiscoverReqHandler handles information, such as the list of available databases or details about a \
-    specific object (cube, dimensions, hierarchies...), from an instance of MdxEngine. The data retrieved with the \
-    Discover method depends on the values of the parameters passed to it. ."""
+    """XmlaDiscoverReqHandler handles information, such as the list of
+    available databases or details about a specific object (cube, dimensions,
+    hierarchies...), from an instance of MdxEngine.
+
+    The data retrieved with the Discover method depends on the values
+    of the parameters passed to it. .
+    """
 
     def mdschema_hierarchies_response(self, request):
-        """
-        Describes each hierarchy within a particular dimension.
+        """Describes each hierarchy within a particular dimension.
+
         :param request:
         :return:
         """

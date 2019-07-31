@@ -1,6 +1,5 @@
-"""
-Managing all `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `DISCOVER <https://technet.microsoft.com/fr-
+fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 # -*- encoding: utf8 -*-
 
 from __future__ import absolute_import, division, print_function, \
@@ -33,11 +32,12 @@ except ImportError:
 
 
 class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
-    """XmlaDiscoverReqHandler handles information, such as the list
-    of available databases or details about a specific object
-    (cube, dimensions, hierarchies...), from an instance of MdxEngine.
-    The data retrieved with the Discover method depends on the
-    values of the parameters passed to it.
+    """XmlaDiscoverReqHandler handles information, such as the list of
+    available databases or details about a specific object (cube, dimensions,
+    hierarchies...), from an instance of MdxEngine.
+
+    The data retrieved with the Discover method depends on the values of
+    the parameters passed to it.
     """
 
     def _change_db_uri(self, old_sqla_uri, new_db):
@@ -48,9 +48,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return parse_uri.scheme + "://" + parse_uri.netloc + "/" + new_db
 
     def change_cube(self, new_cube):
-        """
-        If you change the cube in any request, we have to
-        instantiate the MdxEngine with the new cube.
+        """If you change the cube in any request, we have to instantiate the
+        MdxEngine with the new cube.
 
         :param new_cube: cube name
         :return: new instance of MdxEngine with new star_schema_DataFrame and other variables
@@ -75,8 +74,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
     @staticmethod
     def discover_datasources_response():
-        """
-        list of data sources that are available on the server
+        """list of data sources that are available on the server.
+
         :return:
         """
         xml = xmlwitch.Builder()
@@ -160,9 +159,10 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def discover_schema_rowsets_response(self, request):
-        """
-        Generate the names, restrictions, description, and other information for all enumeration values and any \
-        additional provider-specific enumeration values supported by OlaPy.
+        """Generate the names, restrictions, description, and other information
+        for all enumeration values and any additional provider-specific
+        enumeration values supported by OlaPy.
+
         :param request:
         :return: xmla response as string
         """
@@ -354,8 +354,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
 
     @staticmethod
     def discover_literals_response(request):
-        """
-        Generate information on literals supported by the OlaPy, including data types and values.
+        """Generate information on literals supported by the OlaPy, including
+        data types and values.
+
         :param request:
         :return:
         """
@@ -385,8 +386,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
             return str(xml)
 
     def mdschema_sets_response(self, request):
-        """
-        Describes any sets that are currently defined in a database, including session-scoped sets.
+        """Describes any sets that are currently defined in a database,
+        including session-scoped sets.
+
         :param request:
         :return:
         """
@@ -411,8 +413,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_kpis_response(self, request):
-        """
-        Describes the key performance indicators (KPIs) within a database.
+        """Describes the key performance indicators (KPIs) within a database.
+
         :param request:
         :return:
         """
@@ -438,8 +440,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def dbschema_catalogs_response(self, request):
-        """
-        Catalogs available for a server instance
+        """Catalogs available for a server instance.
+
         :return:
         """
         xml = xmlwitch.Builder()
@@ -459,8 +461,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_cubes_response(self, request):
-        """
-        Describes the structure of cubes.
+        """Describes the structure of cubes.
+
         :param request:
         :return:
         """
@@ -499,8 +501,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def dbschema_tables_response(self, request):
-        """
-        Returns dimensions, measure groups, or schema rowsets exposed as tables.
+        """Returns dimensions, measure groups, or schema rowsets exposed as
+        tables.
+
         :param request:
         :return:
         """
@@ -521,8 +524,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
             return str(xml)
 
     def mdschema_measures_response(self, request):
-        """
-        Returns information about the available measures.
+        """Returns information about the available measures.
+
         :param request:
         :return:
         """
@@ -566,8 +569,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_dimensions_response(self, request):
-        """
-        Returns information about the dimensions in a given cube. Each dimension has one row.
+        """Returns information about the dimensions in a given cube. Each
+        dimension has one row.
+
         :param request:
         :return:
         """
@@ -633,8 +637,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_hierarchies_response(self, request):
-        """
-        Describes each hierarchy within a particular dimension.
+        """Describes each hierarchy within a particular dimension.
+
         :param request:
         :return:
         """
@@ -736,8 +740,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_levels_response(self, request):
-        """
-        Returns rowset contains information about the levels available in a dimension.
+        """Returns rowset contains information about the levels available in a
+        dimension.
+
         :param request:
         :return:
         """
@@ -812,8 +817,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_measuregroups_response(self, request):
-        """
-        Describes the measure groups.
+        """Describes the measure groups.
+
         :param request:
         :return:
         """
@@ -847,8 +852,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_measuregroup_dimensions_response(self, request):
-        """
-        Enumerates the dimensions of the measure groups.
+        """Enumerates the dimensions of the measure groups.
+
         :param request:
         :return:
         """
@@ -892,8 +897,9 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_properties_response(self, request):
-        """
-        PROPERTIES rowset contains information about the available properties for each level of the dimension
+        """PROPERTIES rowset contains information about the available
+        properties for each level of the dimension.
+
         :param request:
         :return:
         """
@@ -974,8 +980,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_members_response(self, request):
-        """
-        Describes the members.
+        """Describes the members.
+
         :param request:
         :return:
         """
@@ -1078,8 +1084,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def discover_instances_response(self, request):
-        """
-        todo
+        """todo.
+
         :param request:
         :return:
         """
@@ -1097,8 +1103,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def dmschema_mining_models_response(self, request):
-        """
-        todo
+        """todo.
+
         :param request:
         :return:
         """
@@ -1116,8 +1122,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_actions_response(self, request):
-        """
-        todo
+        """todo.
+
         :param request:
         :return:
         """
@@ -1135,8 +1141,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_functions_response(self, request):
-        """
-        todo
+        """todo.
+
         :param request:
         :return:
         """
@@ -1155,8 +1161,8 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def mdschema_input_datasources_response(self, request):
-        """
-        todo
+        """todo.
+
         :param request:
         :return:
         """
@@ -1174,9 +1180,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def discover_enumerators_response(self, request):
-        """
-        todo
-        """
+        """todo."""
 
         xml = xmlwitch.Builder()
 
@@ -1198,9 +1202,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
         return str(xml)
 
     def discover_keywords_response(self, request):
-        """
-        todo
-        """
+        """todo."""
 
         xml = xmlwitch.Builder()
 

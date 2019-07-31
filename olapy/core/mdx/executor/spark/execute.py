@@ -27,8 +27,8 @@ class SparkMdxEngine(MdxEngine):
 
     @staticmethod
     def clean_data(star_schema_df, measures):
-        """
-        measure like this: 1 349 is not numeric so we try to transform it to 1349.
+        """measure like this: 1 349 is not numeric so we try to transform it to
+        1349.
 
         :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
@@ -48,8 +48,7 @@ class SparkMdxEngine(MdxEngine):
         return star_schema_df
 
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
-        """
-        Filter a DataFrame (Dataframe_in) with one tuple.
+        """Filter a DataFrame (Dataframe_in) with one tuple.
 
         Example ::
 
@@ -107,8 +106,7 @@ class SparkMdxEngine(MdxEngine):
 
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
-        """
-        if you want to concat two Dataframes with different columns like :
+        """if you want to concat two Dataframes with different columns like :
 
         +-------------+---------+
         | Continent   | Amount  |
@@ -195,8 +193,7 @@ class SparkMdxEngine(MdxEngine):
         ]
 
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
-        """
-        Construct DataFrame of many groups mdx query.
+        """Construct DataFrame of many groups mdx query.
 
         many groups mdx query is something like:
 
@@ -279,7 +276,6 @@ class SparkMdxEngine(MdxEngine):
             'result': DataFrame result
             'columns_desc': dict of dimension and columns used
             }
-
         """
         query = self.clean_mdx_query(mdx_query)
 

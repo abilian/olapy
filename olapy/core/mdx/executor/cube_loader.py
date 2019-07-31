@@ -15,8 +15,7 @@ class CubeLoader(object):
 
     def load_tables(self):
         # type: () -> Dict[Text, pd.DataFrame]
-        """
-        Load tables from csv files.
+        """Load tables from csv files.
 
         :return: tables dict with table name as key and dataframe as value
         """
@@ -31,8 +30,7 @@ class CubeLoader(object):
         return tables
 
     def construct_star_schema(self, facts):
-        """
-        Construct star schema DataFrame from csv files.
+        """Construct star schema DataFrame from csv files.
 
         :param facts: Facts table name
         :return: star schema DataFrame

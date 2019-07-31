@@ -1,7 +1,6 @@
 # -*- encoding: utf8 -*-
-"""
-Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
+fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -17,8 +16,9 @@ from .xmla_execute_xsds import execute_xsd
 
 
 class XmlaExecuteReqHandler(DictExecuteReqHandler):
-    """The Execute method executes XMLA commands provided in the Command element and returns any resulting data
-    using the XMLA MDDataSet data type (for multidimensional result sets.)
+    """The Execute method executes XMLA commands provided in the Command
+    element and returns any resulting data using the XMLA MDDataSet data type
+    (for multidimensional result sets.)
 
     Example::
 
@@ -40,8 +40,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
     """
 
     def _gen_measures_xs0(self, xml, tupls):
-        """
-        add elements representing measures to axis 0 element.
+        """add elements representing measures to axis 0 element.
+
         :param xml: axis 0 tu update, in xml format
         :param tupls: mdx query tuples
         """
@@ -55,8 +55,9 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                 xml.HIERARCHY_UNIQUE_NAME("[Measures]")
 
     def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
-        """
-        For hierarchical rowset, we need to add the tuple ( mdx query contains PARENT_UNIQUE_NAME keyword)
+        """For hierarchical rowset, we need to add the tuple ( mdx query
+        contains PARENT_UNIQUE_NAME keyword)
+
         :param xml: axis 0 tu update, in xml format
         :param tuple: tuple that you want to add his parent
         :param splitted_df: spllited dataframes (with split_dataframe() function)
@@ -74,8 +75,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         )
 
     def _get_lvl_column_by_dimension(self, all_tuples):
-        """
-        TODO
+        """TODO.
+
         :param all_tuples:
         :return:
         """
@@ -147,8 +148,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     )
 
     def tuples_2_xs0(self, tuples, splitted_df, first_att, axis):
-        """
-        transform mdx query tuples (list) to xmla xs0
+        """transform mdx query tuples (list) to xmla xs0.
+
         :param tuples: list of tuples
         :param splitted_df: spllited dataframes (with split_dataframe() function)
         :param first_att: tuple first attribut
@@ -176,8 +177,9 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return xml
 
     def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
-        """
-        generate xs0 axis form query with multiple data groups "exple: select (.. geography..)(..product..)(..time..)"
+        """generate xs0 axis form query with multiple data groups "exple:
+        select (.. geography..)(..product..)(..time..)".
+
         :param axis: ax0 | ax1 ( depends on the mdx query axes )
         :param tuples_groups: list of tuples groups
         :return: tuples axis groups in xml
@@ -243,8 +245,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _generate_xs0_convert2formulas(self):
-        """
-        generate xs0 xml for convert formulas request
+        """generate xs0 xml for convert formulas request.
+
         :return:
         """
         xml = xmlwitch.Builder()
@@ -262,15 +264,14 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _generate_slicer_convert2formulas(self):
-        """
-        generate set et of hierarchies from which data is retrieved for a single member.
+        """Generate set et of hierarchies from which data is retrieved for a
+        single member.
+
         For more information about the slicer axis, see
-        `Specifying the Contents of a Slicer Axis (MDX) <https://docs.microsoft.com/en-us/sql/analysis-\
-        services/multidimensional-models/mdx/mdx-query-and-slicer-axes-specify-the-contents-of-a-slicer-\
-        axis?view=sql-server-2017>`_
+        `Specifying the Contents of a Slicer Axis (MDX)
+        <https://docs.microsoft.com/en-us/sql/analysis-services/multidimensional-models/mdx/mdx-query-and-slicer-axes-specify-the-contents-of-a-slicer-axis?view=sql-server-2017>`_
 
         example::
-
 
             <Axis name="SlicerAxis">
                 <Tuples>
@@ -343,19 +344,12 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return self._generate_xs0_convert2formulas()
 
     def _generate_cells_data_convert2formulas(self):
-        """
-        generate cells data for convert formulas query
+        """generate cells data for convert formulas query.
 
-        for each tuple:
-        <Cell CellOrdinal="0">
-            <Value>[Measures].[Amount]</Value>
-        </Cell>
-        <Cell CellOrdinal="1">
-            <Value>Amount</Value>
-        </Cell>
-        <Cell CellOrdinal="2">
-            <Value>[Measures]</Value>
-        </Cell>
+        for each tuple: <Cell CellOrdinal="0">
+        <Value>[Measures].[Amount]</Value> </Cell> <Cell
+        CellOrdinal="1">     <Value>Amount</Value> </Cell> <Cell
+        CellOrdinal="2">     <Value>[Measures]</Value> </Cell>
         """
 
         xml = xmlwitch.Builder()
@@ -387,8 +381,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
     def generate_cell_data(self):
         # type: () -> text_type
-        """
-        Returns Cell elements representing the cell data contained by a root element that uses the MDDataSet data type.
+        """Returns Cell elements representing the cell data contained by a root
+        element that uses the MDDataSet data type.
 
         Example of CellData::
 
@@ -443,8 +437,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _generate_axes_info_slicer_convert2formulas(self):
-        """
-        generate Slicer Axes for convert formulas query
+        """generate Slicer Axes for convert formulas query.
+
         :return:
         """
         xml = xmlwitch.Builder()
@@ -463,10 +457,10 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def generate_axes_info_slicer(self):
-        """
-        generates slicer axis which filters the data returned by the MDX SELECT statement,
-        restricting the returned data so that only data intersecting with the specified members will be returned
-        (Not used dimensions)
+        """generates slicer axis which filters the data returned by the MDX
+        SELECT statement, restricting the returned data so that only data
+        intersecting with the specified members will be returned (Not used
+        dimensions)
 
         Example AxisInfo::
 
@@ -551,9 +545,9 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _gen_measures_one_axis_info(self, xml):
-        """
-        Add AxisInfo elements, representing the axis metadata contained by the parent OlapInfo element \
-        for measures to the passed xml structure.
+        """Add AxisInfo elements, representing the axis metadata contained by
+        the parent OlapInfo element for measures to the passed xml structure.
+
         :param xml: xml structure to update
         """
         with xml.HierarchyInfo(name="[Measures]"):
@@ -573,9 +567,10 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return xml
 
     def _generate_table_axis_info(self, xml, dimensions_names):
-        """
-        Add AxisInfo elements, representing the axis metadata contained by the parent OlapInfo element \
-        for Dimension to the passed xml structure.
+        """Add AxisInfo elements, representing the axis metadata contained by
+        the parent OlapInfo element for Dimension to the passed xml
+        structure.
+
         :param xml: xml structure to update
         :param dimensions_names: dimension names (without facts table)
         """
@@ -615,8 +610,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     )
 
     def generate_one_axis_info(self, mdx_query_axis="columns", Axis="Axis0"):
-        """
-        AxisInfo elements for one axis (axis0 or axis1)
+        """AxisInfo elements for one axis (axis0 or axis1)
 
         Example AxisInfo::
 
@@ -679,8 +673,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _generate_axes_info_convert2formulas(self):
-        """
-        AxisInfo elements when convert to formulas,
+        """AxisInfo elements when convert to formulas,
 
         xml structure always Axis0 with measures and SlicerAxis with all dimensions like this::
 
@@ -737,8 +730,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def _generate_cell_info_convert2formuls(self):
-        """
-        CellInfo representation for convert to formulas
+        """CellInfo representation for convert to formulas.
+
         :return: CellInfo structure as string
         """
         xml = xmlwitch.Builder()
@@ -748,8 +741,9 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def generate_cell_info(self):
-        """
-        Generate CellInfo which represents the cell metadata contained by the parent OlapInfo element.
+        """Generate CellInfo which represents the cell metadata contained by
+        the parent OlapInfo element.
+
         :return: CellInfo structure as string
         """
 
@@ -768,8 +762,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def generate_slicer_axis(self):
-        """
-        Generate SlicerAxis which contains elements (dimensions) that are not used in the request
+        """Generate SlicerAxis which contains elements (dimensions) that are
+        not used in the request.
 
         Example SlicerAxis::
 
@@ -855,8 +849,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         return str(xml)
 
     def generate_response(self):
-        """
-        generate the xmla response
+        """generate the xmla response.
+
         :return: xmla response as string
         """
 

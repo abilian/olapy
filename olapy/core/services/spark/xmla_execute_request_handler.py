@@ -1,7 +1,6 @@
 # -*- encoding: utf8 -*-
-"""
-Managing all `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses
-"""
+"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
+fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -14,8 +13,9 @@ from ..xmla_execute_request_handler import XmlaExecuteReqHandler
 
 
 class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
-    """The Execute method executes XMLA commands provided in the Command element and returns any resulting data
-    using the XMLA MDDataSet data type (for multidimensional result sets.)
+    """The Execute method executes XMLA commands provided in the Command
+    element and returns any resulting data using the XMLA MDDataSet data type
+    (for multidimensional result sets.)
 
     Example::
 
@@ -141,15 +141,14 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         return tuples, first_att
 
     def _generate_slicer_convert2formulas(self):
-        """
-        generate set et of hierarchies from which data is retrieved for a single member.
+        """Generate set of hierarchies from which data is retrieved for a
+        single member.
+
         For more information about the slicer axis, see
-        `Specifying the Contents of a Slicer Axis (MDX) <https://docs.microsoft.com/en-us/sql/analysis-\
-        services/multidimensional-models/mdx/mdx-query-and-slicer-axes-specify-the-contents-of-a-slicer-\
-        axis?view=sql-server-2017>`_
+        `Specifying the Contents of a Slicer Axis (MDX)
+        <https://docs.microsoft.com/en-us/sql/analysis-services/multidimensional-models/mdx/mdx-query-and-slicer-axes-specify-the-contents-of-a-slicer-axis?view=sql-server-2017>`_
 
         example::
-
 
             <Axis name="SlicerAxis">
                 <Tuples>
@@ -223,8 +222,7 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
     def generate_cell_data(self):
         # # type: () -> text_type
-        """
-        Example of CellData::
+        """Example of CellData::
 
             <Cell CellOrdinal="0">
                 <Value xsi:type="xsi:long">768</Value>
@@ -280,8 +278,8 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         return str(xml)
 
     def generate_slicer_axis(self):
-        """
-        Generate SlicerAxis which contains elements (dimensions) that are not used in the request
+        """Generate SlicerAxis which contains elements (dimensions) that are
+        not used in the request.
 
         Example SlicerAxis::
 

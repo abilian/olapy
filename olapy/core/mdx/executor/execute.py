@@ -1,6 +1,5 @@
 # -*- encoding: utf8 -*-
-"""
-Olapy main's module, this module manipulate Mdx Queries and execute them.
+"""Olapy main's module, this module manipulate Mdx Queries and execute them.
 Execution need two main objects:
 
     - table_loaded: which contains all tables needed to construct a cube
@@ -55,7 +54,6 @@ class MdxEngine(object):
     :param source_type: source data input, Default csv
     :param parser: mdx query parser
     :param facts:  facts table name, Default **Facts**
-
     """
 
     cube = attr.ib(default=None)
@@ -87,9 +85,7 @@ class MdxEngine(object):
     #     return home_directory
 
     def _get_db_cubes_names(self):
-        """
-        Get databases cubes names.
-        """
+        """Get databases cubes names."""
         # get databases names first , and them instantiate MdxEngine with this database, thus \
         # it will try to construct the star schema either automatically or manually
 
@@ -100,8 +96,7 @@ class MdxEngine(object):
 
     @staticmethod
     def _get_csv_cubes_names(cubes_location):
-        """
-        Get csv folder names
+        """Get csv folder names.
 
         :param cubes_location: OlaPy cubes path, which is under olapy-data,
             by default ~/olapy-data/cubes/...
@@ -114,8 +109,7 @@ class MdxEngine(object):
         ]
 
     def get_cubes_names(self):
-        """
-        List all cubes (by default from csv folder only).
+        """List all cubes (by default from csv folder only).
 
         You can explicitly specify csv folder and databases
         with *self.source_type = ('csv','db')*
@@ -137,9 +131,8 @@ class MdxEngine(object):
     def load_cube(
         self, cube_name, fact_table_name="Facts", sep=";", measures=None, **kwargs
     ):
-        """
-        After instantiating MdxEngine(), load_cube construct the cube
-        and load all tables.
+        """After instantiating MdxEngine(), load_cube construct the cube and
+        load all tables.
 
         :param cube_name: cube name
         :param fact_table_name:  facts table name, Default **Facts**
@@ -228,8 +221,8 @@ class MdxEngine(object):
 
     @staticmethod
     def clean_data(star_schema_df, measures):
-        """
-        measure like this: 1 349 is not numeric so we try to transform it to 1349.
+        """measure like this: 1 349 is not numeric so we try to transform it to
+        1349.
 
         :param star_schema_df: start schema dataframe
         :param measures: list of measures columns names
@@ -251,8 +244,7 @@ class MdxEngine(object):
         return star_schema_df
 
     def get_star_schema_dataframe(self, sep, with_id_columns=False):
-        """
-        Merge all DataFrames as star schema.
+        """Merge all DataFrames as star schema.
 
         :param sep: csv files separator.
         :param with_id_columns: start schema dataFrame contains id columns or not
@@ -298,8 +290,7 @@ class MdxEngine(object):
         ]
 
     def get_all_tables_names(self, ignore_fact=False):
-        """
-        Get list of tables names.
+        """Get list of tables names.
 
         :param ignore_fact: return all table name with or without facts table name
         :return: all tables names
@@ -310,8 +301,7 @@ class MdxEngine(object):
         return list(self.tables_loaded)
 
     def get_cube_path(self):
-        """
-        Get path to the cube ( ~/olapy-data/cubes ).
+        """Get path to the cube ( ~/olapy-data/cubes ).
 
         :return: path to the cube
         """
@@ -341,10 +331,10 @@ class MdxEngine(object):
 
     @staticmethod
     def _df_column_values_exist(tupl, df):
-        """
-        for [Geography].[Geography].[Continent].[America].[Los Angeles]
-        check if America exist in Country column and
-        check if Los Angeles exist in City column ...
+        """for [Geography].[Geography].[Continent].[America].[Los Angeles]
+        check if America exist in Country column and check if Los Angeles exist
+        in City column ...
+
         :return:
         """
         for idx, column_value in enumerate(tupl[2:]):
@@ -420,8 +410,7 @@ class MdxEngine(object):
                 return column
 
     def execute_one_tuple(self, tuple_as_list, dataframe_in, columns_to_keep):
-        """
-        Filter a DataFrame (Dataframe_in) with one tuple.
+        """Filter a DataFrame (Dataframe_in) with one tuple.
 
         Example ::
 
@@ -485,8 +474,7 @@ class MdxEngine(object):
 
     @staticmethod
     def add_missed_column(dataframe1, dataframe2):
-        """
-        if you want to concat two Dataframes with different columns like :
+        """if you want to concat two Dataframes with different columns like :
 
         +-------------+---------+
         | Continent   | Amount  |
@@ -566,8 +554,7 @@ class MdxEngine(object):
         return [df_with_less_columns, df_with_more_columns]
 
     def update_columns_to_keep(self, tuple_as_list, columns_to_keep):
-        """
-        If we have multiple dimensions, with many columns like::
+        """If we have multiple dimensions, with many columns like::
 
             columns_to_keep :
 
@@ -634,8 +621,7 @@ class MdxEngine(object):
 
     @staticmethod
     def _uniquefy_tuples(tuples):
-        """
-        Remove redundant tuples.
+        """Remove redundant tuples.
 
         :param tuples: list of string of tuples.
         :return: list of string of unique tuples.
@@ -648,8 +634,7 @@ class MdxEngine(object):
         return unique_tuples
 
     def tuples_to_dataframes(self, tuples_on_mdx_query, columns_to_keep):
-        """
-        Construct DataFrame of many groups mdx query.
+        """Construct DataFrame of many groups mdx query.
 
         many groups mdx query is something like:
 
@@ -709,17 +694,15 @@ class MdxEngine(object):
 
     def check_nested_select(self):
         # type: () -> bool
-        """
-        Check if the MDX Query is Hierarchized and contains many tuples groups.
-        """
+        """Check if the MDX Query is Hierarchized and contains many tuples
+        groups."""
         return (
             not self.parser.hierarchized_tuples()
             and len(self.parser.get_nested_select()) >= 2
         )
 
     def nested_tuples_to_dataframes(self, columns_to_keep):
-        """
-        Construct DataFrame of many groups.
+        """Construct DataFrame of many groups.
 
         :param columns_to_keep: :func:`columns_to_keep`
             (useful for executing many tuples, for instance execute_mdx).
@@ -773,7 +756,6 @@ class MdxEngine(object):
             'result': DataFrame result
             'columns_desc': dict of dimension and columns used
             }
-
         """
         query = self.clean_mdx_query(mdx_query)
         # use measures that exists on where or insides axes

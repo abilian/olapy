@@ -1,8 +1,6 @@
 # -*- encoding: utf8 -*-
-"""
-Do the same thing as MdxEngine, but with only one file or database table
-(no need for a star schema tables).
-"""
+"""Do the same thing as MdxEngine, but with only one file or database table (no
+need for a star schema tables)."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -19,7 +17,6 @@ class MdxEngineLite(MdxEngine):
 
         olapy runserver -tf=$HOME/olapy-data/cubes/sales/Facts.csv \
             -c City,Licence,Amount,Count
-
     """
 
     def __init__(
@@ -47,8 +44,8 @@ class MdxEngineLite(MdxEngine):
             self._columns = []
 
     def load_cube(self, table_or_file, **kwargs):
-        """
-        After instantiating MdxEngine(), load_cube construct the cube and load all tables.
+        """After instantiating MdxEngine(), load_cube construct the cube and
+        load all tables.
 
         :param table_or_file: full file path, or just database table name
             if sql_alchemy_uri provided
@@ -82,8 +79,7 @@ class MdxEngineLite(MdxEngine):
         ]
 
     def load_tables_from_db(self):
-        """
-        Load table from database.
+        """Load table from database.
 
         :return: tables dict with table name as key and dataframe as value
         """
@@ -109,8 +105,7 @@ class MdxEngineLite(MdxEngine):
         return tables
 
     def load_tables_from_csv_files(self):
-        """
-        load the csv file
+        """load the csv file.
 
         :return: pandas DataFrame
         """

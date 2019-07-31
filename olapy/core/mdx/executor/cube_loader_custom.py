@@ -11,9 +11,7 @@ from .cube_loader import CubeLoader
 
 
 class CubeLoaderCustom(CubeLoader):
-    """
-    Load Cube with some configurations
-    """
+    """Load Cube with some configurations."""
 
     def __init__(self, cube_config, cube_path=None, sqla_engine=None, sep=";"):
         CubeLoader.__init__(self)
@@ -38,8 +36,8 @@ class CubeLoaderCustom(CubeLoader):
 
     def load_tables(self):
         # type: () -> Dict[str, pd.DataFrame]
-        """
-        Load tables from config file.
+        """Load tables from config file.
+
         :return: tables dict with table name as key and DataFrame as value
         """
 
@@ -73,7 +71,8 @@ class CubeLoaderCustom(CubeLoader):
         return tables
 
     def construct_star_schema(self, facts):
-        """Construct star schema DataFrame from configuration file for excel client.
+        """Construct star schema DataFrame from configuration file for excel
+        client.
 
         :param facts:  Facts table name
         :return: star schema DataFrame
@@ -109,8 +108,9 @@ class CubeLoaderCustom(CubeLoader):
         return fusion
 
     def get_columns_n_tables(self):
-        """
-        Get all tables and their columns (and renames columns, if you specify this in the config file)
+        """Get all tables and their columns (and renames columns, if you
+        specify this in the config file)
+
         :return:
         """
 
@@ -145,7 +145,8 @@ class CubeLoaderCustom(CubeLoader):
     # web client
 
     def construct_web_star_schema_config_file(self):
-        """Construct star schema DataFrame from configuration file for web client.
+        """Construct star schema DataFrame from configuration file for web
+        client.
 
         :return: star schema DataFrame
         """

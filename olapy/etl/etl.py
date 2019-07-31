@@ -1,7 +1,6 @@
-"""
-If you have a single excel file containing your data and you want to use olapy, you should use this module to
-extract data from your excel file, make transformations, and load then into olapy data folder.
-"""
+"""If you have a single excel file containing your data and you want to use
+olapy, you should use this module to extract data from your excel file, make
+transformations, and load then into olapy data folder."""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -19,8 +18,8 @@ from bonobo.config import use
 @use("input_file_path")
 def extract_excel_pd(**kwargs):
     # type: (dict) -> pd.DataFrame
-    """
-    Bonobo's First chain, extract data from source.
+    """Bonobo's First chain, extract data from source.
+
     :return: Pandas DataFrame
     """
     yield pd.read_excel(kwargs.get("input_file_path"))
@@ -28,8 +27,8 @@ def extract_excel_pd(**kwargs):
 
 @use("cube_config")
 def transform(*args, **kwargs):
-    """
-    Bonobo's second chain, transform data based on olapy rules.
+    """Bonobo's second chain, transform data based on olapy rules.
+
     :return: dict of DataFrames
     """
 
@@ -45,8 +44,8 @@ def transform(*args, **kwargs):
 
 @use("output_cube_path")
 def load_to_olapy(*args, **kwargs):
-    """
-    Bonobo's third chain, load data transformed to olapy-data.
+    """Bonobo's third chain, load data transformed to olapy-data.
+
     :return: generated tables into olapy data folder
     """
     olapy_data_set = args[0]
@@ -60,11 +59,9 @@ def load_to_olapy(*args, **kwargs):
 
 def get_graph(**options):
     # (Any) -> bonobo.Graph
-    """
-    This function builds the graph that needs to be executed.
+    """This function builds the graph that needs to be executed.
 
     :return: bonobo.Graph
-
     """
     graph = bonobo.Graph()
     graph.add_chain(extract_excel_pd, transform, load_to_olapy)
@@ -73,9 +70,8 @@ def get_graph(**options):
 
 
 def get_services(input_file_path, cube_config, output_cube_path, **options):
-    """
-    This function builds the services dictionary, which is a simple dict of names-to-implementation used by bonobo
-    for runtime injection.
+    """This function builds the services dictionary, which is a simple dict of
+    names-to-implementation used by bonobo for runtime injection.
 
     It will be used on top of the defaults provided by bonobo (fs, http, ...). You can override those defaults, or just
     let the framework define them. You can also define your own services and naming is up to you.
@@ -94,8 +90,7 @@ def get_services(input_file_path, cube_config, output_cube_path, **options):
 @click.option("--config_file", "-config", default=None, help="Configuration file path")
 @click.option("--output_cube_path", "-out_cube", default=None, help="Cube export path")
 def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=None):
-    """
-    Run ETl Process for passed excel file.
+    """Run ETl Process for passed excel file.
 
     :param input_file_path: excel file path
 
@@ -124,7 +119,6 @@ def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=Non
                 'Date': ['Year', 'Quarter', 'Month', 'Day']
             }
             ctx.invoke(run_etl, input_file_path='sales.xlsx', cube_config=config, output_cube_path='cube2')
-
     """
     parser = bonobo.get_argument_parser()
     parser.add_argument("-in", "--input_file_path", help="Input file")
