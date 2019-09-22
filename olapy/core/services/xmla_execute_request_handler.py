@@ -135,6 +135,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                 )
                 xml.LNum(str(len(tuple_without_minus_1) - first_att))
                 xml.DisplayInfo("131076")
+                xml.MEMBER_TYPE("1")
 
                 if "PARENT_UNIQUE_NAME" in self.mdx_query.upper():
                     self._gen_xs0_parent(
