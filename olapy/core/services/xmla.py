@@ -133,7 +133,7 @@ class XmlaProviderService(ServiceBase, XmlaProviderLib):
         # handler (which normally load the cube first)
         if (
             request.Properties
-            and request.Properties.PropertyList.Catalog
+            and request.Properties.PropertyList and request.Properties.PropertyList.Catalog
             and not execute_request_hanlder.executor.cube
         ):
             execute_request_hanlder.executor.load_cube(
