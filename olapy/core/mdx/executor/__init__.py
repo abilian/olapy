@@ -1,7 +1,7 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 try:
-    # if pyspark install, use it instead of pandas
+    # if pyspark is installed, use it instead of pandas
 
     from .spark.cube_loader import SparkCubeLoader as CubeLoader
     from .spark.execute import SparkMdxEngine as MdxEngine
@@ -21,8 +21,8 @@ except ImportError:
 
     print(
         """
-        ****************************************************
-        ***************** OlaPy with Pandas ****************
-        ****************************************************
-        """
+    ****************************************************
+    ***************** OlaPy with Pandas ****************
+    ****************************************************
+    """
     )
