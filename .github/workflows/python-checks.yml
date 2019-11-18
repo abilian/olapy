@@ -19,7 +19,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools
+        pip install --upgrade pip setuptools
         pip install -r requirements.txt -r dev-requirements.txt .
         pip install mypy
     - name: Lint with flake8, mypy, etc.

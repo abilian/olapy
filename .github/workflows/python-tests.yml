@@ -19,10 +19,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools
+        which pip
+        pip install --upgrade pip setuptools
+        pip freeze
         pip install -r requirements.txt
+        pip freeze
         pip install -r dev-requirements.txt
+        pip freeze
         pip install .
+        pip freeze
     - name: Test with pytest
       run: |
         pytest
