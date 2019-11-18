@@ -19,12 +19,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip poetry
-        poetry install
-        yarn
+        python -m pip install --upgrade pip setuptools
+        pip install -r requirements.txt -r dev-requirements.txt .
     - name: Lint with flake8, eslint, etc.
       run: |
-        poetry run flake8 abilian
-        poetry run rst-lint *.rst
-        poetry run sphinx-build -W -b dummy docs/ docs/_build/
-        # poetry run bandit -s B101 `find abilian -name '*.py' | grep -v test`
+        flake8 olapy
