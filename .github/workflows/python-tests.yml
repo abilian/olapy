@@ -1,4 +1,4 @@
-name: Check back-end
+name: Install and run Python tests
 
 on: [push]
 
