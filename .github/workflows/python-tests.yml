@@ -17,19 +17,24 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install dependencies 1
       run: |
         which pip
+    - name: Install dependencies 2
+      run: |
         pip freeze
-        #        pip install --upgrade pip setuptools
-        #        pip freeze
+    - name: Install dependencies 3
+      run: |
+        pip install --upgrade pip setuptools
+        pip freeze
         pip install pandas==0.24.2
-        #        pip install -r requirements.txt
-        #        pip freeze
-        #        pip install -r dev-requirements.txt
-        #        pip freeze
-        #        pip install .
-        #        pip freeze
+        pip freeze
+        pip install -r requirements.txt
+        pip freeze
+        pip install -r dev-requirements.txt
+        pip freeze
+        pip install .
+        pip freeze
     - name: Test with pytest
       run: |
         pytest
