@@ -22,12 +22,13 @@ jobs:
         which pip
         pip install --upgrade pip setuptools
         pip freeze
-        pip install -r requirements.txt
-        pip freeze
-        pip install -r dev-requirements.txt
-        pip freeze
-        pip install .
-        pip freeze
+        pip install pandas==0.24.2
+        #        pip install -r requirements.txt
+        #        pip freeze
+        #        pip install -r dev-requirements.txt
+        #        pip freeze
+        #        pip install .
+        #        pip freeze
     - name: Test with pytest
       run: |
         pytest
