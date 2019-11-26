@@ -6,15 +6,15 @@
 #
 attrs==19.3.0
 click==7.0
-lxml==4.4.1
+lxml==4.4.2
 numpy==1.16.5
 pandas==0.24.2
-python-dateutil==2.8.0    # via pandas
+python-dateutil==2.8.1    # via pandas
 pytz==2019.3              # via pandas, spyne
 pyyaml==5.1.2
-regex==2019.8.19
-six==1.12.0               # via python-dateutil
+regex==2019.11.1
+six==1.13.0               # via python-dateutil
 spyne==2.13.11a0
-sqlalchemy==1.3.10
+sqlalchemy==1.3.11
 typing==3.7.4.1
 xmlwitch==0.3
