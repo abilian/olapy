@@ -28,13 +28,13 @@ jobs:
       run: |
         pip freeze
         pip install pandas==0.24.2 numpy==1.16.5
-#        pip freeze
-#        pip install -r requirements.txt
-#        pip freeze
-#        pip install -r dev-requirements.txt
-#        pip freeze
-#        pip install .
-#        pip freeze
+        pip freeze
+        pip install -r requirements.txt
+        pip freeze
+        pip install -r dev-requirements.txt
+        pip freeze
+        pip install .
+        pip freeze
     - name: Test with pytest
       run: |
         pytest
