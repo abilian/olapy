@@ -11,7 +11,7 @@ numpy==1.16.5
 pandas==0.24.2
 python-dateutil==2.8.1    # via pandas
 pytz==2019.3              # via pandas, spyne
-pyyaml==5.1.2
+pyyaml==5.2
 regex==2019.11.1
 six==1.13.0               # via python-dateutil
 spyne==2.13.11a0
