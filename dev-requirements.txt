@@ -9,7 +9,8 @@ pip-tools
 py-cpuinfo
 
 # xmla
--e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
+xmla
+# -e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
 
 #databases_connectors
 #pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
