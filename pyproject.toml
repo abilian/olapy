@@ -1,0 +1,66 @@
+[tool.poetry]
+name = "olapy"
+version = "0.0.0"
+authors = ["Abilian SAS"]
+
+[tool.poetry.dependencies]
+python = "*"
+
+# Later version don't support Python 2 anymore
+numpy = "<1.17"
+pandas = "<0.25"
+
+attrs = "*"
+click = "*"
+lxml = "*"
+pyyaml = ">=4.2b1"
+regex = "*"
+spyne = { version = "^2.13", allows-prereleases = true }
+sqlalchemy = "*"
+typing = "*"
+xmlwitch = "*"
+
+[tool.poetry.dev-dependencies]
+# Tools / dev / testing
+tox = "*"
+pytest = "*"
+pytest-cov = "*"
+PrettyTable = "*"
+gprof2dot = "*"
+ipdb = "*"
+py-cpuinfo = "*"
+
+# xmla
+xmla = "*"
+# -e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
+
+#databases_connectors
+#pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
+#cx_oracle
+#mysql-python # don't work in py3
+#pymysql
+
+# linting
+flake8 = "*"
+flake8-comprehensions = "*"
+flake8-mutable = "*"
+flake8-pytest = "*"
+flake8-super-call = "*"
+flake8-tidy-imports = "*"
+mastool = "*"
+mccabe = "*"
+pylint = "*"
+pre-commit = "*"
+
+# Formatting
+isort = "*"
+
+# Python 3 only
+mypy = { version = "*", python = "^3.6" }
+flake8-bugbear = { version = "*", python = "^3.6" }
+flake8-mypy = { version = "*", python = "^3.6" }
+black = { version = "*", python = "^3.6", allows-prereleases = true }
+
+# Doc
+sphinx-click = "*"
+sphinx-rtd-theme = "*"
