@@ -5,7 +5,7 @@ authors = ["Abilian SAS"]
 description = "OlaPy, an experimental OLAP engine based on Pandas"
 
 [tool.poetry.dependencies]
-python = "2.7.*,>3.6"
+python = ">2.7"
 
 # Later version don't support Python 2 anymore
 numpy = "<1.17"
@@ -60,7 +60,7 @@ isort = "*"
 mypy = { version = "*", python = "^3.6" }
 flake8-bugbear = { version = "*", python = "^3.6" }
 flake8-mypy = { version = "*", python = "^3.6" }
-black = { version = "*", python = "^3.6", allows-prereleases = true }
+black = { version = "*", python = "^3.6", allow-prereleases = true }
 
 # Doc
 sphinx-click = "*"
