@@ -4,17 +4,17 @@
 #
 #    pip-compile
 #
-attrs==19.3.0
-click==7.0
-lxml==4.5.0
-numpy==1.16.6
-pandas==0.24.2
+attrs==19.3.0             # via -r requirements.in (line 11)
+click==7.0                # via -r requirements.in (line 14)
+lxml==4.5.0               # via -r requirements.in (line 7)
+numpy==1.16.6             # via -r requirements.in (line 3), pandas
+pandas==0.24.2            # via -r requirements.in (line 2)
 python-dateutil==2.8.1    # via pandas
 pytz==2019.3              # via pandas, spyne
-pyyaml==5.3
-regex==2020.1.8
+pyyaml==5.3               # via -r requirements.in (line 12)
+regex==2020.2.20          # via -r requirements.in (line 13)
 six==1.14.0               # via python-dateutil
-spyne==2.13.14b0
-sqlalchemy==1.3.13
-typing==3.7.4.1
-xmlwitch==0.3
+spyne==2.13.14b0          # via -r requirements.in (line 8)
+sqlalchemy==1.3.13        # via -r requirements.in (line 9)
+typing==3.7.4.1           # via -r requirements.in (line 6)
+xmlwitch==0.3             # via -r requirements.in (line 10)
