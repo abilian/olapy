@@ -2,9 +2,10 @@
 name = "olapy"
 version = "0.0.0"
 authors = ["Abilian SAS"]
+description = "OlaPy, an experimental OLAP engine based on Pandas"
 
 [tool.poetry.dependencies]
-python = "*"
+python = "2.7.*,>3.6"
 
 # Later version don't support Python 2 anymore
 numpy = "<1.17"
@@ -15,7 +16,7 @@ click = "*"
 lxml = "*"
 pyyaml = ">=4.2b1"
 regex = "*"
-spyne = { version = "^2.13", allows-prereleases = true }
+spyne = { version = "^2.13", allow-prereleases = true }
 sqlalchemy = "*"
 typing = "*"
 xmlwitch = "*"
