@@ -21,6 +21,10 @@ Status
 
 This project is currently a research prototype, not suited for production use.
 
+
+.. image:: https://static.pepy.tech/badge/olapy
+   :target: https://pepy.tech/project/olapy
+
 Licence
 ~~~~~~~
 
