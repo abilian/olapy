@@ -6,7 +6,6 @@ from wsgiref.simple_server import make_server
 
 import pytest
 import sqlalchemy
-from olap.xmla import xmla
 from spyne import Application
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
@@ -23,6 +22,8 @@ from .xs0_responses import TEST_QUERY_AXIS0
 
 HOST = "127.0.0.1"
 PORT = 8230
+
+xmla = pytest.importorskip("xmla")
 
 
 class Member(object):

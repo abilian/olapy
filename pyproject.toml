@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "olapy"
-version = "0.0.0"
+version = "0.7.8"
 authors = ["Abilian SAS"]
 description = "OlaPy, an experimental OLAP engine based on Pandas"
 
@@ -31,9 +31,6 @@ gprof2dot = "*"
 ipdb = "*"
 py-cpuinfo = "*"
 
-# xmla
-xmla = "*"
-# -e "git+https://github.com/mouadhkaabachi/olap.git@55f16d081d05415cba44bcc89304da77ebb7af5f#egg=xmla&subdirectory=xmla"
 
 #databases_connectors
 #pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
@@ -61,6 +58,9 @@ mypy = { version = "*", python = "^3.6" }
 flake8-bugbear = { version = "*", python = "^3.6" }
 flake8-mypy = { version = "*", python = "^3.6" }
 black = { version = "*", python = "^3.6", allow-prereleases = true }
+
+# xmla (for testing - Python 2 only due to dependency on suds)
+xmla = { version = "*", python = "^2.7" }
 
 # Doc
 sphinx-click = "*"
