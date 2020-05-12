@@ -3,6 +3,18 @@ name = "olapy"
 version = "0.7.8"
 authors = ["Abilian SAS"]
 description = "OlaPy, an experimental OLAP engine based on Pandas"
+classifiers = [
+  "Programming Language :: Python",
+  "Development Status :: 3 - Alpha",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 2.7",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7"
+]
+homepage = "https://github.com/abilian/olapy"
+readme = "README.rst"
+
 
 [tool.poetry.dependencies]
 python = ">2.7"
@@ -20,6 +32,20 @@ spyne = { version = "^2.13", allow-prereleases = true }
 sqlalchemy = "*"
 typing = "*"
 xmlwitch = "*"
+
+# Extra (see below)
+awesome-slugify = {optional = true, version = "*"}
+bonobo = {optional = true, version = "*"}
+bonobo-sqlalchemy = {version = "<0.6.1", optional = true}
+pyspark = {version = "<3", optional = true}
+python-dotenv = {optional = true, version = "*"}
+whistle = {version = "<1.0.1", optional = true}
+
+
+[tool.poetry.extras]
+etl = ["awesome-slugify", "bonobo", "bonobo-sqlalchemy", "python-dotenv", "whistle"]
+spark = ["pyspark"]
+
 
 [tool.poetry.dev-dependencies]
 # Tools / dev / testing
