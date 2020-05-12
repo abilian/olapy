@@ -17,7 +17,6 @@ nox.options.reuse_existing_virtualenvs = True
 def lint(session):
     session.run("poetry", "install", "-q", external=True)
     session.install("poetry", "psycopg2-binary")
-    session.run("yarn", external=True)
 
     session.run("make", "lint-ci")
 
@@ -26,7 +25,6 @@ def lint(session):
 def pytest(session):
     session.run("poetry", "install", "-q", external=True)
     session.install("psycopg2-binary")
-    session.run("yarn", external=True)
 
     session.run("pip", "check")
     session.run("pytest", "-q")
@@ -36,7 +34,5 @@ def pytest(session):
 def typeguard(session):
     session.run("poetry", "install", "-q", external=True)
     session.install("psycopg2-binary", "typeguard")
-
-    session.run("yarn", external=True)
 
     session.run("pytest", f"--typeguard-packages={PACKAGE}")
