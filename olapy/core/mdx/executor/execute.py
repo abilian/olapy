@@ -454,7 +454,7 @@ class MdxEngine(object):
         # execute : df[(df['Continent'] == 'America')] and
         #           df[(df['Country'] == 'US')]
         # elif len(tuple_as_list) > 3:
-        for idx, tup_att in enumerate(tuple_as_list[2:]):
+        for tup_att in tuple_as_list[2:]:
 
             # df[(df['Year'] == 2010)]
             # 2010 must be as int, otherwise , pandas generate exception

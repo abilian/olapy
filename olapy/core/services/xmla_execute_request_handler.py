@@ -94,7 +94,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         # [Geography].[Geography].[Continent]  -> first_lvlname : Country
         # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
         all_level_columns = self._get_lvl_column_by_dimension(all_tuples)
-        for idx, tupl in enumerate(tupls):
+        for tupl in tupls:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
             current_lvl_name = split_df[tuple_without_minus_1[0]].columns[
                 len(tuple_without_minus_1) - first_att
