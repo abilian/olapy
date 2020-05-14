@@ -10,14 +10,6 @@ services:
   - mysql
   - postgresql
 
-before_install:
-  - psql -c 'create database olapy_test;' -U postgres
-  - mysql -e 'create database olapy_test;'
-
-install:
-  - pip install -U pip setuptools tox tox-travis wheel poetry
-  - poetry --version
-
 python:
   - '2.7'
   - '3.6'
@@ -27,12 +19,19 @@ python:
 env:
   - SQLALCHEMY_DATABASE_URI=
   - SQLALCHEMY_DATABASE_URI=postgresql://postgres@localhost/olapy_test
-  - SQLALCHEMY_DATABASE_URI=mysql+pymysql://travis@localhost/olapy_test
+  - SQLALCHEMY_DATABASE_URI=mysql://travis@localhost/olapy_test
 
 matrix:
   include:
     - python: 3.6
       env: TOXENV=lint
+
+install:
+  - pip install -U pip setuptools tox tox-travis wheel poetry
+
+before_script:
+  - psql -c 'create database olapy_test;' -U postgres
+  - mysql -e 'create database olapy_test;'
 
 script:
   - tox
