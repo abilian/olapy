@@ -13,7 +13,7 @@ from .db_creation_utils import create_insert, drop_tables
 
 try:
     import sqlalchemy
-except:
+except ImportError:
     pass
 
 cube_config = {
