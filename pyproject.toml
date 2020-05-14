@@ -82,7 +82,7 @@ isort = "*"
 # Python 3 only
 mypy = { version = "*", python = "^3.6" }
 flake8-bugbear = { version = "*", python = "^3.6" }
-flake8-mypy = { version = "*", python = "^3.6" }
+flake8-mypy-fork = { version = "*", python = "^3.6" }
 black = { version = "*", python = "^3.6", allow-prereleases = true }
 
 # xmla (for testing - Python 2 only due to dependency on suds)
