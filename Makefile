@@ -78,9 +78,7 @@ format:
 	isort -rc $(SRC) tests micro_bench demos *.py
 
 update-deps:
-	pip-compile -U > /dev/null
-	pip-compile > /dev/null
-	git --no-pager diff requirements.txt
+	poetry update
 
 #
 # update deps in windows OS
