@@ -40,9 +40,10 @@ lint-python:
 	flake8 olapy tests
 
 	@make lint-py3k
-
 	@make lint-mypy
+	# @make lint-pylint
 
+lint-pylint:
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
 
