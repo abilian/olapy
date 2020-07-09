@@ -1,4 +1,8 @@
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 import os
+
 import nox
 
 PYTHON_VERSIONS = ["2.7", "3.6", "3.7", "3.8"]
@@ -18,7 +22,7 @@ def lint(session):
     session.run("poetry", "install", "-q", external=True)
     session.install("poetry", "psycopg2-binary")
 
-    session.run("make", "lint-ci")
+    session.run("make", "lint-ci", external=True)
 
 
 @nox.session(python=python)

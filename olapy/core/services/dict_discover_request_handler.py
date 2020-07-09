@@ -1,7 +1,8 @@
 # -*- encoding: utf8 -*-
 """Managing all
 `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_
-requests and responses."""
+requests and responses.
+"""
 
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -414,8 +415,7 @@ class DictDiscoverReqHandler:
             return response
 
     def dbschema_catalogs_response(self, request):
-
-        return {"CATALOG_NAME": [catalogue for catalogue in self.cubes]}
+        return {"CATALOG_NAME": list(self.cubes)}
 
     def mdschema_cubes_response(self, request):
         if (

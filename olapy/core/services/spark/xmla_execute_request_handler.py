@@ -1,6 +1,7 @@
 # -*- encoding: utf8 -*-
 """Managing all `EXECUTE <https://technet.microsoft.com/fr-
-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses."""
+fr/library/ms186691(v=sql.110).aspx>`_ requests and responses.
+"""
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
@@ -237,16 +238,17 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
+
         measures_agg = [
             column
             for column in self.mdx_execution_result["result"].columns
             if "sum(" in column
         ]
+
         if (
             len(self.columns_desc["columns"].keys()) == 0
             or len(self.columns_desc["rows"].keys()) == 0
         ) and self.executor.facts in self.columns_desc["all"].keys():
-
             columns_loop = []
             for column in measures_agg:
                 for row in (
@@ -257,12 +259,11 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         else:
             # iterate DataFrame vertically
             columns_loop = itertools.chain(
-                *[
-                    column_value
-                    for column_value in self.mdx_execution_result["result"]
+                *list(
+                    self.mdx_execution_result["result"]
                     .select(measures_agg)
                     .rdd.collect()
-                ]
+                )
             )
 
         xml = xmlwitch.Builder()
@@ -312,11 +313,10 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             return self._generate_slicer_convert2formulas()
 
         unused_dimensions = sorted(
-            list(
-                set(self.executor.get_all_tables_names(ignore_fact=True))
-                - {table_name for table_name in self.columns_desc["all"]}
-            )
+            set(self.executor.get_all_tables_names(ignore_fact=True))
+            - set(self.columns_desc["all"])
         )
+
         xml = xmlwitch.Builder()
         if unused_dimensions:
             with xml.Axis(name="SlicerAxis"):

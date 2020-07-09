@@ -5,6 +5,8 @@ PKG=$(SRC)
 
 default: test lint
 
+all: default
+
 run:
 	python manage.py runserver
 
@@ -34,6 +36,8 @@ develop:
 # Linting
 #
 lint: lint-python
+
+lint-ci: lint
 
 lint-python:
 	@echo "--> Linting Python files"
