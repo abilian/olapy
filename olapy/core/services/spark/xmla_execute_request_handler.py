@@ -355,10 +355,8 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
                             or self.executor.facts in self.columns_desc["where"]
                         ):
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(
-                                    "[Measures].[{}]".format(self.executor.measures[0])
-                                )
-                                xml.Caption("{}".format(self.executor.measures[0]))
+                                xml.UName(f"[Measures].[{self.executor.measures[0]}]")
+                                xml.Caption(f"{self.executor.measures[0]}")
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
                                 xml.DisplayInfo("0")

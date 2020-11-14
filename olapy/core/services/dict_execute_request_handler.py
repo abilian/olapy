@@ -90,8 +90,8 @@ class DictExecuteReqHandler:
 
     def _gen_measures_xs0(self, xml, tupls):
         xml["Member"] = {"Hierarchy": "[Measures]"}
-        xml["UName"] = "[Measures].[{}]".format(tupls[0][1])
-        xml["Caption"] = "{}".format(tupls[0][1])
+        xml["UName"] = f"[Measures].[{tupls[0][1]}]"
+        xml["Caption"] = f"{tupls[0][1]}"
         xml["LName"] = "[Measures]"
         xml["LNum"] = "0"
         xml["DisplayInfo"] = "0"
@@ -173,14 +173,14 @@ class DictExecuteReqHandler:
                     displayinfo = "0"
                 else:
                     hierarchy = "[{0}].[{0}]".format(split_tupl[0])
-                    l_name = "[{}]".format("].[".join(split_tupl[:3]))
+                    l_name = f"[{'].['.join(split_tupl[:3])}]"
                     lvl = len(split_tupl[4:])
                     displayinfo = "131076"
 
                 all_axis["Tuples"] += {
                     "Member": {"Hierarchy": hierarchy},
                     "UName": "{}".format(tupl.strip(" \t\n")),
-                    "Caption": "{}".format(split_tupl[-1]),
+                    "Caption": f"{split_tupl[-1]}",
                     "LName": l_name,
                     "LNum": str(lvl),
                     "DisplayInfo": displayinfo,
@@ -203,7 +203,7 @@ class DictExecuteReqHandler:
         elif self.columns_desc["columns"].keys() == [self.executor.facts]:
             all_axis["Tuples"] += {
                 "Member": {"Hierarchy": "[Measures]"},
-                "UName": "[Measures].[{}]".format(self.executor.selected_measures[0]),
+                "UName": f"[Measures].[{self.executor.selected_measures[0]}]",
                 "Caption": str(self.executor.selected_measures[0]),
                 "LName": "[Measures]",
                 "LNum": "0",
@@ -217,7 +217,7 @@ class DictExecuteReqHandler:
             for idx in range(len(self.mdx_execution_result) * 3):
                 all_axis["Tuples"] += {
                     "Member": {"Hierarchy": "[Measures]"},
-                    "UName": "[Measures].[{}]".format("XL_SD" + str(idx)),
+                    "UName": f"[Measures].[{'XL_SD' + str(idx)}]",
                     "Caption": "XL_SD" + str(idx),
                     "LName": "[Measures]",
                     "LNum": "0",
@@ -953,8 +953,8 @@ class DictExecuteReqHandler:
             ):
                 all_axis["Tuples"] += {
                     "Member": {"Hierarchy": "[Measures]"},
-                    "UName": "[Measures].[{}]".format(self.executor.measures[0]),
-                    "Caption": "{}".format(self.executor.measures[0]),
+                    "UName": f"[Measures].[{self.executor.measures[0]}]",
+                    "Caption": f"{self.executor.measures[0]}",
                     "LName": "[Measures]",
                     "LNum": "0",
                     "DisplayInfo": "0",

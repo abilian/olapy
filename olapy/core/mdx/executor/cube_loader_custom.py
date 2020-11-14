@@ -84,7 +84,7 @@ class CubeLoaderCustom(CubeLoader):
                 df = pd.read_csv(file, sep=self.sep)
             else:
                 df = psql.read_sql_query(
-                    "SELECT * FROM {}".format(dimension_and_key.split(".")[0]),
+                    f"SELECT * FROM {dimension_and_key.split('.')[0]}",
                     self.sqla_engine,
                 )
 

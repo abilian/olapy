@@ -67,7 +67,7 @@ tidy: clean
 
 format:
 	black $(SRC) tests micro_bench demos *.py
-	isort -rc $(SRC) tests micro_bench demos *.py
+	isort $(SRC) tests micro_bench demos *.py
 
 update-deps:
 	poetry update

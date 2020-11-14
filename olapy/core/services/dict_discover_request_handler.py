@@ -569,9 +569,7 @@ class DictDiscoverReqHandler:
                     "HIERARCHY_CAPTION": "Measures",
                     "DIMENSION_TYPE": "2",
                     "HIERARCHY_CARDINALITY": "0",
-                    "DEFAULT_MEMBER": "[Measures].[{}]".format(
-                        self.executor.measures[0]
-                    ),
+                    "DEFAULT_MEMBER": f"[Measures].[{self.executor.measures[0]}]",
                     "STRUCTURE": "0",
                     "IS_VIRTUAL": "false",
                     "IS_READWRITE": "false",

@@ -34,27 +34,17 @@ class Tuple:
         self.value = Value
 
     def __str__(self):
-        return """
-        Hierarchy : {}
-        UName : {}
-        Caption : {}
-        LName : {}
-        LNum : {}
-        DisplayInfo : {}
-        PARENT_UNIQUE_NAME : {}
-        HIERARCHY_UNIQUE_NAME : {}
-        Value : {}
-        """.format(
-            self.hierarchy,
-            self.uname,
-            self.caption,
-            self.lname,
-            self.lnum,
-            self.display_info,
-            self.parent_unique_name,
-            self.hierarchy_unique_name,
-            self.value,
-        )
+        return f"""
+        Hierarchy : {self.hierarchy}
+        UName : {self.uname}
+        Caption : {self.caption}
+        LName : {self.lname}
+        LNum : {self.lnum}
+        DisplayInfo : {self.display_info}
+        PARENT_UNIQUE_NAME : {self.parent_unique_name}
+        HIERARCHY_UNIQUE_NAME : {self.hierarchy_unique_name}
+        Value : {self.value}
+        """
 
 
 class Property(ComplexModel):

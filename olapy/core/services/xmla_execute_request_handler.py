@@ -44,8 +44,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         :param tupls: mdx query tuples
         """
         with xml.Member(Hierarchy="[Measures]"):
-            xml.UName("[Measures].[{}]".format(tupls[0][1]))
-            xml.Caption("{}".format(tupls[0][1]))
+            xml.UName(f"[Measures].[{tupls[0][1]}]")
+            xml.Caption(f"{tupls[0][1]}")
             xml.LName("[Measures]")
             xml.LNum("0")
             xml.DisplayInfo("0")
@@ -196,13 +196,13 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                                 displayinfo = "0"
                             else:
                                 hierarchy = "[{0}].[{0}]".format(split_tupl[0])
-                                l_name = "[{}]".format("].[".join(split_tupl[:3]))
+                                l_name = f"[{'].['.join(split_tupl[:3])}]"
                                 lvl = len(split_tupl[4:])
                                 displayinfo = "131076"
 
                             with xml.Member(Hierarchy=hierarchy):
                                 xml.UName("{}".format(tupl.strip(" \t\n")))
-                                xml.Caption("{}".format(split_tupl[-1]))
+                                xml.Caption(f"{split_tupl[-1]}")
                                 xml.LName(l_name)
                                 xml.LNum(str(lvl))
                                 xml.DisplayInfo(displayinfo)
@@ -232,9 +232,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     with xml.Tuple:
                         with xml.Member(Hierarchy="[Measures]"):
                             xml.UName(
-                                "[Measures].[{}]".format(
-                                    self.executor.selected_measures[0]
-                                )
+                                f"[Measures].[{self.executor.selected_measures[0]}]"
                             )
                             xml.Caption(str(self.executor.selected_measures[0]))
                             xml.LName("[Measures]")
@@ -254,7 +252,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     for idx in range(len(self.mdx_execution_result) * 3):
                         with xml.Tuple:
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName("[Measures].[{}]".format("XL_SD" + str(idx)))
+                                xml.UName(f"[Measures].[{'XL_SD' + str(idx)}]")
                                 xml.Caption("XL_SD" + str(idx))
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
@@ -824,10 +822,8 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                             or self.executor.facts in self.columns_desc["where"]
                         ):
                             with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(
-                                    "[Measures].[{}]".format(self.executor.measures[0])
-                                )
-                                xml.Caption("{}".format(self.executor.measures[0]))
+                                xml.UName(f"[Measures].[{self.executor.measures[0]}]")
+                                xml.Caption(f"{self.executor.measures[0]}")
                                 xml.LName("[Measures]")
                                 xml.LNum("0")
                                 xml.DisplayInfo("0")
@@ -858,7 +854,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                     **{
                         "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
+                    },
                 ):
                     xml.write(execute_xsd)
                     with xml.OlapInfo:

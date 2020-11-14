@@ -40,7 +40,7 @@ class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
                     **{
                         "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
+                    },
                 ):
                     xml.write(mdschema_hierarchies_xsd)
                     if (
@@ -90,7 +90,7 @@ class SparkXmlaDiscoverReqHandler(XmlaDiscoverReqHandler):
                             xml.DIMENSION_TYPE("2")
                             xml.HIERARCHY_CARDINALITY("0")
                             xml.DEFAULT_MEMBER(
-                                "[Measures].[{}]".format(self.executor.measures[0])
+                                f"[Measures].[{self.executor.measures[0]}]"
                             )
                             xml.STRUCTURE("0")
                             xml.IS_VIRTUAL("false")

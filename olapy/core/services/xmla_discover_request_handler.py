@@ -84,7 +84,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     "xmlns:EX": "urn:schemas-microsoft-com:xml-analysis:exception",
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_datasources_xsd)
                 with xml.row:
@@ -115,7 +115,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(xsd)
                 if PropertyName:
@@ -175,7 +175,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     **{
                         "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
+                    },
                 ):
                     xml.write(discover_schema_rowsets_xsd)
                     for resp_row in rows:
@@ -373,7 +373,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     **{
                         "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
+                    },
                 ):
                     xml.write(discover_literals_xsd)
                     for resp_row in rows:
@@ -397,7 +397,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_sets_xsd)
                 if request.Restrictions.RestrictionList:
@@ -423,7 +423,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_kpis_xsd)
 
@@ -449,7 +449,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(dbschema_catalogs_xsd)
                 for catalogue in self.cubes:
@@ -472,7 +472,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_cubes_xsd)
                 if request.Restrictions.RestrictionList:
@@ -515,7 +515,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     **{
                         "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                         "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                    }
+                    },
                 ):
                     xml.write(dbschema_tables_xsd)
 
@@ -535,7 +535,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_measures_xsd)
 
@@ -581,7 +581,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_dimensions_xsd)
                 if request.Restrictions.RestrictionList:
@@ -648,7 +648,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_hierarchies_xsd)
 
@@ -722,7 +722,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.DIMENSION_TYPE("2")
                             xml.HIERARCHY_CARDINALITY("0")
                             xml.DEFAULT_MEMBER(
-                                "[Measures].[{}]".format(self.executor.measures[0])
+                                f"[Measures].[{self.executor.measures[0]}]"
                             )
                             xml.STRUCTURE("0")
                             xml.IS_VIRTUAL("false")
@@ -753,7 +753,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_levels_xsd)
 
@@ -828,7 +828,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_measuresgroups_xsd)
                 if request.Restrictions.RestrictionList:
@@ -864,7 +864,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_measuresgroups_dimensions_xsd)
 
@@ -908,7 +908,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_properties_properties_xsd)
                 if request.Restrictions.RestrictionList:
@@ -992,7 +992,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_members_xsd)
                 if request.Restrictions.RestrictionList:
@@ -1095,7 +1095,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_schema_rowsets_xsd)
         return str(xml)
@@ -1114,7 +1114,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_schema_rowsets_xsd)
         return str(xml)
@@ -1133,7 +1133,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_schema_rowsets_xsd)
         return str(xml)
@@ -1152,7 +1152,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(mdschema_functions_xsd)
 
@@ -1172,7 +1172,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_schema_rowsets_xsd)
         return str(xml)
@@ -1188,7 +1188,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_enumerators_xsd)
 
@@ -1210,7 +1210,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                 **{
                     "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                     "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                }
+                },
             ):
                 xml.write(discover_keywords_xsd)
                 with xml.row:
