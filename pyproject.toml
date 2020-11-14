@@ -16,6 +16,11 @@ homepage = "https://github.com/abilian/olapy"
 readme = "README.rst"
 
 
+[tool.poetry.scripts]
+olapy = 'olapy.__main__:cli'
+etl = 'olapy.etl.etl:run_etl'
+
+
 [tool.poetry.dependencies]
 python = ">3.6"
 
