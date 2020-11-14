@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import cProfile
 import datetime
 import os
@@ -9,10 +6,10 @@ import pstats
 import cpuinfo
 from olap.xmla import xmla
 from prettytable import PrettyTable
-from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.executor import MdxEngine
 from olapy.core.services.xmla import get_wsgi_application
+from tests.test_xmla import WSGIServer
 
 from .cube_generator import CUBE_NAME, CubeGen
 from .micro_bench import MicBench
@@ -23,7 +20,7 @@ REFINEMENT_LVL = 5
 PROFILING_LINES = 15
 
 
-class Config(object):
+class Config:
     def __init__(self, xmla_tools):
         self.config = {"xmla_tools": xmla_tools}
 
@@ -451,10 +448,10 @@ xmla_p_server = XmlaProviderService()
 setattr(xmla_p_server,"app", Config(xmla_tools))
 xmla_p_server.Execute(xmla_p_server, request)
 """,
-        "{}.profile".format(__file__),
+        f"{__file__}.profile",
     )
 
-    s = pstats.Stats("{}.profile".format(__file__), stream=file)
+    s = pstats.Stats(f"{__file__}.profile", stream=file)
     s.strip_dirs()
     s.sort_stats("time").print_stats(PROFILING_LINES)
 

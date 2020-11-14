@@ -1,4 +1,3 @@
-# -*- encoding: utf8 -*-
 """Olapy's main module, this module manipulate MDX Queries and executes them.
 
 Execution needs two main objects:
@@ -14,8 +13,6 @@ Those two objects are constructed in three ways:
       see :mod:`cube_loader`
     - automatically from database, also if they respect the start schema model, see :mod:`cube_loader_db`
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import itertools
 import os
@@ -33,14 +30,14 @@ from olapy.core.mdx.parser.parse import Parser
 # FIXME: find another way
 try:
     from ..tools.connection import get_dialect, get_dialect_name
-    from .cube_loader_db import CubeLoaderDB
     from .cube_loader_custom import CubeLoaderCustom
+    from .cube_loader_db import CubeLoaderDB
 except ImportError:
     pass
 
 
 @attr.s
-class MdxEngine(object):
+class MdxEngine:
     """The main class for executing a query.
 
     :param cube: It must be under ~/olapy-data/cubes/{cube_name}.

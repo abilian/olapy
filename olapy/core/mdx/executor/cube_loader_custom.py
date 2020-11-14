@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import os
 from typing import Dict
 
@@ -29,9 +26,7 @@ class CubeLoaderCustom(CubeLoader):
             table = pd.read_csv(facts, sep=self.sep)
         else:
             # load facts table
-            table = psql.read_sql_query(
-                "SELECT * FROM {}".format(table_name), self.sqla_engine
-            )
+            table = psql.read_sql_query(f"SELECT * FROM {table_name}", self.sqla_engine)
         return table
 
     def load_tables(self):

@@ -1,8 +1,4 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-
-class Tuple(object):
+class Tuple:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
 

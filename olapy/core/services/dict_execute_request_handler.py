@@ -1,9 +1,6 @@
-# -*- encoding: utf8 -*-
 """Managing all
 `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_
 requests and responses."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import itertools
 import re
@@ -128,7 +125,7 @@ class DictExecuteReqHandler:
                     ["[" + str(i) + "]" for i in tuple_without_minus_1[first_att - 1 :]]
                 ),
             )
-            xml["Caption"] = str((tuple_without_minus_1[-1]))
+            xml["Caption"] = str(tuple_without_minus_1[-1])
             xml["LName"] = "[{0}].[{0}].[{1}]".format(tuple_without_minus_1[0], d_tup)
             xml["LNum"] = str(len(tuple_without_minus_1) - first_att)
             xml["DisplayInfo"] = "131076"

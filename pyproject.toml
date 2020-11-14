@@ -17,7 +17,7 @@ readme = "README.rst"
 
 
 [tool.poetry.dependencies]
-python = ">2.7"
+python = ">3.6"
 
 # Later version don't support Python 2 anymore
 numpy = "<1.17"

@@ -1,8 +1,6 @@
 """OlaPy config file parser object contains credentials that allows olapy to
 access database (of course this happens only if SQLALCHEMY_DATABASE_URI
 Environment variable is not specified)."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import os
 

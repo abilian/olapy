@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import os
 from typing import Dict, Text
 
@@ -8,7 +5,7 @@ import pandas as pd
 from pandas.errors import MergeError
 
 
-class CubeLoader(object):
+class CubeLoader:
     def __init__(self, cube_path=None, sep=";"):
         self.cube_path = cube_path
         self.sep = sep

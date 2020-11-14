@@ -1,8 +1,5 @@
-# -*- encoding: utf8 -*-
 """Models to construct xmla responses with Spyne."""
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 from spyne import ComplexModel, Integer, Unicode, XmlAttribute
 
@@ -11,7 +8,7 @@ from spyne import ComplexModel, Integer, Unicode, XmlAttribute
 # with the same variable names, so xmla requests from excel can be reached.
 
 
-class Tuple(object):
+class Tuple:
     """Tuple description (used by spyne)."""
 
     def __init__(

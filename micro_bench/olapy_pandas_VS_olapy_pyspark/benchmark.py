@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import subprocess
 from importlib import reload
 from pprint import pprint
@@ -38,8 +35,8 @@ if __name__ == "__main__":
         reload(olapy.core.mdx.executor)
         reload(olapy.core.services)
         from olapy.core.mdx.executor import MdxEngine
-        from olapy.core.services import XmlaDiscoverReqHandler
-        from olapy.core.services import XmlaExecuteReqHandler
+        from olapy.core.services import XmlaDiscoverReqHandler, \
+            XmlaExecuteReqHandler
 
         bench_result["spark"] = benchmark()
 

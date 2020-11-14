@@ -1,7 +1,5 @@
 """Parse cube configuration file and create cube parser object which can be
 passed to the MdxEngine."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import os
 from collections import OrderedDict

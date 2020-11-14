@@ -1,13 +1,11 @@
 """Managing all database access."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 from typing import List, Optional, Text
 
 from sqlalchemy.engine import Engine
 
 
-class Dialect(object):
+class Dialect:
     """Connect to sql database."""
 
     def __init__(self, sqla_engine=None):
@@ -101,7 +99,7 @@ def get_dialect(sqla_engine):
     dialect_name = get_dialect_name(sqla_engine.url)
     dialect_class = DIALECT_REGISTRY.get(dialect_name)
     if not dialect_class:
-        raise AttributeError("Unknown dialect: {}".format(dialect_name))
+        raise AttributeError(f"Unknown dialect: {dialect_name}")
 
     return dialect_class(sqla_engine)
 

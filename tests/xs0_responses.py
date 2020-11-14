@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 TEST_QUERY_AXIS0 = """[(Member){
    _Hierarchy = "[Measures]"
    UName = "[Measures].[amount]"

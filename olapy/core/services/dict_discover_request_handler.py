@@ -1,19 +1,16 @@
-# -*- encoding: utf8 -*-
 """Managing all
 `DISCOVER <https://technet.microsoft.com/fr-fr/library/ms186653(v=sql.110).aspx>`_
 requests and responses.
 """
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import os
 import uuid
 
 from olapy.core.mdx.executor import MdxEngine
 
-from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
-    discover_schema_rowsets_response_rows
+from ..services.xmla_discover_request_utils import \
+    discover_literals_response_rows, discover_schema_rowsets_response_rows
 from ..services.xmla_discover_xsds import discover_preperties_xsd
 
 # noinspection PyPep8Naming

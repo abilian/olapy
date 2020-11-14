@@ -1,8 +1,5 @@
-# -*- encoding: utf8 -*-
 """Parser for MDX queries, and Break it in parts."""
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import regex
 
@@ -10,13 +7,13 @@ import regex
 
 # FIXME: make this regex more readable (split it)
 REGEX = regex.compile(
-    "(?u)(\[[(\u4e00-\u9fff)*\w+\d ]+\](\.\[[(\u4e00-\u9fff)*"
-    + '\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ '
-    + "]+\])*\.?((Members)|(\[Q\d\]))?)"
+    "(?u)(\\[[(\u4e00-\u9fff)*\\w+\\d ]+\\](\\.\\[[(\u4e00-\u9fff)*"
+    + r'\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ '
+    + r"]+\])*\.?((Members)|(\[Q\d\]))?)"
 )
 
 
-class Parser(object):
+class Parser:
     """Class for Parsing a MDX query."""
 
     def __init__(self, mdx_query=None):

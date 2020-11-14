@@ -1,9 +1,6 @@
-# -*- encoding: utf8 -*-
 """Managing all
 `EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_
 requests and responses."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import itertools
 from datetime import datetime
@@ -127,7 +124,7 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
 
             with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
                 xml.UName(uname)
-                xml.Caption(str((tuple_without_minus_1[-1])))
+                xml.Caption(str(tuple_without_minus_1[-1]))
                 xml.LName(
                     "[{0}].[{0}].[{1}]".format(
                         tuple_without_minus_1[0], current_lvl_name

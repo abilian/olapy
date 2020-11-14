@@ -1,8 +1,5 @@
-# -*- encoding: utf8 -*-
 """Do the same thing as MdxEngine, but with only one file or database table (no
 need for a star schema tables)."""
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import numpy as np
 import pandas as pd
@@ -87,7 +84,7 @@ class MdxEngineLite(MdxEngine):
         tables = {}
         print("Connection string = " + str(self.sqla_engine.url))
         results = self.sqla_engine.execution_options(stream_results=True).execute(
-            "SELECT * FROM {}".format(self.cube)
+            f"SELECT * FROM {self.cube}"
         )
         # Fetch all the results of the query
         if self.columns:

@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 from typing import Dict, Text
 
 import pandas as pd
@@ -37,7 +34,7 @@ class CubeLoaderDB(CubeLoader):
             if "oracle" in dialect_name and table_name.upper() == "FACTS":
                 table_name = table_name.title()
             results = self.sqla_engine.execution_options(stream_results=True).execute(
-                "SELECT * FROM {}".format(table_name)
+                f"SELECT * FROM {table_name}"
             )
             # Fetch all the results of the query
             df = pd.DataFrame(
@@ -59,7 +56,7 @@ class CubeLoaderDB(CubeLoader):
         :return: star schema DataFrame
         """
 
-        df = psql.read_sql_query("SELECT * FROM {}".format(facts), self.sqla_engine)
+        df = psql.read_sql_query(f"SELECT * FROM {facts}", self.sqla_engine)
         inspector = inspect(self.sqla_engine)
 
         for db_table_name in inspector.get_table_names():
@@ -71,10 +68,10 @@ class CubeLoaderDB(CubeLoader):
             try:
                 df = df.merge(
                     psql.read_sql_query(
-                        "SELECT * FROM {}".format(db_table_name), self.sqla_engine
+                        f"SELECT * FROM {db_table_name}", self.sqla_engine
                     )
                 )
             except MergeError:
-                print("No common column between {} and {}".format(facts, db_table_name))
+                print(f"No common column between {facts} and {db_table_name}")
 
         return df

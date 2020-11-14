@@ -41,19 +41,15 @@ lint-ci: lint
 
 lint-python:
 	@echo "--> Linting Python files"
-	flake8 olapy tests
-
-	@make lint-py3k
+	@make lint-flake8
 	@make lint-mypy
-	# @make lint-pylint
+
+lint-flake8:
+	flake8 olapy tests
 
 lint-pylint:
 	@echo "Running pylint, some errors reported might be false positives"
 	-pylint -E --rcfile .pylint.rc $(SRC)
-
-lint-py3k:
-	@echo "Checking Py3k (basic) compatibility"
-	pylint --py3k -d W1637 *.py $(SRC) tests
 
 lint-mypy:
 	mypy olapy tests

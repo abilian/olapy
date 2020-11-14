@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import datetime
 import shutil
 import sys
@@ -12,11 +9,11 @@ from cpuinfo import cpuinfo, os
 from olap.xmla import xmla
 from olap.xmla.interfaces import XMLAException
 from prettytable import PrettyTable
-from tests.queries import query1, query6, query7, query9
-from tests.test_xmla import WSGIServer
 
 from olapy.core.mdx.executor import MdxEngine
 from olapy.core.services.xmla import get_wsgi_application
+from tests.queries import query1, query6, query7, query9
+from tests.test_xmla import WSGIServer
 
 from .micro_bench import MicBench
 
@@ -89,7 +86,7 @@ def main():
 
     for idx, query in enumerate([query1, query6, query7, query9]):
         file.write(
-            "Query {0} :\n".format(str(idx + 1))
+            "Query {} :\n".format(str(idx + 1))
             + query
             + "\n----------------------------------------------------------\n\n"
         )
@@ -118,7 +115,7 @@ def main():
             conn = provider.connect(location=server.url)
 
             mbench = MicBench()
-            t = PrettyTable(["Query", "{0} - olapy execution time".format(dbms)])
+            t = PrettyTable(["Query", f"{dbms} - olapy execution time"])
 
             for idx, query in enumerate([query1, query6, query7, query9]):
 
@@ -132,7 +129,7 @@ def main():
         except XMLAException:
             type, value, traceback = sys.exc_info()
             print("Error opening %s" % (value))
-            print("Can't connect to {0} database".format(dbms))
+            print(f"Can't connect to {dbms} database")
     server.stop()
 
 

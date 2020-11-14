@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import os
 from distutils.dir_util import copy_tree
 from os.path import dirname, expanduser

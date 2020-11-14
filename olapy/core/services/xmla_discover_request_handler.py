@@ -2,8 +2,6 @@
 fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 # -*- encoding: utf8 -*-
 
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import os
 
@@ -11,8 +9,8 @@ import xmlwitch
 from six.moves.urllib.parse import urlparse
 
 from ..services.dict_discover_request_handler import DictDiscoverReqHandler
-from ..services.xmla_discover_request_utils import discover_literals_response_rows, \
-    discover_schema_rowsets_response_rows
+from ..services.xmla_discover_request_utils import \
+    discover_literals_response_rows, discover_schema_rowsets_response_rows
 from .xmla_discover_xsds import dbschema_catalogs_xsd, dbschema_tables_xsd, \
     discover_datasources_xsd, discover_enumerators_xsd, \
     discover_keywords_xsd, discover_literals_xsd, \

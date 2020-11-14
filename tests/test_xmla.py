@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import threading
 from wsgiref.simple_server import make_server
 
@@ -26,7 +23,7 @@ PORT = 8230
 xmla = pytest.importorskip("xmla")
 
 
-class Member(object):
+class Member:
     "Encapsulates xs0 response attributes."
 
     def __init__(self, **kwargs):
@@ -81,7 +78,7 @@ class WSGIServer:
     def url(self):
         host, port = self.server_address
         proto = "http"  # if self._server.ssl_context is None else 'https'
-        return "{}://{}:{}".format(proto, host, port)
+        return f"{proto}://{host}:{port}"
 
 
 @pytest.fixture(scope="module")

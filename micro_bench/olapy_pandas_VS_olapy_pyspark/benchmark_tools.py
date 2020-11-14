@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import datetime
 import threading
 from timeit import Timer
@@ -50,7 +47,7 @@ class WSGIServer:
     def url(self):
         host, port = self.server_address
         proto = "http"  # if self._server.ssl_context is None else 'https'
-        return "{}://{}:{}".format(proto, host, port)
+        return f"{proto}://{host}:{port}"
 
 
 def olapy_mdx_benchmark(queries, mdx_engine):
@@ -64,7 +61,7 @@ def olapy_mdx_benchmark(queries, mdx_engine):
 
 def olapy_xmla_benchmark(queries):
     provider = xmla.XMLAProvider()
-    connection = provider.connect(location="http://{0}:{1}".format(HOST, PORT))
+    connection = provider.connect(location=f"http://{HOST}:{PORT}")
 
     execution_time_results = []
     for query in queries:
@@ -133,7 +130,7 @@ def save_benchmark_result(bench_result):
     )
 
     with open(
-        "benchmark_result-{0}.rst".format(
+        "benchmark_result-{}.rst".format(
             str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"))
         ),
         "w+",

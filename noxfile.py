@@ -1,11 +1,8 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 import os
 
 import nox
 
-PYTHON_VERSIONS = ["2.7", "3.6", "3.7", "3.8"]
+PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
 PACKAGE = "abilian"
 
 travis_python_version = os.environ.get("TRAVIS_PYTHON_VERSION")

@@ -1,11 +1,8 @@
-# -*- encoding: utf8 -*-
 """
 The main Module to manage
 `XMLA <https://technet.microsoft.com/fr-fr/library/ms187178(v=sql.90).aspx>`_
 requests and responses, and the Spyne SOAP server.
 """
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
 
 import imp
 import logging

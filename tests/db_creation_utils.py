@@ -1,7 +1,3 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-
 def create_insert(con, custom=False):
     if custom:
         custom_create_insert(con)
@@ -277,11 +273,11 @@ def drop_tables(con, custom=False):
 
 def custom_drop_tables(con):
     for table_name in ("food_facts", "store", "product", "warehouse"):
-        statement = "DROP TABLE {};".format(table_name)
+        statement = f"DROP TABLE {table_name};"
         con.execute(statement)
 
 
 def normal_drop_tables(con):
     for table_name in ("facts", "geography", "product", "time"):
-        statement = "DROP TABLE {};".format(table_name)
+        statement = f"DROP TABLE {table_name};"
         con.execute(statement)
