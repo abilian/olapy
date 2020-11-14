@@ -1,4 +1,4 @@
-.PHONY: default run test test-with-coverage clean develop lint tidy format
+.PHONY: all default run test test-with-coverage clean develop lint tidy format
 
 SRC=olapy
 PKG=$(SRC)
@@ -8,7 +8,7 @@ default: test lint
 all: default
 
 run:
-	python manage.py runserver
+	olapy runserver
 
 #
 # testing
@@ -24,10 +24,7 @@ test-with-coverage:
 #
 develop:
 	@echo "--> Installing / updating python dependencies for development"
-	pip install -q pip-tools
-	pip-sync requirements.txt
-	pip install -q -r requirements.txt -r dev-requirements.txt
-	pip install -e .
+	poetry install
 	@echo "--> Activating pre-commit hook"
 	pre-commit install
 	@echo ""
@@ -59,17 +56,11 @@ lint-mypy:
 # Cleanup
 #
 clean:
-	find . -name "*.pyc" -delete
-	find . -name .DS_Store -delete
+	rm -rf **.pyc **/.DS_Store
 	find . -name cache -type d -delete
 	find . -type d -empty -delete
-	rm -rf .mypy_cache
-	rm -f migration.log
-	rm -rf build dist
-	rm -rf *.egg .coverage
-	rm -rf doc/_build
-	rm -rf static/gen static/.webassets-cache instance/webassets
-	rm -rf htmlcov
+	rm -rf .mypy_cache migration.log build dist *.egg .coverage htmlcov
+	rm -rf doc/_build static/gen static/.webassets-cache instance/webassets
 
 tidy: clean
 	rm -rf .tox .nox

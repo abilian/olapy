@@ -1,12 +1,43 @@
 repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: v1.1.1
+    rev: v3.3.0
     hooks:
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
-    -   id: debug-statements
-    -   id: check-xml
-    -   id: check-yaml
-    -   id: check-json
-    -   id: check-ast
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+      - id: fix-encoding-pragma
+        args: ['--remove']
+      # - id: no-commit-to-branch
+      # - id: requirements-txt-fixer
+
+-   repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.6.4
+    hooks:
+    -   id: isort
+
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
     -   id: flake8
+
+-   repo: https://github.com/Lucas-C/pre-commit-hooks-go
+    rev: v1.0.1
+    hooks:
+    -   id: checkmake

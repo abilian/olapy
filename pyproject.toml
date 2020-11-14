@@ -19,10 +19,7 @@ readme = "README.rst"
 [tool.poetry.dependencies]
 python = ">3.6"
 
-# Later version don't support Python 2 anymore
-numpy = "<1.17"
-pandas = "<0.25"
-
+pandas = "*"
 attrs = "*"
 click = "*"
 lxml = "*"
@@ -57,7 +54,6 @@ gprof2dot = "*"
 ipdb = "*"
 py-cpuinfo = "*"
 
-
 #databases_connectors
 #pyodbc #need some packages to be installed (sudo apt-get install unixodbc-dev)
 #cx_oracle
@@ -65,7 +61,9 @@ py-cpuinfo = "*"
 #pymysql
 
 # linting
+mypy = "*"
 flake8 = "*"
+flake8-bugbear = "*"
 flake8-comprehensions = "*"
 flake8-mutable = "*"
 flake8-pytest = "*"
@@ -78,15 +76,11 @@ pre-commit = "*"
 
 # Formatting
 isort = "*"
+black = { version = "*", allow-prereleases = true }
 
-# Python 3 only
-mypy = { version = "*", python = "^3.6" }
-flake8-bugbear = { version = "*", python = "^3.6" }
-flake8-mypy-fork = { version = "*", python = "^3.6" }
-black = { version = "*", python = "^3.6", allow-prereleases = true }
-
+# FIXME
 # xmla (for testing - Python 2 only due to dependency on suds)
-xmla = { version = "*", python = "^2.7" }
+# xmla = { version = "*", python = "^2.7" }
 
 # Doc
 sphinx-click = "*"
