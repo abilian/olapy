@@ -1,0 +1,24 @@
+{
+    "template": "https://github.com/abilian/cookiecutter-abilian-python",
+    "commit": "a387d6c129615f9d85d05a7a0f1b709f9bd3a182",
+    "context": {
+        "cookiecutter": {
+            "full_name": "Abilian SAS",
+            "email": "contact@abilian.com",
+            "github_username": "abilian",
+            "project_name": "OlaPy",
+            "project_slug": "olapy",
+            "project_short_description": "OLAP in Python",
+            "pypi_username": "sfermigier",
+            "version": "0.8.0",
+            "use_pytest": "y",
+            "use_pypi_deployment_with_travis": "n",
+            "add_pyup_badge": "y",
+            "command_line_interface": "No command-line interface",
+            "create_author_file": "y",
+            "open_source_license": "Apache Software License 2.0",
+            "_template": "https://github.com/abilian/cookiecutter-abilian-python"
+        }
+    },
+    "directory": null
+}
