@@ -1,6 +1,11 @@
 Changelog for Olapy
 ===================
 
+0.8.0 (2020-11-14)
+------------------
+- Drop support for Python 2.
+- Upgrade dependencies to use Python 3.
+
 0.7.5 (2019-02-08)
 ------------------
 - Support OfficeJS Onlyoffice Spreadsheet (CUBEMEMBER, CUBEVALUE Formulas)
