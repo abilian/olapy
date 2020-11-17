@@ -1,6 +1,10 @@
 Changelog for Olapy
 ===================
 
+0.8.1 (2020-11-17)
+------------------
+- Move pyodide code to another project>
+
 0.8.0 (2020-11-14)
 ------------------
 - Drop support for Python 2.

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "olapy"
-version = "0.8.0"
+version = "0.8.1"
 authors = ["Abilian SAS"]
 description = "OlaPy, an experimental OLAP engine based on Pandas"
 classifiers = [
