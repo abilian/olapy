@@ -56,7 +56,7 @@ lint-mypy:
 # Cleanup
 #
 clean:
-	rm -rf **.pyc **/.DS_Store
+	rm -rf **/*.pyc **/.DS_Store
 	find . -name cache -type d -delete
 	find . -type d -empty -delete
 	rm -rf .mypy_cache migration.log build dist *.egg .coverage htmlcov
@@ -72,19 +72,13 @@ format:
 update-deps:
 	poetry update
 
+publish: clean
+	poetry build
+	twine upload dist/*
+
 #
 # update deps in windows OS
 #
 update-deps-win:
 	pip-compile -U
 	git --no-pager diff requirements.txt
-
-sync-deps:
-	pip install -r requirements.txt -r dev-requirements.txt -e .
-
-release:
-	git push --tags
-	rm -rf /tmp/olapy-dist
-	git clone . /tmp/olapy-dist
-	cd /tmp/olapy-dist ; python setup.py sdist
-	cd /tmp/olapy-dist ; twine upload dist/*
