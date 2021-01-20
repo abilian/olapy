@@ -1,8 +1,16 @@
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from .queries import query1, query7, query8, query9, query16, query_posgres1, \
-    query_posgres2, query_postgres3
+from .queries import (
+    query1,
+    query7,
+    query8,
+    query9,
+    query16,
+    query_posgres1,
+    query_posgres2,
+    query_postgres3,
+)
 
 # import pytest
 # pytest.importorskip("sqlalchemy")

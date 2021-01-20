@@ -9,8 +9,10 @@ import uuid
 
 from olapy.core.mdx.executor import MdxEngine
 
-from ..services.xmla_discover_request_utils import \
-    discover_literals_response_rows, discover_schema_rowsets_response_rows
+from ..services.xmla_discover_request_utils import (
+    discover_literals_response_rows,
+    discover_schema_rowsets_response_rows,
+)
 from ..services.xmla_discover_xsds import discover_preperties_xsd
 
 # noinspection PyPep8Naming

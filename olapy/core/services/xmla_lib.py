@@ -5,8 +5,15 @@ import pandas as pd
 
 from ..mdx.executor import MdxEngine
 from ..mdx.executor.utils import inject_dataframes
-from ..services.request_properties_models import Command, DiscoverRequest, \
-    ExecuteRequest, Propertieslist, Property, Restriction, Restrictionlist
+from ..services.request_properties_models import (
+    Command,
+    DiscoverRequest,
+    ExecuteRequest,
+    Propertieslist,
+    Property,
+    Restriction,
+    Restrictionlist,
+)
 
 
 class XmlaProviderLib:

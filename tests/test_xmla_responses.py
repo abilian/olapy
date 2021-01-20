@@ -1,8 +1,7 @@
 import pytest
 import xmlwitch
 
-from olapy.core.services.xmla_execute_request_handler import \
-    XmlaExecuteReqHandler
+from olapy.core.services.xmla_execute_request_handler import XmlaExecuteReqHandler
 
 from .queries import query11, query12, query14, query15
 

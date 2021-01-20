@@ -22,7 +22,7 @@ etl = 'olapy.etl.etl:run_etl'
 
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">3.6.1,<4"
 
 pandas = "*"
 attrs = "*"
