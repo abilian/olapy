@@ -15,6 +15,8 @@ classifiers = [
 homepage = "https://github.com/abilian/olapy"
 readme = "README.rst"
 
+packages = [{ include = "olapy", from = "src" }]
+
 
 [tool.poetry.scripts]
 olapy = 'olapy.__main__:cli'

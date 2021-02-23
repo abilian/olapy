@@ -1,23 +1,22 @@
 .PHONY: all default run test test-with-coverage clean develop lint tidy format
 
-SRC=olapy
-PKG=$(SRC)
+PKG=olapy
 
 default: test lint
 
 all: default
 
 run:
-	olapy runserver
+	flask runserver
 
 #
 # testing
 #
 test:
-	pytest . --durations=10
+	pytest --durations=10
 
 test-with-coverage:
-	pytest --tb=short --cov $(PKG) --cov-report term-missing .
+	pytest --tb=short --cov $(PKG) --cov-report term-missing
 
 #
 # setup
@@ -42,14 +41,14 @@ lint-python:
 	@make lint-mypy
 
 lint-flake8:
-	flake8 olapy tests
+	flake8 src tests
 
 lint-pylint:
 	@echo "Running pylint, some errors reported might be false positives"
-	-pylint -E --rcfile .pylint.rc $(SRC)
+	-pylint -E --rcfile .pylint.rc src
 
 lint-mypy:
-	mypy olapy tests
+	mypy src tests
 
 
 #
@@ -66,8 +65,8 @@ tidy: clean
 	rm -rf .tox .nox
 
 format:
-	black $(SRC) tests micro_bench demos *.py
-	isort $(SRC) tests micro_bench demos *.py
+	black src tests micro_bench demos *.py
+	isort src tests micro_bench demos *.py
 
 update-deps:
 	poetry update
@@ -75,10 +74,3 @@ update-deps:
 publish: clean
 	poetry build
 	twine upload dist/*
-
-#
-# update deps in windows OS
-#
-update-deps-win:
-	pip-compile -U
-	git --no-pager diff requirements.txt
