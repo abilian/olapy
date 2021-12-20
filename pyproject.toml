@@ -24,7 +24,7 @@ etl = 'olapy.etl.etl:run_etl'
 
 
 [tool.poetry.dependencies]
-python = ">3.6.1,<4"
+python = ">=3.7,<4"
 
 pandas = "*"
 attrs = "*"
@@ -83,7 +83,7 @@ pre-commit = "*"
 
 # Formatting
 isort = "^5"
-black = { version = "*", allow-prereleases = true }
+black = "*"
 
 # FIXME
 # xmla (for testing - Python 2 only due to dependency on suds)
@@ -92,3 +92,5 @@ black = { version = "*", allow-prereleases = true }
 # Doc
 sphinx-click = "*"
 sphinx-rtd-theme = "*"
+types-PyYAML = "^6.0.1"
+types-six = "^1.16.3"
