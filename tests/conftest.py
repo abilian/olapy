@@ -1,8 +1,8 @@
 import os
 from collections import OrderedDict
+from urllib.parse import urlparse
 
 import pytest
-from six.moves.urllib.parse import urlparse
 
 from olapy.core.mdx.executor import MdxEngine
 

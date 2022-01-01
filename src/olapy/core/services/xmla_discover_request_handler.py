@@ -4,9 +4,9 @@ fr/library/ms186653(v=sql.110).aspx>`_ requests and responses."""
 
 
 import os
+from urllib.parse import urlparse
 
 import xmlwitch
-from six.moves.urllib.parse import urlparse
 
 from ..services.dict_discover_request_handler import DictDiscoverReqHandler
 from ..services.xmla_discover_request_utils import (
