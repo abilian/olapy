@@ -44,7 +44,8 @@ query6 = """
     [time].[time].[year].Members}}, {
     [time].[time].[year].[2010]})}}, {
     [time].[time].[quarter].[2010].[Q2 2010]})}}, {
-    [time].[time].[month].[2010].[Q2 2010].[May 2010]}))) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME
+    [time].[time].[month].[2010].[Q2 2010].[May 2010]})))
+    DIMENSION PROPERTIES PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME
     ON COLUMNS
     FROM [sales]
     WHERE ([Measures].[amount])
@@ -52,61 +53,61 @@ query6 = """
 """
 
 query7 = """
-    SELECT {(
-    [product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+    SELECT {
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
-    [geography].[geography].[continent].[Europe],[Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
+        [geography].[geography].[continent].[Europe],[Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([product].[product].[company].[Crazy Development],
-    [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]
-
-    )} ON 0
+        ([product].[product].[company].[Crazy Development],
+        [time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]
+    )}
+    ON 0
     FROM [sales]
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-
     """
 
 query8 = """
-    SELECT {(
-    [geography].[geography].[country].[Europe].[Spain],
-    [Measures].[amount]),
+    SELECT {
+        ([geography].[geography].[country].[Europe].[Spain],
+        [Measures].[amount]),
 
-    ([geography].[geography].[country].[Europe].[France],
-    [Measures].[amount]),
+        ([geography].[geography].[country].[Europe].[France],
+        [Measures].[amount]),
 
-    ([geography].[geography].[country].[Europe].[Switzerland],
-    [Measures].[amount])}
+        ([geography].[geography].[country].[Europe].[Switzerland],
+        [Measures].[amount])
+    }
 
     ON 0
     FROM [sales]
@@ -114,50 +115,49 @@ query8 = """
 """
 
 query9 = """
-    SELECT
-    {([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+    SELECT {
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 15,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 13,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 12,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 14,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount]),
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 16,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount]),
 
-    ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
-    [geography].[geography].[continent].[Europe],
-    [Measures].[amount])}
-
+        ([time].[time].[day].[2010].[Q2 2010].[May 2010].[May 18,2010],
+        [geography].[geography].[continent].[Europe],
+        [Measures].[amount])
+    }
     ON 0
     FROM [sales]
-
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
 query11 = """
-    SELECT  FROM [sales]
+    SELECT FROM [sales]
     WHERE ([Measures].[amount])
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
-    """
+"""
 
 query12 = """
     SELECT {[Measures].[amount],[Measures].[count]}
@@ -167,8 +167,7 @@ query12 = """
 """
 
 query14 = """
-    SELECT
-    {[Measures].[count],[Measures].[amount]}
+    SELECT {[Measures].[count],[Measures].[amount]}
     DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS ,
     NON EMPTY Hierarchize(AddCalculatedMembers(DrilldownMember({{[geography].[geography].[continent].Members}},
     {[geography].[geography].[continent].[Europe]})))
@@ -178,38 +177,40 @@ query14 = """
 """
 
 query15 = """
-SELECT {
-([product].[product].[Crazy Development].[olapy].[Personal],
-[geography].[geography].[Europe].[Switzerland],[Measures].[amount]),
-([product].[product].[Crazy Development].[olapy].[Corporate],
-[geography].[geography].[Europe].[Switzerland],[Measures].[amount]),
-([product].[product].[Crazy Development].[olapy].[Personal],
-[geography].[geography].[Europe].[Spain],[Measures].[amount]),
-([product].[product].[Crazy Development].[olapy].[Personal],
-[geography].[geography].[Europe].[France],[Measures].[amount]),
-([product].[product].[Crazy Development].[olapy].[Partnership],
-[geography].[geography].[Europe].[Switzerland],[Measures].[amount])}
-ON 0
-FROM [sales]
-CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+    SELECT {
+        ([product].[product].[Crazy Development].[olapy].[Personal],
+        [geography].[geography].[Europe].[Switzerland],[Measures].[amount]),
+        ([product].[product].[Crazy Development].[olapy].[Corporate],
+        [geography].[geography].[Europe].[Switzerland],[Measures].[amount]),
+        ([product].[product].[Crazy Development].[olapy].[Personal],
+        [geography].[geography].[Europe].[Spain],[Measures].[amount]),
+        ([product].[product].[Crazy Development].[olapy].[Personal],
+        [geography].[geography].[Europe].[France],[Measures].[amount]),
+        ([product].[product].[Crazy Development].[olapy].[Partnership],
+        [geography].[geography].[Europe].[Switzerland],[Measures].[amount])
+    }
+    ON 0
+    FROM [sales]
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
 query16 = """
-SELECT {
-[product].[product].[Crazy Development].[olapy].[Partnership],
-[product].[product].[Crazy Development].[olapy].[Personal],
-[product].[product].[Crazy Development].[olapy].[Corporate],
-[product].[product].[Crazy Development]}*{
-[geography].[geography].[America].[United States].[New York],
-[geography].[geography].[America].[United States],
-[geography].[geography].[America],
-[geography].[geography].[Europe].[Switzerland].[Geneva],
-[geography].[geography].[Europe].[Switzerland].[Lausanne],
-[geography].[geography].[Europe].[Switzerland],
-[geography].[geography].[Europe].[France].[Paris],
-[geography].[geography].[Europe].[France],
-[geography].[geography].[Europe],
-[geography].[geography].[America]} ON 0 FROM [sales]
+    SELECT {
+        [product].[product].[Crazy Development].[olapy].[Partnership],
+        [product].[product].[Crazy Development].[olapy].[Personal],
+        [product].[product].[Crazy Development].[olapy].[Corporate],
+        [product].[product].[Crazy Development]}*{
+        [geography].[geography].[America].[United States].[New York],
+        [geography].[geography].[America].[United States],
+        [geography].[geography].[America],
+        [geography].[geography].[Europe].[Switzerland].[Geneva],
+        [geography].[geography].[Europe].[Switzerland].[Lausanne],
+        [geography].[geography].[Europe].[Switzerland],
+        [geography].[geography].[Europe].[France].[Paris],
+        [geography].[geography].[Europe].[France],
+        [geography].[geography].[Europe],
+        [geography].[geography].[America]
+    } ON 0 FROM [sales]
 """
 
 where = "WHERE [time].[calendar].[day].[May 12,2010]"
@@ -272,7 +273,9 @@ query_postgres3 = """
     CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
 """
 
-custom_query1 = """SELECT
-                FROM [main]
-                WHERE ([Measures].[supply_time])
-                CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS"""
+custom_query1 = """
+    SELECT
+    FROM [main]
+    WHERE ([Measures].[supply_time])
+    CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+"""

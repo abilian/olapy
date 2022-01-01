@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 import pytest
 import xmlwitch
 
@@ -83,25 +85,33 @@ def test_slicer_axis_query14(executor):
     """
     Dimension with all measures.
     """
-    xml = xmlwitch.Builder()
-    with xml.Axis(name="SlicerAxis"):
-        with xml.Tuples:
-            with xml.Tuple:
-                with xml.Member(Hierarchy="[product].[product]"):
-                    xml.UName("[product].[product].[company].[Crazy Development]")
-                    xml.Caption("Crazy Development")
-                    xml.LName("[product].[product].[company]")
-                    xml.LNum("0")
-                    xml.DisplayInfo("2")
-                with xml.Member(Hierarchy="[time].[time]"):
-                    xml.UName("[time].[time].[year].[2010]")
-                    xml.Caption("2010")
-                    xml.LName("[time].[time].[year]")
-                    xml.LNum("0")
-                    xml.DisplayInfo("2")
+    xml = dedent(
+        """\
+    <Axis name="SlicerAxis">
+      <Tuples>
+        <Tuple>
+          <Member Hierarchy="[product].[product]">
+            <UName>[product].[product].[company].[Crazy Development]</UName>
+            <Caption>Crazy Development</Caption>
+            <LName>[product].[product].[company]</LName>
+            <LNum>0</LNum>
+            <DisplayInfo>2</DisplayInfo>
+          </Member>
+          <Member Hierarchy="[time].[time]">
+            <UName>[time].[time].[year].[2010]</UName>
+            <Caption>2010</Caption>
+            <LName>[time].[time].[year]</LName>
+            <LNum>0</LNum>
+            <DisplayInfo>2</DisplayInfo>
+          </Member>
+        </Tuple>
+      </Tuples>
+    </Axis>
+    """
+    ).strip()
 
     xmla_tools = XmlaExecuteReqHandler(executor, query14, False)
-    assert str(xml) == xmla_tools.generate_slicer_axis()
+    assert xml == xmla_tools.generate_slicer_axis()
 
 
 #
