@@ -92,7 +92,7 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         # in python 3 it returns odict_keys(['Facts']) instead of ['Facts']
         if list(self.columns_desc[mdx_query_axis].keys()) == [self.executor.facts]:
             if len(self.columns_desc[mdx_query_axis][self.executor.facts]) == 1:
-                # to ignore for tupls in itertools.chain(*tuples)
+                # to ignore for tuples in itertools.chain(*tuples)
                 tuples = []
             else:
                 # ['Facts', 'Amount', 'Amount']

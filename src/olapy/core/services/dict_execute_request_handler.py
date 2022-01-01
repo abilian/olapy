@@ -88,10 +88,10 @@ class DictExecuteReqHandler:
             if "[Measures].[XL_SD" not in tup[0] and tup[1]
         ][::3]
 
-    def _gen_measures_xs0(self, xml, tupls):
+    def _gen_measures_xs0(self, xml, tuples):
         xml["Member"] = {"Hierarchy": "[Measures]"}
-        xml["UName"] = f"[Measures].[{tupls[0][1]}]"
-        xml["Caption"] = f"{tupls[0][1]}"
+        xml["UName"] = f"[Measures].[{tuples[0][1]}]"
+        xml["Caption"] = f"{tuples[0][1]}"
         xml["LName"] = "[Measures]"
         xml["LNum"] = "0"
         xml["DisplayInfo"] = "0"
@@ -107,10 +107,10 @@ class DictExecuteReqHandler:
             tuple[0], split_df[tuple[0]].columns[0], parent
         )
 
-    def _gen_xs0_tuples(self, xml, tupls, **kwargs):
+    def _gen_xs0_tuples(self, xml, tuples, **kwargs):
         first_att = kwargs.get("first_att")
         split_df = kwargs.get("split_df")
-        for tupl in tupls:
+        for tupl in tuples:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
             d_tup = split_df[tuple_without_minus_1[0]].columns[
                 len(tuple_without_minus_1) - first_att

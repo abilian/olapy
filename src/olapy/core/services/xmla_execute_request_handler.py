@@ -37,15 +37,15 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
         </Execute>
     """
 
-    def _gen_measures_xs0(self, xml, tupls):
+    def _gen_measures_xs0(self, xml, tuples):
         """add elements representing measures to axis 0 element.
 
         :param xml: axis 0 tu update, in xml format
-        :param tupls: mdx query tuples
+        :param tuples: mdx query tuples
         """
         with xml.Member(Hierarchy="[Measures]"):
-            xml.UName(f"[Measures].[{tupls[0][1]}]")
-            xml.Caption(f"{tupls[0][1]}")
+            xml.UName(f"[Measures].[{tuples[0][1]}]")
+            xml.Caption(f"{tuples[0][1]}")
             xml.LName("[Measures]")
             xml.LNum("0")
             xml.DisplayInfo("0")
@@ -84,14 +84,14 @@ class XmlaExecuteReqHandler(DictExecuteReqHandler):
                 used_levels[tupl[0]] = list(used_levels.get(tupl[0], [])) + [tupl[2]]
         return used_levels
 
-    def _gen_xs0_tuples(self, xml, tupls, **kwargs):
+    def _gen_xs0_tuples(self, xml, tuples, **kwargs):
         first_att = kwargs.get("first_att")
         split_df = kwargs.get("split_df")
         all_tuples = self.executor.parser.decorticate_query(self.mdx_query)["all"]
         # [Geography].[Geography].[Continent]  -> first_lvlname : Country
         # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
         all_level_columns = self._get_lvl_column_by_dimension(all_tuples)
-        for tupl in tupls:
+        for tupl in tuples:
             tuple_without_minus_1 = self.get_tuple_without_nan(tupl)
             current_lvl_name = split_df[tuple_without_minus_1[0]].columns[
                 len(tuple_without_minus_1) - first_att
