@@ -24,7 +24,7 @@ etl = 'olapy.etl.etl:run_etl'
 
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4"
+python = ">=3.8,<4"
 
 pandas = "*"
 attrs = "*"
@@ -32,7 +32,7 @@ click = "*"
 lxml = "*"
 pyyaml = ">=4.2b1"
 regex = "*"
-spyne = { version = "^2.13", allow-prereleases = true }
+spyne = "^2.13"
 sqlalchemy = "*"
 typing = "*"
 xmlwitch = "*"
