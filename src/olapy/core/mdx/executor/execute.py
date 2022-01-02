@@ -18,13 +18,13 @@ import itertools
 import os
 from collections import OrderedDict
 from os.path import expanduser
-from typing import Any, Dict, List, Optional, Text
+from typing import Any, List
 
-import attr
 import numpy as np
 import pandas as pd
+from attrs import define, field
 
-from olapy.core.mdx.parser.parse import Parser
+from olapy.core.mdx.parser import MdxParser
 
 # Needed because SQLAlchemy doesn't work under pyiodide
 # FIXME: find another way
@@ -36,7 +36,7 @@ except ImportError:
     pass
 
 
-@attr.s
+@define
 class MdxEngine:
     """The main class for executing a query.
 
@@ -54,24 +54,24 @@ class MdxEngine:
     :param facts:  facts table name, Default **Facts**
     """
 
-    cube = attr.ib(default=None)
-    facts = attr.ib(default="Facts")
-    source_type = attr.ib(default="csv")
-    parser = attr.ib(default=attr.Factory(Parser))
-    csv_files_cubes = attr.ib(default=attr.Factory(list))
-    db_cubes = attr.ib(default=attr.Factory(list))
-    sqla_engine = attr.ib(default=None)
-    olapy_data_location = attr.ib(
+    cube = field(default=None)
+    facts: str = field(default="Facts")
+    source_type: str = field(default="csv")
+    parser: MdxParser = field(factory=MdxParser)
+    csv_files_cubes: list = field(factory=list)
+    db_cubes: list = field(factory=list)
+    sqla_engine = field(default=None)
+    olapy_data_location: str = field(
         default=os.path.join(
             os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"
         )
     )
-    cube_config = attr.ib(default=None)
-    tables_loaded = attr.ib(default=None)
-    star_schema_dataframe = attr.ib(default=None)
-    measures = attr.ib(default=None)
-    selected_measures = attr.ib(default=None)
-    cubes_folder = attr.ib(default="cubes")
+    cube_config = field(default=None)
+    tables_loaded = field(default=None)
+    star_schema_dataframe = field(default=None)
+    measures = field(default=None)
+    selected_measures = field(default=None)
+    cubes_folder: str = field(default="cubes")
 
     # @olapy_data_location.default
     # def get_default_cubes_directory(self):
@@ -117,6 +117,7 @@ class MdxEngine:
 
         if "db" in self.source_type:
             self.db_cubes = self._get_db_cubes_names()
+
         if "csv" in self.source_type:
             cubes_folder_path = os.path.join(
                 self.olapy_data_location, self.cubes_folder
@@ -154,8 +155,7 @@ class MdxEngine:
         if self.tables_loaded:
             self.star_schema_dataframe = self.get_star_schema_dataframe(sep=sep)
 
-    def load_tables(self, sep):
-        # type: (Text) -> Dict[Text, pd.DataFrame]
+    def load_tables(self, sep: str) -> dict[str, pd.DataFrame]:
         """
         Load all tables as dict of { Table_name : DataFrame } for the current
         cube instance.
