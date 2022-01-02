@@ -19,8 +19,7 @@ class CubeLoaderDB(CubeLoader):
         CubeLoader.__init__(self)
         self.sqla_engine = sqla_engine
 
-    def load_tables(self):
-        # type: () -> Dict[Text, pd.DataFrame]
+    def load_tables(self) -> dict[str, pd.DataFrame]:
         """Load tables from database.
 
         :return: tables dict with table name as key and dataframe as value

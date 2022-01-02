@@ -201,32 +201,31 @@ class Parser:
         split_group = group.replace("\n", "").replace("\t", "").split("],")
         return list(map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
 
-    def get_nested_select(self):
+    def get_nested_select(self) -> list[str]:
         """Get tuples groups in query like ::
 
-                Select {
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount]),
+            Select {
+                ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+                [Geography].[Geography].[Continent].[Europe],
+                [Measures].[Amount]),
 
-                    ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                    [Geography].[Geography].[Continent].[Europe],
-                    [Measures].[Amount])
-                    }
+                ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+                [Geography].[Geography].[Continent].[Europe],
+                [Measures].[Amount])
+                }
 
-                out :
-                    ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
-                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
+            out :
+                ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
+                [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
 
-                    '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
-                    [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
+                '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
+                [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
 
         :return: All groups as list of strings.
         """
         return regex.findall(r"\(([^()]+)\)", self.mdx_query)
 
-    def hierarchized_tuples(self):
-        # type: () -> bool
+    def hierarchized_tuples(self) -> bool:
         """Check if `hierarchized <https://docs.microsoft.com/en-
         us/sql/mdx/hierarchize-mdx>`_  mdx query.
 

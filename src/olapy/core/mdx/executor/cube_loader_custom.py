@@ -29,8 +29,7 @@ class CubeLoaderCustom(CubeLoader):
             table = psql.read_sql_query(f"SELECT * FROM {table_name}", self.sqla_engine)
         return table
 
-    def load_tables(self):
-        # type: () -> Dict[str, pd.DataFrame]
+    def load_tables(self) -> dict[str, pd.DataFrame]:
         """Load tables from config file.
 
         :return: tables dict with table name as key and DataFrame as value

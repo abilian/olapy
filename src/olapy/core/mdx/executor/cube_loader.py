@@ -1,5 +1,4 @@
 import os
-from typing import Dict, Text
 
 import pandas as pd
 from pandas.errors import MergeError
@@ -10,8 +9,7 @@ class CubeLoader:
         self.cube_path = cube_path
         self.sep = sep
 
-    def load_tables(self):
-        # type: () -> Dict[Text, pd.DataFrame]
+    def load_tables(self) -> dict[str, pd.DataFrame]:
         """Load tables from csv files.
 
         :return: tables dict with table name as key and dataframe as value
