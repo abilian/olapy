@@ -47,6 +47,8 @@ abilian/static/placeholders
 .cov2emacs.log
 /.eggs/
 __pycache__
+.DS_Store
+.DS_Store?
 build_fmt
 libfmt
 *.cpp

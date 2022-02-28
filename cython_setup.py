@@ -2,18 +2,24 @@ from setuptools import find_packages
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
+from Cython import __version__ as cython_version
 
 import re
 import ast
 
 from os.path import abspath, dirname, exists, join
+from os import makedirs, chdir, getcwd
+from shutil import copy, copytree, rmtree
+from subprocess import run
 
 NAME = "olapy"
-PROJECT_ROOT = abspath(dirname(__file__))
+BUILD = abspath(dirname(__file__))
+ROOT = abspath(join(dirname(__file__), ".."))
+LIBFMT = abspath(join(ROOT, "libfmt"))
 
 
 def read(*path):
-    full_path = join(PROJECT_ROOT, *path)
+    full_path = join(BUILD, *path)
     if not exists(full_path):
         return ""
     with open(full_path, "r", encoding="utf-8") as f:
@@ -26,37 +32,30 @@ def read_version():
     return str(ast.literal_eval(version_string))
 
 
-# def build_libfmt():
-#     libfmt = join(PROJECT_ROOT, "libfmt")
-#     if exists(join(libfmt, "libfmt.a")):
-#         print("libfmt.a found")
-#         return
-#     if not exists(libfmt):
-#         makedirs(libfmt)
-#     src = "fmt-8.0.1"
-#     src_path = join(PROJECT_ROOT, "vendor", f"{src}.tar.gz")
-#     if not exists(src_path):
-#         raise ValueError(f"{src_path} not found")
-#     build = join(PROJECT_ROOT, "build_fmt")
-#     if exists(build):
-#         rmtree(build)
-#     makedirs(build)
-#     print("now:", os.getcwd())
-#     orig_wd = os.getcwd()
-#     os.chdir(build)
-#     run(["tar", "xzf", src_path])
-#     os.chdir(join(build, src))
-#     run(["cmake", "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE", "."])
-#     run(["make", "fmt"])
-#     os.chdir(orig_wd)
-#     copytree(join(build, src, "include", "fmt"), join(libfmt, "fmt"))
-#     copy(join(build, src, "libfmt.a"), libfmt)
-#
-#
-# build_libfmt()
-
-readme = read("README.rst")
-version = read_version()
+def build_libfmt():
+    if exists(join(LIBFMT, "libfmt.a")):
+        print("libfmt.a found:", join(LIBFMT, "libfmt.a"))
+        return
+    print("Build libfmt 8.0.1")
+    if not exists(LIBFMT):
+        makedirs(LIBFMT)
+    src = "fmt-8.0.1"
+    src_path = join(ROOT, "vendor", f"{src}.tar.gz")
+    if not exists(src_path):
+        raise ValueError(f"{src_path} not found")
+    build = join(BUILD, "build_fmt")
+    if exists(build):
+        rmtree(build)
+    makedirs(build)
+    orig_wd = getcwd()
+    chdir(build)
+    run(["tar", "xzf", src_path])
+    chdir(join(build, src))
+    run(["cmake", "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE", "."])
+    run(["make", "fmt"])
+    chdir(orig_wd)
+    copytree(join(build, src, "include", "fmt"), join(LIBFMT, "fmt"))
+    copy(join(build, src, "libfmt.a"), LIBFMT)
 
 
 def pypyx_ext(*pathname):
@@ -70,16 +69,16 @@ def pypyx_ext(*pathname):
         sources=[src],
         language="c++",
         extra_compile_args=[
-            # "-pthread",
-            # "-std=c++17",
-            "-std=c++11",
+            "-pthread",
+            "-std=c++17",
+            # "-std=c++11",
             "-O3",
             "-Wno-unused-function",
             "-Wno-deprecated-declarations",
         ],
-        # libraries=["fmt"],
-        # include_dirs=["libfmt"],
-        # library_dirs=["libfmt"],
+        libraries=["fmt"],
+        include_dirs=["libfmt"],
+        library_dirs=["libfmt"],
     )
 
 
@@ -92,6 +91,13 @@ extensions = [
     pypyx_ext(NAME, "core", "mdx", "executor", "mdx_engine"),
 ]
 
+readme = read("README.rst")
+version = read_version()
+
+build_libfmt()
+copytree(LIBFMT, join(BUILD, "libfmt"))
+print("Build", NAME, version, "in", BUILD, "with Cython", cython_version)
+
 
 setup(
     ext_modules=cythonize(
@@ -99,14 +105,14 @@ setup(
         language_level="3str",
         include_path=[
             # join(PROJECT_ROOT, NAME, "stdlib"),
-            join(PROJECT_ROOT, NAME),
+            join(BUILD, NAME),
         ],
     ),
     name=NAME,
     version=version,
     description="OlaPy, an experimental OLAP engine based on Pandas",
     long_description=readme,
-    python_requires="<4,>=3.8",
+    python_requires="<4,>=3.9",
     project_urls={"homepage": "https://github.com/abilian/olapy"},
     author="Abilian SAS",
     classifiers=[
@@ -114,7 +120,6 @@ setup(
         "Development Status :: 3 - Alpha",
         "Natural Language :: English",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CythonPlus",
     ],
