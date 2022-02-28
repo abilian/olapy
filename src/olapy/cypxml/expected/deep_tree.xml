@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base>
+  <level-1>
+    <level-2>
+      <level-3>
+        <level-4>
+          <level-5>
+            <level-6>
+              <level-7>
+                <level-8>Some deep info</level-8>
+              </level-7>
+            </level-6>
+          </level-5>
+        </level-4>
+      </level-3>
+    </level-2>
+  </level-1>
+  <level>
+    <level>
+      <level>
+        <level>
+          <level>
+            <level>
+              <level>
+                <level>Another deep info</level>
+              </level>
+            </level>
+          </level>
+        </level>
+      </level>
+    </level>
+  </level>
+</base>

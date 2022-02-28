@@ -46,3 +46,9 @@ abilian/static/placeholders
 *.mo
 .cov2emacs.log
 /.eggs/
+__pycache__
+build_fmt
+libfmt
+*.cpp
+*.c
+*.h

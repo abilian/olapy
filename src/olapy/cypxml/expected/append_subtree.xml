@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base>
+  <element>aaa</element>
+  <subtree1>
+    <element>
+      <element>
+        <element>ccc</element>
+      </element>
+    </element>
+  </subtree1>
+  <element>bbb</element>
+</base>
+<subtree2>
+  <element>ddd</element>
+</subtree2>
+<string>sss</string>
+<subtree3>
+  <element>eee</element>
+</subtree3>

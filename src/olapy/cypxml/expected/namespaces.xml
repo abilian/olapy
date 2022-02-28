@@ -1,0 +1,3 @@
+<parent xmlns:my="http://example.org/ns/">
+  <my:child my:attr="foo" />
+</parent>

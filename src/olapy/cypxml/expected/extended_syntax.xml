@@ -1,0 +1,11 @@
+<doc>
+    <elem x="x" y="y" z="z" />
+    <elem x="x" y="y" z="z" />
+    <elem z="z" y="y" x="x" />
+    <container>
+        <elem />
+    </container>
+    <container>
+        <elem />
+    </container>
+</doc>
