@@ -3,7 +3,7 @@ olapy, you should use this module to extract data from your excel file, make
 transformations, and load then into olapy data folder."""
 
 import os
-from os.path import expanduser, isdir
+from os.path import isdir, join
 from pathlib import Path
 
 import bonobo
@@ -11,6 +11,8 @@ import click
 import pandas as pd
 import yaml
 from bonobo.config import use
+
+from olapy.core.common import DEFAULT_CUBES
 
 
 @use("input_file_path")
@@ -50,7 +52,7 @@ def load_to_olapy(*args, **kwargs):
     if not isdir(kwargs.get("output_cube_path")):
         os.mkdir(kwargs.get("output_cube_path"))
     for df_name, df in olapy_data_set.items():
-        save_to = os.path.join(kwargs.get("output_cube_path"), df_name + ".csv")
+        save_to = join(kwargs.get("output_cube_path"), df_name + ".csv")
         df.to_csv(path_or_buf=save_to, sep=";", encoding="utf8")
     print("Loaded in " + kwargs.get("output_cube_path"))
 
@@ -140,8 +142,8 @@ def run_etl(input_file_path, config_file, output_cube_path=None, cube_config=Non
         if output_cube_path:
             options["output_cube_path"] = output_cube_path
         else:
-            options["output_cube_path"] = os.path.join(
-                expanduser("~"), "olapy-data", "cubes", Path(input_file_path).stem
+            options["output_cube_path"] = join(
+                DEFAULT_CUBES, Path(input_file_path).stem
             )
 
         bonobo.run(get_graph(**options), services=get_services(**options))

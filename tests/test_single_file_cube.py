@@ -1,6 +1,6 @@
 import pytest
 
-from olapy.core.mdx.executor.lite_execute import MdxEngineLite
+from olapy.core.mdx.executor.mdx_engine_lite import MdxEngineLite
 
 from .queries import query1
 

@@ -9,16 +9,28 @@ import pandas as pd
 import pyodide
 from olapy.core.services.xmla_lib import get_response
 
-xmla_request_params = {'cube': 'sales','request_type': 'DISCOVER_PROPERTIES','properties': {},
-          'restrictions': {'PropertyName': 'ServerName'},'mdx_query': None}
+xmla_request_params = {'cube': 'sales',
+                       'request_type': 'DISCOVER_PROPERTIES',
+                       'properties': {},
+                       'restrictions': {'PropertyName': 'ServerName'},
+                       'mdx_query': None}
 
-dataframes = {'Facts' : pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Facts.csv"),sep=';', encoding='utf8'),
-'Product':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Product.csv"),sep=';', encoding='utf8'),
-'Geography':pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"),sep=';', encoding='utf8')
+dataframes = {
+    'Facts': pd.read_csv(
+        pyodide.open_url("olapy-data/cubes/sales/Facts.csv"),
+        sep=';', encoding='utf8'),
+    'Product': pd.read_csv(
+        pyodide.open_url("olapy-data/cubes/sales/Product.csv"),
+        sep=';', encoding='utf8'),
+    'Geography': pd.read_csv(pyodide.open_url("olapy-data/cubes/sales/Geography.csv"),
+        sep=';', encoding='utf8')
 }
 
 # get_response uses the patch
-get_response(xmla_request_params=xmla_request_params,dataframes=dataframes, output='xmla') # or output='dict'
+get_response(
+    xmla_request_params=xmla_request_params,
+    dataframes=dataframes,
+    output='xmla') # or output='dict'
 """
 
 

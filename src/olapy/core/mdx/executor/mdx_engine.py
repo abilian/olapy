@@ -9,15 +9,16 @@ Those two objects are constructed in three ways:
 
     - manually with a config file, see :mod:`cube_loader_custom`
     - automatically from csv files, if they respect olapy's
-      `start schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
+      `star schema model <http://datawarehouse4u.info/Data-warehouse-schema-architecture-star-schema.html>`_,
       see :mod:`cube_loader`
-    - automatically from database, also if they respect the start schema model, see :mod:`cube_loader_db`
+    - automatically from database, also if they respect the start schema model,
+      see :mod:`cube_loader_db`
 """
 
 import itertools
 import os
 from collections import OrderedDict
-from os.path import expanduser
+from os.path import join, isdir
 from typing import Any, List
 
 import numpy as np
@@ -25,6 +26,7 @@ import pandas as pd
 from attrs import define, field
 
 from olapy.core.mdx.parser import MdxParser
+from olapy.core.common import DEFAULT_DATA
 
 # Needed because SQLAlchemy doesn't work under pyiodide
 # FIXME: find another way
@@ -42,13 +44,16 @@ class MdxEngine:
 
     :param cube: It must be under ~/olapy-data/cubes/{cube_name}.
 
-        example: if cube = 'sales'
+        example: if cube == 'sales'
         then full path -> *home_directory/olapy-data/cubes/sales*
 
-    :param cubes_folder: which is under olapy-data, and contains all csv cubes by default * ~/olapy-data/cubes/...
+    :param cubes_folder: folder under olapy-data, that contains all csv cubes by
+        default * ~/olapy-data/cubes/...
     :param olapy_data_location: olapy-data path
-    :param cube_config: cube-config.yml parsing file result (dict for creating customized cube)
-    :param sql_engine: sql_alchemy engine if you don't want to use any database config file
+    :param cube_config: cube-config.yml parsing file result (dict for creating
+        customized cube)
+    :param sql_engine: sql_alchemy engine if you don't want to use any database
+        config file
     :param source_type: source data input, Default csv
     :param parser: mdx query parser
     :param facts:  facts table name, Default **Facts**
@@ -61,11 +66,7 @@ class MdxEngine:
     csv_files_cubes: list = field(factory=list)
     db_cubes: list = field(factory=list)
     sqla_engine = field(default=None)
-    olapy_data_location: str = field(
-        default=os.path.join(
-            os.environ.get("OLAPY_PATH", expanduser("~")), "olapy-data"
-        )
-    )
+    olapy_data_location: str = field(default=DEFAULT_DATA)
     cube_config = field(default=None)
     tables_loaded = field(default=None)
     star_schema_dataframe = field(default=None)
@@ -78,14 +79,14 @@ class MdxEngine:
     #     # with OLAPY_PATH env var, we can inject olap_web's flask instance_path olapy-data,
     #     home_directory = os.environ.get("OLAPY_PATH", expanduser("~"))
     #     if "olapy-data" not in home_directory:
-    #         home_directory = os.path.join(home_directory, "olapy-data")
+    #         home_directory = join(home_directory, "olapy-data")
     #
     #     return home_directory
 
     def _get_db_cubes_names(self):
         """Get databases cubes names."""
-        # get databases names first , and them instantiate MdxEngine with this database, thus \
-        # it will try to construct the star schema either automatically or manually
+        # get databases names first, and them instantiate MdxEngine with this database,
+        # thus it will try to construct the star schema either automatically or manually
 
         dialect = get_dialect(self.sqla_engine)
         if not self.sqla_engine or str(self.sqla_engine) != str(dialect.engine):
@@ -103,7 +104,7 @@ class MdxEngine:
         return [
             file
             for file in os.listdir(cubes_location)
-            if os.path.isdir(os.path.join(cubes_location, file))
+            if isdir(join(cubes_location, file))
         ]
 
     def get_cubes_names(self):
@@ -119,10 +120,7 @@ class MdxEngine:
             self.db_cubes = self._get_db_cubes_names()
 
         if "csv" in self.source_type:
-            cubes_folder_path = os.path.join(
-                self.olapy_data_location, self.cubes_folder
-            )
-
+            cubes_folder_path = join(self.olapy_data_location, self.cubes_folder)
             self.csv_files_cubes = self._get_csv_cubes_names(cubes_folder_path)
 
         return self.db_cubes + self.csv_files_cubes
@@ -163,7 +161,7 @@ class MdxEngine:
         :param sep: csv files separator.
         :return: dict with table names as keys and DataFrames as values.
         """
-        cubes_folder_path = self.get_cube_path()
+        cube_folder_path = self.get_cube_path()
         cube_loader = None  # type: Any
 
         if (
@@ -173,7 +171,7 @@ class MdxEngine:
         ):
             cube_loader = CubeLoaderCustom(
                 cube_config=self.cube_config,
-                cube_path=cubes_folder_path,
+                cube_path=cube_folder_path,
                 sqla_engine=self.sqla_engine,
                 sep=sep,
             )
@@ -193,7 +191,7 @@ class MdxEngine:
             # force reimport CubeLoader every instance call (MdxEngine or SparkMdxEngine)
             from . import CubeLoader
 
-            cube_loader = CubeLoader(cubes_folder_path, sep)
+            cube_loader = CubeLoader(cube_folder_path, sep)
 
         return cube_loader.load_tables()
 
@@ -304,7 +302,7 @@ class MdxEngine:
         :return: path to the cube
         """
         if self.source_type.upper() == "CSV":
-            return os.path.join(self.olapy_data_location, self.cubes_folder, self.cube)
+            return join(self.olapy_data_location, self.cubes_folder, self.cube)
         return None
 
     @staticmethod
@@ -333,11 +331,12 @@ class MdxEngine:
         check if America exist in Country column and check if Los Angeles exist
         in City column ...
 
-        :return:
+        :return: boolean
         """
         for idx, column_value in enumerate(tupl[2:]):
-            # for numeric column values, pandas convert them to unicode, so try to convert to int
-            # ( exple Time dimension, with Year column value 2010 -> 2010 unicode)
+            # for numeric column values, pandas convert them to unicode, so try to
+            # convert to int (exemple Time dimension, with Year column value
+            # 2010 -> 2010 unicode)
             try:
                 column_value = int(column_value)
             except ValueError:
@@ -437,8 +436,8 @@ class MdxEngine:
 
         :param tuple_as_list: tuple as list
         :param dataframe_in: DataFrame in with you want to execute tuple
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx)
-            other columns to keep in the execution except the current tuple
+        :param columns_to_keep: (useful for executing many tuples, for instance
+           execute_mdx) other columns to keep in the execution except the current tuple
         :return: Filtered DataFrame
         """
         df = dataframe_in
@@ -644,7 +643,8 @@ class MdxEngine:
             FROM [D]
 
         :param tuples_on_mdx_query: list of string of tuples.
-        :param columns_to_keep: (useful for executing many tuples, for instance execute_mdx).
+        :param columns_to_keep: (useful for executing many tuples, for instance
+            execute_mdx).
         :return: Pandas DataFrame.
         """
         # get only used columns and dimensions for all query
@@ -746,7 +746,8 @@ class MdxEngine:
 
         :param mdx_query: Mdx Query
 
-        :return: dict with DataFrame execution result and (dimension and columns used as dict)
+        :return: dict with DataFrame execution result and (dimension and columns used
+            as dict)
 
         example::
 
@@ -772,7 +773,8 @@ class MdxEngine:
         # tuples_on_mdx_query.sort(key=lambda x: x[0])
         # sort by tuple length
         # tuples_on_mdx_query.sort(key=len)
-        # # sort by tuple dimensions, we dont want something like [X].[Y].[X] But instead [X].[X].[Y]
+        # # sort by tuple dimensions, we dont want something like [X].[Y].[X]
+        #   but instead [X].[X].[Y]
         # tuples_on_mdx_query.sort(key=lambda x: x[0])
         tuples_on_mdx_query.sort(key=lambda tupl: (tupl[0], len(tupl)))
 

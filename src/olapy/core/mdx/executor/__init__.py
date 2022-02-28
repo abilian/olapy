@@ -2,7 +2,7 @@ try:
     # if pyspark is installed, use it instead of pandas
 
     from .spark.cube_loader import SparkCubeLoader as CubeLoader
-    from .spark.execute import SparkMdxEngine as MdxEngine
+    from .spark.mdx_engine import SparkMdxEngine as MdxEngine
 
     print(
         """
@@ -15,7 +15,7 @@ try:
 except ImportError:
 
     from .cube_loader import CubeLoader  # type: ignore
-    from .execute import MdxEngine  # type: ignore
+    from .mdx_engine import MdxEngine  # type: ignore
 
     print(
         """

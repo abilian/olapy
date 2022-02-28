@@ -608,7 +608,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                     ):
 
                         self.change_cube(request.Properties.PropertyList.Catalog)
-                        ord = 1
+                        ordinal = 1
                         for tables in self.executor.get_all_tables_names(
                             ignore_fact=True
                         ):
@@ -618,7 +618,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.DIMENSION_NAME(tables)
                                 xml.DIMENSION_UNIQUE_NAME("[" + tables + "]")
                                 xml.DIMENSION_CAPTION(tables)
-                                xml.DIMENSION_ORDINAL(str(ord))
+                                xml.DIMENSION_ORDINAL(str(ordinal))
                                 xml.DIMENSION_TYPE("3")
                                 xml.DIMENSION_CARDINALITY("23")
                                 xml.DEFAULT_HIERARCHY(
@@ -628,7 +628,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                                 xml.IS_READWRITE("false")
                                 xml.DIMENSION_UNIQUE_SETTINGS("1")
                                 xml.DIMENSION_IS_VISIBLE("true")
-                            ord += 1
+                            ordinal += 1
 
                         # for measure
                         with xml.row:
@@ -637,7 +637,7 @@ class XmlaDiscoverReqHandler(DictDiscoverReqHandler):
                             xml.DIMENSION_NAME("Measures")
                             xml.DIMENSION_UNIQUE_NAME("[Measures]")
                             xml.DIMENSION_CAPTION("Measures")
-                            xml.DIMENSION_ORDINAL(str(ord))
+                            xml.DIMENSION_ORDINAL(str(ordinal))
                             xml.DIMENSION_TYPE("2")
                             xml.DIMENSION_CARDINALITY("0")
                             xml.DEFAULT_HIERARCHY("[Measures]")

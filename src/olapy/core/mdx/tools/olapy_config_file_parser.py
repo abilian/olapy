@@ -2,9 +2,9 @@
 access database (of course this happens only if SQLALCHEMY_DATABASE_URI
 Environment variable is not specified)."""
 
-import os
-
 import yaml
+
+from olapy.core.common import DEFAULT_CONFIG  # .../olapy-data/olapy-config.yml
 
 
 class DbConfigParser:
@@ -15,28 +15,15 @@ class DbConfigParser:
         :param config_file_path: full path to olapy config file,
             Default : ~/olapy-data/olapy-config.yml
         """
-
         if config_file_path is None:
-            from os.path import expanduser
+            config_file_path = DEFAULT_CONFIG
+        with open(config_file_path, encoding="utf8") as config_file:
+            self.config = yaml.load(config_file, Loader=yaml.SafeLoader)
 
-            home_directory = expanduser("~")
-            self.config_file_path = os.path.join(
-                home_directory, "olapy-data", "olapy-config.yml"
-            )
-        else:
-            self.config_file_path = config_file_path
-
-    def get_db_credentials(self, db_config_path=None):
+    @property
+    def db_credentials(self):
         """Get all db credentials in the config file.
 
-        :param db_config_path: full path to olapy config file,
-            Default : ~/olapy-data/olapy-config.yml
         :return: dict of database connection credentials.
         """
-        if db_config_path:
-            file_path = db_config_path
-        else:
-            file_path = self.config_file_path
-        with open(file_path) as config_file:
-            config = yaml.load(config_file)
-            return config["connection_string"]
+        return self.config["connection_string"]

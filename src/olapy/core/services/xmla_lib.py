@@ -1,8 +1,11 @@
 import importlib
+
 from pprint import pprint
+from os.path import join
 
 import pandas as pd
 
+from olapy.core.common import DEFAULT_CUBES
 from ..mdx.executor import MdxEngine
 from ..mdx.executor.utils import inject_dataframes
 from ..services.request_properties_models import (
@@ -20,9 +23,9 @@ class XmlaProviderLib:
     """XmlaProviderLib tu use olapy as library without running any server (no
     spyne, no wsgi...)"""
 
-    def __init__(self, discover_request_hanlder, execute_request_hanlder):
+    def __init__(self, discover_request_hanlder, execute_request_handler):
         self.discover_request_hanlder = discover_request_hanlder
-        self.execute_request_hanlder = execute_request_hanlder
+        self.execute_request_handler = execute_request_handler
 
     def Discover(self, request):
         """Retrieves information, such as the list of available databases,
@@ -64,9 +67,9 @@ class XmlaProviderLib:
         else:
             convert2formulas = False
 
-        self.execute_request_hanlder.execute_mdx_query(mdx_query, convert2formulas)
+        self.execute_request_handler.execute_mdx_query(mdx_query, convert2formulas)
 
-        return self.execute_request_hanlder.generate_response()
+        return self.execute_request_handler.generate_response()
 
 
 def get_response(
@@ -107,9 +110,8 @@ def get_response(
 
     xmla_service = XmlaProviderLib(discover_request_handler, execute_request_handler)
 
-    property = Property(**xmla_request_params.get("properties"))  # type: ignore
     properties = Propertieslist()
-    properties.PropertyList = property  # type: ignore
+    properties.PropertyList = Property(**xmla_request_params.get("properties"))  # type: ignore
 
     if xmla_request_params.get("mdx_query"):  #  Execute request
         request = ExecuteRequest()
@@ -159,15 +161,28 @@ if __name__ == "__main__":
          FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS""",
     }
 
+    # dataframes = {
+    #     "Facts": pd.read_csv(
+    #         "olapy-data/cubes/sales/Facts.csv", sep=";", encoding="utf8"
+    #     ),
+    #     "Product": pd.read_csv(
+    #         "olapy-data/cubes/sales/Product.csv", sep=";", encoding="utf8"
+    #     ),
+    #     "Geography": pd.read_csv(
+    #         "olapy-data/cubes/sales/Geography.csv", sep=";", encoding="utf8"
+    #     ),
+    # }
     dataframes = {
         "Facts": pd.read_csv(
-            "olapy-data/cubes/sales/Facts.csv", sep=";", encoding="utf8"
+            join(DEFAULT_CUBES, "sales", "Facts.csv"), sep=";", encoding="utf8"
         ),
         "Product": pd.read_csv(
-            "olapy-data/cubes/sales/Product.csv", sep=";", encoding="utf8"
+            join(DEFAULT_CUBES, "sales", "Product.csv"), sep=";", encoding="utf8"
         ),
         "Geography": pd.read_csv(
-            "olapy-data/cubes/sales/Geography.csv", sep=";", encoding="utf8"
+            join(DEFAULT_CUBES, "sales", "Geography.csv"),
+            sep=";",
+            encoding="utf8",
         ),
     }
 

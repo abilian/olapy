@@ -5,7 +5,7 @@ from typing import List
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit
 
-from olapy.core.mdx.executor.execute import MdxEngine
+from olapy.core.mdx.executor.mdx_engine import MdxEngine
 
 
 class SparkMdxEngine(MdxEngine):

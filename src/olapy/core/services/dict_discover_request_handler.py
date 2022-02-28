@@ -477,7 +477,7 @@ class DictDiscoverReqHandler:
         ):
 
             self.change_cube(request.Properties.PropertyList.Catalog)
-            ord = 1
+            ordinal = 1
 
             rows = []
             for tables in self.executor.get_all_tables_names(ignore_fact=True):
@@ -487,7 +487,7 @@ class DictDiscoverReqHandler:
                     "DIMENSION_NAME": tables,
                     "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
                     "DIMENSION_CAPTION": tables,
-                    "DIMENSION_ORDINAL": str(ord),
+                    "DIMENSION_ORDINAL": str(ordinal),
                     "DIMENSION_TYPE": "3",
                     "DIMENSION_CARDINALITY": "23",
                     "DEFAULT_HIERARCHY": "[" + tables + "].[" + tables + "]",
@@ -497,7 +497,7 @@ class DictDiscoverReqHandler:
                     "DIMENSION_IS_VISIBLE": "true",
                 }
 
-                ord += 1
+                ordinal += 1
 
             # for measure
             rows += {
@@ -506,7 +506,7 @@ class DictDiscoverReqHandler:
                 "DIMENSION_NAME": "Measures",
                 "DIMENSION_UNIQUE_NAME": "[Measures]",
                 "DIMENSION_CAPTION": "Measures",
-                "DIMENSION_ORDINAL": str(ord),
+                "DIMENSION_ORDINAL": str(ordinal),
                 "DIMENSION_TYPE": "2",
                 "DIMENSION_CARDINALITY": "0",
                 "DEFAULT_HIERARCHY": "[Measures]",
@@ -537,19 +537,18 @@ class DictDiscoverReqHandler:
                     if table_name == self.executor.facts:
                         continue
 
-                    column_attribut = df.iloc[0][0]
+                    # column_attribute :
+                    col_attr = df.iloc[0][0]
                     rows += {
                         "CATALOG_NAME": self.selected_cube,
                         "CUBE_NAME": self.selected_cube,
                         "DIMENSION_UNIQUE_NAME": "[" + table_name + "]",
                         "HIERARCHY_NAME": table_name,
-                        "HIERARCHY_UNIQUE_NAME": "[{0}].[{0}]".format(table_name),
+                        "HIERARCHY_UNIQUE_NAME": f"[{table_name}].[{table_name}]",
                         "HIERARCHY_CAPTION": table_name,
                         "DIMENSION_TYPE": "3",
                         "HIERARCHY_CARDINALITY": "6",
-                        "DEFAULT_MEMBER": "[{0}].[{0}].[{1}].[{2}]".format(
-                            table_name, df.columns[0], column_attribut
-                        ),
+                        "DEFAULT_MEMBER": f"[{table_name}].[{table_name}].[{df.columns[0]}].[{col_attr}]",
                         "STRUCTURE": "0",
                         "IS_VIRTUAL": "false",
                         "IS_READWRITE": "false",
@@ -603,11 +602,9 @@ class DictDiscoverReqHandler:
                             "CATALOG_NAME": self.selected_cube,
                             "CUBE_NAME": self.selected_cube,
                             "DIMENSION_UNIQUE_NAME": "[" + tables + "]",
-                            "HIERARCHY_UNIQUE_NAME": "[{0}].[{0}]".format(tables),
+                            "HIERARCHY_UNIQUE_NAME": f"[{tables}].[{tables}]",
                             "LEVEL_NAME": str(col),
-                            "LEVEL_UNIQUE_NAME": "[{0}].[{0}].[{1}]".format(
-                                tables, col
-                            ),
+                            "LEVEL_UNIQUE_NAME": f"[{tables}].[{tables}].[{col}]",
                             "LEVEL_CAPTION": str(col),
                             "LEVEL_NUMBER": str(l_nb),
                             "LEVEL_CARDINALITY": "0",
@@ -676,7 +673,7 @@ class DictDiscoverReqHandler:
                     "DIMENSION_CARDINALITY": "MANY",
                     "DIMENSION_IS_VISIBLE": "true",
                     "DIMENSION_IS_FACT_DIMENSION": "false",
-                    "DIMENSION_GRANULARITY": "[{0}].[{0}]".format(tables),
+                    "DIMENSION_GRANULARITY": f"[{tables}].[{tables}]",
                 }
                 for tables in self.executor.get_all_tables_names(ignore_fact=True)
             ]
