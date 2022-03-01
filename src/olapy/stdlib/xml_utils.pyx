@@ -1,8 +1,8 @@
-from stdlib.string cimport Str
-from stdlib._string cimport npos
+from olapy.stdlib.string cimport Str
+from olapy.stdlib._string cimport npos
 from libcythonplus.dict cimport cypdict
 from libcythonplus.list cimport cyplist
-from stdlib.format cimport format
+from olapy.stdlib.format cimport format
 
 
 cdef int replace_one(Str src, Str pattern, Str content) nogil:

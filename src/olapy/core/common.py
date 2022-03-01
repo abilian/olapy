@@ -5,7 +5,7 @@ from os.path import expanduser, join
 from pathlib import Path
 import platform
 
-__version__ = "0.8.3"
+__version__ = "0.8.4"
 OLAPY_PATH = os.environ.get("OLAPY_PATH", expanduser("~"))
 DEFAULT_DATA = join(OLAPY_PATH, "olapy-data")
 DEFAULT_CUBES = join(DEFAULT_DATA, "cubes")

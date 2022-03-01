@@ -1,11 +1,11 @@
-from stdlib.string cimport Str
-from stdlib.format cimport format
+from olapy.stdlib.string cimport Str
+from olapy.stdlib.format cimport format
 from libcythonplus.dict cimport cypdict
 from libcythonplus.list cimport cyplist
 
-from .stdlib.xml_utils cimport escaped, quotedattr, nameprep, concate
+from olapy.stdlib.xml_utils cimport escaped, quotedattr, nameprep, concate
 
-from scheduler.scheduler cimport SequentialMailBox, NullResult, Scheduler
+from olapy.scheduler.scheduler cimport SequentialMailBox, NullResult, Scheduler
 
 
 cdef Str to_str(byte_or_string):

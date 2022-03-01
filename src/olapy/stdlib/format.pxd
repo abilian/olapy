@@ -1,4 +1,4 @@
-from stdlib.string cimport Str
+from olapy.stdlib.string cimport Str
 
 
 

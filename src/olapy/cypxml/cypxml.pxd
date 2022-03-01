@@ -1,14 +1,14 @@
-from stdlib.string cimport Str
-from stdlib._string cimport string
-from stdlib.format cimport format
+from olapy.stdlib.string cimport Str
+from olapy.stdlib._string cimport string
+from olapy.stdlib.format cimport format
 from libcythonplus.dict cimport cypdict
 from libcythonplus.list cimport cyplist
 
-from .stdlib.xml_utils cimport escaped, quotedattr, nameprep, concate, indented
+from olapy.stdlib.xml_utils cimport escaped, quotedattr, nameprep, concate, indented
 
 # from scheduler.scheduler cimport SequentialMailBox, NullResult, Scheduler
 # Using BatchMailBox seems more fast:
-from scheduler.scheduler cimport BatchMailBox, NullResult, Scheduler
+from olapy.scheduler.scheduler cimport BatchMailBox, NullResult, Scheduler
 
 
 cdef cypclass cypXML:

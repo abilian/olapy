@@ -82,12 +82,26 @@ def pypyx_ext(*pathname):
 
 
 extensions = [
+    pypyx_ext(NAME, "stdlib", "xml_utils"),
+    pypyx_ext(NAME, "cypxml", "cypxml"),
     pypyx_ext(NAME, "core", "common"),
     pypyx_ext(NAME, "core", "mdx", "executor", "cube_loader_custom"),
     pypyx_ext(NAME, "core", "mdx", "executor", "cube_loader_db"),
     pypyx_ext(NAME, "core", "mdx", "executor", "cube_loader"),
     pypyx_ext(NAME, "core", "mdx", "executor", "mdx_engine_lite"),
     pypyx_ext(NAME, "core", "mdx", "executor", "mdx_engine"),
+    pypyx_ext(NAME, "core", "mdx", "executor", "utils"),
+    pypyx_ext(NAME, "core", "services", "dict_discover_request_handler"),
+    pypyx_ext(NAME, "core", "services", "dict_execute_request_handler"),
+    pypyx_ext(NAME, "core", "services", "models"),
+    pypyx_ext(NAME, "core", "services", "request_properties_models"),
+    pypyx_ext(NAME, "core", "services", "xmla_discover_request_handler"),
+    pypyx_ext(NAME, "core", "services", "xmla_discover_request_utils"),
+    pypyx_ext(NAME, "core", "services", "xmla_discover_xsds"),
+    pypyx_ext(NAME, "core", "services", "xmla_execute_request_handler"),
+    pypyx_ext(NAME, "core", "services", "xmla_execute_xsds"),
+    pypyx_ext(NAME, "core", "services", "xmla_lib"),
+    pypyx_ext(NAME, "core", "services", "xmla"),
 ]
 
 readme = read("README.rst")
@@ -106,7 +120,7 @@ setup(
         extensions,
         language_level="3str",
         include_path=[
-            # join(PROJECT_ROOT, NAME, "stdlib"),
+            join(BUILD, NAME, "stdlib"),
             join(BUILD, NAME),
         ],
     ),
@@ -138,6 +152,8 @@ setup(
         "olapy.default_config",
         "olapy.demo_cubes_templates",
         "olapy",
+        "olapy.cypxml",
+        "olapy.stdlib",
         "olapy.core",
         "olapy.core.mdx",
         "olapy.core.mdx.executor",
