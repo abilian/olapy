@@ -8,7 +8,6 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Natural Language :: English",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9"
 ]
 homepage = "https://github.com/abilian/olapy"
@@ -23,7 +22,7 @@ etl = 'olapy.etl.etl:run_etl'
 
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4"
+python = ">=3.9,<4"
 
 pandas = "*"
 attrs = "*"

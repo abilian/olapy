@@ -71,7 +71,6 @@ def pypyx_ext(*pathname):
         extra_compile_args=[
             "-pthread",
             "-std=c++17",
-            # "-std=c++11",
             "-O3",
             "-Wno-unused-function",
             "-Wno-deprecated-declarations",
@@ -95,9 +94,12 @@ readme = read("README.rst")
 version = read_version()
 
 build_libfmt()
-copytree(LIBFMT, join(BUILD, "libfmt"))
-print("Build", NAME, version, "in", BUILD, "with Cython", cython_version)
+build_libfmt = join(BUILD, "libfmt")
+if exists(build_libfmt):
+    rmtree(build_libfmt)
+copytree(LIBFMT, build_libfmt)
 
+print("Build", NAME, version, "in", BUILD, "with Cython", cython_version)
 
 setup(
     ext_modules=cythonize(
@@ -114,26 +116,27 @@ setup(
     long_description=readme,
     python_requires="<4,>=3.9",
     project_urls={"homepage": "https://github.com/abilian/olapy"},
+    url="https://github.com/abilian/olapy",
     author="Abilian SAS",
+    author_email="jd@abilian.com",
     classifiers=[
         "Programming Language :: Python",
         "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
         "Natural Language :: English",
-        "Operating System :: OS Independent",
+        "Operating System :: Linux",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CythonPlus",
     ],
+    license="GNU LGPL",
     include_package_data=True,
     zip_safe=False,
     entry_points={
         "console_scripts": ["olapy = olapy.__main__:cli", "etl = olapy.etl.etl:run_etl"]
     },
     packages=[
-        "config",
-        "cubes_templates",
-        "demos.ETL",
-        "micro_bench",
-        "micro_bench.olapy_pandas_VS_olapy_pyspark",
+        "olapy.default_config",
+        "olapy.demo_cubes_templates",
         "olapy",
         "olapy.core",
         "olapy.core.mdx",
@@ -144,6 +147,9 @@ setup(
         "olapy.core.services",
         "olapy.core.services.spark",
         "olapy.etl",
+        # "demos.ETL",
+        # "micro_bench",
+        # "micro_bench.olapy_pandas_VS_olapy_pyspark",
     ],
     package_dir={"": "."},
     package_data={

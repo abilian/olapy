@@ -3,6 +3,7 @@
 import os
 from os.path import expanduser, join
 from pathlib import Path
+import platform
 
 __version__ = "0.8.3"
 OLAPY_PATH = os.environ.get("OLAPY_PATH", expanduser("~"))
@@ -17,4 +18,10 @@ def is_compiled():
     return Path(__file__).suffix == ".so"
 
 
-print("OlaPy compiled with Cython:", is_compiled())
+print("OlaPy instance version:", __version__)
+print("Default data path:", DEFAULT_DATA)
+print("Version of Python:", platform.python_version())
+if is_compiled():
+    print("This OlaPy version is compiled with Cython+")
+else:
+    print("This OlaPy version use standard CPython")
