@@ -18,8 +18,8 @@ from ..mdx.parser.parse import REGEX
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
-from libcythonplus.dict cimport cypdict
-from libcythonplus.list cimport cyplist
+# from libcythonplus.dict cimport cypdict
+# from libcythonplus.list cimport cyplist
 from olapy.cypxml cimport cypXML, to_str
 
 
