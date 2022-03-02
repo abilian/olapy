@@ -91,6 +91,7 @@ extensions = [
     pypyx_ext(NAME, "core", "mdx", "executor", "mdx_engine_lite"),
     pypyx_ext(NAME, "core", "mdx", "executor", "mdx_engine"),
     pypyx_ext(NAME, "core", "mdx", "executor", "utils"),
+    pypyx_ext(NAME, "core", "mdx", "parser", "parse"),
     pypyx_ext(NAME, "core", "services", "dict_discover_request_handler"),
     pypyx_ext(NAME, "core", "services", "dict_execute_request_handler"),
     pypyx_ext(NAME, "core", "services", "models"),
@@ -102,6 +103,8 @@ extensions = [
     pypyx_ext(NAME, "core", "services", "xmla_execute_xsds"),
     pypyx_ext(NAME, "core", "services", "xmla_lib"),
     pypyx_ext(NAME, "core", "services", "xmla"),
+    pypyx_ext(NAME, "core", "services", "spark", "xmla_discover_request_handler"),
+    pypyx_ext(NAME, "core", "services", "spark", "xmla_execute_request_handler"),
 ]
 
 readme = read("README.rst")

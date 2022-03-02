@@ -1209,7 +1209,7 @@ class XmlaDiscoverReqHandler:
                     row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
                     row.stag("CUBE_NAME").text(to_str(self.selected_cube))
                     row.stag("DIMENSION_UNIQUE_NAME").text(format("[{}]", s_tname))
-                    row.stag("HIERARCHY_NAME").text(to_str(table_name))
+                    row.stag("HIERARCHY_NAME").text(s_tname)
                     row.stag("HIERARCHY_UNIQUE_NAME").text(format(
                                                                 "[{}].[{}]",
                                                                 s_tname,

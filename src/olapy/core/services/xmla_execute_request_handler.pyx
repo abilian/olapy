@@ -917,6 +917,8 @@ class XmlaExecuteReqHandler:
 
         :return: CellData as string
         """
+        cdef cypXML xml
+        cdef Str result
 
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
@@ -1564,7 +1566,7 @@ class XmlaExecuteReqHandler:
         """
         # not used dimensions
         cdef cypXML xml
-        cdef Str result, dd, col_attr, col0
+        cdef Str result, dd, col_attr, col0, measure
 
         if self.convert2formulas:
             return self._generate_slicer_convert2formulas()

@@ -1,13 +1,18 @@
-"""Managing all `EXECUTE <https://technet.microsoft.com/fr-
-fr/library/ms186691(v=sql.110).aspx>`_ requests and responses.
+"""Managing all
+`EXECUTE <https://technet.microsoft.com/fr-fr/library/ms186691(v=sql.110).aspx>`_
+requests and responses.
 """
 
 import itertools
 from collections import OrderedDict
 
-import xmlwitch
+# import xmlwitch
 
 from ..xmla_execute_request_handler import XmlaExecuteReqHandler
+
+from olapy.stdlib.string cimport Str
+from olapy.stdlib.format cimport format
+from olapy.cypxml cimport cypXML, to_str
 
 
 class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
@@ -185,38 +190,63 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
         :return:
         """
-        xml = xmlwitch.Builder()
-        with xml.Axis(name="SlicerAxis"):
-            with xml.Tuples:
-                with xml.Tuple:
-                    for dim_diff in self.executor.get_all_tables_names(
-                        ignore_fact=True
-                    ):
-                        column_attribut = (
-                            self.executor.tables_loaded[dim_diff]
-                            .select(self.executor.tables_loaded[dim_diff].columns[0])
-                            .first()[0]
-                        )
+        cdef cypXML xml
+        cdef Str result, dd, col_attr, col0
 
-                        with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
-                            xml.UName(
-                                "[{0}].[{0}].[{1}].[{2}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff].columns[0],
-                                    column_attribut,
-                                )
-                            )
-                            xml.Caption(str(column_attribut))
-                            xml.LName(
-                                "[{0}].[{0}].[{1}]".format(
-                                    dim_diff,
-                                    self.executor.tables_loaded[dim_diff].columns[0],
-                                )
-                            )
-                            xml.LNum("0")
-                            xml.DisplayInfo("2")
+        # xml = xmlwitch.Builder()
+        xml = cypXML()
+        xml.set_max_depth(0)
+        # with xml.Axis(name="SlicerAxis"):
+        #     with xml.Tuples:
+        #         with xml.Tuple:
+        #             for dim_diff in self.executor.get_all_tables_names(
+        #                 ignore_fact=True
+        #             ):
+        #                 column_attribut = (
+        #                     self.executor.tables_loaded[dim_diff]
+        #                     .select(self.executor.tables_loaded[dim_diff].columns[0])
+        #                     .first()[0]
+        #                 )
+        #
+        #                 with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
+        #                     xml.UName(
+        #                         "[{0}].[{0}].[{1}].[{2}]".format(
+        #                             dim_diff,
+        #                             self.executor.tables_loaded[dim_diff].columns[0],
+        #                             column_attribut,
+        #                         )
+        #                     )
+        #                     xml.Caption(str(column_attribut))
+        #                     xml.LName(
+        #                         "[{0}].[{0}].[{1}]".format(
+        #                             dim_diff,
+        #                             self.executor.tables_loaded[dim_diff].columns[0],
+        #                         )
+        #                     )
+        #                     xml.LNum("0")
+        #                     xml.DisplayInfo("2")
+        a = xml.stag("Axis").sattr("name", "SlicerAxis")
+        ts = a.stag("Tuples")
+        t = ts.stag("Tuple")
+        for dim_diff in self.executor.get_all_tables_names(ignore_fact=True):
+            dd = to_str(dim_diff)
+            col_attr = to_str(str(
+                    self.executor.tables_loaded[dim_diff]
+                    .select(self.executor.tables_loaded[dim_diff].columns[0])
+                    .first()[0]
+                ))
+            col0 = to_str(str(self.executor.tables_loaded[dim_diff].columns[0]))
+            m = t.stag("Member")
+            m.attr(Str("Hierarchy"), format("[{}].[{}]", dd, dd))
+            m.stag("UName").text(format("[{}].[{}].[{}].[{}]", dd, dd, col0, col_attr))
+            m.stag("Caption").text(col_attr)
+            m.stag("LName").text(format("[{}].[{}].[{}]", dd, dd, col0))
+            m.stag("LNum").stext("0")
+            m.stag("DisplayInfo").stext("2")
 
-        return str(xml)
+        # return str(xml)
+        result = xml.dump()
+        return result.bytes().decode("utf8").strip()
 
     def generate_cell_data(self):
         # # type: () -> text_type
@@ -232,6 +262,8 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
         :return: CellData as string
         """
+        cdef cypXML xml
+        cdef Str result
 
         if self.convert2formulas:
             return self._generate_cells_data_convert2formulas()
@@ -263,17 +295,27 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
                 )
             )
 
-        xml = xmlwitch.Builder()
+        # xml = xmlwitch.Builder()
+        xml = cypXML()
+        xml.set_max_depth(0)
+        # index = 0
+        # for value in columns_loop:
+        #     # if np.isnan(value):
+        #     #     value = ""
+        #     with xml.Cell(CellOrdinal=str(index)):
+        #         xml.Value(str(value), **{"xsi:type": "xsi:long"})
+        #
+        #     index += 1
         index = 0
         for value in columns_loop:
             # if np.isnan(value):
             #     value = ""
-            with xml.Cell(CellOrdinal=str(index)):
-                xml.Value(str(value), **{"xsi:type": "xsi:long"})
-
+            c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
+            c.stag("Value").text(to_str(str(value))).sattr("xsi:type", "xsi:long")
             index += 1
-
-        return str(xml)
+        # return str(xml)
+        result = xml.dump()
+        return result.bytes().decode("utf8").strip()
 
     def generate_slicer_axis(self):
         """Generate SlicerAxis which contains elements (dimensions) that are
@@ -305,6 +347,8 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
         :return: SlicerAxis as string
         """
         # not used dimensions
+        cdef cypXML xml
+        cdef Str result, dd, col_attr, col0, measure
 
         if self.convert2formulas:
             return self._generate_slicer_convert2formulas()
@@ -314,51 +358,93 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
             - set(self.columns_desc["all"])
         )
 
-        xml = xmlwitch.Builder()
-        if unused_dimensions:
-            with xml.Axis(name="SlicerAxis"):
-                with xml.Tuples:
-                    with xml.Tuple:
-                        for dim_diff in unused_dimensions:
-                            column_attribut = (
+        # if unused_dimensions:
+        #     with xml.Axis(name="SlicerAxis"):
+        #         with xml.Tuples:
+        #             with xml.Tuple:
+        #                 for dim_diff in unused_dimensions:
+        #                     column_attribut = (
+        #                         self.executor.tables_loaded[dim_diff]
+        #                         .select(
+        #                             self.executor.tables_loaded[dim_diff].columns[0]
+        #                         )
+        #                         .first()[0]
+        #                     )
+        #                     with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
+        #                         xml.UName(
+        #                             "[{0}].[{0}].[{1}].[{2}]".format(
+        #                                 dim_diff,
+        #                                 self.executor.tables_loaded[dim_diff].columns[
+        #                                     0
+        #                                 ],
+        #                                 column_attribut,
+        #                             )
+        #                         )
+        #                         xml.Caption(str(column_attribut))
+        #                         xml.LName(
+        #                             "[{0}].[{0}].[{1}]".format(
+        #                                 dim_diff,
+        #                                 self.executor.tables_loaded[dim_diff].columns[
+        #                                     0
+        #                                 ],
+        #                             )
+        #                         )
+        #                         xml.LNum("0")
+        #                         xml.DisplayInfo("2")
+        #
+        #                 # Hierarchize
+        #                 if len(self.executor.selected_measures) <= 1 and (
+        #                     self.executor.parser.hierarchized_tuples()
+        #                     or self.executor.facts in self.columns_desc["where"]
+        #                 ):
+        #                     with xml.Member(Hierarchy="[Measures]"):
+        #                         xml.UName(f"[Measures].[{self.executor.measures[0]}]")
+        #                         xml.Caption(f"{self.executor.measures[0]}")
+        #                         xml.LName("[Measures]")
+        #                         xml.LNum("0")
+        #                         xml.DisplayInfo("0")
+
+        if not unused_dimensions:
+            return ""
+
+        xml = cypXML()
+        xml.set_max_depth(0)
+
+        a = xml.stag("Axis")
+        a.sattr("name", "SlicerAxis")
+        ts = a.stag("Tuples")
+        t = ts.stag("Tuple")
+        for dim_diff in unused_dimensions:
+            dd = to_str(dim_diff)  # converted to Str for format() args
+            col_attr = to_str(str(
                                 self.executor.tables_loaded[dim_diff]
                                 .select(
                                     self.executor.tables_loaded[dim_diff].columns[0]
                                 )
                                 .first()[0]
-                            )
-                            with xml.Member(Hierarchy="[{0}].[{0}]".format(dim_diff)):
-                                xml.UName(
-                                    "[{0}].[{0}].[{1}].[{2}]".format(
-                                        dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[
-                                            0
-                                        ],
-                                        column_attribut,
-                                    )
-                                )
-                                xml.Caption(str(column_attribut))
-                                xml.LName(
-                                    "[{0}].[{0}].[{1}]".format(
-                                        dim_diff,
-                                        self.executor.tables_loaded[dim_diff].columns[
-                                            0
-                                        ],
-                                    )
-                                )
-                                xml.LNum("0")
-                                xml.DisplayInfo("2")
+                            ))
+            col0 = to_str(str(self.executor.tables_loaded[dim_diff].columns[0]))
+            m = t.stag("Member")
+            m.attr(Str("Hierarchy"), format("[{}].[{}]", dd, dd))
+            m.stag("UName").text(format("[{}].[{}].[{}].[{}]", dd, dd, col0, col_attr))
+            m.stag("Caption").text(col_attr)
+            m.stag("LName").text(format("[{}].[{}].[{}]", dd, dd, col0))
+            m.stag("LNum").stext("0")
+            m.stag("DisplayInfo").stext("2")
 
-                        # Hierarchize
-                        if len(self.executor.selected_measures) <= 1 and (
-                            self.executor.parser.hierarchized_tuples()
-                            or self.executor.facts in self.columns_desc["where"]
-                        ):
-                            with xml.Member(Hierarchy="[Measures]"):
-                                xml.UName(f"[Measures].[{self.executor.measures[0]}]")
-                                xml.Caption(f"{self.executor.measures[0]}")
-                                xml.LName("[Measures]")
-                                xml.LNum("0")
-                                xml.DisplayInfo("0")
+        # Hierarchize
+        if len(self.executor.selected_measures) <= 1 and (
+            self.executor.parser.hierarchized_tuples()
+            or self.executor.facts in self.columns_desc["where"]
+        ):
+            measure = to_str(str(self.executor.measures[0]))
+            m = t.stag("Member").sattr("Hierarchy", "[Measures]")
+            m.stag("UName").text(format("[Measures].[{}]", measure))
+            m.stag("Caption").text(measure)
+            m.stag("LName").stext("[Measures]")
+            m.stag("LNum").stext("0")
+            m.stag("DisplayInfo").stext("0")
 
-        return str(xml)
+        # return str(xml)
+        result = xml.dump()
+        return result.bytes().decode("utf8").strip()  # strip() for passing tests
