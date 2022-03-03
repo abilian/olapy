@@ -23,8 +23,8 @@ class XmlaProviderLib:
     """XmlaProviderLib tu use olapy as library without running any server (no
     spyne, no wsgi...)"""
 
-    def __init__(self, discover_request_hanlder, execute_request_handler):
-        self.discover_request_hanlder = discover_request_hanlder
+    def __init__(self, discover_request_handler, execute_request_handler):
+        self.discover_request_handler = discover_request_handler
         self.execute_request_handler = execute_request_handler
 
     def Discover(self, request):
@@ -37,7 +37,7 @@ class XmlaProviderLib:
         :return: XML Discover response as string
         """
         method_name = request.RequestType.lower() + "_response"
-        method = getattr(self.discover_request_hanlder, method_name)
+        method = getattr(self.discover_request_handler, method_name)
 
         if request.RequestType == "DISCOVER_DATASOURCES":
             return method()

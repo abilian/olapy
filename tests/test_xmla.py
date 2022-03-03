@@ -87,8 +87,8 @@ def conn():
     create_insert(engine)
     executor = MdxEngine(sqla_engine=engine, source_type="db")
     executor.load_cube(cube_name="main", fact_table_name="facts")
-    discover_request_hanlder = XmlaDiscoverReqHandler(executor)
-    execute_request_hanlder = XmlaExecuteReqHandler(executor)
+    discover_request_handler = XmlaDiscoverReqHandler(executor)
+    execute_request_handler = XmlaExecuteReqHandler(executor)
 
     print("spawning server")
     application = Application(
@@ -97,8 +97,8 @@ def conn():
         in_protocol=Soap11(validator="soft"),
         out_protocol=Soap11(validator="soft"),
         config={
-            "discover_request_hanlder": discover_request_hanlder,
-            "execute_request_hanlder": execute_request_hanlder,
+            "discover_request_handler": discover_request_handler,
+            "execute_request_handler": execute_request_handler,
         },
     )
 
