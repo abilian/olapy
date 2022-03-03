@@ -11,7 +11,8 @@ cp cython_setup.py cython_build
 cd cython_build
 
 # python cython_setup.py build_ext --inplace
-python cython_setup.py sdist bdist_wheel
+python cython_setup.py sdist bdist_wheel || exit 0
+
 ls -ltrh dist
 
 find olapy -type f -name "*.c" -delete

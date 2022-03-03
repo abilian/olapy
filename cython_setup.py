@@ -1,6 +1,7 @@
-from setuptools import find_packages
-from distutils.core import setup
-from distutils.extension import Extension
+# from distutils.core import setup
+# from distutils.extension import Extension
+from setuptools import setup
+from setuptools.extension import Extension
 from Cython.Build import cythonize
 from Cython import __version__ as cython_version
 
