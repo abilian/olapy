@@ -14,7 +14,7 @@ from .xmla_execute_xsds import execute_xsd
 # DictExecuteReqHandler:
 import re
 from collections import OrderedDict
-from olapy.core.parse import find_all_tuples
+from olapy.core.parse import find_all_tuples, split_tuple
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -432,7 +432,7 @@ class XmlaExecuteReqHandler:
         for group in tuples_groups:
             t = ts.stag("Tuple")
             for tupl in self.executor.parser.split_group(group):
-                split_tupl = self.executor.parser.split_tuple(tupl)
+                split_tupl = split_tuple(tupl)
                 if split_tupl[0].upper() == "MEASURES":
                     hierarchy = "[Measures]"
                     l_name = "[" + split_tupl[0] + "]"
@@ -878,8 +878,7 @@ class XmlaExecuteReqHandler:
             c.stag("Value").text(to_str(str(tupl)))
             index += 1
             c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
-            c.stag("Value").text(to_str(str(
-                                self.executor.parser.split_tuple(tupl)[-1])))
+            c.stag("Value").text(to_str(split_tuple(tupl)[-1]))
             index += 1
 
             tupl2list = tupl.split(".")

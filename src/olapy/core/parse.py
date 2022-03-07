@@ -18,29 +18,29 @@ def find_all_tuples(query_string) -> list:
     return REGEX.findall(query_string)
 
 
+def split_tuple(tupl):
+    """Split Tuple (String) into items.
+
+    example::
+
+         input : '[Geography].[Geography].[Continent].[Europe]'
+
+         output : ['Geography','Geography','Continent','Europe']
+
+    :param tupl: MDX Tuple as String
+    :return: Tuple items in list
+    """
+    split_tupl = tupl.strip(" \t\n").split("].[")
+    split_tupl[0] = split_tupl[0].replace("[", "")
+    split_tupl[-1] = split_tupl[-1].replace("]", "")
+    return split_tupl
+
+
 class Parser:
     """Class for Parsing a MDX query."""
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
-
-    @staticmethod
-    def split_tuple(tupl):
-        """Split Tuple (String) into items.
-
-        example::
-
-             input : '[Geography].[Geography].[Continent].[Europe]'
-
-             output : ['Geography','Geography','Continent','Europe']
-
-        :param tupl: MDX Tuple as String
-        :return: Tuple items in list
-        """
-        split_tupl = tupl.strip(" \t\n").split("].[")
-        split_tupl[0] = split_tupl[0].replace("[", "")
-        split_tupl[-1] = split_tupl[-1].replace("]", "")
-        return split_tupl
 
     @staticmethod
     def get_tuples(query, start=None, stop=None):

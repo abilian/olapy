@@ -8,6 +8,7 @@ import os
 import uuid
 
 from olapy.core.mdx.executor import MdxEngine
+from olapy.core.parse import split_tuple
 
 from ..services.xmla_discover_request_utils import (
     discover_literals_response_rows,
@@ -756,7 +757,7 @@ class DictDiscoverReqHandler:
             and request.Restrictions.RestrictionList.TREE_OP == 8
         ):
             self.change_cube(request.Properties.PropertyList.Catalog)
-            separed_tuple = self.executor.parser.split_tuple(
+            separed_tuple = split_tuple(
                 request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME
             )
             joined = ".".join(separed_tuple[:-1])

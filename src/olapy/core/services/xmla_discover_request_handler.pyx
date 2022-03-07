@@ -10,6 +10,7 @@ import xmlwitch
 
 #from olapy.core.mdx.executor import MdxEngine
 
+from olapy.core.parse import split_tuple
 
 from ..services.xmla_discover_request_utils import (
     discover_literals_response_rows,
@@ -1852,7 +1853,7 @@ class XmlaDiscoverReqHandler:
                     request.Restrictions.RestrictionList.LEVEL_UNIQUE_NAME
                 )
 
-            separated_tuple = self.executor.parser.split_tuple(member_lvl_name)
+            separated_tuple = split_tuple(member_lvl_name)
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
                 and request.Properties.PropertyList.Catalog is not None

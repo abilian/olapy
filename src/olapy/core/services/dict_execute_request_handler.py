@@ -6,7 +6,7 @@ import itertools
 import re
 from collections import OrderedDict
 
-from olapy.core.parse import find_all_tuples
+from olapy.core.parse import find_all_tuples, split_tuple
 
 
 class DictExecuteReqHandler:
@@ -165,7 +165,7 @@ class DictExecuteReqHandler:
         all_axis = {"Axis": {"name": axis}, "Tuples": []}
         for group in tuples_groups:
             for tupl in self.executor.parser.split_group(group):
-                split_tupl = self.executor.parser.split_tuple(tupl)
+                split_tupl = split_tuple(tupl)
                 if split_tupl[0].upper() == "MEASURES":
                     hierarchy = "[Measures]"
                     l_name = "[" + split_tupl[0] + "]"
@@ -301,7 +301,7 @@ class DictExecuteReqHandler:
             cells += {
                 "Cell": {
                     "CellOrdinal": str(index),
-                    "Value": self.executor.parser.split_tuple(tupl)[-1],
+                    "Value": split_tuple(tupl)[-1],
                 }
             }
 
