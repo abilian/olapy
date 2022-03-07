@@ -26,7 +26,7 @@ import pandas as pd
 from attrs import define, field
 
 from olapy.core.parse import Parser as MdxParser
-from olapy.core.parse import decorticate_query
+from olapy.core.parse import decorticate_query, split_group
 from olapy.core.common import DEFAULT_DATA
 
 # Needed because SQLAlchemy doesn't work under pyiodide
@@ -709,14 +709,14 @@ class MdxEngine:
         """
         dfs = []
         grouped_tuples = self.parser.get_nested_select()
-        for tuple_groupe in grouped_tuples:
+        for tuple_group in grouped_tuples:
             transformed_tuple_groups = []
-            for tuple in self.parser.split_group(tuple_groupe):
-                tuple = tuple.split("].[")
-                tuple[0] = tuple[0].replace("[", "")
-                tuple[-1] = tuple[-1].replace("]", "")
-                if tuple[0].upper() != "MEASURES":
-                    transformed_tuple_groups.append(tuple)
+            for tpl in split_group(tuple_group):
+                tpl = tpl.split("].[")
+                tpl[0] = tpl[0].replace("[", "")
+                tpl[-1] = tpl[-1].replace("]", "")
+                if tpl[0].upper() != "MEASURES":
+                    transformed_tuple_groups.append(tpl)
 
             dfs.append(
                 self.tuples_to_dataframes(transformed_tuple_groups, columns_to_keep)[0]

@@ -171,42 +171,45 @@ def decorticate_query(query):
     }
 
 
+def _add_tuple_brackets(tupl):
+    """After splitting tuple with :func:`split_group`, you got some tuple
+    like **aa].[bb].[cc].[dd** so add_tuple_brackets fix this by adding
+    missed brackets **[aa].[bb].[cc].[dd]**.
+
+    :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
+    :return: [aa].[bb].[cc].[dd] as string.
+    """
+    tupl = tupl.strip()
+    if tupl[0] != "[":
+        tupl = "[" + tupl
+    if tupl[-1] != "]":
+        tupl = tupl + "]"
+    return tupl
+
+
+def split_group(group):
+    """
+    Split group of tuples.
+    example::
+
+        group : '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'
+
+        out : ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]']
+
+    :param group: Group of tuple as string.
+    :return: Separated tuples as list.
+    """
+    return [
+        _add_tuple_brackets(t)
+        for t in group.replace("\n", "").replace("\t", "").split("],")
+    ]
+
+
 class Parser:
     """Class for Parsing a MDX query."""
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
-
-    @staticmethod
-    def add_tuple_brackets(tupl):
-        """After splitting tuple with :func:`split_group`, you got some tuple
-        like **aa].[bb].[cc].[dd** so add_tuple_brackets fix this by adding
-        missed brackets **[aa].[bb].[cc].[dd]**.
-
-        :param tupl: Tuple as string example  'aa].[bb].[cc].[dd'.
-        :return: [aa].[bb].[cc].[dd] as string.
-        """
-        tupl = tupl.strip()
-        if tupl[0] != "[":
-            tupl = "[" + tupl
-        if tupl[-1] != "]":
-            tupl = tupl + "]"
-        return tupl
-
-    def split_group(self, group):
-        """
-        Split group of tuples.
-        example::
-
-            group : '[Geo].[Geo].[Continent],[Prod].[Prod].[Name],[Time].[Time].[Day]'
-
-            out : ['[Geo].[Geo].[Continent]','[Prod].[Prod].[Name]','[Time].[Time].[Day]']
-
-        :param group: Group of tuple as string.
-        :return: Separated tuples as list.
-        """
-        split_group = group.replace("\n", "").replace("\t", "").split("],")
-        return list(map(lambda tupl: self.add_tuple_brackets(tupl), split_group))
 
     def get_nested_select(self) -> list[str]:
         """Get tuples groups in query like ::

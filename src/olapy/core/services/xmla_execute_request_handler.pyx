@@ -14,7 +14,7 @@ from .xmla_execute_xsds import execute_xsd
 # DictExecuteReqHandler:
 import re
 from collections import OrderedDict
-from olapy.core.parse import find_all_tuples, split_tuple, decorticate_query
+from olapy.core.parse import (find_all_tuples, split_group, split_tuple, decorticate_query)
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -69,7 +69,7 @@ def execute_convert_formulas_query(mdx_query):
     ][::3]
 
 
-def get_lvl_column_by_dimension(self, all_tuples):
+def get_lvl_column_by_dimension(all_tuples):
     """TODO.
 
     :param all_tuples:
@@ -312,7 +312,7 @@ class XmlaExecuteReqHandler:
             m = xml.stag("Member").attr(
                                     Str("Hierarchy"),
                                     format("[{0}].[{0}]", minus1, minus1))
-            m.stag("UName").text(Str(uname))
+            m.stag("UName").text(to_str(uname))
             m.stag("Caption").text(to_str(str(tuple_without_minus_1[-1])))
             m.stag("LName").text(
                 format(
@@ -431,7 +431,7 @@ class XmlaExecuteReqHandler:
         ts = a.stag("Tuples")
         for group in tuples_groups:
             t = ts.stag("Tuple")
-            for tupl in self.executor.parser.split_group(group):
+            for tupl in split_group(group):
                 split_tupl = split_tuple(tupl)
                 if split_tupl[0].upper() == "MEASURES":
                     hierarchy = "[Measures]"

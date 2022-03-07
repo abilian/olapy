@@ -6,7 +6,7 @@ import itertools
 import re
 from collections import OrderedDict
 
-from olapy.core.parse import find_all_tuples, split_tuple
+from olapy.core.parse import find_all_tuples, split_group, split_tuple
 
 
 class DictExecuteReqHandler:
