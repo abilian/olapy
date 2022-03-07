@@ -36,144 +36,146 @@ def split_tuple(tupl):
     return split_tupl
 
 
+def _get_tuples(query, start=None, stop=None):
+    """Get all tuples in the mdx query.
+
+    Example::
+
+
+        SELECT  {
+                    [Geography].[Geography].[All Continent].Members,
+                    [Geography].[Geography].[Continent].[Europe]
+                } ON COLUMNS,
+
+                {
+                    [Product].[Product].[Company]
+                } ON ROWS
+
+                FROM {sales}
+
+    It returns ::
+
+        [
+            ['Geography','Geography','Continent'],
+            ['Geography','Geography','Continent','Europe'],
+            ['Product','Product','Company']
+        ]
+
+
+    :param query: mdx query
+    :param start: keyword in the query where we start (examples start = SELECT)
+    :param stop:  keyword in the query where we stop (examples start = ON ROWS)
+
+    :return:  nested list of tuples (see the example)
+    """
+    if start is not None:
+        start = query.index(start)
+    if stop is not None:
+        stop = query.index(stop)
+
+    # clean the query (remove All, Members...)
+    return [
+        [
+            tup_att.replace("All ", "").replace("[", "").replace("]", "")
+            for tup_att in tup[0]
+            .replace(".Members", "")
+            .replace(".MEMBERS", "")
+            .split("].[")
+            if tup_att
+        ]
+        for tup in find_all_tuples(query[start:stop])
+        if len(tup[0].split("].[")) > 1
+    ]
+
+
+@cache
+def decorticate_query(query):
+    """Get all tuples that exists in the MDX Query by axes.
+
+    Example::
+
+        query : SELECT  {
+                            [Geography].[Geography].[All Continent].Members,
+                            [Geography].[Geography].[Continent].[Europe]
+                        } ON COLUMNS,
+
+                        {
+                            [Product].[Product].[Company]
+                        } ON ROWS
+
+                        FROM {sales}
+
+        output : {
+                'all': [   ['Geography', 'Geography', 'Continent'],
+                           ['Geography', 'Geography', 'Continent', 'Europe'],
+                           ['Product', 'Product', 'Company']],
+
+                'columns': [['Geography', 'Geography', 'Continent'],
+                            ['Geography', 'Geography', 'Continent', 'Europe']],
+
+                'rows': [['Product', 'Product', 'Company']],
+                'where': []
+                }
+
+    :param query: MDX Query
+    :return: dict of axis as key and tuples as value
+    """
+
+    # Hierarchize -> ON COLUMNS , ON ROWS ...
+    # without Hierarchize -> ON 0
+    try:
+        query = query.decode("utf-8")
+    except AttributeError:
+        pass
+
+    tuples_on_mdx_query = _get_tuples(query)
+    on_rows = []
+    on_columns = []
+    on_where = []
+
+    try:
+        # ON ROWS
+        if "ON ROWS" in query:
+            stop = "ON ROWS"
+            if "ON COLUMNS" in query:
+                start = "ON COLUMNS"
+            else:
+                start = "SELECT"
+            on_rows = _get_tuples(query, start, stop)
+
+        # ON COLUMNS
+        if "ON COLUMNS" in query:
+            start = "SELECT"
+            stop = "ON COLUMNS"
+            on_columns = _get_tuples(query, start, stop)
+
+        # ON COLUMNS (AS 0)
+        if "ON 0" in query:
+            start = "SELECT"
+            stop = "ON 0"
+            on_columns = _get_tuples(query, start, stop)
+
+        # WHERE
+        if "WHERE" in query:
+            start = "FROM"
+            on_where = _get_tuples(query, start)
+
+    except BaseException:  # pragma: no cover
+        raise SyntaxError("Please check your MDX Query")
+
+    return {
+        "all": tuples_on_mdx_query,
+        "columns": on_columns,
+        "rows": on_rows,
+        "where": on_where,
+    }
+
+
 class Parser:
     """Class for Parsing a MDX query."""
 
     def __init__(self, mdx_query=None):
         self.mdx_query = mdx_query
-
-    @staticmethod
-    def get_tuples(query, start=None, stop=None):
-        """Get all tuples in the mdx query.
-
-        Example::
-
-
-            SELECT  {
-                        [Geography].[Geography].[All Continent].Members,
-                        [Geography].[Geography].[Continent].[Europe]
-                    } ON COLUMNS,
-
-                    {
-                        [Product].[Product].[Company]
-                    } ON ROWS
-
-                    FROM {sales}
-
-        It returns ::
-
-            [
-                ['Geography','Geography','Continent'],
-                ['Geography','Geography','Continent','Europe'],
-                ['Product','Product','Company']
-            ]
-
-
-        :param query: mdx query
-        :param start: keyword in the query where we start (examples start = SELECT)
-        :param stop:  keyword in the query where we stop (examples start = ON ROWS)
-
-        :return:  nested list of tuples (see the example)
-        """
-        if start is not None:
-            start = query.index(start)
-        if stop is not None:
-            stop = query.index(stop)
-
-        # clean the query (remove All, Members...)
-        return [
-            [
-                tup_att.replace("All ", "").replace("[", "").replace("]", "")
-                for tup_att in tup[0]
-                .replace(".Members", "")
-                .replace(".MEMBERS", "")
-                .split("].[")
-                if tup_att
-            ]
-            for tup in find_all_tuples(query[start:stop])
-            if len(tup[0].split("].[")) > 1
-        ]
-
-    def decorticate_query(self, query):
-        """Get all tuples that exists in the MDX Query by axes.
-
-        Example::
-
-            query : SELECT  {
-                                [Geography].[Geography].[All Continent].Members,
-                                [Geography].[Geography].[Continent].[Europe]
-                            } ON COLUMNS,
-
-                            {
-                                [Product].[Product].[Company]
-                            } ON ROWS
-
-                            FROM {sales}
-
-            output : {
-                    'all': [   ['Geography', 'Geography', 'Continent'],
-                               ['Geography', 'Geography', 'Continent', 'Europe'],
-                               ['Product', 'Product', 'Company']],
-
-                    'columns': [['Geography', 'Geography', 'Continent'],
-                                ['Geography', 'Geography', 'Continent', 'Europe']],
-
-                    'rows': [['Product', 'Product', 'Company']],
-                    'where': []
-                    }
-
-        :param query: MDX Query
-        :return: dict of axis as key and tuples as value
-        """
-
-        # Hierarchize -> ON COLUMNS , ON ROWS ...
-        # without Hierarchize -> ON 0
-        try:
-            query = query.decode("utf-8")
-        except AttributeError:
-            pass
-
-        tuples_on_mdx_query = self.get_tuples(query)
-        on_rows = []
-        on_columns = []
-        on_where = []
-
-        try:
-            # ON ROWS
-            if "ON ROWS" in query:
-                stop = "ON ROWS"
-                if "ON COLUMNS" in query:
-                    start = "ON COLUMNS"
-                else:
-                    start = "SELECT"
-                on_rows = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS
-            if "ON COLUMNS" in query:
-                start = "SELECT"
-                stop = "ON COLUMNS"
-                on_columns = self.get_tuples(query, start, stop)
-
-            # ON COLUMNS (AS 0)
-            if "ON 0" in query:
-                start = "SELECT"
-                stop = "ON 0"
-                on_columns = self.get_tuples(query, start, stop)
-
-            # WHERE
-            if "WHERE" in query:
-                start = "FROM"
-                on_where = self.get_tuples(query, start)
-
-        except BaseException:  # pragma: no cover
-            raise SyntaxError("Please check your MDX Query")
-
-        return {
-            "all": tuples_on_mdx_query,
-            "columns": on_columns,
-            "rows": on_rows,
-            "where": on_where,
-        }
 
     @staticmethod
     def add_tuple_brackets(tupl):

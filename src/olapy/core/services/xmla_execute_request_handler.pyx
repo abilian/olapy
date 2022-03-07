@@ -14,7 +14,7 @@ from .xmla_execute_xsds import execute_xsd
 # DictExecuteReqHandler:
 import re
 from collections import OrderedDict
-from olapy.core.parse import find_all_tuples, split_tuple
+from olapy.core.parse import find_all_tuples, split_tuple, decorticate_query
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -250,7 +250,7 @@ class XmlaExecuteReqHandler:
 
         first_att = kwargs.get("first_att")
         split_df = kwargs.get("split_df")
-        all_tuples = self.executor.parser.decorticate_query(self.mdx_query)["all"]
+        all_tuples = decorticate_query(self.mdx_query)["all"]
         # [Geography].[Geography].[Continent]  -> first_lvlname : Country
         # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
         all_level_columns = get_lvl_column_by_dimension(all_tuples)

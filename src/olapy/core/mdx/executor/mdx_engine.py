@@ -26,6 +26,7 @@ import pandas as pd
 from attrs import define, field
 
 from olapy.core.parse import Parser as MdxParser
+from olapy.core.parse import decorticate_query
 from olapy.core.common import DEFAULT_DATA
 
 # Needed because SQLAlchemy doesn't work under pyiodide
@@ -758,7 +759,7 @@ class MdxEngine:
         """
         query = self.clean_mdx_query(mdx_query)
         # use measures that exists on where or insides axes
-        query_axes = self.parser.decorticate_query(query)
+        query_axes = decorticate_query(query)
         if self.change_measures(query_axes["all"]):
             self.selected_measures = self.change_measures(query_axes["all"])
 

@@ -6,6 +6,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit
 
 from olapy.core.mdx.executor.mdx_engine import MdxEngine
+from olapy.core.parse import decorticate_query
 
 
 class SparkMdxEngine(MdxEngine):
@@ -276,7 +277,7 @@ class SparkMdxEngine(MdxEngine):
         query = self.clean_mdx_query(mdx_query)
 
         # use measures that exists on where or insides axes
-        query_axes = self.parser.decorticate_query(query)
+        query_axes = decorticate_query(query)
         if self.change_measures(query_axes["all"]):
             self.selected_measures = self.change_measures(query_axes["all"])
 
