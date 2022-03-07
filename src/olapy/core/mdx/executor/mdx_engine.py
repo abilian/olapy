@@ -25,8 +25,7 @@ import numpy as np
 import pandas as pd
 from attrs import define, field
 
-from olapy.core.parse import Parser as MdxParser
-from olapy.core.parse import decorticate_query, split_group
+from olapy.core.parse import decorticate_query, MdxParser, split_group
 from olapy.core.common import DEFAULT_DATA
 
 # Needed because SQLAlchemy doesn't work under pyiodide
@@ -56,14 +55,14 @@ class MdxEngine:
     :param sql_engine: sql_alchemy engine if you don't want to use any database
         config file
     :param source_type: source data input, Default csv
-    :param parser: mdx query parser
+    :param parsed: mdx query parsed
     :param facts:  facts table name, Default **Facts**
     """
 
     cube = field(default=None)
     facts: str = field(default="Facts")
     source_type: str = field(default="csv")
-    parser: MdxParser = field(factory=MdxParser)
+    parsed: MdxParser = field(factory=MdxParser)
     csv_files_cubes: list = field(factory=list)
     db_cubes: list = field(factory=list)
     sqla_engine = field(default=None)
@@ -597,7 +596,7 @@ class MdxEngine:
         :return: updated columns_to_keep
         """
         df = self.tables_loaded[tuple_as_list[0]]
-        if self.parser.hierarchized_tuples() or self._df_column_values_exist(
+        if self.parsed.hierarchized_tuples or self._df_column_values_exist(
             tuple_as_list, df
         ):
             start_columns_used = 2
@@ -691,15 +690,6 @@ class MdxEngine:
             df = pd.concat(self.add_missed_column(df, next_df), sort=False)
         return df
 
-    def check_nested_select(self):
-        # type: () -> bool
-        """Check if the MDX Query is Hierarchized and contains many tuples
-        groups."""
-        return (
-            not self.parser.hierarchized_tuples()
-            and len(self.parser.get_nested_select()) >= 2
-        )
-
     def nested_tuples_to_dataframes(self, columns_to_keep):
         """Construct DataFrame of many groups.
 
@@ -708,7 +698,7 @@ class MdxEngine:
         :return: a list of Pandas DataFrame.
         """
         dfs = []
-        grouped_tuples = self.parser.get_nested_select()
+        grouped_tuples = self.parsed.nested_select
         for tuple_group in grouped_tuples:
             transformed_tuple_groups = []
             for tpl in split_group(tuple_group):
@@ -723,17 +713,6 @@ class MdxEngine:
             )
 
         return dfs
-
-    def clean_mdx_query(self, mdx_query):
-        try:
-            clean_query = (
-                mdx_query.decode("utf-8").strip().replace("\n", "").replace("\t", "")
-            )
-        except AttributeError:
-            clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
-        # todo property in parser
-        self.parser.mdx_query = clean_query
-        return clean_query
 
     def execute_mdx(self, mdx_query):
         """Execute an MDX Query.
@@ -757,7 +736,8 @@ class MdxEngine:
             'columns_desc': dict of dimension and columns used
             }
         """
-        query = self.clean_mdx_query(mdx_query)
+        self.parsed.load(mdx_query)
+        query = self.parsed.mdx_query
         # use measures that exists on where or insides axes
         query_axes = decorticate_query(query)
         if self.change_measures(query_axes["all"]):
@@ -784,7 +764,7 @@ class MdxEngine:
         # SELECT  FROM [Sales] WHERE ([Measures].[Amount])
         if tuples_on_mdx_query:
 
-            if self.check_nested_select():
+            if self.parsed.check_nested_select():
                 df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
             else:
                 df_to_fusion = self.tuples_to_dataframes(
@@ -793,7 +773,7 @@ class MdxEngine:
             df = self.fusion_dataframes(df_to_fusion)
 
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
-            sort = self.parser.hierarchized_tuples()
+            sort = self.parsed.hierarchized_tuples
             # margins=True for columns total !!!!!
             result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
 

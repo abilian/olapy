@@ -5,8 +5,11 @@ import regex
 
 # flake8: noqa W605
 
+
+REGEX_NESTED = regex.compile(r"\(([^()]+)\)")
+
 # FIXME: make this regex more readable (split it)
-REGEX = regex.compile(
+REGEX_TUPLES = regex.compile(
     "(?u)(\\[[(\u4e00-\u9fff)*\\w+\\d ]+\\](\\.\\[[(\u4e00-\u9fff)*"
     + r'\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ '
     + r"]+\])*\.?((Members)|(\[Q\d\]))?)"
@@ -15,7 +18,7 @@ REGEX = regex.compile(
 
 @cache
 def find_all_tuples(query_string) -> list:
-    return REGEX.findall(query_string)
+    return REGEX_TUPLES.findall(query_string)
 
 
 def split_tuple(tupl):
@@ -205,40 +208,60 @@ def split_group(group):
     ]
 
 
-class Parser:
+class MdxParser:
     """Class for Parsing a MDX query."""
 
-    def __init__(self, mdx_query=None):
-        self.mdx_query = mdx_query
+    def __init__(self):
+        """__init__ create a bumb instance, neet to load it afterwards with "load()" """
+        self.mdx_query = None
+        self.hierarchized_tuples = False
+        self.nested_select = []
 
-    def get_nested_select(self) -> list[str]:
-        """Get tuples groups in query like ::
+    def load(self, mdx_query):
+        try:
+            clean_query = (
+                mdx_query.decode("utf-8").strip().replace("\n", "").replace("\t", "")
+            )
+        except AttributeError:
+            clean_query = mdx_query.strip().replace("\n", "").replace("\t", "")
+        self.mdx_query = clean_query
+        self.hierarchized_tuples = "Hierarchize" in clean_query
+        self.nested_select = REGEX_NESTED.findall(clean_query)
 
-            Select {
-                ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
-                [Geography].[Geography].[Continent].[Europe],
-                [Measures].[Amount]),
+    def check_nested_select(self):
+        # type: () -> bool
+        """Check if the MDX Query is Hierarchized and contains many tuples
+        groups."""
+        return not self.hierarchized_tuples and len(self.nested_select) >= 2
 
-                ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
-                [Geography].[Geography].[Continent].[Europe],
-                [Measures].[Amount])
-                }
+    # def get_nested_select(self) -> list[str]:
+    #     """Get tuples groups in query like ::
+    #
+    #         Select {
+    #             ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],
+    #             [Geography].[Geography].[Continent].[Europe],
+    #             [Measures].[Amount]),
+    #
+    #             ([Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],
+    #             [Geography].[Geography].[Continent].[Europe],
+    #             [Measures].[Amount])
+    #             }
+    #
+    #         out :
+    #             ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
+    #             [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
+    #
+    #             '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
+    #             [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
+    #
+    #     :return: All groups as list of strings.
+    #     """
+    #     return regex.findall(r"\(([^()]+)\)", self.mdx_query)
 
-            out :
-                ['[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 19,2010],\
-                [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]',
-
-                '[Time].[Time].[Day].[2010].[Q2 2010].[May 2010].[May 17,2010],\
-                [Geography].[Geography].[Continent].[Europe],[Measures].[Amount]']
-
-        :return: All groups as list of strings.
-        """
-        return regex.findall(r"\(([^()]+)\)", self.mdx_query)
-
-    def hierarchized_tuples(self) -> bool:
-        """Check if `hierarchized <https://docs.microsoft.com/en-
-        us/sql/mdx/hierarchize-mdx>`_  mdx query.
-
-        :return: True | False
-        """
-        return "Hierarchize" in self.mdx_query
+    # def hierarchized_tuples(self) -> bool:
+    #     """Check if `hierarchized <https://docs.microsoft.com/en-
+    #     us/sql/mdx/hierarchize-mdx>`_  mdx query.
+    #
+    #     :return: True | False
+    #     """
+    #     return "Hierarchize" in self.mdx_query

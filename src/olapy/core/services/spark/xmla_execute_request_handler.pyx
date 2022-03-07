@@ -434,7 +434,7 @@ class SparkXmlaExecuteReqHandler(XmlaExecuteReqHandler):
 
         # Hierarchize
         if len(self.executor.selected_measures) <= 1 and (
-            self.executor.parser.hierarchized_tuples()
+            self.executor.parsed.hierarchized_tuples
             or self.executor.facts in self.columns_desc["where"]
         ):
             measure = to_str(str(self.executor.measures[0]))

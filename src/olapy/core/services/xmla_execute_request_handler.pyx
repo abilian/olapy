@@ -384,13 +384,13 @@ class XmlaExecuteReqHandler:
                             tupls, split_df=splitted_df, first_att=first_att
                     )))
             # Hierarchize:
-            if not self.executor.parser.hierarchized_tuples():
+            if not self.executor.parsed.hierarchized_tuples:
                 t.append(to_str(self._gen_measures_xs0(tupls)))
 
         result = xml.dump()
         return result.bytes().decode("utf8")
 
-    def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
+    def _gen_xs0_grouped_tuples(self, axis):
         """generate xs0 axis form query with multiple data groups "exple:
         select (.. geography..)(..product..)(..time..)".
 
@@ -429,7 +429,7 @@ class XmlaExecuteReqHandler:
         #                         xml.DisplayInfo(displayinfo)
         a = xml.stag("Axis").attr(Str("name"), to_str(str(axis)))
         ts = a.stag("Tuples")
-        for group in tuples_groups:
+        for group in self.executor.parsed.nested_select:
             t = ts.stag("Tuple")
             for tupl in split_group(group):
                 split_tupl = split_tuple(tupl)
@@ -654,10 +654,8 @@ class XmlaExecuteReqHandler:
         cdef Str result
 
         # patch 4 select (...) (...) (...) from bla bla bla
-        if self.executor.check_nested_select():
-            return self._gen_xs0_grouped_tuples(
-                axis, self.executor.parser.get_nested_select()
-            )
+        if self.executor.parsed.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis)
 
         # xml = xmlwitch.Builder()
         tuples, first_att = self._generate_tuples_xs0(splitted_df, mdx_query_axis)
@@ -1121,7 +1119,7 @@ class XmlaExecuteReqHandler:
                         and len(self.columns_desc["all"][self.executor.facts]) > 1
                     )
                     or (
-                        not self.executor.parser.hierarchized_tuples()
+                        not self.executor.parsed.hierarchized_tuples
                         and not self.columns_desc["where"]
                     )
                 ):
@@ -1380,7 +1378,7 @@ class XmlaExecuteReqHandler:
         a.append(to_str(self._generate_table_axis_info(axis_tables_without_facts)))
         # Hierarchize
         if (
-            not self.executor.parser.hierarchized_tuples() and
+            not self.executor.parsed.hierarchized_tuples and
             len(self.columns_desc["columns"].get(self.executor.facts, [1, 1])) == 1
             ):
             a.append(to_str(self._gen_measures_one_axis_info()))
@@ -1599,7 +1597,7 @@ class XmlaExecuteReqHandler:
             m.stag("DisplayInfo").stext("2")
         # Hierarchize
         if len(self.executor.selected_measures) <= 1 and (
-            self.executor.parser.hierarchized_tuples()
+            self.executor.parsed.hierarchized_tuples
             or self.executor.facts in self.columns_desc["where"]
         ):
             measure = to_str(str(self.executor.measures[0]))

@@ -156,15 +156,15 @@ class DictExecuteReqHandler:
 
             self._gen_xs0_tuples(tupl, tupls, split_df=split_df, first_att=first_att)
             # Hierarchize'
-            if not self.executor.parser.hierarchized_tuples():
+            if not self.executor.parsed.hierarchized_tuples:
                 self._gen_measures_xs0(tupl, tupls)
             all_axis["Tuples"] += tupl
         return all_axis
 
-    def _gen_xs0_grouped_tuples(self, axis, tuples_groups):
+    def _gen_xs0_grouped_tuples(self, axis):
         all_axis = {"Axis": {"name": axis}, "Tuples": []}
-        for group in tuples_groups:
-            for tupl in self.executor.parser.split_group(group):
+        for group in self.executor.parsed.nested_select:
+            for tupl in split_group(group):
                 split_tupl = split_tuple(tupl)
                 if split_tupl[0].upper() == "MEASURES":
                     hierarchy = "[Measures]"
@@ -190,10 +190,8 @@ class DictExecuteReqHandler:
 
     def generate_xs0_one_axis(self, split_df, mdx_query_axis="all", axis="Axis0"):
         # patch 4 select (...) (...) (...) from bla bla bla
-        if self.executor.check_nested_select():
-            return self._gen_xs0_grouped_tuples(
-                axis, self.executor.parser.get_nested_select()
-            )
+        if self.executor.parsed.check_nested_select():
+            return self._gen_xs0_grouped_tuples(axis)
 
         all_axis = {"Axis": {"name": axis}, "Tuples": []}
 
@@ -441,7 +439,7 @@ class DictExecuteReqHandler:
                         self.executor.facts in self.columns_desc["all"]
                         and (len(self.columns_desc["all"][self.executor.facts]) > 1)
                         or (
-                            not self.executor.parser.hierarchized_tuples()
+                            not self.executor.parsed.hierarchized_tuples
                             and not self.columns_desc["where"]
                         )
                     ):
@@ -586,7 +584,7 @@ class DictExecuteReqHandler:
             axes_info += self._generate_table_axis_info(None, axis_tables_without_facts)
             # Hierarchize
             if (
-                not self.executor.parser.hierarchized_tuples()
+                not self.executor.parsed.hierarchized_tuples
                 and len(self.columns_desc["columns"].get(self.executor.facts, [1, 1]))
                 == 1
             ):
@@ -948,7 +946,7 @@ class DictExecuteReqHandler:
 
             # Hierarchize
             if len(self.executor.selected_measures) <= 1 and (
-                self.executor.parser.hierarchized_tuples()
+                self.executor.parsed.hierarchized_tuples
                 or self.executor.facts in self.columns_desc["where"]
             ):
                 all_axis["Tuples"] += {

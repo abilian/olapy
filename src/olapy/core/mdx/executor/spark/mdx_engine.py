@@ -274,8 +274,8 @@ class SparkMdxEngine(MdxEngine):
             'columns_desc': dict of dimension and columns used
             }
         """
-        query = self.clean_mdx_query(mdx_query)
-
+        self.parsed.load(mdx_query)
+        query = self.parsed.mdx_query
         # use measures that exists on where or insides axes
         query_axes = decorticate_query(query)
         if self.change_measures(query_axes["all"]):
@@ -292,7 +292,7 @@ class SparkMdxEngine(MdxEngine):
         tuples_on_mdx_query = [
             tup for tup in query_axes["all"] if tup[0].upper() != "MEASURES"
         ]
-        if not self.parser.hierarchized_tuples():
+        if not self.parsed.hierarchized_tuples:
             tuples_on_mdx_query = self._uniquefy_tuples(tuples_on_mdx_query)
             tuples_on_mdx_query.sort(key=lambda x: x[0])
 
@@ -302,7 +302,7 @@ class SparkMdxEngine(MdxEngine):
 
         if tuples_on_mdx_query:
 
-            if self.check_nested_select():
+            if self.parsed.check_nested_select():
                 df_to_fusion = self.nested_tuples_to_dataframes(columns_to_keep)
             else:
                 df_to_fusion = self.tuples_to_dataframes(
@@ -312,7 +312,7 @@ class SparkMdxEngine(MdxEngine):
             df = self.fusion_dataframes(df_to_fusion)
             cols = list(itertools.chain.from_iterable(columns_to_keep.values()))
 
-            sort = self.parser.hierarchized_tuples()
+            sort = self.parsed.hierarchized_tuples
             # margins=True for columns total !!!!!
             # result = df.groupby(cols, sort=sort).sum()[self.selected_measures]
             if sort:

@@ -1,7 +1,6 @@
 from pytest import fixture
 
-from olapy.core.parse import Parser as MdxParser
-from olapy.core.parse import decorticate_query
+from olapy.core.parse import decorticate_query, MdxParser
 
 from .queries import query1, query2, query3, query4, query5, query6, where
 
