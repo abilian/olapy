@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 from attrs import define, field
 
-from olapy.core.parser import MdxParser
+from olapy.core.parse import Parser as MdxParser
 from olapy.core.common import DEFAULT_DATA
 
 # Needed because SQLAlchemy doesn't work under pyiodide

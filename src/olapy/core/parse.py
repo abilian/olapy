@@ -1,6 +1,6 @@
 """Parser for MDX queries, and Break it in parts."""
 
-
+from functools import cache
 import regex
 
 # flake8: noqa W605
@@ -11,6 +11,11 @@ REGEX = regex.compile(
     + r'\w+\d\.\,\s\(\)\_\-\:"\’\´\€\&\$ '
     + r"]+\])*\.?((Members)|(\[Q\d\]))?)"
 )
+
+
+@cache
+def find_all_tuples(query_string) -> list:
+    return REGEX.findall(query_string)
 
 
 class Parser:
@@ -85,7 +90,7 @@ class Parser:
                 .split("].[")
                 if tup_att
             ]
-            for tup in REGEX.findall(query[start:stop])
+            for tup in find_all_tuples(query[start:stop])
             if len(tup[0].split("].[")) > 1
         ]
 

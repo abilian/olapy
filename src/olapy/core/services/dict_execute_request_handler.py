@@ -6,7 +6,7 @@ import itertools
 import re
 from collections import OrderedDict
 
-from ..parser.parse import REGEX
+from olapy.core.parse import find_all_tuples
 
 
 class DictExecuteReqHandler:
@@ -84,7 +84,7 @@ class DictExecuteReqHandler:
 
         return [
             tup[0]
-            for tup in re.compile(REGEX).findall(mdx_query)
+            for tup in find_all_tuples(mdx_query)
             if "[Measures].[XL_SD" not in tup[0] and tup[1]
         ][::3]
 
