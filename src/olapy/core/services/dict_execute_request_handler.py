@@ -6,7 +6,7 @@ import itertools
 import re
 from collections import OrderedDict
 
-from ..mdx.parser.parse import REGEX
+from ..parser.parse import REGEX
 
 
 class DictExecuteReqHandler:

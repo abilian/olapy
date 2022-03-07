@@ -14,7 +14,7 @@ from .xmla_execute_xsds import execute_xsd
 # DictExecuteReqHandler:
 import re
 from collections import OrderedDict
-from ..mdx.parser.parse import REGEX
+from ..parser.parse import REGEX
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
