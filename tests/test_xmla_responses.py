@@ -47,7 +47,7 @@ def test_slicer_axis_query11(executor):
                     xml.DisplayInfo("0")
 
     xmla_tools = XmlaExecuteReqHandler(executor, query11, False)
-    assert str(xml) == xmla_tools.generate_slicer_axis()
+    assert str(xml) == xmla_tools.generate_slicer_axis().decode("utf8")
 
 
 def test_slicer_axis_query12(executor):
@@ -78,7 +78,7 @@ def test_slicer_axis_query12(executor):
                     xml.DisplayInfo("2")
 
     xmla_tools = XmlaExecuteReqHandler(executor, query12, False)
-    assert str(xml) == xmla_tools.generate_slicer_axis()
+    assert str(xml) == xmla_tools.generate_slicer_axis().decode("utf8")
 
 
 def test_slicer_axis_query14(executor):
@@ -111,7 +111,7 @@ def test_slicer_axis_query14(executor):
     ).strip()
 
     xmla_tools = XmlaExecuteReqHandler(executor, query14, False)
-    assert xml == xmla_tools.generate_slicer_axis()
+    assert xml == xmla_tools.generate_slicer_axis().decode("utf8")
 
 
 #
@@ -135,7 +135,7 @@ def test_query15_cell_data(executor):
 
     xmla_tools = XmlaExecuteReqHandler(executor, query15, False)
 
-    assert str(xml) == xmla_tools.generate_cell_data()
+    assert str(xml) == xmla_tools.generate_cell_data().decode("utf8")
 
 
 #
@@ -255,4 +255,4 @@ def test_query15_xs0(executor):
                     xml.DisplayInfo("0")
 
     xmla_tools = XmlaExecuteReqHandler(executor, query15, False)
-    assert str(xml) == xmla_tools.generate_xs0()
+    assert str(xml) == xmla_tools.generate_xs0().decode("utf8")

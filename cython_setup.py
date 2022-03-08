@@ -102,6 +102,7 @@ extensions = [
     pypyx_ext(NAME, "core", "services", "xmla_discover_xsds"),
     pypyx_ext(NAME, "core", "services", "xmla_execute_request_handler"),
     pypyx_ext(NAME, "core", "services", "xmla_execute_xsds"),
+    pypyx_ext(NAME, "core", "services", "xmla_execute_xsds_s"),
     pypyx_ext(NAME, "core", "services", "xmla_lib"),
     pypyx_ext(NAME, "core", "services", "xmla"),
     pypyx_ext(NAME, "core", "services", "spark", "xmla_discover_request_handler"),

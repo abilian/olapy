@@ -15,8 +15,7 @@ REGEX_TUPLES = regex.compile(
     + r"]+\])*\.?((Members)|(\[Q\d\]))?)"
 )
 
-
-@cache
+# @cache  # seems to no accelerate operations
 def find_all_tuples(query_string) -> list:
     return REGEX_TUPLES.findall(query_string)
 
@@ -91,7 +90,7 @@ def _get_tuples(query, start=None, stop=None):
     ]
 
 
-@cache
+# @cache  # seems to no accelerate operations
 def decorticate_query(query):
     """Get all tuples that exists in the MDX Query by axes.
 
@@ -212,7 +211,7 @@ class MdxParser:
     """Class for Parsing a MDX query."""
 
     def __init__(self):
-        """__init__ create a bumb instance, neet to load it afterwards with "load()" """
+        """__init__ create a dumb instance, need to load it afterwards with "load()" """
         self.mdx_query = None
         self.hierarchized_tuples = False
         self.nested_select = []

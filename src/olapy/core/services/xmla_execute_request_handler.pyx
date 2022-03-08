@@ -7,12 +7,11 @@ from datetime import datetime
 from typing import List, Text
 
 import numpy as np
-# import xmlwitch
 
-from .xmla_execute_xsds import execute_xsd
+# from .xmla_execute_xsds import execute_xsd
+from olapy.core.services.xmla_execute_xsds_s cimport execute_xsd_s
 
 # DictExecuteReqHandler:
-import re
 from collections import OrderedDict
 from olapy.core.parse import (find_all_tuples, split_group, split_tuple, decorticate_query)
 
@@ -20,7 +19,7 @@ from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
 # from libcythonplus.dict cimport cypdict
 # from libcythonplus.list cimport cyplist
-from olapy.cypxml cimport cypXML, to_str
+from olapy.cypxml cimport cypXML
 
 
 def execute_convert_formulas_query(mdx_query):
@@ -159,6 +158,10 @@ class XmlaExecuteReqHandler:
         """
 
         self.mdx_query = mdx_query
+        self.hierarchy_unique_name = "HIERARCHY_UNIQUE_NAME" in self.mdx_query.upper()
+        self.parent_unique_name = "PARENT_UNIQUE_NAME" in self.mdx_query.upper()
+        self.measures_one_axis_info_bytes = None
+
         self.convert2formulas = convert2formulas
         if self.convert2formulas:
             self.mdx_execution_result = execute_convert_formulas_query(mdx_query)
@@ -191,18 +194,19 @@ class XmlaExecuteReqHandler:
         #     xml.DisplayInfo("0")
         #     if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
         #         xml.HIERARCHY_UNIQUE_NAME("[Measures]")
-        measure = to_str(str(tuples[0][1]))
+        measure = Str(str(tuples[0][1]).encode("utf8"))
         m = xml.stag("Member").sattr("Hierarchy", "[Measures]")
         m.stag("UName").text(format("[Measures].[{}]", measure))
         m.stag("Caption").text(measure)
         m.stag("LName").stext("[Measures]")
         m.stag("LNum").stext("0")
         m.stag("DisplayInfo").stext("0")
-        if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
+        if self.hierarchy_unique_name:
             m.stag("HIERARCHY_UNIQUE_NAME").stext("[Measures]")
 
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     # def _gen_xs0_parent(self, xml, tuple, splitted_df, first_att):
     def _gen_xs0_parent(self, tuple, splitted_df, first_att):
@@ -216,7 +220,7 @@ class XmlaExecuteReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, tup0
 
         xml = cypXML()
         xml.set_max_depth(0)
@@ -229,21 +233,22 @@ class XmlaExecuteReqHandler:
         #         tuple[0], splitted_df[tuple[0]].columns[0], parent
         #     )
         # )
+        tup0 = Str(str(tuple[0]).encode("utf8"))
         xml.stag("PARENT_UNIQUE_NAME").text(format(
             "[{}].[{}].[{}]{}",
-            to_str(str(tuple[0])),
-            to_str(str(tuple[0])),
-            to_str(str(splitted_df[tuple[0]].columns[0])),
-            to_str(parent)
+            tup0,
+            tup0,
+            Str(str(splitted_df[tuple[0]].columns[0]).encode("utf8")),
+            Str(parent.encode("utf8"))
         ))
 
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     # def _gen_xs0_tuples(self, xml, tuples, **kwargs):
     def _gen_xs0_tuples(self, tuples, **kwargs):
         cdef cypXML xml
-        cdef Str result, minus1
+        cdef Str result, minus1, lnum_s
 
         xml = cypXML()
         xml.set_max_depth(1)
@@ -286,7 +291,7 @@ class XmlaExecuteReqHandler:
                 )
 
 
-            minus1 = to_str(str(tuple_without_minus_1[0]))
+            minus1 = Str(str(tuple_without_minus_1[0]).encode("utf8"))
             # with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
             #     xml.UName(uname)
             #     xml.Caption(str(tuple_without_minus_1[-1]))
@@ -312,29 +317,31 @@ class XmlaExecuteReqHandler:
             m = xml.stag("Member").attr(
                                     Str("Hierarchy"),
                                     format("[{0}].[{0}]", minus1, minus1))
-            m.stag("UName").text(to_str(uname))
-            m.stag("Caption").text(to_str(str(tuple_without_minus_1[-1])))
+            m.stag("UName").text(Str(uname.encode("utf8")))
+            m.stag("Caption").text(Str(str(tuple_without_minus_1[-1]).encode("utf8")))
             m.stag("LName").text(
                 format(
                     "[{0}].[{0}].[{1}]",
                     minus1,
                     minus1,
-                    to_str(str(current_lvl_name)))
+                    Str(str(current_lvl_name).encode("utf8")))
             )
-            m.stag("LNum").text(to_str(str(len(tuple_without_minus_1) - first_att)))
+            lnum_s = Str(str(len(tuple_without_minus_1) - first_att).encode("utf8"))
+            m.stag("LNum").text(lnum_s)
             m.stag("DisplayInfo").stext("131076")
-            if "PARENT_UNIQUE_NAME" in self.mdx_query.upper():
-                m.append(to_str(self._gen_xs0_parent(
+            if self.parent_unique_name:
+                m.append(Str(self._gen_xs0_parent(
                         tuple=tuple_without_minus_1,
                         splitted_df=split_df,
                         first_att=first_att,
                     )))
-            if "HIERARCHY_UNIQUE_NAME" in self.mdx_query.upper():
+            if self.hierarchy_unique_name:
                 m.stag("HIERARCHY_UNIQUE_NAME").text(
                         format("[{0}].[{0}]", minus1, minus1)
                     )
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def tuples_2_xs0(self, tuples, splitted_df, first_att, axis):
         """transform mdx query tuples (list) to xmla xs0.
@@ -369,7 +376,7 @@ class XmlaExecuteReqHandler:
         #                 if not self.executor.parser.hierarchized_tuples():
         #                     self._gen_measures_xs0(xml, tupls)
 
-        a = xml.stag("Axis").attr(Str("name"), to_str(str(axis)))
+        a = xml.stag("Axis").attr(Str("name"), Str(str(axis).encode("utf8")))
         ts = a.stag("Tuples")
         for tupls in itertools.chain(*tuples):
             t = ts.stag("Tuple")
@@ -377,18 +384,19 @@ class XmlaExecuteReqHandler:
                 tupls[0][1] in self.executor.measures
                 and len(self.executor.selected_measures) > 1
                 ):
-                t.append(to_str(self._gen_measures_xs0(tupls)))
+                t.append(Str(self._gen_measures_xs0(tupls)))
                 if tupls[0][-1] in self.executor.measures:
                     continue
-            t.append(to_str(self._gen_xs0_tuples(
+            t.append(Str(self._gen_xs0_tuples(
                             tupls, split_df=splitted_df, first_att=first_att
                     )))
             # Hierarchize:
             if not self.executor.parsed.hierarchized_tuples:
-                t.append(to_str(self._gen_measures_xs0(tupls)))
+                t.append(Str(self._gen_measures_xs0(tupls)))
 
         result = xml.dump()
-        return result.bytes().decode("utf8")
+        # return result.bytes().decode("utf8")
+        return result.bytes()
 
     def _gen_xs0_grouped_tuples(self, axis):
         """generate xs0 axis form query with multiple data groups "exple:
@@ -427,7 +435,7 @@ class XmlaExecuteReqHandler:
         #                         xml.LName(l_name)
         #                         xml.LNum(str(lvl))
         #                         xml.DisplayInfo(displayinfo)
-        a = xml.stag("Axis").attr(Str("name"), to_str(str(axis)))
+        a = xml.stag("Axis").attr(Str("name"), Str(str(axis).encode("utf8")))
         ts = a.stag("Tuples")
         for group in self.executor.parsed.nested_select:
             t = ts.stag("Tuple")
@@ -437,21 +445,22 @@ class XmlaExecuteReqHandler:
                     hierarchy = "[Measures]"
                     l_name = "[" + split_tupl[0] + "]"
                     lvl = 0
-                    displayinfo = "0"
+                    displayinfo = b"0"
                 else:
                     hierarchy = "[{0}].[{0}]".format(split_tupl[0])
                     l_name = f"[{'].['.join(split_tupl[:3])}]"
                     lvl = len(split_tupl[4:])
-                    displayinfo = "131076"
-                m = t.stag("Member").attr(Str("Hierarchy"), to_str(hierarchy))
-                m.stag("UName").text(to_str(tupl.strip(" \t\n")))
-                m.stag("Caption").text(to_str(str(split_tupl[-1])))
-                m.stag("LName").text(to_str(l_name))
-                m.stag("LNum").text(to_str(str(lvl)))
-                m.stag("DisplayInfo").text(to_str(displayinfo))
+                    displayinfo = b"131076"
+                m = t.stag("Member").attr(Str("Hierarchy"), Str(hierarchy.encode("utf8")))
+                m.stag("UName").text(Str(tupl.strip(" \t\n").encode("utf8")))
+                m.stag("Caption").text(Str(str(split_tupl[-1]).encode("utf8")))
+                m.stag("LName").text(Str(l_name.encode("utf8")))
+                m.stag("LNum").text(Str(str(lvl).encode("utf8")))
+                m.stag("DisplayInfo").text(Str(displayinfo))
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def generate_xs0(self):
         """
@@ -516,7 +525,7 @@ class XmlaExecuteReqHandler:
 
         dfs = self.split_dataframe()
         if self.columns_desc["rows"] and self.columns_desc["columns"]:
-            return """
+            return b"""
             {}
             {}
             """.format(
@@ -675,22 +684,23 @@ class XmlaExecuteReqHandler:
             #                 xml.LName("[Measures]")
             #                 xml.LNum("0")
             #                 xml.DisplayInfo("0")
-            a = xml.stag("Axis").attr(Str("name"), to_str(str(axis)))
+            a = xml.stag("Axis").attr(Str("name"), Str(axis.encode("utf8")))
             ts = a.stag("Tuples")
             t = ts.stag("Tuple")
             m = t.stag("Member").sattr("Hierarchy", "[Measures]")
             m.stag("UName").text(format(
                                 "[Measures].[{}]",
-                                 to_str(str(self.executor.selected_measures[0]))
+                                 Str(str(self.executor.selected_measures[0]).encode("utf8"))
                              ))
-            m.stag("Caption").text(to_str(str(self.executor.selected_measures[0])))
+            m.stag("Caption").text(Str(str(self.executor.selected_measures[0]).encode("utf8")))
             m.stag("LName").stext("[Measures]")
             m.stag("LNum").stext("0")
             m.stag("DisplayInfo").stext("0")
             result = xml.dump()
-            return result.bytes().decode("utf8").strip()
+            # return result.bytes().decode("utf8").strip()
+            return result.bytes().strip()
         else:
-            return ""
+            return b""
 
     def _generate_xs0_convert2formulas(self):
         """generate xs0 xml for convert formulas request.
@@ -698,7 +708,7 @@ class XmlaExecuteReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, xl_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -718,19 +728,18 @@ class XmlaExecuteReqHandler:
         ts = a.stag("Tuples")
         if isinstance(self.mdx_execution_result, list):
             for idx in range(len(self.mdx_execution_result) * 3):
+                xl_s = format("XL_SD{}", Str(str(idx).encode("ut8")))
                 t = ts.stag("Tuple")
                 m = t.stag("Member").sattr("Hierarchy", "[Measures]")
-                m.stag("UName").text(format(
-                            "[Measures].[{}]",
-                             to_str('XL_SD' + str(idx))
-                         ))
-                m.stag("Caption").text(to_str('XL_SD' + str(idx)))
+                m.stag("UName").text(format("[Measures].[{}]", xl_s))
+                m.stag("Caption").text(xl_s)
                 m.stag("LName").stext("[Measures]")
                 m.stag("LNum").stext("0")
                 m.stag("DisplayInfo").stext("0")
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def _generate_slicer_convert2formulas(self):
         """Generate set et of hierarchies from which data is retrieved for a
@@ -780,7 +789,7 @@ class XmlaExecuteReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result, dd, col_attr, col0
+        cdef Str result, dd_s, dd_dd_s, col_attr, col0
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -815,19 +824,21 @@ class XmlaExecuteReqHandler:
         ts = a.stag("Tuples")
         t = ts.stag("Tuple")
         for dim_diff in self.executor.get_all_tables_names(ignore_fact=True):
-            dd = to_str(dim_diff)
-            col_attr = to_str(str(self.executor.tables_loaded[dim_diff].iloc[0][0]))
-            col0 = to_str(str(self.executor.tables_loaded[dim_diff].columns[0]))
+            dd_s = Str(str(dim_diff).encode("utf8"))
+            dd_dd_s = format("[{}].[{}]", dd_s, dd_s)
+            col_attr = Str(str(self.executor.tables_loaded[dim_diff].iloc[0][0]).encode("utf8"))
+            col0 = Str(str(self.executor.tables_loaded[dim_diff].columns[0]).encode("utf8"))
             m = t.stag("Member")
-            m.attr(Str("Hierarchy"), format("[{}].[{}]", dd, dd))
-            m.stag("UName").text(format("[{}].[{}].[{}].[{}]", dd, dd, col0, col_attr))
+            m.attr(Str("Hierarchy"), dd_dd_s)
+            m.stag("UName").text(format("{}.[{}].[{}]", dd_dd_s, col0, col_attr))
             m.stag("Caption").text(col_attr)
-            m.stag("LName").text(format("[{}].[{}].[{}]", dd, dd, col0))
+            m.stag("LName").text(format("{}.[{}]", dd_dd_s, col0))
             m.stag("LNum").stext("0")
             m.stag("DisplayInfo").stext("2")
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def _generate_axes_convert2formulas(self):
         return self._generate_xs0_convert2formulas()
@@ -841,7 +852,7 @@ class XmlaExecuteReqHandler:
         CellOrdinal="2">     <Value>[Measures]</Value> </Cell>
         """
         cdef cypXML xml
-        cdef Str result, sdim, to_write, sname
+        cdef Str result, id_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -872,30 +883,33 @@ class XmlaExecuteReqHandler:
         #     index += 1
         index = 0
         for tupl in self.mdx_execution_result:
-            c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
-            c.stag("Value").text(to_str(str(tupl)))
+            id_s = Str(str(index).encode("utf8"))
+            c = xml.stag("Cell").attr(Str("CellOrdinal"), id_s)
+            c.stag("Value").text(Str(str(tupl).encode("utf8")))
             index += 1
-            c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
-            c.stag("Value").text(to_str(split_tuple(tupl)[-1]))
+            id_s = Str(str(index).encode("utf8"))
+            c = xml.stag("Cell").attr(Str("CellOrdinal"), id_s)
+            c.stag("Value").text(Str(split_tuple(tupl)[-1].encode("utf8")))
             index += 1
-
+            id_s = Str(str(index).encode("utf8"))
             tupl2list = tupl.split(".")
             if tupl2list[0].upper() == "[MEASURES]":
-                value = "[Measures]"
+                value = b"[Measures]"
             else:
-                value = "{0}.{0}.[{1}]".format(
+                value = b"{0}.{0}.[{1}]".format(
                     tupl2list[0],
                     self.executor.tables_loaded[
                         tupl2list[0].replace("[", "").replace("]", "")
                     ].columns[len(tupl2list[4:])],
                 )
-            c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
-            c.stag("Value").text(to_str(value))
+            c = xml.stag("Cell").attr(Str("CellOrdinal"), id_s)
+            c.stag("Value").text(Str(value))
             index += 1
 
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def generate_cell_data(self):
         # type: () -> Text
@@ -953,12 +967,13 @@ class XmlaExecuteReqHandler:
         for value in columns_loop:
             if np.isnan(value):
                 value = ""
-            c = xml.stag("Cell").attr(Str("CellOrdinal"), to_str(str(index)))
-            c.stag("Value").text(to_str(str(value))).sattr("xsi:type", "xsi:long")
+            c = xml.stag("Cell").attr(Str("CellOrdinal"), Str(str(index).encode("utf8")))
+            c.stag("Value").text(Str(str(value).encode("utf8"))).sattr("xsi:type", "xsi:long")
             index += 1
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def _generate_axes_info_slicer_convert2formulas(self):
         """generate Slicer Axes for convert formulas query.
@@ -966,7 +981,7 @@ class XmlaExecuteReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result, sdim, to_write, sname
+        cdef Str result, d_s, to_write, name_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -983,44 +998,45 @@ class XmlaExecuteReqHandler:
         #                 name=to_write + ".[DISPLAY_INFO]", type="xs:unsignedInt"
         #             )
         a = xml.stag("AxisInfo").sattr("name", "SlicerAxis")
-        sname = Str("name")
+        name_s = Str("name")
         for dim in self.executor.get_all_tables_names(ignore_fact=True):
-            sdim = Str(dim)
-            to_write = format("[{}].[{}]", sdim, sdim)
-            h = a.stag("HierarchyInfo").attr(sname, to_write)
+            d_s = Str(str(dim).encode("utf8"))
+            to_write = format("[{}].[{}]", d_s, d_s)
+            h = a.stag("HierarchyInfo").attr(name_s, to_write)
             h.stag("UName").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[MEMBER_UNIQUE_NAME]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("Caption").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[MEMBER_CAPTION]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("LName").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[LEVEL_UNIQUE_NAME]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("LNum").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[LEVEL_NUMBER]", to_write)
                                 ).sattr(
                                     "type", "xs:int"
                                 )
             h.stag("DisplayInfo").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[DISPLAY_INFO]", to_write)
                                 ).sattr(
                                     "type", "xs:unsignedInt"
                                 )
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     def generate_axes_info_slicer(self):
         """generates slicer axis which filters the data returned by the MDX
@@ -1052,7 +1068,7 @@ class XmlaExecuteReqHandler:
         :return: AxisInfo as string
         """
         cdef cypXML xml
-        cdef Str result, sdim, to_write, sname
+        cdef Str result, dd_s, to_write, name_s
 
         if self.convert2formulas:
             return self._generate_axes_info_slicer_convert2formulas()
@@ -1062,7 +1078,7 @@ class XmlaExecuteReqHandler:
         slicer_list = sorted(set(all_dimensions_names) - set(self.columns_desc["all"]))
 
         if not slicer_list:
-            return ""
+            return b""
 
         if "Measures" in slicer_list:
             slicer_list.insert(
@@ -1106,11 +1122,11 @@ class XmlaExecuteReqHandler:
         #             xml.DisplayInfo(
         #                 name=to_write + ".[DISPLAY_INFO]", type="xs:unsignedInt"
         #             )
-        sname = Str("name")
-        a = xml.stag("AxisInfo").attr(sname, Str("SlicerAxis"))
+        name_s = Str("name")
+        a = xml.stag("AxisInfo").attr(name_s, Str("SlicerAxis"))
         for dim_diff in slicer_list:
-            sdim = Str(dim_diff)
-            to_write = format("[{}].[{}]", sdim, sdim)
+            dd_s = Str(str(dim_diff).encode("utf8"))
+            to_write = format("[{}].[{}]", dd_s, dd_s)
             if dim_diff == "Measures":
                 # if measures > 1 we don't have to write measure
                 # Hierarchize
@@ -1126,40 +1142,41 @@ class XmlaExecuteReqHandler:
                     continue
                 else:
                     to_write = Str("[Measures]")
-            h = a.stag("HierarchyInfo").attr(sname, to_write)
+            h = a.stag("HierarchyInfo").attr(name_s, to_write)
             h.stag("UName").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[MEMBER_UNIQUE_NAME]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("Caption").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[MEMBER_CAPTION]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("LName").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[LEVEL_UNIQUE_NAME]", to_write)
                                 ).sattr(
                                     "type", "xs:string"
                                 )
             h.stag("LNum").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[LEVEL_NUMBER]", to_write)
                                 ).sattr(
                                     "type", "xs:int"
                                 )
             h.stag("DisplayInfo").attr(
-                                    sname,
+                                    name_s,
                                     format("{}.[DISPLAY_INFO]", to_write)
                                 ).sattr(
                                     "type", "xs:unsignedInt"
                                 )
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
     # def _gen_measures_one_axis_info(self, xml):
     def _gen_measures_one_axis_info(self):
@@ -1186,6 +1203,9 @@ class XmlaExecuteReqHandler:
         cdef cypXML xml
         cdef Str result
 
+        if self.measures_one_axis_info_bytes:
+            return self.measures_one_axis_info_bytes
+
         xml = cypXML()
         xml.set_max_depth(0)
         h = xml.stag("HierarchyInfo").sattr("name", "[Measures]")
@@ -1199,18 +1219,20 @@ class XmlaExecuteReqHandler:
                                                                 "type", "xs:int")
         h.stag("DisplayInfo").sattr("name", "[Measures].[DISPLAY_INFO]").sattr(
                                                             "type", "xs:unsignedInt")
-        if "PARENT_UNIQUE_NAME" in self.mdx_query:
+        if self.parent_unique_name:
             h.stag("PARENT_UNIQUE_NAME").sattr(
                                                 "name",
                                                 "[Measures].[PARENT_UNIQUE_NAME]"
                                             ).sattr("type", "xs:string")
-        if "HIERARCHY_UNIQUE_NAME" in self.mdx_query:
+        if self.hierarchy_unique_name:
             h.stag("HIERARCHY_UNIQUE_NAME").sattr(
                                                 "name",
                                                 "[Measures].[HIERARCHY_UNIQUE_NAME]"
                                             ).sattr("type", "xs:string")
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        self.measures_one_axis_info_bytes = result.bytes().strip()
+        return self.measures_one_axis_info_bytes
 
     # def _generate_table_axis_info(self, xml, dimensions_names):
     def _generate_table_axis_info(self, dimensions_names):
@@ -1256,48 +1278,52 @@ class XmlaExecuteReqHandler:
         #                 type="xs:string",
         #             )
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, name_s, dn_s, dn_dn_s
 
+        name_s = Str("name")
         xml = cypXML()
         xml.set_max_depth(1)
 
         for dimension_name in dimensions_names:
-            dn = to_str(dimensions_names)
+            dn_s = Str(dimensions_names.encode("utf8"))
+            dn_dn_s = format("[{}].[{}]", dn_s, dn_s)
+
             h = xml.stag("HierarchyInfo").attr(
-                                                Str("name"),
-                                                format("[{}].[{}]", dn, dn)
+                                                name_s,
+                                                dn_dn_s
                                                 )
             h.stag("UName").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[MEMBER_UNIQUE_NAME]", dn, dn)
+                                    name_s,
+                                    format("{}.[MEMBER_UNIQUE_NAME]", dn_dn_s)
                                 ).sattr("type", "xs:string")
             h.stag("Caption").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[MEMBER_CAPTION]", dn, dn)
+                                    name_s,
+                                    format("{}.[MEMBER_CAPTION]", dn_dn_s)
                                 ).sattr("type", "xs:string")
             h.stag("LName").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[LEVEL_UNIQUE_NAME]", dn, dn)
+                                    name_s,
+                                    format("{}.[LEVEL_UNIQUE_NAME]", dn_dn_s)
                                 ).sattr("type", "xs:string")
             h.stag("LNum").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[LEVEL_NUMBER]", dn, dn)
+                                    name_s,
+                                    format("{}.[LEVEL_NUMBER]", dn_dn_s)
                                 ).sattr("type", "xs:int")
             h.stag("DisplayInfo").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[DISPLAY_INFO]", dn, dn)
+                                    name_s,
+                                    format("{}.[DISPLAY_INFO]", dn_dn_s)
                                 ).sattr("type", "xs:unsignedInt")
             if "Hierarchize" in self.mdx_query:
                 h.stag("PARENT_UNIQUE_NAME").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[PARENT_UNIQUE_NAME]", dn, dn)
+                                    name_s,
+                                    format("{}.[PARENT_UNIQUE_NAME]", dn_dn_s)
                                 ).sattr("type", "xs:string")
                 h.stag("HIERARCHY_UNIQUE_NAME").attr(
-                                    Str("name"),
-                                    format("[{}].[{}].[HIERARCHY_UNIQUE_NAME]", dn, dn)
+                                    name_s,
+                                    format("{}.[HIERARCHY_UNIQUE_NAME]", dn_dn_s)
                                 ).sattr("type", "xs:string")
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()
+        # return result.bytes().decode("utf8").strip()
+        return result.bytes().strip()
 
 
     def generate_one_axis_info(self, mdx_query_axis="columns", Axis="Axis0"):
@@ -1344,7 +1370,7 @@ class XmlaExecuteReqHandler:
             if table_name != self.executor.facts
         ]
         if not axis_tables:
-            return ""
+            return b""
         # xml = xmlwitch.Builder()
         # measure must be written at the top
         # if axis_tables:
@@ -1368,23 +1394,24 @@ class XmlaExecuteReqHandler:
         xml = cypXML()
         xml.set_max_depth(1)
 
-        a = xml.stag("AxisInfo").attr(Str("name"), to_str(Axis))
+        a = xml.stag("AxisInfo").attr(Str("name"), Str(str(Axis).encode("utf8")))
         # many measures, then write this on the top
         if (
             self.executor.facts in axis_tables.keys() and
             len(axis_tables[self.executor.facts]) > 1
             ):
-            a.append(to_str(self._gen_measures_one_axis_info()))
-        a.append(to_str(self._generate_table_axis_info(axis_tables_without_facts)))
+            a.append(Str(self._gen_measures_one_axis_info()))
+        a.append(Str(self._generate_table_axis_info(axis_tables_without_facts)))
         # Hierarchize
         if (
             not self.executor.parsed.hierarchized_tuples and
             len(self.columns_desc["columns"].get(self.executor.facts, [1, 1])) == 1
             ):
-            a.append(to_str(self._gen_measures_one_axis_info()))
+            a.append(Str(self._gen_measures_one_axis_info()))
         # return str(xml)
         result = xml.dump()
-        return result.bytes().decode("utf8")
+        # return result.bytes().decode("utf8")
+        return result.bytes()
 
     def _generate_axes_info_convert2formulas(self):
         """AxisInfo elements when convert to formulas,
@@ -1443,15 +1470,15 @@ class XmlaExecuteReqHandler:
         #
         # return str(xml)
         return (
-        '<AxisInfo name="Axis0">\n'
-        '  <HierarchyInfo name="[Measures]">\n'
-        '    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xs:string" />\n'
-        '    <Caption name="[Measures].[MEMBER_CAPTION]" type="xs:string" />\n'
-        '    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xs:string" />\n'
-        '    <LNum name="[Measures].[LEVEL_NUMBER]" type="xs:int" />\n'
-        '    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xs:unsignedInt" />\n'
-        '  </HierarchyInfo>\n'
-        '</AxisInfo>')
+        b'<AxisInfo name="Axis0">\n'
+        b'  <HierarchyInfo name="[Measures]">\n'
+        b'    <UName name="[Measures].[MEMBER_UNIQUE_NAME]" type="xs:string" />\n'
+        b'    <Caption name="[Measures].[MEMBER_CAPTION]" type="xs:string" />\n'
+        b'    <LName name="[Measures].[LEVEL_UNIQUE_NAME]" type="xs:string" />\n'
+        b'    <LNum name="[Measures].[LEVEL_NUMBER]" type="xs:int" />\n'
+        b'    <DisplayInfo name="[Measures].[DISPLAY_INFO]" type="xs:unsignedInt" />\n'
+        b'  </HierarchyInfo>\n'
+        b'</AxisInfo>')
 
     def _generate_cell_info_convert2formuls(self):
         """CellInfo representation for convert to formulas.
@@ -1468,7 +1495,7 @@ class XmlaExecuteReqHandler:
         #     xml.Value(name="VALUE")
         # xml.stag("CellInfo").stag("Value").sattr("name", "VALUE")
         # return str(xml)
-        return '<CellInfo>\n  <Value name="VALUE" />\n</CellInfo>'
+        return b'<CellInfo>\n  <Value name="VALUE" />\n</CellInfo>'
 
     def generate_cell_info(self):
         """Generate CellInfo which represents the cell metadata contained by
@@ -1500,14 +1527,14 @@ class XmlaExecuteReqHandler:
         # return str(xml)
         # result = xml.dump()
         # return result.bytes().decode("utf8")
-        return ('<CellInfo>\n'
-        '  <Value name="VALUE" />\n'
-        '  <FormatString name="FORMAT_STRING" type="xs:string" />\n'
-        '  <Language name="LANGUAGE" type="xs:unsignedInt" />\n'
-        '  <BackColor name="BACK_COLOR" type="xs:unsignedInt" />\n'
-        '  <ForeColor name="FORE_COLOR" type="xs:unsignedInt" />\n'
-        '  <FontFlags name="FONT_FLAGS" type="xs:int" />\n'
-        '</CellInfo>')
+        return (b'<CellInfo>\n'
+        b'  <Value name="VALUE" />\n'
+        b'  <FormatString name="FORMAT_STRING" type="xs:string" />\n'
+        b'  <Language name="LANGUAGE" type="xs:unsignedInt" />\n'
+        b'  <BackColor name="BACK_COLOR" type="xs:unsignedInt" />\n'
+        b'  <ForeColor name="FORE_COLOR" type="xs:unsignedInt" />\n'
+        b'  <FontFlags name="FONT_FLAGS" type="xs:int" />\n'
+        b'</CellInfo>')
 
     def generate_axes_info(self):
         """
@@ -1522,7 +1549,7 @@ class XmlaExecuteReqHandler:
             return self._generate_axes_info_convert2formulas()
 
         if self.columns_desc["rows"]:
-            return """
+            return b"""
             {}
             {}
             """.format(
@@ -1563,7 +1590,7 @@ class XmlaExecuteReqHandler:
         """
         # not used dimensions
         cdef cypXML xml
-        cdef Str result, dd, col_attr, col0, measure
+        cdef Str result, dd_s, dd_dd_s, col_attr, col0, measure
 
         if self.convert2formulas:
             return self._generate_slicer_convert2formulas()
@@ -1574,7 +1601,7 @@ class XmlaExecuteReqHandler:
         )
 
         if not unused_dimensions:
-            return ""
+            return b""
 
         xml = cypXML()
         xml.set_max_depth(0)
@@ -1585,14 +1612,15 @@ class XmlaExecuteReqHandler:
         ts = a.stag("Tuples")
         t = ts.stag("Tuple")
         for dim_diff in unused_dimensions:
-            dd = to_str(dim_diff)  # converted to Str for format() args
-            col_attr = to_str(str(self.executor.tables_loaded[dim_diff].iloc[0][0]))
-            col0 = to_str(str(self.executor.tables_loaded[dim_diff].columns[0]))
+            dd_s = Str(str(dim_diff).encode("utf8"))
+            dd_dd_s = format("[{}].[{}]", dd_s, dd_s)
+            col_attr = Str(str(self.executor.tables_loaded[dim_diff].iloc[0][0]).encode("utf8"))
+            col0 = Str(str(self.executor.tables_loaded[dim_diff].columns[0]).encode("utf8"))
             m = t.stag("Member")
-            m.attr(Str("Hierarchy"), format("[{}].[{}]", dd, dd))
-            m.stag("UName").text(format("[{}].[{}].[{}].[{}]", dd, dd, col0, col_attr))
+            m.attr(Str("Hierarchy"), dd_dd_s)
+            m.stag("UName").text(format("{}.[{}].[{}]", dd_dd_s, col0, col_attr))
             m.stag("Caption").text(col_attr)
-            m.stag("LName").text(format("[{}].[{}].[{}]", dd, dd, col0))
+            m.stag("LName").text(format("{}.[{}]", dd_dd_s, col0))
             m.stag("LNum").stext("0")
             m.stag("DisplayInfo").stext("2")
         # Hierarchize
@@ -1600,7 +1628,7 @@ class XmlaExecuteReqHandler:
             self.executor.parsed.hierarchized_tuples
             or self.executor.facts in self.columns_desc["where"]
         ):
-            measure = to_str(str(self.executor.measures[0]))
+            measure = Str(str(self.executor.measures[0]).encode("utf8"))
             m = t.stag("Member").sattr("Hierarchy", "[Measures]")
             m.stag("UName").text(format("[Measures].[{}]", measure))
             m.stag("Caption").text(measure)
@@ -1609,7 +1637,8 @@ class XmlaExecuteReqHandler:
             m.stag("DisplayInfo").stext("0")
 
         result = xml.dump()
-        return result.bytes().decode("utf8").strip()  # strip() for passing tests
+        # return result.bytes().decode("utf8").strip()  # strip() for passing tests
+        return result.bytes().strip()  # strip() for passing tests
 
         # with xml.Axis(name="SlicerAxis"):
         #     with xml.Tuples:
@@ -1660,10 +1689,10 @@ class XmlaExecuteReqHandler:
         :return: xmla response as string
         """
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, now_s
 
         xml = cypXML()
-        xml.set_max_depth(1)
+        xml.set_max_depth(3)
 
         if self.mdx_query == "":
             # check if command contains a query
@@ -1710,30 +1739,31 @@ class XmlaExecuteReqHandler:
             #         with xml.CellData:
             #             xml.write(self.generate_cell_data())
             # return str(xml)
+            now_s = Str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S").encode("utf8"))
             e = xml.stag("return")
             root = e.stag("root")
             root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:mddataset")
             root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
             root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-            root.append(to_str(execute_xsd))
+            root.append(execute_xsd_s)
             info = root.stag("OlapInfo")
             c = info.stag("CubeInfo").stag("Cube")
             c.stag("CubeName").stext("Sales")
             d = c.stag("LastDataUpdate")
-            d.text(to_str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")))
+            d.text(now_s)
             d.sattr("xmlns", "http://schemas.microsoft.com/analysisservices/2003/engine")
             s = c.stag("LastSchemaUpdate")
-            s.text(to_str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")))
+            s.text(now_s)
             s.sattr("xmlns", "http://schemas.microsoft.com/analysisservices/2003/engine")
-            info.append(to_str(self.generate_cell_info()))
+            info.append(Str(self.generate_cell_info()))
             a = info.stag("AxesInfo")
-            a.append(to_str(self.generate_axes_info()))
-            a.append(to_str(self.generate_axes_info_slicer()))
+            a.append(Str(self.generate_axes_info()))
+            a.append(Str(self.generate_axes_info_slicer()))
             x = root.stag("Axes")
-            x.append(to_str(self.generate_xs0()))
-            x.append(to_str(self.generate_slicer_axis()))
+            x.append(Str(self.generate_xs0()))
+            x.append(Str(self.generate_slicer_axis()))
             c = root.stag("CellData")
-            c.append(to_str(self.generate_cell_data()))
+            c.append(Str(self.generate_cell_data()))
 
         result = xml.dump()
-        return result.bytes().decode("utf8")
+        return result.bytes().decode("utf8", "replace")
