@@ -13,7 +13,8 @@ from olapy.core.services.xmla_execute_xsds_s cimport execute_xsd_s
 
 # DictExecuteReqHandler:
 from collections import OrderedDict
-from olapy.core.parse import (find_all_tuples, split_group, split_tuple, decorticate_query)
+from olapy.core.parse import (find_all_tuples, split_group, split_tuple,
+                              decorticate_query)
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -111,7 +112,8 @@ class XmlaExecuteReqHandler:
 
     *** wip : removing class inheritance
      "DictExecuteReqHandler handles xmla commands to an instance of MdxEngine.
-     This includes requests involving data transfer, such as retrieving data on the server."
+     This includes requests involving data transfer, such as retrieving data on the
+     server."
 
     ***
 
@@ -224,8 +226,7 @@ class XmlaExecuteReqHandler:
 
         xml = cypXML()
         xml.set_max_depth(0)
-
-        parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1 : -1]))
+        parent = ".".join(f"[{x}]" for x in tuple[first_att - 1 : -1])
         if parent:
             parent = "." + parent
         # xml.PARENT_UNIQUE_NAME(
@@ -246,25 +247,24 @@ class XmlaExecuteReqHandler:
         return result.bytes().strip()
 
     # def _gen_xs0_tuples(self, xml, tuples, **kwargs):
-    def _gen_xs0_tuples(self, tuples, **kwargs):
+    def _gen_xs0_tuples(self, tuples, split_df, first_att):
         cdef cypXML xml
-        cdef Str result, minus1, lnum_s
+        cdef Str result, dim_s, dims_s, lnum_s
 
         xml = cypXML()
         xml.set_max_depth(1)
 
-        first_att = kwargs.get("first_att")
-        split_df = kwargs.get("split_df")
         all_tuples = decorticate_query(self.mdx_query)["all"]
         # [Geography].[Geography].[Continent]  -> first_lvlname : Country
         # [Geography].[Geography].[Europe]     -> first_lvlname : Europe
         all_level_columns = get_lvl_column_by_dimension(all_tuples)
         for tupl in tuples:
+            current_dimension = tuple_without_minus_1[0]
             tuple_without_minus_1 = get_tuple_without_nan(tupl)
-            current_lvl_name = split_df[tuple_without_minus_1[0]].columns[
+            current_lvl_name = split_df[current_dimension].columns[
                 len(tuple_without_minus_1) - first_att
             ]
-            current_dimension = tuple_without_minus_1[0]
+
             if all(
                 used_column in self.executor.tables_loaded[current_dimension].columns
                 for used_column in all_level_columns[current_dimension]
@@ -273,25 +273,21 @@ class XmlaExecuteReqHandler:
                     current_dimension,
                     current_lvl_name,
                     ".".join(
-                        [
-                            "[" + str(tuple_value) + "]"
+                            f"[{tuple_value}]"
                             for tuple_value in tuple_without_minus_1[first_att - 1 :]
-                        ]
                     ),
                 )
             else:
                 uname = "[{0}].[{0}].{1}".format(
                     current_dimension,
                     ".".join(
-                        [
-                            "[" + str(tuple_value) + "]"
+                            f"[{tuple_value}]"
                             for tuple_value in tuple_without_minus_1[first_att - 1 :]
-                        ]
                     ),
                 )
 
-
-            minus1 = Str(str(tuple_without_minus_1[0]).encode("utf8"))
+            dim_s = Str(str(current_dimension).encode("utf8"))
+            dims_s = format("[{}].[{}]", dim_s, dim_s)
             # with xml.Member(Hierarchy="[{0}].[{0}]".format(tuple_without_minus_1[0])):
             #     xml.UName(uname)
             #     xml.Caption(str(tuple_without_minus_1[-1]))
@@ -314,16 +310,13 @@ class XmlaExecuteReqHandler:
             #         xml.HIERARCHY_UNIQUE_NAME(
             #             "[{0}].[{0}]".format(tuple_without_minus_1[0])
             #         )
-            m = xml.stag("Member").attr(
-                                    Str("Hierarchy"),
-                                    format("[{0}].[{0}]", minus1, minus1))
+            m = xml.stag("Member").attr(Str("Hierarchy"), dims_s)
             m.stag("UName").text(Str(uname.encode("utf8")))
             m.stag("Caption").text(Str(str(tuple_without_minus_1[-1]).encode("utf8")))
             m.stag("LName").text(
                 format(
-                    "[{0}].[{0}].[{1}]",
-                    minus1,
-                    minus1,
+                    "{}.[{}]",
+                    dims_s,
                     Str(str(current_lvl_name).encode("utf8")))
             )
             lnum_s = Str(str(len(tuple_without_minus_1) - first_att).encode("utf8"))
@@ -336,9 +329,7 @@ class XmlaExecuteReqHandler:
                         first_att=first_att,
                     )))
             if self.hierarchy_unique_name:
-                m.stag("HIERARCHY_UNIQUE_NAME").text(
-                        format("[{0}].[{0}]", minus1, minus1)
-                    )
+                m.stag("HIERARCHY_UNIQUE_NAME").text(dims_s)
         result = xml.dump()
         # return result.bytes().decode("utf8").strip()
         return result.bytes().strip()
@@ -376,7 +367,7 @@ class XmlaExecuteReqHandler:
         #                 if not self.executor.parser.hierarchized_tuples():
         #                     self._gen_measures_xs0(xml, tupls)
 
-        a = xml.stag("Axis").attr(Str("name"), Str(str(axis).encode("utf8")))
+        a = xml.stag("Axis").attr(Str("name"), Str(axis.encode("utf8")))
         ts = a.stag("Tuples")
         for tupls in itertools.chain(*tuples):
             t = ts.stag("Tuple")
@@ -387,9 +378,7 @@ class XmlaExecuteReqHandler:
                 t.append(Str(self._gen_measures_xs0(tupls)))
                 if tupls[0][-1] in self.executor.measures:
                     continue
-            t.append(Str(self._gen_xs0_tuples(
-                            tupls, split_df=splitted_df, first_att=first_att
-                    )))
+            t.append(Str(self._gen_xs0_tuples(tupls, splitted_df, first_att)))
             # Hierarchize:
             if not self.executor.parsed.hierarchized_tuples:
                 t.append(Str(self._gen_measures_xs0(tupls)))
@@ -435,7 +424,7 @@ class XmlaExecuteReqHandler:
         #                         xml.LName(l_name)
         #                         xml.LNum(str(lvl))
         #                         xml.DisplayInfo(displayinfo)
-        a = xml.stag("Axis").attr(Str("name"), Str(str(axis).encode("utf8")))
+        a = xml.stag("Axis").attr(Str("name"), Str(axis.encode("utf8")))
         ts = a.stag("Tuples")
         for group in self.executor.parsed.nested_select:
             t = ts.stag("Tuple")
@@ -443,7 +432,7 @@ class XmlaExecuteReqHandler:
                 split_tupl = split_tuple(tupl)
                 if split_tupl[0].upper() == "MEASURES":
                     hierarchy = "[Measures]"
-                    l_name = "[" + split_tupl[0] + "]"
+                    l_name = f"[{split_tupl[0]}]"
                     lvl = 0
                     displayinfo = b"0"
                 else:
@@ -451,7 +440,8 @@ class XmlaExecuteReqHandler:
                     l_name = f"[{'].['.join(split_tupl[:3])}]"
                     lvl = len(split_tupl[4:])
                     displayinfo = b"131076"
-                m = t.stag("Member").attr(Str("Hierarchy"), Str(hierarchy.encode("utf8")))
+                m = t.stag("Member").attr(
+                                    Str("Hierarchy"), Str(hierarchy.encode("utf8")))
                 m.stag("UName").text(Str(tupl.strip(" \t\n").encode("utf8")))
                 m.stag("Caption").text(Str(str(split_tupl[-1]).encode("utf8")))
                 m.stag("LName").text(Str(l_name.encode("utf8")))
@@ -595,7 +585,8 @@ class XmlaExecuteReqHandler:
         element that uses the MDDataSet data type.
 
         :param splitted_df: spllited dataframes (with split_dataframe() function)
-        :param mdx_query_axis: from mdx query,  rows | columns | where (condition) | all (rows + columns + where)
+        :param mdx_query_axis: from mdx query,  rows | columns | where (condition) |
+            all (rows + columns + where)
         :return: one xs0 reponse as xml format
         """
 
@@ -655,12 +646,13 @@ class XmlaExecuteReqHandler:
         """
 
         :param splitted_df: splitted dataframes (with split_dataframe() function)
-        :param mdx_query_axis: axis to which you want generate xs0 xml, (rows, columns or all)
+        :param mdx_query_axis: axis to which you want generate xs0 xml, (rows, columns
+            or all)
         :param axis: axis0 or axis1
         :return:
         """
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, measure_s
 
         # patch 4 select (...) (...) (...) from bla bla bla
         if self.executor.parsed.check_nested_select():
@@ -684,15 +676,13 @@ class XmlaExecuteReqHandler:
             #                 xml.LName("[Measures]")
             #                 xml.LNum("0")
             #                 xml.DisplayInfo("0")
+            measure_s = Str(str(self.executor.selected_measures[0]).encode("utf8"))
             a = xml.stag("Axis").attr(Str("name"), Str(axis.encode("utf8")))
             ts = a.stag("Tuples")
             t = ts.stag("Tuple")
             m = t.stag("Member").sattr("Hierarchy", "[Measures]")
-            m.stag("UName").text(format(
-                                "[Measures].[{}]",
-                                 Str(str(self.executor.selected_measures[0]).encode("utf8"))
-                             ))
-            m.stag("Caption").text(Str(str(self.executor.selected_measures[0]).encode("utf8")))
+            m.stag("UName").text(format("[Measures].[{}]", measure_s))
+            m.stag("Caption").text(measure_s)
             m.stag("LName").stext("[Measures]")
             m.stag("LNum").stext("0")
             m.stag("DisplayInfo").stext("0")
@@ -967,8 +957,10 @@ class XmlaExecuteReqHandler:
         for value in columns_loop:
             if np.isnan(value):
                 value = ""
-            c = xml.stag("Cell").attr(Str("CellOrdinal"), Str(str(index).encode("utf8")))
-            c.stag("Value").text(Str(str(value).encode("utf8"))).sattr("xsi:type", "xsi:long")
+            c = xml.stag("Cell").attr(
+                                Str("CellOrdinal"), Str(str(index).encode("utf8")))
+            c.stag("Value").text(Str(str(value).encode("utf8"))).sattr(
+                                                                "xsi:type", "xsi:long")
             index += 1
         # return str(xml)
         result = xml.dump()
@@ -1394,7 +1386,7 @@ class XmlaExecuteReqHandler:
         xml = cypXML()
         xml.set_max_depth(1)
 
-        a = xml.stag("AxisInfo").attr(Str("name"), Str(str(Axis).encode("utf8")))
+        a = xml.stag("AxisInfo").attr(Str("name"), Str(Axis.encode("utf8")))
         # many measures, then write this on the top
         if (
             self.executor.facts in axis_tables.keys() and
@@ -1416,7 +1408,8 @@ class XmlaExecuteReqHandler:
     def _generate_axes_info_convert2formulas(self):
         """AxisInfo elements when convert to formulas,
 
-        xml structure always Axis0 with measures and SlicerAxis with all dimensions like this::
+        xml structure always Axis0 with measures and SlicerAxis with all dimensions
+        like this::
 
             <AxisInfo name="Axis0">
                 <HierarchyInfo name="[Measures]">
