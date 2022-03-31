@@ -6,9 +6,7 @@ check it <http://stackoverflow.com/questions/25046837/the-encodingstyle-attribut
 
 from olapy.stdlib.string cimport Str
 
-cdef Str execute_xsd_s
-
-_execute_xsd = """
+execute_xsd_s = Str("""
 <xs:schema elementFormDefault="qualified"
 targetNamespace="urn:schemas-microsoft-com:xml-analysis:mddataset"
 xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset"
@@ -142,6 +140,4 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-</xs:schema>"""
-
-execute_xsd_s = Str(_execute_xsd.encode("utf8", "replace"))
+</xs:schema>""")
