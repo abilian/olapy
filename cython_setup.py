@@ -97,6 +97,7 @@ extensions = [
     pypyx_ext(NAME, "core", "services", "dict_execute_request_handler"),
     pypyx_ext(NAME, "core", "services", "models"),
     pypyx_ext(NAME, "core", "services", "request_properties_models"),
+    pypyx_ext(NAME, "core", "services", "xmla_discover_literals_response_rows_s"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_request_handler"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_request_utils"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_xsds"),

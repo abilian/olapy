@@ -12,8 +12,11 @@ import xmlwitch
 
 from olapy.core.parse import split_tuple
 
+from olapy.core.services.structures cimport STuple, RowTuples
+from olapy.core.services.xmla_discover_literals_response_rows_s cimport discover_literals_response_rows_l
+
 from ..services.xmla_discover_request_utils import (
-    discover_literals_response_rows,
+    #discover_literals_response_rows,
     discover_schema_rowsets_response_rows,
 )
 from .xmla_discover_xsds import (
@@ -592,13 +595,15 @@ class XmlaDiscoverReqHandler:
         """
         cdef cypXML xml
         cdef Str result
+        cdef RowTuples resp_row
+        cdef STuple kv
 
         if (
             request.Properties.PropertyList.Content == "SchemaData"
             or request.Properties.PropertyList.Format == "Tabular"
         ):
 
-            rows = discover_literals_response_rows
+            # rows = discover_literals_response_rows
 
             # xml = xmlwitch.Builder()
             xml = cypXML()
@@ -622,10 +627,10 @@ class XmlaDiscoverReqHandler:
             root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
             root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
             root.append(to_str(discover_literals_xsd))
-            for resp_row in rows:
+            for resp_row in discover_literals_response_rows_l:
                 row = root.stag("row")
-                for att_name, value in resp_row.items():
-                    row.tag(to_str(att_name)).text(to_str(str(value)))
+                for kv in resp_row.row:
+                    row.tag(<Str>kv.key).text(<Str>kv.value)
 
             # return str(xml)
             result = xml.dump()
