@@ -24,28 +24,30 @@ from olapy.core.services.schema_response cimport discover_schema_rowsets_respons
 #     #discover_literals_response_rows,
 #     discover_schema_rowsets_response_rows,
 # )
-from .xmla_discover_xsds import (
-    dbschema_catalogs_xsd,
-    dbschema_tables_xsd,
-    discover_datasources_xsd,
-    discover_enumerators_xsd,
-    discover_keywords_xsd,
-    discover_literals_xsd,
-    discover_preperties_xsd,
-    discover_schema_rowsets_xsd,
-    mdschema_cubes_xsd,
-    mdschema_dimensions_xsd,
-    mdschema_functions_xsd,
-    mdschema_hierarchies_xsd,
-    mdschema_kpis_xsd,
-    mdschema_levels_xsd,
-    mdschema_measures_xsd,
-    mdschema_measuresgroups_dimensions_xsd,
-    mdschema_measuresgroups_xsd,
-    mdschema_members_xsd,
-    mdschema_properties_properties_xsd,
-    mdschema_sets_xsd,
+
+from olapy.core.services.xmla_discover_xsds_s cimport (
+    dbschema_catalogs_xsd_s,
+    dbschema_tables_xsd_s,
+    discover_datasources_xsd_s,
+    discover_enumerators_xsd_s,
+    discover_keywords_xsd_s,
+    discover_literals_xsd_s,
+    discover_preperties_xsd_s,
+    discover_schema_rowsets_xsd_s,
+    mdschema_cubes_xsd_s,
+    mdschema_dimensions_xsd_s,
+    mdschema_functions_xsd_s,
+    mdschema_hierarchies_xsd_s,
+    mdschema_kpis_xsd_s,
+    mdschema_levels_xsd_s,
+    mdschema_measures_xsd_s,
+    mdschema_measuresgroups_dimensions_xsd_s,
+    mdschema_measuresgroups_xsd_s,
+    mdschema_members_xsd_s,
+    mdschema_properties_properties_xsd_s,
+    mdschema_sets_xsd_s,
 )
+from olapy.core.services.xmla_discover_properties_xml cimport properties_xml
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -154,7 +156,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns:EX", "urn:schemas-microsoft-com:xml-analysis:exception")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_datasources_xsd))
+        root.append(discover_datasources_xsd_s)
         row = root.stag("row")
         row.stag("DataSourceName").stext("sales")
         row.stag("DataSourceDescription").stext("sales Sample Data")
@@ -168,107 +170,107 @@ class XmlaDiscoverReqHandler:
         result = xml.dump()
         return result.bytes().decode("utf8")
 
-    @staticmethod
-    def _get_properties(
-        xsd,
-        PropertyName,
-        PropertyDescription,
-        PropertyType,
-        PropertyAccessType,
-        IsRequired,
-        Value,
-    ):
-        cdef cypXML xml
-        cdef Str result
-
-        # xml = xmlwitch.Builder()
-        xml = cypXML()
-        xml.set_max_depth(0)
-        # with xml["return"]:
-        #     with xml.root(
-        #         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-        #         **{
-        #             "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-        #             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-        #         },
-        #     ):
-        #         xml.write(xsd)
-        #         if PropertyName:
-        #
-        #             with xml.row:
-        #                 xml.PropertyName(PropertyName)
-        #                 xml.PropertyDescription(PropertyDescription)
-        #                 xml.PropertyType(PropertyType)
-        #                 xml.PropertyAccessType(PropertyAccessType)
-        #                 xml.IsRequired(IsRequired)
-        #                 xml.Value(Value)
-        #
-        #         else:
-        #             properties_names_n_description = [
-        #                 "ServerName",
-        #                 "ProviderVersion",
-        #                 "MdpropMdxSubqueries",
-        #                 "MdpropMdxDrillFunctions",
-        #                 "MdpropMdxNamedSets",
-        #             ]
-        #             properties_types = ["string", "string", "int", "int", "int"]
-        #             values = [
-        #                 os.getenv("USERNAME", "default"),
-        #                 "0.0.3  25-Nov-2016 07:20:28 GMT",
-        #                 "15",
-        #                 "3",
-        #                 "15",
-        #             ]
-        #
-        #             for idx, prop_desc in enumerate(properties_names_n_description):
-        #                 with xml.row:
-        #                     xml.PropertyName(prop_desc)
-        #                     xml.PropertyDescription(prop_desc)
-        #                     xml.PropertyType(properties_types[idx])
-        #                     xml.PropertyAccessType("Read")
-        #                     xml.IsRequired("false")
-        #                     xml.Value(values[idx])
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(xsd))
-        row = root.stag("row")
-        if PropertyName:
-            row.stag("PropertyName").text(to_str(PropertyName))
-            row.stag("PropertyDescription").text(to_str(PropertyDescription))
-            row.stag("PropertyType").text(to_str(PropertyType))
-            row.stag("PropertyAccessType").text(to_str(PropertyAccessType))
-            row.stag("IsRequired").text(to_str(IsRequired))
-            row.stag("Value").text(to_str(str(Value)))
-        else:
-            properties_names_n_description = [
-                "ServerName",
-                "ProviderVersion",
-                "MdpropMdxSubqueries",
-                "MdpropMdxDrillFunctions",
-                "MdpropMdxNamedSets",
-            ]
-            properties_types = ["string", "string", "int", "int", "int"]
-            values = [
-                os.getenv("USERNAME", "default"),
-                "0.0.3  25-Nov-2016 07:20:28 GMT",
-                "15",
-                "3",
-                "15",
-            ]
-            for idx, prop_desc in enumerate(properties_names_n_description):
-                row.stag("PropertyName").text(to_str(prop_desc))
-                row.stag("PropertyDescription").text(to_str(prop_desc))
-                row.stag("PropertyType").text(to_str(properties_types[idx]))
-                row.stag("PropertyAccessType").stext("Read")
-                row.stag("IsRequired").stext("false")
-                row.stag("Value").text(to_str(values[idx]))
-
-        # return str(xml)
-        result = xml.dump()
-        return result.bytes().decode("utf8")
+    # @staticmethod
+    # def _get_properties(
+    #     xsd,
+    #     PropertyName,
+    #     PropertyDescription,
+    #     PropertyType,
+    #     PropertyAccessType,
+    #     IsRequired,
+    #     Value,
+    # ):
+    #     cdef cypXML xml
+    #     cdef Str result
+    #
+    #     # xml = xmlwitch.Builder()
+    #     xml = cypXML()
+    #     xml.set_max_depth(0)
+    #     # with xml["return"]:
+    #     #     with xml.root(
+    #     #         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
+    #     #         **{
+    #     #             "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+    #     #             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    #     #         },
+    #     #     ):
+    #     #         xml.write(xsd)
+    #     #         if PropertyName:
+    #     #
+    #     #             with xml.row:
+    #     #                 xml.PropertyName(PropertyName)
+    #     #                 xml.PropertyDescription(PropertyDescription)
+    #     #                 xml.PropertyType(PropertyType)
+    #     #                 xml.PropertyAccessType(PropertyAccessType)
+    #     #                 xml.IsRequired(IsRequired)
+    #     #                 xml.Value(Value)
+    #     #
+    #     #         else:
+    #     #             properties_names_n_description = [
+    #     #                 "ServerName",
+    #     #                 "ProviderVersion",
+    #     #                 "MdpropMdxSubqueries",
+    #     #                 "MdpropMdxDrillFunctions",
+    #     #                 "MdpropMdxNamedSets",
+    #     #             ]
+    #     #             properties_types = ["string", "string", "int", "int", "int"]
+    #     #             values = [
+    #     #                 os.getenv("USERNAME", "default"),
+    #     #                 "0.0.3  25-Nov-2016 07:20:28 GMT",
+    #     #                 "15",
+    #     #                 "3",
+    #     #                 "15",
+    #     #             ]
+    #     #
+    #     #             for idx, prop_desc in enumerate(properties_names_n_description):
+    #     #                 with xml.row:
+    #     #                     xml.PropertyName(prop_desc)
+    #     #                     xml.PropertyDescription(prop_desc)
+    #     #                     xml.PropertyType(properties_types[idx])
+    #     #                     xml.PropertyAccessType("Read")
+    #     #                     xml.IsRequired("false")
+    #     #                     xml.Value(values[idx])
+    #     ret = xml.stag("return")
+    #     root = ret.stag("root")
+    #     root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
+    #     root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
+    #     root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+    #     root.append(to_str(xsd))
+    #     row = root.stag("row")
+    #     if PropertyName:
+    #         row.stag("PropertyName").text(to_str(PropertyName))
+    #         row.stag("PropertyDescription").text(to_str(PropertyDescription))
+    #         row.stag("PropertyType").text(to_str(PropertyType))
+    #         row.stag("PropertyAccessType").text(to_str(PropertyAccessType))
+    #         row.stag("IsRequired").text(to_str(IsRequired))
+    #         row.stag("Value").text(to_str(str(Value)))
+    #     else:
+    #         properties_names_n_description = [
+    #             "ServerName",
+    #             "ProviderVersion",
+    #             "MdpropMdxSubqueries",
+    #             "MdpropMdxDrillFunctions",
+    #             "MdpropMdxNamedSets",
+    #         ]
+    #         properties_types = ["string", "string", "int", "int", "int"]
+    #         values = [
+    #             os.getenv("USERNAME", "default"),
+    #             "0.0.3  25-Nov-2016 07:20:28 GMT",
+    #             "15",
+    #             "3",
+    #             "15",
+    #         ]
+    #         for idx, prop_desc in enumerate(properties_names_n_description):
+    #             row.stag("PropertyName").text(to_str(prop_desc))
+    #             row.stag("PropertyDescription").text(to_str(prop_desc))
+    #             row.stag("PropertyType").text(to_str(properties_types[idx]))
+    #             row.stag("PropertyAccessType").stext("Read")
+    #             row.stag("IsRequired").stext("false")
+    #             row.stag("Value").text(to_str(values[idx]))
+    #
+    #     # return str(xml)
+    #     result = xml.dump()
+    #     return result.bytes().decode("utf8")
 
 
     def _get_properties_by_restrictions(self, request):
@@ -283,51 +285,51 @@ class XmlaDiscoverReqHandler:
             else:
                 value = self.cubes[0]
 
-            return self._get_properties(
-                discover_preperties_xsd,
-                "Catalog",
-                "Catalog",
-                "string",
-                "ReadWrite",
-                "false",
-                value,
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("Catalog"),
+                Str("Catalog"),
+                Str("string"),
+                Str("ReadWrite"),
+                Str("false"),
+                Str(value.encode("utf8", "replace")),
+            ).bytes().decode("utf8")
 
         elif request.Restrictions.RestrictionList.PropertyName == "ServerName":
-            return self._get_properties(
-                discover_preperties_xsd,
-                "ServerName",
-                "ServerName",
-                "string",
-                "Read",
-                "false",
-                "Mouadh",
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("ServerName"),
+                Str("ServerName"),
+                Str("string"),
+                Str("Read"),
+                Str("false"),
+                Str("Mouadh"),
+            ).bytes().decode("utf8")
 
         elif request.Restrictions.RestrictionList.PropertyName == "ProviderVersion":
-            return self._get_properties(
-                discover_preperties_xsd,
-                "ProviderVersion",
-                "ProviderVersion",
-                "string",
-                "Read",
-                "false",
-                "0.02  08-Mar-2016 08:41:28 GMT",
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("ProviderVersion"),
+                Str("ProviderVersion"),
+                Str("string"),
+                Str("Read"),
+                Str("false"),
+                Str("0.02  08-Mar-2016 08:41:28 GMT"),
+            ).bytes().decode("utf8")
 
         elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxSubqueries":
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return self._get_properties(
-                discover_preperties_xsd,
-                "MdpropMdxSubqueries",
-                "MdpropMdxSubqueries",
-                "int",
-                "Read",
-                "false",
-                "15",
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("MdpropMdxSubqueries"),
+                Str("MdpropMdxSubqueries"),
+                Str("int"),
+                Str("Read"),
+                Str("false"),
+                Str("15"),
+            ).bytes().decode("utf8")
 
         elif (
             request.Restrictions.RestrictionList.PropertyName
@@ -336,33 +338,37 @@ class XmlaDiscoverReqHandler:
             if request.Properties.PropertyList.Catalog is not None:
                 self.change_cube(request.Properties.PropertyList.Catalog)
 
-            return self._get_properties(
-                discover_preperties_xsd,
-                "MdpropMdxDrillFunctions",
-                "MdpropMdxDrillFunctions",
-                "int",
-                "Read",
-                "false",
-                "3",
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("MdpropMdxDrillFunctions"),
+                Str("MdpropMdxDrillFunctions"),
+                Str("int"),
+                Str("Read"),
+                Str("false"),
+                Str("3"),
+            ).bytes().decode("utf8")
 
         elif request.Restrictions.RestrictionList.PropertyName == "MdpropMdxNamedSets":
-            return self._get_properties(
-                discover_preperties_xsd,
-                "MdpropMdxNamedSets",
-                "MdpropMdxNamedSets",
-                "int",
-                "Read",
-                "false",
-                "15",
-            )
+            return properties_xml(
+                discover_preperties_xsd_s,
+                Str("MdpropMdxNamedSets"),
+                Str("MdpropMdxNamedSets"),
+                Str("int"),
+                Str("Read"),
+                Str("false"),
+                Str("15"),
+            ).bytes().decode("utf8")
 
-        return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
+        return properties_xml(
+            discover_preperties_xsd_s, Str(), Str(), Str(), Str(), Str(), Str()
+        ).bytes().decode("utf8")
 
     def discover_properties_response(self, request):
         if request.Restrictions.RestrictionList:
             return self._get_properties_by_restrictions(request)
-        return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
+        return properties_xml(
+            discover_preperties_xsd_s, Str(), Str(), Str(), Str(), Str(), Str()
+        ).bytes().decode("utf8")
 
     def discover_schema_rowsets_response(self, request):
         """Generate the names, restrictions, description, and other information
@@ -447,7 +453,7 @@ class XmlaDiscoverReqHandler:
             root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
             root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
             root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-            root.append(to_str(discover_literals_xsd))
+            root.append(discover_literals_xsd_s)
             for resp_row in discover_literals_response_rows_l:
                 row = root.stag("row")
                 for kv in resp_row.row:
@@ -491,7 +497,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_sets_xsd))
+        root.append(mdschema_sets_xsd_s)
 
         if request.Restrictions.RestrictionList:
             if (
@@ -538,7 +544,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_kpis_xsd))
+        root.append(mdschema_kpis_xsd_s)
 
         if request.Restrictions.RestrictionList:
             if (
@@ -579,7 +585,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(dbschema_catalogs_xsd))
+        root.append(dbschema_catalogs_xsd_s)
         for catalogue in self.cubes:
             row = root.stag("row")
             row.stag("CATALOG_NAME").text(to_str(catalogue))
@@ -635,7 +641,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_cubes_xsd))
+        root.append(mdschema_cubes_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -694,7 +700,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(dbschema_tables_xsd))
+        root.append(dbschema_tables_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -752,7 +758,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_measures_xsd))
+        root.append(mdschema_measures_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -856,7 +862,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_dimensions_xsd))
+        root.append(mdschema_dimensions_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME
@@ -1014,7 +1020,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_hierarchies_xsd))
+        root.append(mdschema_hierarchies_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1186,7 +1192,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_levels_xsd))
+        root.append(mdschema_levels_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1295,7 +1301,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_measuresgroups_xsd))
+        root.append(mdschema_measuresgroups_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1366,7 +1372,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_measuresgroups_dimensions_xsd))
+        root.append(mdschema_measuresgroups_dimensions_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1486,7 +1492,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_properties_properties_xsd))
+        root.append(mdschema_properties_properties_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
@@ -1666,7 +1672,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_members_xsd))
+        root.append(mdschema_members_xsd_s)
         if request.Restrictions.RestrictionList:
             self.change_cube(request.Properties.PropertyList.Catalog)
 
@@ -1785,7 +1791,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_schema_rowsets_xsd))
+        root.append(discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1817,7 +1823,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_schema_rowsets_xsd))
+        root.append(discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1849,7 +1855,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_schema_rowsets_xsd))
+        root.append(discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1881,7 +1887,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(mdschema_functions_xsd))
+        root.append(mdschema_functions_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1913,7 +1919,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_schema_rowsets_xsd))
+        root.append(discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1947,7 +1953,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_enumerators_xsd))
+        root.append(discover_enumerators_xsd_s)
         row = root.stag("row")
         row.stag("EnumName").stext("ProviderType")
         row.stag("ElementName").stext("TDP")
@@ -1983,7 +1989,7 @@ class XmlaDiscoverReqHandler:
         root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
         root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
         root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_keywords_xsd))
+        root.append(discover_keywords_xsd_s)
         row = root.stag("row")
         row.stag("Keyword").stext("aggregate")
         row.stag("Keyword").stext("ancestors")
