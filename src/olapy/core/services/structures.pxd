@@ -25,20 +25,28 @@ cdef cypclass RowTuples:
 
 
 cdef cypclass SchemaResponse:
-    cyplist[STuple] schema
+    # cyplist[STuple] schema
+    Str name
+    Str guid
+    Str mask
     RowTuples restrictions
 
     __init__(self):
-        self.schema = cyplist[STuple]()
+        # self.schema = cyplist[STuple]()
+        self.name = NULL
+        self.guid = NULL
+        self.mask = NULL
         self.restrictions = RowTuples()
 
     void set_name(self, const char* value):
-        st = STuple("SchemaName", value)
-        self.schema.append(st)
+        self.name = Str(value)
+        # st = STuple("SchemaName", value)
+        # self.schema.append(st)
 
     void set_guid(self, const char* value):
-        st = STuple("SchemaGuid", value)
-        self.schema.append(st)
+        self.guid = Str(value)
+        # st = STuple("SchemaGuid", value)
+        # self.schema.append(st)
 
     void add_restriction(self, const char* name, const char* tpe):
         """ change structure
@@ -73,5 +81,6 @@ cdef cypclass SchemaResponse:
         self.restrictions.append(name, tpe)
 
     void set_restriction_mask(self, const char* value):
-        st = STuple("RestrictionsMask", value)
-        self.schema.append(st)
+        # st = STuple("RestrictionsMask", value)
+        # self.schema.append(st)
+        self.mask = Str(value)

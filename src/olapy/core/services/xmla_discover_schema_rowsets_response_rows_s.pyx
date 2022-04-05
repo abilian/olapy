@@ -1,400 +1,220 @@
-discover_schema_rowsets_response_rows = [
-    {
-        "SchemaName": "DBSCHEMA_CATALOGS",
-        "SchemaGuid": "C8B52211-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": ["CATALOG_NAME"],
-            "restriction_types": ["string"],
-        },
-        "RestrictionsMask": "1",
-    },
-    {
-        "SchemaName": "DISCOVER_LITERALS",
-        "SchemaGuid": "C3EF5ECB-0A07-4665-A140-B075722DBDC2",
-        "restrictions": {
-            "restriction_names": ["LiteralName"],
-            "restriction_types": ["string"],
-        },
-        "RestrictionsMask": "1",
-    },
-    {
-        "SchemaName": "DISCOVER_PROPERTIES",
-        "SchemaGuid": "4B40ADFB-8B09-4758-97BB-636E8AE97BCF",
-        "restrictions": {
-            "restriction_names": ["PropertyName"],
-            "restriction_types": ["string"],
-        },
-        "RestrictionsMask": "1",
-    },
-    {
-        "SchemaName": "DISCOVER_SCHEMA_ROWSETS",
-        "SchemaGuid": "EEA0302B-7922-4992-8991-0E605D0E5593",
-        "restrictions": {
-            "restriction_names": ["SchemaName"],
-            "restriction_types": ["string"],
-        },
-        "RestrictionsMask": "1",
-    },
-    {
-        "SchemaName": "DMSCHEMA_MINING_MODELS",
-        "SchemaGuid": "3ADD8A77-D8B9-11D2-8D2A-00E029154FDE",
-        "restrictions": {
-            "restriction_names": [
-                "MODEL_CATALOG",
-                "MODEL_SCHEMA",
-                "MODEL_NAME",
-                "MODEL_TYPE",
-                "SERVICE_NAME",
-                "SERVICE_TYPE_ID",
-                "MINING_STRUCTURE",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedInt",
-                "string",
-            ],
-        },
-        "RestrictionsMask": "127",
-    },
-    {
-        "SchemaName": "MDSCHEMA_ACTIONS",
-        "SchemaGuid": "A07CCD08-8148-11D0-87BB-00C04FC33942",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "ACTION_NAME",
-                "ACTION_TYPE",
-                "COORDINATE",
-                "COORDINATE_TYPE",
-                "INVOCATION",
-                "CUBE_SOURCE",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "int",
-                "string",
-                "int",
-                "int",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "511",
-    },
-    {
-        "SchemaName": "MDSCHEMA_CUBES",
-        "SchemaGuid": "C8B522D8-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "CUBE_SOURCE",
-                "BASE_CUBE_NAME",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "string",
-            ],
-        },
-        "RestrictionsMask": "31",
-    },
-    {
-        "SchemaName": "MDSCHEMA_DIMENSIONS",
-        "SchemaGuid": "C8B522D9-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "DIMENSION_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "CUBE_SOURCE",
-                "DIMENSION_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "127",
-    },
-    {
-        "SchemaName": "MDSCHEMA_FUNCTIONS",
-        "SchemaGuid": "A07CCD07-8148-11D0-87BB-00C04FC33942",
-        "restrictions": {
-            "restriction_names": [
-                "LIBRARY_NAME",
-                "INTERFACE_NAME",
-                "FUNCTION_NAME",
-                "ORIGIN",
-            ],
-            "restriction_types": ["string", "string", "string", "int"],
-        },
-        "RestrictionsMask": "15",
-    },
-    {
-        "SchemaName": "MDSCHEMA_HIERARCHIES",
-        "SchemaGuid": "C8B522DA-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "HIERARCHY_NAME",
-                "HIERARCHY_UNIQUE_NAME",
-                "HIERARCHY_ORIGIN",
-                "CUBE_SOURCE",
-                "HIERARCHY_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "unsignedShort",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "511",
-    },
-    {
-        "SchemaName": "MDSCHEMA_INPUT_DATASOURCES",
-        "SchemaGuid": "A07CCD32-8148-11D0-87BB-00C04FC33942",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "DATASOURCE_NAME",
-                "DATASOURCE_TYPE",
-            ],
-            "restriction_types": ["string", "string", "string", "string"],
-        },
-        "RestrictionsMask": "15",
-    },
-    {
-        "SchemaName": "MDSCHEMA_KPIS",
-        "SchemaGuid": "2AE44109-ED3D-4842-B16F-B694D1CB0E3F",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "KPI_NAME",
-                "CUBE_SOURCE",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "31",
-    },
-    {
-        "SchemaName": "MDSCHEMA_LEVELS",
-        "SchemaGuid": "C8B522DB-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "HIERARCHY_UNIQUE_NAME",
-                "LEVEL_NAME",
-                "LEVEL_UNIQUE_NAME",
-                "LEVEL_ORIGIN",
-                "CUBE_SOURCE",
-                "LEVEL_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "unsignedShort",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "1023",
-    },
-    {
-        "SchemaName": "MDSCHEMA_MEASUREGROUPS",
-        "SchemaGuid": "E1625EBF-FA96-42FD-BEA6-DB90ADAFD96B",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "MEASUREGROUP_NAME",
-            ],
-            "restriction_types": ["string", "string", "string", "string"],
-        },
-        "RestrictionsMask": "15",
-    },
-    {
-        "SchemaName": "MDSCHEMA_MEASUREGROUP_DIMENSIONS",
-        "SchemaGuid": "A07CCD33-8148-11D0-87BB-00C04FC33942",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "MEASUREGROUP_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "DIMENSION_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "63",
-    },
-    {
-        "SchemaName": "MDSCHEMA_MEASURES",
-        "SchemaGuid": "C8B522DC-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "MEASURE_NAME",
-                "MEASURE_UNIQUE_NAME",
-                "MEASUREGROUP_NAME",
-                "CUBE_SOURCE",
-                "MEASURE_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "255",
-    },
-    {
-        "SchemaName": "MDSCHEMA_MEMBERS",
-        "SchemaGuid": "C8B522DE-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "HIERARCHY_UNIQUE_NAME",
-                "LEVEL_UNIQUE_NAME",
-                "LEVEL_NUMBER",
-                "MEMBER_NAME",
-                "MEMBER_UNIQUE_NAME",
-                "MEMBER_CAPTION",
-                "MEMBER_TYPE",
-                "TREE_OP",
-                "CUBE_SOURCE",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedInt",
-                "string",
-                "string",
-                "string",
-                "int",
-                "int",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "8191",
-    },
-    {
-        "SchemaName": "MDSCHEMA_PROPERTIES",
-        "SchemaGuid": "C8B522DD-5CF3-11CE-ADE5-00AA0044773D",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "DIMENSION_UNIQUE_NAME",
-                "HIERARCHY_UNIQUE_NAME",
-                "LEVEL_UNIQUE_NAME",
-                "MEMBER_UNIQUE_NAME",
-                "PROPERTY_NAME",
-                "PROPERTY_TYPE",
-                "PROPERTY_CONTENT_TYPE",
-                "PROPERTY_ORIGIN",
-                "CUBE_SOURCE",
-                "PROPERTY_VISIBILITY",
-            ],
-            "restriction_types": [
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "string",
-                "unsignedShort",
-                "unsignedShort",
-                "unsignedShort",
-            ],
-        },
-        "RestrictionsMask": "8191",
-    },
-    {
-        "SchemaName": "MDSCHEMA_SETS",
-        "SchemaGuid": "A07CCD0B-8148-11D0-87BB-00C04FC33942",
-        "restrictions": {
-            "restriction_names": [
-                "CATALOG_NAME",
-                "SCHEMA_NAME",
-                "CUBE_NAME",
-                "SET_NAME",
-                "SCOPE",
-            ],
-            "restriction_types": ["string", "string", "string", "string", "int"],
-        },
-        "RestrictionsMask": "31",
-    },
-]
+from olapy.core.services.structures cimport SchemaResponse
+from libcythonplus.list cimport cyplist
+from olapy.core.services.xmla_discover_schema_rowsets_response_items cimport _make_MDSCHEMA_HIERARCHIES, _make_MDSCHEMA_MEASURES
+
+
+# cdef cyplist[SchemaResponse] discover_schema_rowsets_response_rows_l
+
+
+cdef cyplist[SchemaResponse] _make_schema_rowsets_response_rows() nogil:
+    cdef cyplist[SchemaResponse] rows
+    cdef SchemaResponse row
+
+    rows = cyplist[SchemaResponse]()
+
+    row = SchemaResponse()
+    row.set_name("DBSCHEMA_CATALOGS")
+    row.set_guid("C8B52211-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.set_restriction_mask("1")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("DISCOVER_LITERALS")
+    row.set_guid("C3EF5ECB-0A07-4665-A140-B075722DBDC2")
+    row.add_restriction("LiteralName", "string")
+    row.set_restriction_mask("1")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("DISCOVER_PROPERTIES")
+    row.set_guid("4B40ADFB-8B09-4758-97BB-636E8AE97BCF")
+    row.add_restriction("PropertyName", "string")
+    row.set_restriction_mask("1")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("DISCOVER_SCHEMA_ROWSETS")
+    row.set_guid("EEA0302B-7922-4992-8991-0E605D0E5593")
+    row.add_restriction("SchemaName", "string")
+    row.set_restriction_mask("1")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("DMSCHEMA_MINING_MODELS")
+    row.set_guid("3ADD8A77-D8B9-11D2-8D2A-00E029154FDE")
+    row.add_restriction("MODEL_CATALOG", "string")
+    row.add_restriction("MODEL_SCHEMA", "string")
+    row.add_restriction("MODEL_NAME", "string")
+    row.add_restriction("MODEL_TYPE", "string")
+    row.add_restriction("SERVICE_NAME", "string")
+    row.add_restriction("SERVICE_TYPE_ID", "unsignedInt")
+    row.add_restriction("MINING_STRUCTURE", "string")
+    row.set_restriction_mask("127")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_ACTIONS")
+    row.set_guid("A07CCD08-8148-11D0-87BB-00C04FC33942")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("ACTION_NAME", "string")
+    row.add_restriction("ACTION_TYPE", "int")
+    row.add_restriction("COORDINATE", "string")
+    row.add_restriction("COORDINATE_TYPE", "int")
+    row.add_restriction("INVOCATION", "int")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.set_restriction_mask("511")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_CUBES")
+    row.set_guid("C8B522D8-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.add_restriction("BASE_CUBE_NAME", "string")
+    row.set_restriction_mask("31")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_DIMENSIONS")
+    row.set_guid("C8B522D9-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("DIMENSION_NAME", "string")
+    row.add_restriction("DIMENSION_UNIQUE_NAME", "string")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.add_restriction("DIMENSION_VISIBILITY", "unsignedShort")
+    row.set_restriction_mask("127")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_FUNCTIONS")
+    row.set_guid("A07CCD07-8148-11D0-87BB-00C04FC33942")
+    row.add_restriction("LIBRARY_NAME", "string")
+    row.add_restriction("INTERFACE_NAME", "string")
+    row.add_restriction("FUNCTION_NAME", "string")
+    row.add_restriction("ORIGIN", "int")
+    row.set_restriction_mask("15")
+    rows.append(row)
+
+    rows.append(_make_MDSCHEMA_HIERARCHIES())
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_INPUT_DATASOURCES")
+    row.set_guid("A07CCD32-8148-11D0-87BB-00C04FC33942")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("DATASOURCE_NAME", "string")
+    row.add_restriction("DATASOURCE_TYPE", "string")
+    row.set_restriction_mask("15")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_KPIS")
+    row.set_guid("2AE44109-ED3D-4842-B16F-B694D1CB0E3F")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("KPI_NAME", "string")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.set_restriction_mask("31")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_LEVELS")
+    row.set_guid("C8B522DB-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("DIMENSION_UNIQUE_NAME", "string")
+    row.add_restriction("HIERARCHY_UNIQUE_NAME", "string")
+    row.add_restriction("LEVEL_NAME", "string")
+    row.add_restriction("LEVEL_UNIQUE_NAME", "string")
+    row.add_restriction("LEVEL_ORIGIN", "unsignedShort")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.add_restriction("LEVEL_VISIBILITY", "unsignedShort")
+    row.set_restriction_mask("1023")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_MEASUREGROUPS")
+    row.set_guid("E1625EBF-FA96-42FD-BEA6-DB90ADAFD96B")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("MEASUREGROUP_NAME", "string")
+    row.set_restriction_mask("15")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_MEASUREGROUP_DIMENSIONS")
+    row.set_guid("A07CCD33-8148-11D0-87BB-00C04FC33942")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("MEASUREGROUP_NAME", "string")
+    row.add_restriction("DIMENSION_UNIQUE_NAME", "string")
+    row.add_restriction("DIMENSION_VISIBILITY", "unsignedShort")
+    row.set_restriction_mask("63")
+    rows.append(row)
+
+    rows.append(_make_MDSCHEMA_MEASURES())
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_MEMBERS")
+    row.set_guid("C8B522DE-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("DIMENSION_UNIQUE_NAME", "string")
+    row.add_restriction("HIERARCHY_UNIQUE_NAME", "string")
+    row.add_restriction("LEVEL_UNIQUE_NAME", "string")
+    row.add_restriction("LEVEL_NUMBER", "unsignedInt")
+    row.add_restriction("MEMBER_NAME", "string")
+    row.add_restriction("MEMBER_UNIQUE_NAME", "string")
+    row.add_restriction("MEMBER_CAPTION", "string")
+    row.add_restriction("MEMBER_TYPE", "int")
+    row.add_restriction("TREE_OP", "int")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.set_restriction_mask("8191")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_PROPERTIES")
+    row.set_guid("C8B522DD-5CF3-11CE-ADE5-00AA0044773D")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("DIMENSION_UNIQUE_NAME", "string")
+    row.add_restriction("HIERARCHY_UNIQUE_NAME", "string")
+    row.add_restriction("LEVEL_UNIQUE_NAME", "string")
+    row.add_restriction("MEMBER_UNIQUE_NAME", "string")
+    row.add_restriction("PROPERTY_NAME", "string")
+    row.add_restriction("PROPERTY_TYPE", "string")
+    row.add_restriction("PROPERTY_CONTENT_TYPE", "string")
+    row.add_restriction("PROPERTY_ORIGIN", "unsignedShort")
+    row.add_restriction("CUBE_SOURCE", "unsignedShort")
+    row.add_restriction("PROPERTY_VISIBILITY", "unsignedShort")
+    row.set_restriction_mask("8191")
+    rows.append(row)
+
+    row = SchemaResponse()
+    row.set_name("MDSCHEMA_SETS")
+    row.set_guid("A07CCD0B-8148-11D0-87BB-00C04FC33942")
+    row.add_restriction("CATALOG_NAME", "string")
+    row.add_restriction("SCHEMA_NAME", "string")
+    row.add_restriction("CUBE_NAME", "string")
+    row.add_restriction("SET_NAME", "string")
+    row.add_restriction("SCOPE", "int")
+    row.set_restriction_mask("31")
+    rows.append(row)
+
+    return rows
+
+
+discover_schema_rowsets_response_rows_l = _make_schema_rowsets_response_rows()

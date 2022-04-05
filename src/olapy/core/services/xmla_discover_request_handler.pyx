@@ -6,19 +6,24 @@ import os
 import uuid
 from urllib.parse import urlparse
 
-import xmlwitch
+# import xmlwitch
 
 #from olapy.core.mdx.executor import MdxEngine
-
+from libcythonplus.list cimport cyplist
 from olapy.core.parse import split_tuple
 
-from olapy.core.services.structures cimport STuple, RowTuples
+from olapy.core.services.structures cimport STuple, RowTuples, SchemaResponse
 from olapy.core.services.xmla_discover_literals_response_rows_s cimport discover_literals_response_rows_l
+from olapy.core.services.xmla_discover_schema_rowsets_response_rows_s cimport discover_schema_rowsets_response_rows_l
+from olapy.core.services.xmla_discover_schema_rowsets_response_items cimport (
+    MDSCHEMA_HIERARCHIES_sr, MDSCHEMA_MEASURES_sr, DBSCHEMA_TABLES_sr,
+    DISCOVER_DATASOURCES_sr, DISCOVER_INSTANCES_sr, DISCOVER_KEYWORDS_sr)
+from olapy.core.services.schema_response cimport discover_schema_rowsets_response_str
 
-from ..services.xmla_discover_request_utils import (
-    #discover_literals_response_rows,
-    discover_schema_rowsets_response_rows,
-)
+# from ..services.xmla_discover_request_utils import (
+#     #discover_literals_response_rows,
+#     discover_schema_rowsets_response_rows,
+# )
 from .xmla_discover_xsds import (
     dbschema_catalogs_xsd,
     dbschema_tables_xsd,
@@ -359,69 +364,6 @@ class XmlaDiscoverReqHandler:
             return self._get_properties_by_restrictions(request)
         return self._get_properties(discover_preperties_xsd, "", "", "", "", "", "")
 
-    @staticmethod
-    def _discover_schema_rowsets_response(rows):
-        """Generate the names, restrictions, description, and other information
-        for all enumeration values and any additional provider-specific
-        enumeration values supported by OlaPy.
-
-        :param rows:
-        :return: xmla response as string
-        """
-        cdef cypXML xml
-        cdef Str result
-
-        # xml = xmlwitch.Builder()
-        xml = cypXML()
-        xml.set_max_depth(2)
-        # with xml["return"]:
-        #     with xml.root(
-        #         xmlns="urn:schemas-microsoft-com:xml-analysis:rowset",
-        #         **{
-        #             "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
-        #             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-        #         },
-        #     ):
-        #         xml.write(discover_schema_rowsets_xsd)
-        #         for resp_row in rows:
-        #             with xml.row:
-        #                 xml.SchemaName(resp_row["SchemaName"])
-        #                 xml.SchemaGuid(resp_row["SchemaGuid"])
-        #                 for idx, restriction in enumerate(
-        #                     resp_row["restrictions"]["restriction_names"]
-        #                 ):
-        #                     with xml.Restrictions:
-        #                         xml.Name(restriction)
-        #                         xml.Type(
-        #                             resp_row["restrictions"]["restriction_types"][
-        #                                 idx
-        #                             ]
-        #                         )
-        #
-        #                 xml.RestrictionsMask(resp_row["RestrictionsMask"])
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(to_str(discover_schema_rowsets_xsd))
-        for resp_row in rows:
-            row = root.stag("row")
-            row.stag("SchemaName").text(to_str(resp_row["SchemaName"]))
-            row.stag("SchemaGuid").text(to_str(resp_row["SchemaGuid"]))
-            for idx, restriction in enumerate(
-                resp_row["restrictions"]["restriction_names"]
-            ):
-                r = row.stag("Restrictions")
-                r.stag("NAME").text(to_str(restriction))
-                r.stag("Type").text(to_str(
-                            resp_row["restrictions"]["restriction_types"][idx]
-                            ))
-            row.stag("RestrictionsMask").text(to_str(resp_row["RestrictionsMask"]))
-
-        result = xml.dump()
-        return result.bytes().decode("utf8")
-
     def discover_schema_rowsets_response(self, request):
         """Generate the names, restrictions, description, and other information
         for all enumeration values and any additional provider-specific
@@ -430,7 +372,10 @@ class XmlaDiscoverReqHandler:
         :param request:
         :return: xmla response as string
         """
-        rows = discover_schema_rowsets_response_rows
+        cdef Str result
+        cdef cyplist[SchemaResponse] ext
+
+        ext = cyplist[SchemaResponse]()
 
         restriction_list = request.Restrictions.RestrictionList
         if restriction_list:
@@ -439,151 +384,27 @@ class XmlaDiscoverReqHandler:
                 and request.Properties.PropertyList.Catalog is not None
             ):
                 self.change_cube(request.Properties.PropertyList.Catalog)
-
-                restriction_names = [
-                    "CATALOG_NAME",
-                    "SCHEMA_NAME",
-                    "CUBE_NAME",
-                    "DIMENSION_UNIQUE_NAME",
-                    "HIERARCHY_NAME",
-                    "HIERARCHY_UNIQUE_NAME",
-                    "HIERARCHY_ORIGIN",
-                    "CUBE_SOURCE",
-                    "HIERARCHY_VISIBILITY",
-                ]
-                restriction_types = [
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "unsignedShort",
-                    "unsignedShort",
-                    "unsignedShort",
-                ]
-
-                rows = [
-                    {
-                        "SchemaName": "MDSCHEMA_HIERARCHIES",
-                        "SchemaGuid": "C8B522DA-5CF3-11CE-ADE5-00AA0044773D",
-                        "restrictions": {
-                            "restriction_names": restriction_names,
-                            "restriction_types": restriction_types,
-                        },
-                        "RestrictionsMask": "511",
-                    }
-                ]
-
-                return self._discover_schema_rowsets_response(rows)
+                ext.append(MDSCHEMA_HIERARCHIES_sr)
+                result = discover_schema_rowsets_response_str(ext)
+                return result.bytes().decode("utf8")
 
             if (
                 restriction_list.SchemaName == "MDSCHEMA_MEASURES"
                 and request.Properties.PropertyList.Catalog is not None
             ):
                 self.change_cube(request.Properties.PropertyList.Catalog)
+                ext.append(MDSCHEMA_MEASURES_sr)
+                result = discover_schema_rowsets_response_str(ext)
+                return result.bytes().decode("utf8")
 
-                restriction_names = [
-                    "CATALOG_NAME",
-                    "SCHEMA_NAME",
-                    "CUBE_NAME",
-                    "MEASURE_NAME",
-                    "MEASURE_UNIQUE_NAME",
-                    "MEASUREGROUP_NAME",
-                    "CUBE_SOURCE",
-                    "MEASURE_VISIBILITY",
-                ]
-                restriction_types = [
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "string",
-                    "unsignedShort",
-                    "unsignedShort",
-                ]
-
-                rows = [
-                    {
-                        "SchemaName": "MDSCHEMA_MEASURES",
-                        "SchemaGuid": "C8B522DC-5CF3-11CE-ADE5-00AA0044773D",
-                        "restrictions": {
-                            "restriction_names": restriction_names,
-                            "restriction_types": restriction_types,
-                        },
-                        "RestrictionsMask": "255",
-                    }
-                ]
-
-                return self._discover_schema_rowsets_response(rows)
-
-        ext = [
-            {
-                "SchemaName": "DBSCHEMA_TABLES",
-                "SchemaGuid": "C8B52229-5CF3-11CE-ADE5-00AA0044773D",
-                "restrictions": {
-                    "restriction_names": [
-                        "TABLE_CATALOG",
-                        "TABLE_SCHEMA",
-                        "TABLE_NAME",
-                        "TABLE_TYPE",
-                        "TABLE_OLAP_TYPE",
-                    ],
-                    "restriction_types": [
-                        "string",
-                        "string",
-                        "string",
-                        "string",
-                        "string",
-                    ],
-                },
-                "RestrictionsMask": "31",
-            },
-            {
-                "SchemaName": "DISCOVER_DATASOURCES",
-                "SchemaGuid": "06C03D41-F66D-49F3-B1B8-987F7AF4CF18",
-                "restrictions": {
-                    "restriction_names": [
-                        "DataSourceName",
-                        "URL",
-                        "ProviderName",
-                        "ProviderType",
-                        "AuthenticationMode",
-                    ],
-                    "restriction_types": [
-                        "string",
-                        "string",
-                        "string",
-                        "string",
-                        "string",
-                    ],
-                },
-                "RestrictionsMask": "31",
-            },
-            {
-                "SchemaName": "DISCOVER_INSTANCES",
-                "SchemaGuid": "20518699-2474-4C15-9885-0E947EC7A7E3",
-                "restrictions": {
-                    "restriction_names": ["INSTANCE_NAME"],
-                    "restriction_types": ["string"],
-                },
-                "RestrictionsMask": "1",
-            },
-            {
-                "SchemaName": "DISCOVER_KEYWORDS",
-                "SchemaGuid": "1426C443-4CDD-4A40-8F45-572FAB9BBAA1",
-                "restrictions": {
-                    "restriction_names": ["Keyword"],
-                    "restriction_types": ["string"],
-                },
-                "RestrictionsMask": "1",
-            },
-        ]
-
-        ext.extend(rows)
-
-        return self._discover_schema_rowsets_response(ext)
+        ext.append(DBSCHEMA_TABLES_sr)
+        ext.append(DISCOVER_DATASOURCES_sr)
+        ext.append(DISCOVER_INSTANCES_sr)
+        ext.append(DISCOVER_KEYWORDS_sr)
+        for sr in discover_schema_rowsets_response_rows_l:
+            ext.append(sr)
+        result = discover_schema_rowsets_response_str(ext)
+        return result.bytes().decode("utf8")
 
     @staticmethod
     def discover_literals_response(request):
