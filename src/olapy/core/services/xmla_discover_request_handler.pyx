@@ -48,8 +48,27 @@ from olapy.core.services.xmla_discover_xsds_s cimport (
     mdschema_sets_xsd_s,
 )
 from olapy.core.services.xmla_discover_properties_xml cimport properties_xml
-from olapy.core.services.xmla_discover_dimensions_xml cimport (
-    fill_dimension_xml, fill_dimension_measures_xml)
+from olapy.core.services.utils cimport (
+    bracket,
+    dot_bracket,
+    pylist_to_cyplist,
+    cypstr_copy_slice_to
+)
+from olapy.core.services.xmla_discover_fill_xml cimport (
+    fill_dimension,
+    fill_dimension_measures,
+    fill_cube,
+    fill_mds_measures,
+    fill_mds_hier_table,
+    fill_mds_hier_name,
+    fill_mds_levels_table,
+    fill_mds_levels_measure,
+    fill_mds_measuregroups,
+    fill_mds_measuregroup_dimensions,
+    fill_mds_properties,
+    fill_mds_members_a,
+    fill_mds_members_b,
+)
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
@@ -62,6 +81,7 @@ except ImportError:
     pass
 
 # noinspection PyPep8Naming
+
 
 
 cdef Elem root_element_with_xsd(cypXML xml, Str xsd) nogil:
@@ -638,19 +658,7 @@ class XmlaDiscoverReqHandler:
                 self.change_cube(request.Properties.PropertyList.Catalog)
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_TYPE").stext("CUBE")
-                row.stag("LAST_SCHEMA_UPDATE").stext("2016-07-22T10:41:38")
-                row.stag("LAST_DATA_UPDATE").stext("2016-07-22T10:41:38")
-                row.stag("DESCRIPTION").text(to_str(
-                                            "MDX " + self.selected_cube + " results"))
-                row.stag("IS_DRILLTHROUGH_ENABLED").stext("true")
-                row.stag("IS_LINKABLE").stext("false")
-                row.stag("IS_WRITE_ENABLED").stext("false")
-                row.stag("IS_SQL_ENABLED").stext("false")
-                row.stag("CUBE_CAPTION").text(to_str(self.selected_cube))
-                row.stag("CUBE_SOURCE").stext("1")
+                fill_cube(row, Str(self.selected_cube.encode("utf8", "replace")))
 
         # return str(xml)
         result = xml.dump()
@@ -696,6 +704,7 @@ class XmlaDiscoverReqHandler:
         :return:
         """
         cdef cypXML xml
+        cdef Str cube_s
         cdef Str result
 
         # xml = xmlwitch.Builder()
@@ -743,25 +752,14 @@ class XmlaDiscoverReqHandler:
                 and request.Properties.PropertyList.Catalog is not None
             ):
                 self.change_cube(request.Properties.PropertyList.Catalog)
-
-                for mes in self.executor.measures:
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
+                for measure in self.executor.measures:
                     row = root.stag("row")
-                    row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                    row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-
-                    row.stag("MEASURE_NAME").text(to_str(mes))
-                    row.stag("MEASURE_UNIQUE_NAME").text(to_str(
-                                                        "[Measures].[" + mes + "]"))
-                    row.stag("MEASURE_CAPTION").text(to_str(mes))
-                    row.stag("MEASURE_AGGREGATOR").stext("1")
-                    row.stag("DATA_TYPE").stext("5")
-                    row.stag("NUMERIC_PRECISION").stext("16")
-                    row.stag("NUMERIC_SCALE").stext("-1")
-                    row.stag("MEASURE_IS_VISIBLE").stext("true")
-                    row.stag("MEASURE_NAME_SQL_COLUMN_NAME").text(to_str(mes))
-                    row.stag("MEASURE_UNQUALIFIED_CAPTION").text(to_str(mes))
-                    row.stag("MEASUREGROUP_NAME").stext("default")
-
+                    fill_mds_measures(
+                            row,
+                            cube_s,
+                            Str(measure.encode("utf8", "replace"))
+                        )
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -858,7 +856,7 @@ class XmlaDiscoverReqHandler:
                     ordinal += 1
                     tables_s = Str(tables.encode("utf8", "replace"))
                     row = root.stag("row")
-                    fill_dimension_xml(
+                    fill_dimension(
                         row,
                         catalog_name,
                         tables_s,
@@ -869,7 +867,7 @@ class XmlaDiscoverReqHandler:
                 # for measure
                 ordinal += 1
                 row = root.stag("row")
-                fill_dimension_measures_xml(row, catalog_name, ordinal)
+                fill_dimension_measures(row, catalog_name, ordinal)
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -882,7 +880,7 @@ class XmlaDiscoverReqHandler:
         """
         # Enumeration of hierarchies in all dimensions
         cdef cypXML xml
-        cdef Str result, column_attribut, s_table_name
+        cdef Str result, column_attribut, table_s, cube_s, default_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -990,32 +988,14 @@ class XmlaDiscoverReqHandler:
                 #     request.Restrictions.RestrictionList.HIERARCHY_VISIBILITY == 3
                 #     or request.Restrictions.RestrictionList.CATALOG_NAME == self.selected_cube
                 # ):
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
+                default_s = to_str(str(self.executor.measures[0]))
                 for table_name, df in self.executor.tables_loaded.items():
                     if table_name == self.executor.facts:
                         continue
 
                     column_attribut = to_str(str(df.iloc[0][0]))
-                    s_tname = to_str(table_name)
-
-                    row = root.stag("row")
-                    row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                    row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                    row.stag("DIMENSION_UNIQUE_NAME").text(format("[{}]", s_tname))
-                    row.stag("HIERARCHY_NAME").text(s_tname)
-                    row.stag("HIERARCHY_UNIQUE_NAME").text(format(
-                                                                "[{}].[{}]",
-                                                                s_tname,
-                                                                s_tname,
-                                                            ))
-                    row.stag("HIERARCHY_CAPTION").text(s_tname)
-                    row.stag("DIMENSION_TYPE").stext("3")
-                    row.stag("HIERARCHY_CARDINALITY").stext("6")
-                    # xml.DEFAULT_MEMBER(
-                    #     "[{0}].[{0}].[{1}]".format(
-                    #         table_name, column_attribut
-                    #     )
-                    # )
-
+                    table_s = to_str(table_name)
                     # todo recheck
                     if (
                         request.Properties.PropertyList.Format
@@ -1023,47 +1003,21 @@ class XmlaDiscoverReqHandler:
                     ):
                         # Format found in onlyoffice and not in excel
                         # ALL_MEMBER causes prob with excel
-                        row.stag("ALL_MEMBER").text(format(
-                                                        "[{}].[{}].[{}]",
-                                                        s_tname,
-                                                        s_tname,
-                                                        column_attribut,
-                                                    ))
+                        # row.stag("ALL_MEMBER").text(format(
+                        #                                 "[{}].[{}].[{}]",
+                        #                                 table_s,
+                        #                                 table_s,
+                        #                                 column_attribut,
+                        #                             ))
+                        column_attribut = to_str(str(df.iloc[0][0]))
+                    else:
+                        column_attribut = NULL
 
-                    row.stag("STRUCTURE").stext("0")
-                    row.stag("IS_VIRTUAL").stext("false")
-                    row.stag("IS_READWRITE").stext("false")
-                    row.stag("DIMENSION_UNIQUE_SETTINGS").stext("1")
-                    row.stag("DIMENSION_IS_VISIBLE").stext("true")
-                    row.stag("HIERARCHY_ORDINAL").stext("1")
-                    row.stag("DIMENSION_IS_SHARED").stext("true")
-                    row.stag("HIERARCHY_IS_VISIBLE").stext("true")
-                    row.stag("HIERARCHY_ORIGIN").stext("1")
-                    row.stag("INSTANCE_SELECTION").stext("0")
+                    row = root.stag("row")
+                    fill_mds_hier_table(row, cube_s, table_s, column_attribut)
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("DIMENSION_UNIQUE_NAME").stext("[Measures]")
-                row.stag("HIERARCHY_NAME").stext("Measures")
-                row.stag("HIERARCHY_UNIQUE_NAME").stext("[Measures]")
-                row.stag("HIERARCHY_CAPTION").stext("Measures")
-                row.stag("DIMENSION_TYPE").stext("2")
-                row.stag("HIERARCHY_CARDINALITY").stext("0")
-                row.stag("DEFAULT_MEMBER").text(format(
-                                                "[Measures].[{}]",
-                                                to_str(str(self.executor.measures[0])),
-                                            ))
-                row.stag("STRUCTURE").stext("0")
-                row.stag("IS_VIRTUAL").stext("false")
-                row.stag("IS_READWRITE").stext("false")
-                row.stag("DIMENSION_UNIQUE_SETTINGS").stext("1")
-                row.stag("DIMENSION_IS_VISIBLE").stext("true")
-                row.stag("HIERARCHY_ORDINAL").stext("1")
-                row.stag("DIMENSION_IS_SHARED").stext("true")
-                row.stag("HIERARCHY_IS_VISIBLE").stext("true")
-                row.stag("HIERARCHY_ORIGIN").stext("1")
-                row.stag("INSTANCE_SELECTION").stext("0")
+                fill_mds_hier_name(row, cube_s, default_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1077,7 +1031,8 @@ class XmlaDiscoverReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result, s_table, s_col
+        cdef Str result, cube_s, col_s, table_s
+        cdef int level
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -1154,61 +1109,19 @@ class XmlaDiscoverReqHandler:
             ):
 
                 self.change_cube(request.Properties.PropertyList.Catalog)
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
 
                 for tables in self.executor.get_all_tables_names(ignore_fact=True):
-                    l_nb = 0
-                    s_table = to_str(tables)
+                    level = 0 # FIXME BUG ?, should level be from 1
+                    table_s = to_str(tables)
                     for col in self.executor.tables_loaded[tables].columns:
-                        s_col = to_str(str(col))
+                        col_s = to_str(str(col))
                         row = root.stag("row")
-                        row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                        row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-
-                        row.stag("DIMENSION_UNIQUE_NAME").text(format(
-                                                                    "[{}]",
-                                                                    s_table,
-                                                                ))
-                        row.stag("HIERARCHY_UNIQUE_NAME").text(format(
-                                                                    "[{}].[{}]",
-                                                                    s_table,
-                                                                    s_table,
-                                                                ))
-                        row.stag("LEVEL_NAME").text(to_str(str(col)))
-                        row.stag("LEVEL_UNIQUE_NAME").text(format(
-                                                                    "[{}].[{}].[{}]",
-                                                                    s_table,
-                                                                    s_table,
-                                                                    s_col,
-                                                                ))
-                        row.stag("LEVEL_CAPTION").text(s_col)
-                        row.stag("LEVEL_NUMBER").text(to_str(str(l_nb)))
-                        row.stag("LEVEL_CARDINALITY").stext("0")
-                        row.stag("LEVEL_TYPE").stext("0")
-                        row.stag("CUSTOM_ROLLUP_SETTINGS").stext("0")
-                        row.stag("LEVEL_UNIQUE_SETTINGS").stext("0")
-                        row.stag("LEVEL_IS_VISIBLE").stext("true")
-                        row.stag("LEVEL_DBTYPE").stext("130")
-                        row.stag("LEVEL_KEY_CARDINALITY").stext("1")
-                        row.stag("LEVEL_ORIGIN").stext("2")
-                        l_nb += 1
+                        fill_mds_levels_table(row, cube_s, table_s, col_s, level)
+                        level += 1
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("DIMENSION_UNIQUE_NAME").stext("[Measures]")
-                row.stag("HIERARCHY_UNIQUE_NAME").stext("[Measures]")
-                row.stag("LEVEL_NAME").stext("MeasuresLevel")
-                row.stag("LEVEL_UNIQUE_NAME").stext("[Measures]")
-                row.stag("LEVEL_CAPTION").stext("MeasuresLevel")
-                row.stag("LEVEL_NUMBER").stext("0")
-                row.stag("LEVEL_CARDINALITY").stext("0")
-                row.stag("LEVEL_TYPE").stext("0")
-                row.stag("CUSTOM_ROLLUP_SETTINGS").stext("0")
-                row.stag("LEVEL_UNIQUE_SETTINGS").stext("0")
-                row.stag("LEVEL_IS_VISIBLE").stext("true")
-                row.stag("LEVEL_DBTYPE").stext("130")
-                row.stag("LEVEL_KEY_CARDINALITY").stext("1")
-                row.stag("LEVEL_ORIGIN").stext("2")
+                fill_mds_levels_measure(row, cube_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1221,7 +1134,7 @@ class XmlaDiscoverReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result
+        cdef Str result, cube_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -1257,16 +1170,10 @@ class XmlaDiscoverReqHandler:
                 and request.Properties.PropertyList.Catalog is not None
             ):
                 self.change_cube(request.Properties.PropertyList.Catalog)
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-
-                row.stag("MEASUREGROUP_NAME").stext("default")
-                row.stag("DESCRIPTION").stext("-")
-                row.stag("IS_WRITE_ENABLED").stext("true")
-                row.stag("MEASUREGROUP_CAPTION").stext("default")
-
+                fill_mds_measuregroups(row, cube_s)
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -1278,7 +1185,7 @@ class XmlaDiscoverReqHandler:
         :return:
         """
         cdef cypXML xml
-        cdef Str result, s_table
+        cdef Str result, cube_s, table_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -1324,24 +1231,11 @@ class XmlaDiscoverReqHandler:
             ):
 
                 self.change_cube(request.Properties.PropertyList.Catalog)
-
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
                 for tables in self.executor.get_all_tables_names(ignore_fact=True):
-                    s_table = to_str(tables)
+                    table_s = to_str(tables)
                     row = root.stag("row")
-                    row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                    row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                    row.stag("MEASUREGROUP_NAME").stext("default")
-                    row.stag("MEASUREGROUP_CARDINALITY").stext("ONE")
-                    row.stag("DIMENSION_UNIQUE_NAME").text(format("[{}]", s_table))
-                    row.stag("DIMENSION_CARDINALITY").stext("MANY")
-                    row.stag("DIMENSION_IS_VISIBLE").stext("true")
-                    row.stag("DIMENSION_IS_FACT_DIMENSION").stext("false")
-                    row.stag("DIMENSION_GRANULARITY").text(format(
-                                                                    "[{}].[{}]",
-                                                                    s_table,
-                                                                    s_table,
-                                                                ))
-
+                    fill_mds_measuregroup_dimensions(row, cube_s, table_s)
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -1354,6 +1248,7 @@ class XmlaDiscoverReqHandler:
         :return:
         """
         cdef cypXML xml
+        cdef Str cube_s
         cdef Str result
 
         # xml = xmlwitch.Builder()
@@ -1437,65 +1332,9 @@ class XmlaDiscoverReqHandler:
                 request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
                 and request.Properties.PropertyList.Catalog is not None
             ):
-                properties_names = [
-                    "FONT_FLAGS",
-                    "LANGUAGE",
-                    "style",
-                    "ACTION_TYPE",
-                    "FONT_SIZE",
-                    "FORMAT_STRING",
-                    "className",
-                    "UPDATEABLE",
-                    "BACK_COLOR",
-                    "CELL_ORDINAL",
-                    "FONT_NAME",
-                    "VALUE",
-                    "FORMATTED_VALUE",
-                    "FORE_COLOR",
-                ]
-                properties_captions = [
-                    "FONT_FLAGS",
-                    "LANGUAGE",
-                    "style",
-                    "ACTION_TYPE",
-                    "FONT_SIZE",
-                    "FORMAT_STRING",
-                    "className",
-                    "UPDATEABLE",
-                    "BACK_COLOR",
-                    "CELL_ORDINAL",
-                    "FONT_NAME",
-                    "VALUE",
-                    "FORMATTED_VALUE",
-                    "FORE_COLOR",
-                ]
-                properties_datas = [
-                    "3",
-                    "19",
-                    "130",
-                    "19",
-                    "18",
-                    "130",
-                    "130",
-                    "19",
-                    "19",
-                    "19",
-                    "130",
-                    "12",
-                    "130",
-                    "19",
-                ]
-
                 self.change_cube(request.Properties.PropertyList.Catalog)
-
-                for idx, prop_name in enumerate(properties_names):
-                    row = root.stag("row")
-                    row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                    row.stag("PROPERTY_TYPE").stext("2")
-                    row.stag("PROPERTY_NAME").text(to_str(prop_name))
-                    row.stag("PROPERTY_CAPTION").text(to_str(properties_captions[idx]))
-                    row.stag("DATA_TYPE").text(to_str(properties_datas[idx]))
-
+                cube_s = Str(self.selected_cube.encode("utf8", "replace"))
+                fill_mds_properties(root, cube_s)
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -1509,7 +1348,13 @@ class XmlaDiscoverReqHandler:
         # Enumeration of hierarchies in all dimensions
 
         cdef cypXML xml
-        cdef Str result, s_tuple0
+        cdef Str result, cube_s, dim_unique_name, hier_unique_name,
+        cdef Str level_unique_name, member_name, member_level_name
+        cdef Str parent_unique_name, dot
+        cdef cyplist[Str] members_s, tmp_lst, parent_level
+        cdef int level_number
+
+        dot = Str(".")
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -1609,6 +1454,7 @@ class XmlaDiscoverReqHandler:
         root = root_element_with_xsd(xml, mdschema_members_xsd_s)
         if request.Restrictions.RestrictionList:
             self.change_cube(request.Properties.PropertyList.Catalog)
+            cube_s = Str(self.selected_cube.encode("utf8", "replace"))
 
             if request.Restrictions.RestrictionList.MEMBER_UNIQUE_NAME:
                 member_lvl_name = (
@@ -1619,81 +1465,106 @@ class XmlaDiscoverReqHandler:
                     request.Restrictions.RestrictionList.LEVEL_UNIQUE_NAME
                 )
 
-            separated_tuple = split_tuple(member_lvl_name)
+            member_names = split_tuple(member_lvl_name)
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
                 and request.Properties.PropertyList.Catalog is not None
                 and request.Restrictions.RestrictionList.TREE_OP == 8
             ):
 
-                joined = ".".join(separated_tuple[:-1])
+                dot_names = ".".join(member_names[:-1])
                 # exple
                 # separed_tuple -> [Product].[Product].[Company].[Crazy Development]
                 # joined -> [Product].[Product].[Company]
+                # FIXME BAD COMMENT, separed_tuple not good. Actually it is:
+                # member_lvl_name -> [Product].[Product].[Company].[Crazy Development]
+                # member_names -> "Product", "Product", "Company", "Crazy Development"
+                # dot_names -> "Product.Product.Company"
 
-                last_attribut = "".join(
-                    att for att in separated_tuple[-1] if att not in "[]"
+
+                last_name = "".join(
+                    att for att in member_names[-1] if att not in "[]"
                 ).replace("&", "&amp;")
 
-                s_tuple0 = to_str(str(separated_tuple[0]))
+                dim_unique_name = Str(member_names[0].encode("utf8", "replace"))
+                level_unique_name = Str(dot_names.encode("utf8", "replace"))
+                member_name = Str(last_name.encode("utf8", "replace"))
+                member_level_name = Str(member_lvl_name.encode("utf8", "replace"))
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("DIMENSION_UNIQUE_NAME").text(s_tuple0)
-                row.stag("HIERARCHY_UNIQUE_NAME").text(format(
-                                                            "{}.{}",
-                                                            s_tuple0,
-                                                            s_tuple0,
-                                                        ))
-                row.stag("LEVEL_UNIQUE_NAME").text(to_str(joined))
-                row.stag("LEVEL_NUMBER").stext("0")
-                row.stag("MEMBER_ORDINAL").stext("0")
-                row.stag("MEMBER_NAME").text(to_str(last_attribut))
-                row.stag("MEMBER_UNIQUE_NAME").text(to_str(str(member_lvl_name)))
-                row.stag("MEMBER_TYPE").stext("1")
-                row.stag("MEMBER_CAPTION").text(to_str(last_attribut))
-                row.stag("CHILDREN_CARDINALITY").stext("1")
-                row.stag("PARENT_LEVEL").stext("0")
-                row.stag("PARENT_COUNT").stext("0")
-                row.stag("MEMBER_KEY").text(to_str(last_attribut))
-                row.stag("IS_PLACEHOLDERMEMBER").stext("false")
-                row.stag("IS_DATAMEMBER").stext("false")
+                fill_mds_members_a(
+                    row,
+                    cube_s,
+                    dim_unique_name,
+                    level_unique_name,
+                    member_name,
+                    member_level_name,
+                )
 
             elif member_lvl_name:
-                parent_level = [
-                    "[" + tuple_att + "]" for tuple_att in separated_tuple[:-1]
-                ]
-                hierarchy_unique_name = ".".join(
-                    ["[" + tuple_att + "]" for tuple_att in separated_tuple[:2]]
-                )
-                if len(separated_tuple) == 3:
-                    level_unique_name = ".".join(
-                        ["[" + tuple_att + "]" for tuple_att in separated_tuple]
-                    )
-                else:
-                    level_unique_name = ".".join(parent_level)
+                # parent_level = [
+                #     "[" + tuple_att + "]" for tuple_att in separated_tuple[:-1]
+                # ]
+                # hierarchy_unique_name = ".".join(
+                #     ["[" + tuple_att + "]" for tuple_att in separated_tuple[:2]]
+                # )
+                # if len(separated_tuple) == 3:
+                #     level_unique_name = ".".join(
+                #         ["[" + tuple_att + "]" for tuple_att in separated_tuple]
+                #     )
+                # else:
+                #     level_unique_name = ".".join(parent_level)
 
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("DIMENSION_UNIQUE_NAME").text(to_str(
-                                                    "[" + separated_tuple[0] + "]"))
-                row.stag("HIERARCHY_UNIQUE_NAME").text(to_str(hierarchy_unique_name))
-                row.stag("LEVEL_UNIQUE_NAME").text(to_str(level_unique_name))
-                row.stag("LEVEL_NUMBER").text(to_str(str(len(separated_tuple[2:]))))
-                row.stag("MEMBER_ORDINAL").stext("0")
-                row.stag("MEMBER_NAME").text(to_str(str(separated_tuple[-1])))
-                row.stag("MEMBER_UNIQUE_NAME").text(to_str(member_lvl_name))
-                row.stag("MEMBER_TYPE").stext("1")
-                row.stag("MEMBER_CAPTION").text(to_str(str(separated_tuple[-1])))
-                row.stag("CHILDREN_CARDINALITY").stext("1")
-                row.stag("PARENT_LEVEL").stext("0")
-                row.stag("PARENT_COUNT").stext("0")
-                row.stag("PARENT_UNIQUE_NAME").text(to_str(".".join(parent_level)))
-                row.stag("MEMBER_KEY").text(to_str(separated_tuple[-1]))
-                row.stag("IS_PLACEHOLDERMEMBER").stext("false")
-                row.stag("IS_DATAMEMBER").stext("false")
+                # members_s = cyplist[Str]()
+                members_s = pylist_to_cyplist(member_names)
+                parent_level = cypstr_copy_slice_to(members_s, members_s.__len__() - 1)
+                if members_s.__len__() == 3:
+                    level_unique_name = dot_bracket(members_s)
+                else:
+                    level_unique_name = dot_bracket(parent_level)
+                # FIXME the previous call has no [] on dim_unique_name ?
+                dim_unique_name = bracket(members_s[0])
+                tmp_lst = cypstr_copy_slice_to(members_s, 2)
+                hier_unique_name = dot_bracket(tmp_lst)
+                member_name = members_s[-1]
+                member_level_name = Str(member_lvl_name.encode("utf8", "replace"))
+                level_number = (<int>members_s.__len__()) - 2
+                if level_number < 0:
+                    level_number = 0
+                tmp_lst = cypstr_copy_slice_to(members_s, members_s.__len__() - 1)
+                parent_unique_name = dot_bracket(parent_level)
+
+                fill_mds_members_b(
+                    row,
+                    cube_s,
+                    dim_unique_name,
+                    hier_unique_name,
+                    level_unique_name,
+                    member_name,
+                    member_level_name,
+                    level_number,
+                    parent_unique_name
+                )
+                # row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
+                # row.stag("CUBE_NAME").text(to_str(self.selected_cube))
+                # row.stag("DIMENSION_UNIQUE_NAME").text(to_str(
+                #                                     "[" + separated_tuple[0] + "]"))
+                # row.stag("HIERARCHY_UNIQUE_NAME").text(to_str(hierarchy_unique_name))
+                # row.stag("LEVEL_UNIQUE_NAME").text(to_str(level_unique_name))
+                # row.stag("LEVEL_NUMBER").text(to_str(str(len(separated_tuple[2:]))))
+                # row.stag("MEMBER_ORDINAL").stext("0")
+                # row.stag("MEMBER_NAME").text(to_str(str(separated_tuple[-1])))
+                # row.stag("MEMBER_UNIQUE_NAME").text(to_str(member_lvl_name))
+                # row.stag("MEMBER_TYPE").stext("1")
+                # row.stag("MEMBER_CAPTION").text(to_str(str(separated_tuple[-1])))
+                # row.stag("CHILDREN_CARDINALITY").stext("1")
+                # row.stag("PARENT_LEVEL").stext("0")
+                # row.stag("PARENT_COUNT").stext("0")
+                # row.stag("PARENT_UNIQUE_NAME").text(to_str(".".join(parent_level)))
+                # row.stag("MEMBER_KEY").text(to_str(separated_tuple[-1]))
+                # row.stag("IS_PLACEHOLDERMEMBER").stext("false")
+                # row.stag("IS_DATAMEMBER").stext("false")
 
         # return str(xml)
         result = xml.dump()
