@@ -102,6 +102,7 @@ extensions = [
     pypyx_ext(NAME, "core", "services", "xmla_discover_schema_rowsets_response_rows_s"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_literals_response_rows_s"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_xsds_s"),
+    pypyx_ext(NAME, "core", "services", "xmla_discover_dimensions_xml"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_request_handler"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_request_utils"),
     pypyx_ext(NAME, "core", "services", "xmla_discover_xsds"),

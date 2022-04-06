@@ -48,10 +48,13 @@ from olapy.core.services.xmla_discover_xsds_s cimport (
     mdschema_sets_xsd_s,
 )
 from olapy.core.services.xmla_discover_properties_xml cimport properties_xml
+from olapy.core.services.xmla_discover_dimensions_xml cimport (
+    fill_dimension_xml, fill_dimension_measures_xml)
 
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
 from olapy.cypxml cimport cypXML, to_str
+from olapy.cypxml.cypxml cimport Elem
 
 try:
     from sqlalchemy import create_engine
@@ -59,6 +62,18 @@ except ImportError:
     pass
 
 # noinspection PyPep8Naming
+
+
+cdef Elem root_element_with_xsd(cypXML xml, Str xsd) nogil:
+    cdef Elem root
+
+    ret = xml.stag("return")
+    root = ret.stag("root")
+    root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
+    root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
+    root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+    root.append(xsd)
+    return root
 
 
 class XmlaDiscoverReqHandler:
@@ -448,12 +463,7 @@ class XmlaDiscoverReqHandler:
             #             with xml.row:
             #                 for att_name, value in resp_row.items():
             #                     xml[att_name](value)
-            ret = xml.stag("return")
-            root = ret.stag("root")
-            root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-            root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-            root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-            root.append(discover_literals_xsd_s)
+            root = root_element_with_xsd(xml, discover_literals_xsd_s)
             for resp_row in discover_literals_response_rows_l:
                 row = root.stag("row")
                 for kv in resp_row.row:
@@ -492,13 +502,7 @@ class XmlaDiscoverReqHandler:
         #                 and request.Properties.PropertyList.Catalog is not None
         #             ):
         #                 self.change_cube(request.Properties.PropertyList.Catalog)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_sets_xsd_s)
-
+        root = root_element_with_xsd(xml, mdschema_sets_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -539,13 +543,7 @@ class XmlaDiscoverReqHandler:
         #                 and request.Properties.PropertyList.Catalog is not None
         #             ):
         #                 self.change_cube(request.Properties.PropertyList.Catalog)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_kpis_xsd_s)
-
+        root = root_element_with_xsd(xml, mdschema_kpis_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -580,12 +578,7 @@ class XmlaDiscoverReqHandler:
         #         for catalogue in self.cubes:
         #             with xml.row:
         #                 xml.CATALOG_NAME(catalogue)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(dbschema_catalogs_xsd_s)
+        root = root_element_with_xsd(xml, dbschema_catalogs_xsd_s)
         for catalogue in self.cubes:
             row = root.stag("row")
             row.stag("CATALOG_NAME").text(to_str(catalogue))
@@ -636,12 +629,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.IS_SQL_ENABLED("false")
         #                     xml.CUBE_CAPTION(self.selected_cube)
         #                     xml.CUBE_SOURCE("1")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_cubes_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_cubes_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -695,12 +683,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(dbschema_tables_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(dbschema_tables_xsd_s)
+        root = root_element_with_xsd(xml, dbschema_tables_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -753,12 +736,7 @@ class XmlaDiscoverReqHandler:
         #                         xml.MEASURE_NAME_SQL_COLUMN_NAME(mes)
         #                         xml.MEASURE_UNQUALIFIED_CAPTION(mes)
         #                         xml.MEASUREGROUP_NAME("default")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_measures_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_measures_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -797,6 +775,11 @@ class XmlaDiscoverReqHandler:
         """
         cdef cypXML xml
         cdef Str result
+        cdef Str catalog_name
+        cdef Str tables_s
+        cdef int ordinal
+        cdef Str dimension_type_s
+        cdef Str dimension_cardinal_s
 
         # xml = xmlwitch.Builder()
         xml = cypXML()
@@ -857,12 +840,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.IS_READWRITE("false")
         #                     xml.DIMENSION_UNIQUE_SETTINGS("1")
         #                     xml.DIMENSION_IS_VISIBLE("true")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_dimensions_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_dimensions_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME
@@ -872,40 +850,26 @@ class XmlaDiscoverReqHandler:
                 and request.Properties.PropertyList.Catalog is not None
             ):
                 self.change_cube(request.Properties.PropertyList.Catalog)
-                ordinal = 1
+                ordinal = 0
+                catalog_name = Str(self.selected_cube.encode("utf8", "replace"))
+                dimension_type_s = Str("3")
+                dimension_cardinal_s = Str("23")
                 for tables in self.executor.get_all_tables_names(ignore_fact=True):
-                    row = root.stag("row")
-                    row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                    row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                    row.stag("DIMENSION_NAME").text(to_str(tables))
-                    row.stag("DIMENSION_UNIQUE_NAME").text(to_str("[" + tables + "]"))
-                    row.stag("DIMENSION_CAPTION").text(to_str(tables))
-                    row.stag("DIMENSION_ORDINAL").text(to_str(str(ordinal)))
-                    row.stag("DIMENSION_TYPE").stext("3")
-                    row.stag("DIMENSION_CARDINALITY").stext("23")
-                    row.stag("DEFAULT_HIERARCHY").text(to_str(
-                                                "[" + tables + "].[" + tables + "]"))
-                    row.stag("IS_VIRTUAL").stext("false")
-                    row.stag("IS_READWRITE").stext("false")
-                    row.stag("DIMENSION_UNIQUE_SETTINGS").stext("1")
-                    row.stag("DIMENSION_IS_VISIBLE").stext("true")
                     ordinal += 1
+                    tables_s = Str(tables.encode("utf8", "replace"))
+                    row = root.stag("row")
+                    fill_dimension_xml(
+                        row,
+                        catalog_name,
+                        tables_s,
+                        ordinal,
+                        dimension_type_s,
+                        dimension_cardinal_s
+                    )
                 # for measure
+                ordinal += 1
                 row = root.stag("row")
-                row.stag("CATALOG_NAME").text(to_str(self.selected_cube))
-                row.stag("CUBE_NAME").text(to_str(self.selected_cube))
-                row.stag("DIMENSION_NAME").stext("Measures")
-                row.stag("DIMENSION_UNIQUE_NAME").stext("[Measures]")
-                row.stag("DIMENSION_CAPTION").stext("Measures")
-                row.stag("DIMENSION_ORDINAL").text(to_str(str(ordinal)))
-                row.stag("DIMENSION_TYPE").stext("2")
-                row.stag("DIMENSION_CARDINALITY").stext("0")
-                row.stag("DEFAULT_HIERARCHY").stext("[Measures]")
-                row.stag("IS_VIRTUAL").stext("false")
-                row.stag("IS_READWRITE").stext("false")
-                row.stag("DIMENSION_UNIQUE_SETTINGS").stext("1")
-                row.stag("DIMENSION_IS_VISIBLE").stext("true")
-
+                fill_dimension_measures_xml(row, catalog_name, ordinal)
         # return str(xml)
         result = xml.dump()
         return result.bytes().decode("utf8")
@@ -1015,12 +979,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.HIERARCHY_IS_VISIBLE("true")
         #                     xml.HIERARCHY_ORIGIN("1")
         #                     xml.INSTANCE_SELECTION("0")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_hierarchies_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_hierarchies_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1187,12 +1146,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.LEVEL_DBTYPE("130")
         #                     xml.LEVEL_KEY_CARDINALITY("1")
         #                     xml.LEVEL_ORIGIN("2")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_levels_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_levels_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1296,12 +1250,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.DESCRIPTION("-")
         #                     xml.IS_WRITE_ENABLED("true")
         #                     xml.MEASUREGROUP_CAPTION("default")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_measuresgroups_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_measuresgroups_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1367,12 +1316,7 @@ class XmlaDiscoverReqHandler:
         #                         xml.DIMENSION_IS_VISIBLE("true")
         #                         xml.DIMENSION_IS_FACT_DIMENSION("false")
         #                         xml.DIMENSION_GRANULARITY("[{0}].[{0}]".format(tables))
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_measuresgroups_dimensions_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_measuresgroups_dimensions_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.CUBE_NAME == self.selected_cube
@@ -1487,12 +1431,7 @@ class XmlaDiscoverReqHandler:
         #                         xml.PROPERTY_NAME(prop_name)
         #                         xml.PROPERTY_CAPTION(properties_captions[idx])
         #                         xml.DATA_TYPE(properties_datas[idx])
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_properties_properties_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_properties_properties_xsd_s)
         if request.Restrictions.RestrictionList:
             if (
                 request.Restrictions.RestrictionList.PROPERTY_TYPE == 2
@@ -1667,12 +1606,7 @@ class XmlaDiscoverReqHandler:
         #                     xml.MEMBER_KEY(separated_tuple[-1])
         #                     xml.IS_PLACEHOLDERMEMBER("false")
         #                     xml.IS_DATAMEMBER("false")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_members_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_members_xsd_s)
         if request.Restrictions.RestrictionList:
             self.change_cube(request.Properties.PropertyList.Catalog)
 
@@ -1786,12 +1720,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(discover_schema_rowsets_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_schema_rowsets_xsd_s)
+        root = root_element_with_xsd(xml, discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1818,12 +1747,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(discover_schema_rowsets_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_schema_rowsets_xsd_s)
+        root = root_element_with_xsd(xml, discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1850,12 +1774,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(discover_schema_rowsets_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_schema_rowsets_xsd_s)
+        root = root_element_with_xsd(xml, discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1882,12 +1801,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(mdschema_functions_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(mdschema_functions_xsd_s)
+        root = root_element_with_xsd(xml, mdschema_functions_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1914,12 +1828,7 @@ class XmlaDiscoverReqHandler:
         #         },
         #     ):
         #         xml.write(discover_schema_rowsets_xsd)
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_schema_rowsets_xsd_s)
+        root = root_element_with_xsd(xml, discover_schema_rowsets_xsd_s)
 
         # return str(xml)
         result = xml.dump()
@@ -1948,12 +1857,7 @@ class XmlaDiscoverReqHandler:
         #             xml.EnumName("ProviderType")
         #             xml.ElementName("TDP")
         #             xml.EnumType("string")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_enumerators_xsd_s)
+        root = root_element_with_xsd(xml, discover_enumerators_xsd_s)
         row = root.stag("row")
         row.stag("EnumName").stext("ProviderType")
         row.stag("ElementName").stext("TDP")
@@ -1984,12 +1888,7 @@ class XmlaDiscoverReqHandler:
         #         with xml.row:
         #             xml.Keyword("aggregate")
         #             xml.Keyword("ancestors")
-        ret = xml.stag("return")
-        root = ret.stag("root")
-        root.sattr("xmlns", "urn:schemas-microsoft-com:xml-analysis:rowset")
-        root.sattr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema")
-        root.sattr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        root.append(discover_keywords_xsd_s)
+        root = root_element_with_xsd(xml, discover_keywords_xsd_s)
         row = root.stag("row")
         row.stag("Keyword").stext("aggregate")
         row.stag("Keyword").stext("ancestors")
