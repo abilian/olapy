@@ -1,13 +1,14 @@
-from olapy.stdlib.string cimport Str
 from libcythonplus.list cimport cyplist
+from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
-from olapy.cypxml.cypxml cimport Elem
+from olapy.cypxml cimport Elem
 from olapy.core.services.utils cimport bracket, bracket2
 from olapy.core.services.discover_properties_items cimport (
     properties_names,
     properties_captions,
     properties_datas
 )
+
 
 cdef void fill_dimension(Elem, Str, Str, int, Str, Str) nogil
 cdef void fill_dimension_measures(Elem, Str, int) nogil

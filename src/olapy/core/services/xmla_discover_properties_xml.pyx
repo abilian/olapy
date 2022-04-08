@@ -1,20 +1,6 @@
 from olapy.stdlib.string cimport Str
-from olapy.stdlib.format cimport format
-from olapy.cypxml cimport cypXML
-from olapy.cypxml.cypxml cimport Elem
-from libc.stdlib  cimport getenv
-
-
-cdef Str username() nogil:
-    cdef char * u
-    cdef Str result
-
-    u = getenv("USERNAME")
-    if u is not NULL:
-        result = Str(u)
-        if result.__len__() > 0:
-            return result
-    return Str("default")
+from olapy.cypxml cimport cypXML, Elem
+from olapy.core.services.utils cimport username
 
 
 cdef Elem _fill_properties(

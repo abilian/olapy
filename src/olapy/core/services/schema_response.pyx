@@ -1,7 +1,8 @@
-from olapy.stdlib.string cimport Str
 from libcythonplus.list cimport cyplist
-from olapy.core.services.structures cimport SchemaResponse
+from olapy.stdlib.string cimport Str
 from olapy.cypxml cimport cypXML
+from olapy.core.services.structures cimport SchemaResponse
+
 
 discover_schema_rowsets_xsd_s = Str("""
 <xsd:schema elementFormDefault="qualified"

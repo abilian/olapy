@@ -1,5 +1,5 @@
-from olapy.stdlib.string cimport Str
 from libcythonplus.list cimport cyplist
+from olapy.stdlib.string cimport Str
 
 
 cdef cyplist[Str] _make_properties_names() nogil:

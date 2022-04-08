@@ -1,3 +1,8 @@
+"""
+cython+ port: this python file now only used by:
+    dict_discover_request_handler.py
+"""
+
 discover_schema_rowsets_response_rows = [
     {
         "SchemaName": "DBSCHEMA_CATALOGS",

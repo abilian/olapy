@@ -1,6 +1,19 @@
-from olapy.stdlib.string cimport Str
+from libc.stdlib  cimport getenv
 from libcythonplus.list cimport cyplist
+from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
+
+
+cdef Str username() nogil:
+    cdef char * u
+    cdef Str result
+
+    u = getenv("USERNAME")
+    if u is not NULL:
+        result = Str(u)
+        if result.__len__() > 0:
+            return result
+    return Str("default")
 
 
 cdef Str bracket(Str s) nogil:

@@ -1,5 +1,5 @@
-from olapy.stdlib.string cimport Str
 from libcythonplus.list cimport cyplist
+from olapy.stdlib.string cimport Str
 
 
 cdef cypclass STuple:

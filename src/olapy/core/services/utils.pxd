@@ -1,7 +1,10 @@
+from libc.stdlib  cimport getenv
 from libcythonplus.list cimport cyplist
 from olapy.stdlib.string cimport Str
 from olapy.stdlib.format cimport format
 
+
+cdef Str username() nogil
 cdef Str bracket(Str) nogil
 cdef Str bracket2(Str) nogil
 cdef Str dot_bracket(cyplist[Str]) nogil

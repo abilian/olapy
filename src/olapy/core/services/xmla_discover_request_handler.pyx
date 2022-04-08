@@ -5,13 +5,19 @@ requests and responses."""
 import os
 import uuid
 from urllib.parse import urlparse
-
 # import xmlwitch
 
-#from olapy.core.mdx.executor import MdxEngine
 from libcythonplus.list cimport cyplist
-from olapy.core.parse import split_tuple
+from olapy.stdlib.string cimport Str
+from olapy.stdlib.format cimport format
+from olapy.cypxml cimport cypXML, Elem, to_str
 
+try:
+    from sqlalchemy import create_engine
+except ImportError:
+    pass
+
+from olapy.core.parse import split_tuple
 from olapy.core.services.structures cimport STuple, RowTuples, SchemaResponse
 from olapy.core.services.xmla_discover_literals_response_rows_s cimport discover_literals_response_rows_l
 from olapy.core.services.xmla_discover_schema_rowsets_response_rows_s cimport discover_schema_rowsets_response_rows_l
@@ -19,11 +25,6 @@ from olapy.core.services.xmla_discover_schema_rowsets_response_items cimport (
     MDSCHEMA_HIERARCHIES_sr, MDSCHEMA_MEASURES_sr, DBSCHEMA_TABLES_sr,
     DISCOVER_DATASOURCES_sr, DISCOVER_INSTANCES_sr, DISCOVER_KEYWORDS_sr)
 from olapy.core.services.schema_response cimport discover_schema_rowsets_response_str
-
-# from ..services.xmla_discover_request_utils import (
-#     #discover_literals_response_rows,
-#     discover_schema_rowsets_response_rows,
-# )
 
 from olapy.core.services.xmla_discover_xsds_s cimport (
     dbschema_catalogs_xsd_s,
@@ -70,18 +71,7 @@ from olapy.core.services.xmla_discover_fill_xml cimport (
     fill_mds_members_b,
 )
 
-from olapy.stdlib.string cimport Str
-from olapy.stdlib.format cimport format
-from olapy.cypxml cimport cypXML, to_str
-from olapy.cypxml.cypxml cimport Elem
-
-try:
-    from sqlalchemy import create_engine
-except ImportError:
-    pass
-
 # noinspection PyPep8Naming
-
 
 
 cdef Elem root_element_with_xsd(cypXML xml, Str xsd) nogil:
