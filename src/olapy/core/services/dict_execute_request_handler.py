@@ -99,7 +99,6 @@ class DictExecuteReqHandler:
             xml["HIERARCHY_UNIQUE_NAME"] = "[Measures]"
 
     def _gen_xs0_parent(self, xml, tuple, split_df, first_att):
-
         parent = ".".join(map(lambda x: "[" + str(x) + "]", tuple[first_att - 1 : -1]))
         if parent:
             parent = "." + parent

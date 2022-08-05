@@ -111,7 +111,8 @@ def get_response(
     properties = Propertieslist()
     properties.PropertyList = property  # type: ignore
 
-    if xmla_request_params.get("mdx_query"):  #  Execute request
+    # Execute request
+    if xmla_request_params.get("mdx_query"):
         request = ExecuteRequest()
         request.Command = Command(  # type: ignore
             Statement=xmla_request_params.get("mdx_query")
@@ -121,7 +122,8 @@ def get_response(
 
         return xmla_service.Execute(request)
 
-    else:  #  Discover request
+    # Discover request
+    else:
         request = DiscoverRequest()  # type: ignore
         restriction = Restriction(  # type: ignore
             **xmla_request_params.get("restrictions")
